@@ -1,0 +1,169 @@
+/*
+ * Application styles that control the main layout.
+ * @author Kelsey Dedoshka
+ * @author Frank Wood
+ */
+
+/*
+ * Global browser settings.
+ */
+
+html, body, {
+    // We will control the margins, paddings and border.
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    // Normalize font, line-height so we can use 'em' sizes.
+    font-size: 100%;
+    line-height: 1em;
+
+    // Makes sure the html/body fills the entire browser view.
+    // This is needed so that the child containers can fill as well.
+    height: 100%
+}
+
+/*
+ * Mast
+ *  -Fixed to the top of the browser
+ *  -doesn't scroll
+ */
+
+#mast {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+
+    height: $mastHeight;
+    line-height: $mastHeight;
+
+    z-index: 100;
+
+    box-sizing: border-box;
+    padding: 0px 16px 0px 0px;
+
+    overflow: hidden;
+
+    background-color: $mastBackgroundColor;
+    color: $mastTextColor;
+
+    border-bottom: solid 1px $mastBorderBottomColor;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+#mastLogo {
+    box-sizing: border-box;
+    height: $mastHeight;
+    padding: 4px;
+}
+
+/*
+ * NavPane
+ *  -positioned under the mast to the left
+ *  -fills to the bottom
+ *  -no horizontal overflow (manually configure width based on nav items)
+ *  -will scroll vertically if needed
+ */
+
+#navPane {
+    position: absolute;
+    top: $mastHeight;
+    width: $navPaneWidth;
+    bottom: 0px;
+
+    z-index: 10;
+
+    box-sizing: border-box;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background-color: $navPaneBackgroundColor;
+    color: $navPaneTextColor;
+    border-right: solid 1px $navPaneBorderRightColor;
+    box-shadow: 2px 0 5px -2px black;
+
+    >.group {
+        margin: 20px;
+
+        .heading {
+            font-weight: bold;
+            color: $navGroupHeadingColor;
+            padding: 5px;
+        }
+
+        ul {
+            margin: 10px 0px 0px 0px;
+            list-style-type: none;
+            font-size: 1.1em;
+        }
+
+        li {
+            margin: 5px;
+            padding: 8px 0px;
+        }
+
+        a {
+            color: $navItemNormalColor;
+            text-decoration: none;
+            &:hover {
+                color: $navItemHoverColor;
+            }
+            &.active {
+                color: $navItemActiveColor;
+            }
+        }
+    }
+
+    >hr {
+        border: none;
+        height: 2px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        background-color: $navGroupSeparatorColor;
+    }
+}
+
+.navPaneTrans-enter {
+    left: -$navPaneWidth;
+    transition: 0.3s;
+}
+
+.navPaneTrans-enter-active {
+    left: 0px;
+}
+
+.navPaneTrans-leave {
+    left: 0px;
+    transition: 0.3s
+}
+
+.navPaneTrans-leave-active {
+    left: -$navPaneWidth;
+}
+
+/*
+ * ViewPane
+ *  -where the router puts the active route
+ *  -fills to the bottom and to the right
+ *  -will scroll vertically and horizontally if needed
+ */
+
+#viewPane {
+    position: absolute;
+    top: $mastHeight;
+    left: 0;
+    bottom: 0px;
+    right: 0px;
+
+    overflow: auto;
+
+    background-color: $viewPaneBackgroundColor;
+
+    &.navPaneShown {
+        left: $navPaneWidth;
+    }
+}

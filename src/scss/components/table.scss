@@ -1,0 +1,24 @@
+/*
+ * Custom table styles.
+ * @author Kelsey Dedoshka
+ */
+
+.defaultTable {
+    tr:nth-child(even) {
+        background-color: #F2F2F2;
+    }
+
+}
+
+.basicTable {
+    width: 100%;
+
+    tr td:first-child {
+        font-weight: bold;
+        padding-right: 20px;
+    }
+
+    tr td:nth-child(2) {
+        color: gray;
+    }
+}

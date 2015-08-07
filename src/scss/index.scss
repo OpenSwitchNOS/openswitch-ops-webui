@@ -1,0 +1,80 @@
+/*
+ * Main entry point for loading the styles.
+ * @author Kelsey Dedoshka
+ * @author Frank Wood
+ */
+
+// mast, routeView
+$mastHeight: 3em;
+
+// mast
+$mastBackgroundColor: white;
+$mastTextColor: black;
+$mastBorderBottomColor: lightgrey;
+
+// NavPane, viewPane
+$navPaneWidth: 150px;
+
+// NavPane
+$navPaneBackgroundColor: #404040;
+$navPaneTextColor: black;
+$navGroupHeadingColor: grey;
+$navGroupSeparatorColor: #383838;
+$navPaneBorderRightColor: #2e2e2e;
+$navItemNormalColor: #bbbbbb;
+$navItemHoverColor: white;
+$navItemActiveColor: #0096d6;
+
+// viewPane & viewBox
+$viewPaneBackgroundColor: #F5F5F5;
+$viewBoxBackgroundColor: white;
+$viewBoxShadow: 0px 0px 3px lightgrey;
+$viewBoxHeaderBorderBottom: solid 1px lightgrey;
+$viewBoxHeaderFontSize: 1.5em;
+$viewBoxHeaderFontWeight: 100;
+
+// icons (font-awesome and grommet)
+$iconNormalColor: #999;
+$iconHoverColor: black;
+
+@import '~grommet/scss/hpe/index';
+
+@import 'app.scss';
+
+// component styles
+@import 'components/actionIcon.scss';
+@import 'components/view.scss';
+@import 'components/boxGraphic.scss';
+@import 'components/port.scss';
+@import 'components/colorBlock.scss';
+@import 'components/vlanKey.scss';
+@import 'components/table.scss';
+@import 'components/propTable.scss';
+@import 'components/statusText.scss';
+
+// FIXME: delete me
+$tilePanelBackgroundColor: white;
+$tilePanelShadowColor: lightgrey;
+$tilePanelSeparatorColor: lightgrey;
+@import 'components/tile.scss';
+
+// view styles
+
+
+// Turn off all scroll bars?
+// ::-webkit-scrollbar {
+//     display: none;
+// }
+
+// Notes on media CSS...
+//
+// If [device width] is greater than or equal to min-width than do...
+// If [device width] is less than or equal to max-width than do...
+// $smallScreen: 'only screen and (max-width: 640px)';
+// $mediumScreen: 'only screen and (min-width: 641px) and (max-width: 1024px)';
+// $largeScreen: 'only screen and (min-width: 1025px)';
+//
+// Usage:
+// @media #{$smallScreen}
+// @media #{$mediumScreen}
+// @media #{$largeScreen}

@@ -1,0 +1,20 @@
+# Ignore all build files
+
+build
+
+
+# Ignore 3rd party dependencies
+
+node_modules
+
+
+# Ignore all log directories & files
+
+logs
+*.log
+
+
+# Ignore any coverage directories (tools like istanbul)
+
+coverage
+

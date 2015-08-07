@@ -1,0 +1,65 @@
+/*
+ * Port graphic styles.
+ * @author Kelsey Dedoshka
+ */
+
+$portColor: #3D3D3D;
+
+.portGraphicBase {
+    width: 65px;
+    height: 55px;
+    background-color: #DEDEDE;
+    border-color: $portColor;
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 4px;
+    margin-top: 15px;
+    margin-left: 10px;
+    padding: 5px;
+    padding-top: 0px;
+}
+
+.portGraphicTier1 {
+    background-color: $portColor;
+    width: 20px;
+    height: 5px;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    margin-left: 15px;
+    margin-top: 1px;
+}
+
+.portGraphicTier2 {
+    background-color: $portColor;
+    width: 30px;
+    height: 5px;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    margin-left: 10px;
+}
+
+.portGraphicInnerBase {
+    background-color: $portColor;
+    width: 50px;
+    height: 30px;
+    border-radius: 2px;
+    margin-left: 0px;
+    padding: 5px;
+    padding-bottom: 2px;
+}
+
+.prongTable {
+    width: 100%;
+    margin-top: 2px;
+    margin-left: 3px;
+
+    tr td {
+        padding: 0px;
+    }
+}
+
+.prong {
+    width: 3px;
+    height: 20px;
+    background: linear-gradient(#3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%);
+}

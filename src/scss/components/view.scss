@@ -1,0 +1,72 @@
+/*
+ * View styles.
+ * @author Frank Wood
+ */
+
+ // Allows the view box elements to expand when needed in the view pane.
+.viewFill {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    padding: 4px;
+}
+
+// Style a view element to flex in the left-to-right direction,
+// wrapping children.
+.viewRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    min-height: 100px;
+    min-width: 100px;
+}
+
+// Style a view element to flex in the top-to-bottom direction
+.viewCol {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 100px;
+    min-width: 100px;
+}
+
+// Style a view element as a 'viewBox'
+// ...with a background, border, min height/width, etc.
+.viewBox {
+    background-color: $viewBoxBackgroundColor;
+    border-radius: 5px;
+    box-shadow: $viewBoxShadow;
+    margin: 8px;
+    padding: 8px;
+    box-sizing: border-box;
+    min-height: 100px;
+    min-width: 100px;
+}
+
+// Style a view element relative to other siblings (1, 2, or 3).
+.viewFlex0 {
+    flex: 0 0 auto;
+}
+.viewFlex1 {
+    flex: 1;
+}
+.viewFlex2 {
+    flex: 2;
+}
+.viewFlex3 {
+    flex: 3;
+}
+
+// Style the viewBoxHeader (used in the ViewBoxHeader component).
+.viewBoxHeader {
+    box-sizing: border-box;
+    border-bottom: $viewBoxHeaderBorderBottom;
+    display: flex;
+    justify-content: space-between;
+    font-size: $viewBoxHeaderFontSize;
+    line-height: $viewBoxHeaderFontSize;
+    font-weight: $viewBoxHeaderFontWeight;
+}

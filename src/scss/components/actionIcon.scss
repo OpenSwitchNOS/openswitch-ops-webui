@@ -1,0 +1,42 @@
+/*
+ * Custom font-awesome icon styles
+ * @author Frank Wood
+ */
+
+@mixin disableIcon {
+    cursor: default;
+    opacity: 0.3;
+}
+
+// Style the font-awesome icons like grommet icons.
+.actionIcon.fa {
+    width: 48px;
+    text-align: center;
+    color: $iconNormalColor;
+    cursor: pointer;
+    &.disabled {
+        @include disableIcon();
+    }
+    &:not(.disabled) {
+        transition: all 0.3s ease-in-out;
+        &:hover {
+            color: $iconHoverColor;
+        }
+    }
+}
+
+// Style the grommet icons for the disabled state.
+.actionIcon .control-icon {
+    // Make the grommet icons a little smaller or the header title will not be
+    // aligned vertically.
+    height: $viewBoxHeaderFontSize;
+    vertical-align: top;
+}
+
+.actionIcon.disabled .control-icon {
+    @include disableIcon();
+    transition: none;
+    &:hover {
+        stroke: $iconNormalColor;
+    }
+}

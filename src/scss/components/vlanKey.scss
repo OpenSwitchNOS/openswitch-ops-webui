@@ -1,0 +1,31 @@
+/*
+ * VLAN key styles.
+ * @author Kelsey Dedoshka
+ */
+
+.vlanKeyWrapper {
+    margin-left: 20px;
+}
+
+.vlanKeyContainer {
+    position: relative;
+    min-height: 100px;
+    min-width: 150px;
+}
+
+.colorBlockKeyContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.portKeyContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 2px;
+}
+
+.editKeyContainer {
+    padding-left: 20px;
+}

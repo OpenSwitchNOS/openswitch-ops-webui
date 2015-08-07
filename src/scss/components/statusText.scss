@@ -1,0 +1,13 @@
+/*
+ * Status text styles.
+ * @author Frank Wood
+ */
+
+.statusText {
+    .status-icon { // Grommet icon class
+        height: 1em;
+    }
+    span {
+        vertical-align: bottom;
+    }
+}

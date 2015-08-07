@@ -1,0 +1,176 @@
+/*
+ * Box Graphic styles.
+ * @author Kelsey Dedoshka
+ */
+
+$portCornerRadius: 3px;
+
+.boxContainer {
+    width: 100%;
+    height: 160px;
+    border-radius: 5px;
+    background-color: #303030;
+    padding: 10px;
+    padding-right: 15px;
+    padding-left: 50px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    table {
+        margin-top: 5px;
+        margin-bottom: 0px;
+    }
+}
+
+.innerBoxTable {
+    width: 100%;
+    /*background-color: gray;*/
+    /*border-radius: 4px;*/
+    margin-top: 5px;
+}
+
+.portBoxContainer {
+    padding: 3px;
+}
+
+.boxPortBackgroundTop {
+    background-color: gray;
+
+    td:first-child {
+        border-top-left-radius: 4px;
+    }
+
+    td:last-child {
+        border-top-right-radius: 4px;
+    }
+}
+
+.boxPortBackgroundBottom {
+    background-color: gray;
+
+    td:first-child {
+        border-bottom-left-radius: 4px;
+    }
+
+    td:last-child {
+        border-bottom-right-radius: 4px;
+    }
+}
+
+.boxPortBackgroundMiddle {
+    background-color: gray;
+}
+
+.boxPortTop, .boxPortBottom {
+    background-color: black;
+    height: 30px;
+    width: 55px;
+}
+
+.boxPortTop {
+    border-top-left-radius: $portCornerRadius;
+    border-top-right-radius: $portCornerRadius;
+}
+
+.boxPortBottom {
+    border-bottom-left-radius: $portCornerRadius;
+    border-bottom-right-radius: $portCornerRadius;
+}
+
+.boxMiddle, .boxLabels {
+    position: relative;
+    height: 30px;
+}
+
+.boxBlack {
+    position: absolute;
+    left: 0;
+    margin-left: 15px;
+    width: 30px;
+    height: 4px;
+    background-color: black;
+    border-radius: 2.0px;
+}
+
+.boxBlackTop {
+    top: 0;
+}
+
+.boxBlackBottom {
+    bottom: 0;
+}
+
+.arrowBlack {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 10px;
+}
+
+.boxArrowUp {
+    border-bottom: 10px solid black;
+    margin-left: 17px;
+}
+
+.boxArrowDown {
+    border-top: 10px black solid;
+    margin-left: 32px;
+}
+
+.boxPortLabels {
+    width: 100%;
+}
+
+.boxNumLabels {
+    position: absolute;
+    color: #D4D4D4;
+    font-size: 12px;
+    top: 5px;
+}
+
+.boxTopLabels {
+    margin-left: 9px;
+}
+
+.boxBottomLabels {
+    right: 0;
+    margin-right: 7px;
+}
+
+.arrowWhite {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 10px;
+}
+
+.boxArrowUpLabel {
+    border-bottom: 8px solid white;
+    margin-left: 24px;
+}
+
+.boxArrowDownLabel {
+    border-top: 8px solid white;
+    margin-left: 32px;
+}
+
+.portBadgeContainer {
+    margin-top: 0px !important;
+    border-collapse: separate;
+    border-spacing: 3px;
+}
+
+.portBadge {
+    height: 12px;
+    width: 12px;
+    border-radius: 1.0px !important;
+    padding-right: 2px;
+}
