@@ -33,10 +33,10 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/, loader: 'babel',
                 include: [
-                    Path.resolve(__dirname, "src/js"),
+                    Path.resolve(__dirname, 'src/js'),
                     // Needed by Grommet
-                    Path.resolve(__dirname, "node_modules/grommet/components"),
-                    Path.resolve(__dirname, "node_modules/grommet/mixins")
+                    Path.resolve(__dirname, 'node_modules/grommet/components'),
+                    Path.resolve(__dirname, 'node_modules/grommet/mixins')
                 ],
             },
             // Match all .woff (web open font format) files.
@@ -59,14 +59,16 @@ module.exports = {
                 test: /\.scss$/,
                 loader: 'style!css!sass?outputStyle=expanded&' +
                     'includePaths[]=' +
-                        (Path.resolve(process.cwd(), 'node_modules'))
+                        (Path.resolve(__dirname, 'node_modules/grommet/node_modules')) + '&' +
+                        (Path.resolve(__dirname, 'node_modules'))
             },
             // Match all .css files.
             {
                 test: /\.css$/,
                 loader: 'style!css?' +
                     'includePaths[]=' +
-                        (Path.resolve(process.cwd(), 'node_modules'))
+                        (Path.resolve(__dirname, 'node_modules/grommet/node_modules')) + '&' +
+                        (Path.resolve(__dirname, 'node_modules'))
             },
             // Match all .json files.
             // Allows loading JSON as a require module (i.e. package.json).
