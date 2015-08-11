@@ -52,13 +52,19 @@ html, body, {
 
     display: flex;
     justify-content: space-between;
+
+    img {
+        box-sizing: border-box;
+        height: $mastHeight;
+        padding: 4px;
+    }
+
+    i {
+        box-sizing: border-box;
+        // height: $mastHeight;
+    }
 }
 
-#mastLogo {
-    box-sizing: border-box;
-    height: $mastHeight;
-    padding: 4px;
-}
 
 /*
  * NavPane

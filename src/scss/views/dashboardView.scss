@@ -1,0 +1,46 @@
+/*
+ * Dashboard view styles.
+ * @author Frank Wood
+ */
+
+$transDelay: 2s;
+
+.portTopTrans-enter {
+    opacity: 0.01;
+}
+
+.portTopTrans-enter-active {
+    opacity: 1;
+    transition: opacity $transDelay ease-in;
+}
+
+.portTopTrans-leave {
+    opacity: 1;
+}
+
+.portTopTrans-leave-active {
+    opacity: 0.01;
+    transition: opacity $transDelay ease-in;
+}
+
+.vlanTopTrans-enter, {
+    transition: all .5s ease-out;
+    overflow: hidden;
+}
+
+.vlanTopTrans-leave {
+    transition: all .5s ease-out;
+    overflow: hidden;
+}
+
+.vlanTopTrans-enter, .vlanTopTrans-leave.vlanTopTrans-leave-active {
+    opacity: 0;
+    transform: scale(.5, 0);
+    transform-origin: top left;
+}
+
+.vlanTopTrans-leave, .vlanTopTrans-enter.vlanTopTrans-enter-active {
+    opacity: 1;
+    transform: scale(1, 1);
+    transform-origin: top center;
+}

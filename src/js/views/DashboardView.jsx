@@ -3,7 +3,8 @@
  * @author Frank Wood
  */
 
-var React = require('react'),
+var React = require('react/addons'),
+    ReactCSSTransitionGroup = React.addons.CSSTransitionGroup,
     Reflux = require('reflux'),
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
@@ -19,6 +20,10 @@ var React = require('react'),
 function t(key) {
     return I18n.text('views.dashboard.' + key);
 }
+
+// FIXME: remove this
+var startPort = 110;
+var remove = true;
 
 module.exports = React.createClass({
 
@@ -39,9 +44,11 @@ module.exports = React.createClass({
     autoRefresh: function() {
         var recurFn = this.autoRefresh;
         DashboardActions.loadSysInfo();
+        startPort++;
+        remove = !remove;
         autoRefreshTimeout = setTimeout(function() {
             recurFn();
-        }, 1000);
+        }, 3000);
     },
 
     onClickEditSysInfo: function() {
@@ -84,18 +91,22 @@ module.exports = React.createClass({
         );
     },
 
-    mkPortMeter: function() {
+    mkPortMeter: function(portNum) {
         // FIXME: localize the text
+        var somePercent = Math.floor((Math.random() * 100) + 1);
         return (
-            <GMeter value={45}
-                min={ { value: 0, label: '0 GB' } }
-                max={ { value: 80, label: '80 GB' } }
-                thresholds={[
-                    { label: 'OK', value: 0, colorIndex: 'ok' },
-                    { label: 'Warning', value: 60, colorIndex: 'warning' },
-                    { label: 'Error', value: 70, colorIndex: 'error' }
-                ]}
-                units="GB" />
+            <div>
+                <div>{'Port: ' + portNum}</div>
+                <GMeter value={somePercent}
+                    min={ { value: 0, label: '0%' } }
+                    max={ { value: 100, label: '100%' } }
+                    thresholds={[
+                        { label: 'OK', value: 0, colorIndex: 'ok' },
+                        { label: 'Warning', value: 75, colorIndex: 'warning' },
+                        { label: 'Error', value: 90, colorIndex: 'error' }
+                    ]}
+                    units="%" />
+            </div>
         );
     },
 
@@ -147,10 +158,28 @@ module.exports = React.createClass({
 
                     <div className="viewBox viewFlex1">
                         <ViewBoxHeader title={t('portTopUtil')} />
+                        <div className="viewCol">
+                            <ReactCSSTransitionGroup
+                                transitionName="portTopTrans">
+                                <div key={'k' + 100}>{this.mkPortMeter(100)}</div>
+                                <div key={'k' + startPort}>{this.mkPortMeter(startPort)}</div>
+                                <div key={'k' + 200}>{this.mkPortMeter(200)}</div>
+                                <div key={'k' + startPort+1}>{this.mkPortMeter(startPort+1)}</div>
+                            </ReactCSSTransitionGroup>
+                        </div>
                     </div>
 
                     <div className="viewBox viewFlex1">
-                        <ViewBoxHeader title={t('syslog')} />
+                        <ViewBoxHeader title={t('vlanTopUtil')} />
+                        <div className="viewCol">
+                            <ReactCSSTransitionGroup
+                                transitionName="vlanTopTrans">
+                                {remove ? null : <div key={'k' + startPort}>{this.mkPortMeter(startPort)}</div> }
+                                <div key={'k' + 100}>{this.mkPortMeter(100)}</div>
+                                <div key={'k' + 200}>{this.mkPortMeter(200)}</div>
+                                <div key={'k' + 300}>{this.mkPortMeter(200)}</div>
+                            </ReactCSSTransitionGroup>
+                        </div>
                     </div>
 
                 </div>

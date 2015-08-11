@@ -49,7 +49,9 @@ module.exports = {
                 cpu: 'CPU Load',
                 memory: 'Memory',
                 storage: 'Storage',
-                temp: 'Temperature'
+                temp: 'Temperature',
+                portTopUtil: 'Top Port Utilization',
+                vlanTopUtil: 'Top VLAN Utilization'
             },
             ports: {
                 name: 'Ports'

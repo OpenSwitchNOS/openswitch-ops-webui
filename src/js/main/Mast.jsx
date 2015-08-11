@@ -12,7 +12,7 @@ var React = require('react'),
     SystemInfoStore = require('SystemInfoStore'),
     SystemInfoActions = require('SystemInfoActions'),
     UserStore = require('UserStore'),
-    ClassNames = require('classnames');
+    ActionIcon = require('ActionIcon');
 
 module.exports = React.createClass({
 
@@ -35,19 +35,21 @@ module.exports = React.createClass({
             sysName = 'Serial#', //this.state.sys.name,
             sysLoc = 'alswitch3.rose.hp.com', //this.state.sys.location,
             user = this.state.user.name,
-            showNavPane = this.state.render.showNavPane,
-            navToggleCls = ClassNames(
-                'faClickable', 'fa', 'fa-lg',
-                { 'fa-chevron-left': showNavPane },
-                { 'fa-chevron-right': !showNavPane }
+            showToggleIcon = this.state.render.showNavPane,
+            chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
+            toggleIcon = (
+                <ActionIcon
+                    className='fa-lg'
+                    fa={chevron}
+                    onClick={RenderActions.toggleNavPane}
+                />
             );
 
         return (
             <div id="mast">
 
                 <span>
-                    <i className={navToggleCls}
-                        onClick={RenderActions.toggleNavPane} />
+                    {toggleIcon}
                     <img id="mastLogo" src="OpenHalonLogo.png" />
                 </span>
 

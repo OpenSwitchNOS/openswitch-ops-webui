@@ -16,7 +16,8 @@ module.exports = React.createClass({
     propTypes: {
         fa: PropTypes.string,
         icon: PropTypes.element,
-        onClick: PropTypes.func
+        onClick: PropTypes.func,
+        className: PropTypes.string
     },
 
     render: function() {
@@ -25,6 +26,7 @@ module.exports = React.createClass({
         if (this.props.icon) {
             cls = ClassNames(
                 'actionIcon',
+                this.props.className,
                 { disabled: !this.props.onClick }
             );
 
@@ -37,6 +39,7 @@ module.exports = React.createClass({
 
         cls = ClassNames(
             'actionIcon',
+            this.props.className,
             'fa',
             'fa-' + this.props.fa,
             { disabled: !this.props.onClick }
