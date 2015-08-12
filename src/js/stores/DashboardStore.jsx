@@ -4,7 +4,7 @@
  */
 
 var Reflux = require('reflux'),
-DashboardActions = require('DashboardActions');
+    DashboardActions = require('DashboardActions');
 
 module.exports = Reflux.createStore({
 

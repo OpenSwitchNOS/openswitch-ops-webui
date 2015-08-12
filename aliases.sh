@@ -1,6 +1,9 @@
 # Put this in your .bash_aliases:
 # . <path-to-this-file>/aliases.sh
 
+# TODO: sourcemap back into Halon install
+# TODO: Halon build should be: 'npm run test; npm run buildprod'
+
 alias wb='npm run build'
 alias wbw='npm run buildwatch'
 alias wbd='npm run builddebug'

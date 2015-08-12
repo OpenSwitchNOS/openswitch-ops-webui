@@ -17,7 +17,9 @@
 // wrapping children.
 .viewRow {
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
+    -webkit-flex-direction: row;
     flex-wrap: wrap;
     box-sizing: border-box;
     min-height: 100px;
@@ -27,7 +29,9 @@
 // Style a view element to flex in the top-to-bottom direction
 .viewCol {
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
+    -webkit-flex-direction: column;
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
@@ -49,15 +53,19 @@
 // Style a view element relative to other siblings (1, 2, or 3).
 .viewFlex0 {
     flex: 0 0 auto;
+    -webkit-flex: 0 0 auto;
 }
 .viewFlex1 {
     flex: 1;
+    -webkit-flex: 1;
 }
 .viewFlex2 {
     flex: 2;
+    -webkit-flex: 2;
 }
 .viewFlex3 {
     flex: 3;
+    -webkit-flex: 3;
 }
 
 // Style the viewBoxHeader (used in the ViewBoxHeader component).
@@ -65,7 +73,9 @@
     box-sizing: border-box;
     border-bottom: $viewBoxHeaderBorderBottom;
     display: flex;
+    display: -webkit-flex;
     justify-content: space-between;
+    -webkit-justify-content: space-between;
     font-size: $viewBoxHeaderFontSize;
     line-height: $viewBoxHeaderFontSize;
     font-weight: $viewBoxHeaderFontWeight;
