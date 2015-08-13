@@ -53,8 +53,12 @@ module.exports = {
                 portTopUtil: 'Top Port Utilization',
                 vlanTopUtil: 'Top VLAN Utilization'
             },
-            ports: {
-                name: 'Ports'
+            portMonitor: {
+                name: 'Monitor',
+                portUtil: 'Port Utilization - Port '
+            },
+            portConfig: {
+                name: 'Config'
             },
             ip: {
                 name: 'IP'

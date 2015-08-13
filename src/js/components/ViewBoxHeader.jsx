@@ -33,7 +33,7 @@ module.exports = React.createClass({
         return (
             <div className="viewBoxHeader">
                 {this.props.title}
-                <div>{icons}</div>
+                <div className="flexIcons">{icons}</div>
             </div>
         );
     }

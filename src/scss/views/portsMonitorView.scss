@@ -1,0 +1,86 @@
+/* port monitor view styles
+ * @author Kelsey Dedoshka
+ */
+
+$borderRadius : 5px;
+$detailsHeight: 200px;
+$disabledHeight: $detailsHeight - 30;
+$disabledText: #575757;
+$activeText: white;
+
+//main chart wrapper
+#portStatsChart {
+    width: 100%;
+    height: 350px !important;
+    padding: 20px;
+}
+
+//key toggle toolbar wrapper
+.graphToggleWrapper {
+
+    .toggleText {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 20px;
+    }
+
+    .fa-area-chart {
+        font-size: 24px;
+    }
+
+    //color keys for toolbar key
+    .color0 {
+        color: rgba(0,120,4,1);
+    }
+
+    .color1 {
+        color: rgba(0,88,105,1);
+    }
+
+    .color2 {
+        color: rgba(139,178,0,1);
+    }
+
+    .color3 {
+        color: rgba(60,43,69,1);
+    }
+}
+
+//port details component styles
+.portDetails {
+    .title {
+        font-weight: normal;
+        color: black;
+        font-size: 22px;
+        height: 20px;
+        margin-bottom: 10px;
+    }
+
+    .details {
+        font-weight: bold;
+        font-size: 35px;
+    }
+
+    tr td:first-child {
+        padding-right: 20px;
+        border-right-color: lightgray;
+        border-right-width: 1px;
+        border-right-style: solid;
+    }
+
+    tr td:nth-child(2) {
+        padding-left: 50px;
+    }
+}
+
+//details padding
+.innerContainer {
+    padding: 20px;
+}
+
+//port list drop down menu
+.portSelectionItem {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+}

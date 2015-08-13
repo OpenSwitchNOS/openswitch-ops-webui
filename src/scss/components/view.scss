@@ -79,4 +79,9 @@
     font-size: $viewBoxHeaderFontSize;
     line-height: $viewBoxHeaderFontSize;
     font-weight: $viewBoxHeaderFontWeight;
+
+    //flex icons inline with div components
+    .flexIcons {
+        display: inline-flex;
+    }
 }

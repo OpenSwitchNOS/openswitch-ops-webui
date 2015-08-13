@@ -10,11 +10,12 @@ var React = require('react'),
     DefaultRoute = Router.DefaultRoute,
 
     DashboardView = require('DashboardView'),
-    PortsView = require('PortsView'),
     IpView = require('IpView'),
     LldpView = require('LldpView'),
     MonitorView = require('MonitorView'),
     VlansView = require('VlansView'),
+    PortsMonitorView = require('PortsMonitorView'),
+    PortsConfigView = require('PortsConfigView'),
     TestView1 = require('TestView1'),
     TestView2 = require('TestView2'),
     TestView3 = require('TestView3'),
@@ -25,7 +26,8 @@ var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="dashboard" handler={DashboardView}/>
         <Route name="vlans" handler={VlansView}/>
-        <Route name="ports" handler={PortsView}/>
+        <Route name="portMonitor" handler={PortsMonitorView}/>
+        <Route name="portConfig" handler={PortsConfigView}/>
         <Route name="lldp" handler={LldpView}/>
         <Route name="ip" handler={IpView}/>
         <Route name="monitor" handler={MonitorView}/>
