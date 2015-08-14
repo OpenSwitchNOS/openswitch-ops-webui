@@ -5,10 +5,13 @@
 
 var Reflux = require('reflux');
 
+// TODO: change the name of this to "global settings" or something.
+
 module.exports = Reflux.createActions([
     'smallScreen',
     'normalScreen',
     'showNavPane',
     'hideNavPane',
-    'toggleNavPane'
+    'toggleNavPane',
+    'login'
 ]);

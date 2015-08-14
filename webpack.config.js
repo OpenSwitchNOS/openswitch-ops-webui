@@ -11,6 +11,7 @@ module.exports = {
     entry: [
         './src/img/favicon.ico',        // file loader copies to the output path
         './src/img/OpenHalonLogo.png',  // file loader copies to the output path
+        './src/img/OpenSwitchLogo.png', // file loader copies to the output path
         './src/index.html',             // file loader copies to the output path
         './src/js/index.jsx'            // entry point
     ],
