@@ -21,7 +21,7 @@ module.exports = Reflux.createStore({
                 { 'main': '#6AB5DE', 'accent': '#2D84B3' },
                 { 'main': '#F5D16E', 'accent': '#C7A23C' },
                 { 'main': '#FE9966', 'accent': '#C76332' }
-        ],
+            ],
         vlanDisplay: [],
         boxPortConfig: {},
         selectedVlan: -1

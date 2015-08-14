@@ -1,5 +1,5 @@
 /*
- * Ports view.
+ * System monitor view.
  * @author Frank Wood
  */
 
@@ -8,13 +8,13 @@ var React = require('react'),
 
 module.exports = React.createClass({
 
-    displayName: 'PortsView',
+    displayName: 'SystemMonitor',
 
     render: function() {
         var t = I18n.text;
         return (
             <div>
-                <h1>{t('views.ports.name')}</h1>
+                <h1>{t('views.systemMonitor.name')}</h1>
             </div>
         );
     }

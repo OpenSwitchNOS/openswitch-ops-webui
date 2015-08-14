@@ -3,6 +3,16 @@
  * @author Frank Wood
  */
 
+
+#dashboardView .utilizationRow {
+    border-bottom: $viewBoxHeaderBorderBottom;
+    margin-bottom: 24px;
+}
+
+#dashboardView .viewBox.box1 {
+    height: 252px;
+}
+
 $transDelay: 2s;
 
 .portTopTrans-enter {

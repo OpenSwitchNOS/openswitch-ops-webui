@@ -16,58 +16,67 @@ module.exports = {
         general: 'General',
         ports: 'Ports',
         vlans: 'VLANs',
-        monitor: 'Monitor',
         routing: 'Routing',
+        test: 'Test',
 
         // Errors.
         err: {
-            dataNotUrls: 'Resulting data is not an array of URLs'
         },
 
         // View specific text.
         views: {
             dashboard: {
                 name: 'Overview',
-                system: 'System',
-                topPortStats: 'Port Top Talkers',
-                info: 'Information',
+                systemInfo: 'Information',
+                systemStatus: 'Status',
                 productName: 'Product',
                 baseMac: 'Base MAC',
-                manufacturedOn: 'Manufactured On',
-                manufacturer: 'Manufactured By',
                 version: 'Version',
                 onieVersion: 'ONIE Version',
-                partNumber: 'Part #',
-                platformName: 'Platform',
-                serialNum: 'Serial #',
                 vendor: 'Vendor',
                 upTime: 'Up Time',
+                error: 'Error',
                 warning: 'Warning',
                 ok: 'OK',
                 fanStatus: 'Fan Status',
                 powerStatus: 'Power Status',
                 cpu: 'CPU Load',
                 memory: 'Memory',
+                memoryUnits: 'GB',
                 storage: 'Storage',
+                storageUnits: 'GB',
                 temp: 'Temperature',
+                tempUnits: 'C',
                 portTopUtil: 'Top Port Utilization',
-                vlanTopUtil: 'Top VLAN Utilization'
+                vlanTopUtil: 'Top VLAN Utilization',
+                port: 'Port',
+                vlan: 'VLAN'
             },
-            ports: {
-                name: 'Ports'
+            systemMonitor: {
+                name: 'System Monitor'
             },
-            ip: {
-                name: 'IP'
+            portMgmt: {
+                name: 'Management'
             },
-            lldp: {
-                name: 'LLDP'
+            portMonitor: {
+                name: 'Monitor',
+                portUtil: 'Port Utilization - Port '
             },
-            monitor: {
+            vlanMgmt: {
+                name: 'Management'
+            },
+            vlanPortConfig: {
+                name: 'Port Config',
+                boxGraphic: 'VLANs'
+            },
+            vlanMonitor: {
                 name: 'Monitor'
             },
-            vlans: {
-                name: 'VLANs',
-                boxGraphic: 'VLANs'
+            staticRoutes: {
+                name: 'Static Routes'
+            },
+            bgp: {
+                name: 'BGP'
             },
             test1: {
                 name: 'Test1',

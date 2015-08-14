@@ -1,5 +1,5 @@
 /*
- * LLDP view.
+ * Static routes view.
  * @author Frank Wood
  */
 
@@ -8,13 +8,13 @@ var React = require('react'),
 
 module.exports = React.createClass({
 
-    displayName: 'LldpView',
+    displayName: 'StaticRoutesView',
 
     render: function() {
         var t = I18n.text;
         return (
             <div>
-                <h1>{t('views.lldp.name')}</h1>
+                <h1>{t('views.staticRoutes.name')}</h1>
             </div>
         );
     }

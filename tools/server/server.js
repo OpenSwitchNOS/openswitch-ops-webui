@@ -11,6 +11,8 @@ var path = require('path'),
 // This is where you can add mock resources.
 require('./vlans')(app);
 require('./sysInfo')(app);
+require('./sysStats')(app);
+require('./ports')(app);
 require('./boxGraphic')(app);
 
 // This will allow the browser to load static files under "./build"

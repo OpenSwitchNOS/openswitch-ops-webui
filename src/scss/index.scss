@@ -13,7 +13,7 @@ $mastTextColor: black;
 $mastBorderBottomColor: lightgrey;
 
 // NavPane, viewPane
-$navPaneWidth: 150px;
+$navPaneWidth: 160px;
 
 // NavPane
 $navPaneBackgroundColor: #404040;
@@ -52,15 +52,9 @@ $iconHoverColor: black;
 @import 'components/propTable.scss';
 @import 'components/statusText.scss';
 
-// FIXME: delete me
-$tilePanelBackgroundColor: white;
-$tilePanelShadowColor: lightgrey;
-$tilePanelSeparatorColor: lightgrey;
-@import 'components/tile.scss';
-
 // view styles
 @import 'views/dashboardView.scss';
-
+@import 'views/portsMonitorView.scss';
 
 // Turn off all scroll bars?
 // ::-webkit-scrollbar {
