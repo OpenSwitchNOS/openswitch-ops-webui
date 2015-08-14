@@ -9,7 +9,7 @@ var React = require('react'),
 
 module.exports = React.createClass({
 
-    displayName: 'StatusLabel',
+    displayName: 'StatusText',
 
     propTypes: {
         value: PropTypes.string.isRequired,

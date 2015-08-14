@@ -1,18 +1,18 @@
 /*
- * Actions for the Dashboard view.
+ * Actions for System statistics (frequently changes).
  * @author Frank Wood
  */
 
 var Reflux = require('reflux'),
     Request = require('superagent');
 
-var DashboardActions = Reflux.createActions({
+var SystemStatsActions = Reflux.createActions({
     // Actions: load, loadFailed, loadCompleted
-    loadSysInfo: { asyncResult: true }
+    load: { asyncResult: true },
 });
 
-DashboardActions.loadSysInfo.listen(function() {
-    Request.get('/ui/sysinfo').end(function(err, res) {
+SystemStatsActions.load.listen(function() {
+    Request.get('/ui/sysstats').end(function(err, res) {
         if (err) {
             this.failed(err); // Callback action: loadFailed
         } else {
@@ -21,4 +21,4 @@ DashboardActions.loadSysInfo.listen(function() {
     }.bind(this));
 });
 
-module.exports = DashboardActions;
+module.exports = SystemStatsActions;

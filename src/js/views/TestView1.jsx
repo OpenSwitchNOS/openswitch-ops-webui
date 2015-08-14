@@ -10,65 +10,144 @@ var React = require('react'),
     GHelpIcon = require('grommet/components/icons/Help'),
     ReactShuffle = require('react-shuffle');
 
+var NUM_SLOTS_VIEWABLE = 5,
+    NUM_SLOTS = NUM_SLOTS_VIEWABLE * 2,
+    NUM_DATA_IDS = 15;
+
 module.exports = React.createClass({
 
     displayName: 'TestView',
 
     getInitialState: function() {
+        var numSlots = NUM_SLOTS,
+            slots = [];
+        for (var i=0; i<numSlots; i++) {
+            slots.push( { key: 'k' + i, init: true, val: 0 } );
+        }
         return {
-            filter: false,
-            lines: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+            slots: slots
         };
+    },
+
+    componentDidMount: function() {
+        setTimeout(this.clearSlotsInit, 500);
+    },
+
+    clearSlotsInit: function() {
+        var slots = this.state.slots;
+        for (var i=0; i<slots.length; i++) {
+            delete slots[i].init;
+        }
+        this.setState( { slots: slots } );
+    },
+
+    rndDataIds: function(count) {
+        var rndId,
+            ids = [];
+        for (var i=0; i<count; i++) {
+            do {
+                rndId = Math.floor((Math.random() * NUM_DATA_IDS) + 1);
+            } while (0 <= ids.indexOf(rndId));
+            ids.push(rndId);
+        }
+        return ids;
+    },
+
+    rndDataVals: function(count) {
+        var vals = [];
+        for (var i=0; i<count; i++) {
+            vals.push(Math.floor((Math.random() * 100) + 1));
+        }
+        return vals;
+    },
+
+    findSlotIdx: function(id) {
+        var slots = this.state.slots,
+            i;
+        // use existing slot if there is one
+        for (i=0; i<slots.length; i++) {
+            if (slots[i].id === id) {
+                return i;
+            }
+        }
+        // use first free slot
+        for (i=0; i<slots.length; i++) {
+            if (!slots[i].id) {
+                return i;
+            }
+        }
+        return -1;
+    },
+
+    // Simultate new data items arriving.
+    onClickPlus: function() {
+        var slots = this.state.slots,
+            dataIds = this.rndDataIds(NUM_SLOTS_VIEWABLE),
+            dataVals = this.rndDataVals(NUM_SLOTS_VIEWABLE),
+            i, id, val, slotIdx;
+
+        // clear all values (new data arriving).
+        for (i=0; i<slots.length; i++) {
+            slots[i].val = 0;
+        }
+
+        for (i=0; i<NUM_SLOTS_VIEWABLE; i++) {
+            id = dataIds[i];
+            val = dataVals[i];
+            slotIdx = this.findSlotIdx(id);
+            if (slotIdx >= 0) {
+                slots[slotIdx].id = id;
+                slots[slotIdx].val = val;
+            }
+        }
+
+        // sort the slots based on the data val
+        slots = slots.sort(function(a, b) {
+            return b.val - a.val;
+        });
+
+        // clear out IDS of not viewable slots
+        for (i=NUM_SLOTS_VIEWABLE; i<NUM_SLOTS; i++) {
+            delete slots[i].id;
+        }
+
+        this.setState({
+            slots: slots
+        });
+    },
+
+    mkShuffleItems: function() {
+        var divs = [],
+            slots = this.state.slots,
+            slot;
+        for (var i=0; i<slots.length; i++) {
+            slot = slots[i];
+            if (slot.init) {
+                divs.push(
+                    <div style={{ display: 'none' }} key={slot.key} />
+                );
+            } else if (slot.id) {
+                divs.push(
+                    <div key={slot.key}>
+                        {
+                            'id:' + slot.id + ' val:' + slot.val +
+                            ' key:' + slot.key
+                        }
+                    </div>
+                );
+            }
+        }
+        return divs;
     },
 
     onClickHelp: function() {
         alert('Clicked help.');
     },
 
-    nextRnd: function(newLines) {
-        var rnd;
-        do {
-            rnd = Math.floor((Math.random() * 10) + 1);
-        } while (newLines.indexOf(rnd) >= 0);
-        return rnd;
-    },
-
-    mkLines: function(filter) {
-        var newLines = [];
-        newLines.push(this.nextRnd(newLines));
-        newLines.push(this.nextRnd(newLines));
-        newLines.push(this.nextRnd(newLines));
-        newLines.push(this.nextRnd(newLines));
-        newLines.push(this.nextRnd(newLines));
-        if (!filter) {
-            newLines.push(this.nextRnd(newLines));
-            newLines.push(this.nextRnd(newLines));
-            newLines.push(this.nextRnd(newLines));
-            newLines.push(this.nextRnd(newLines));
-            newLines.push(this.nextRnd(newLines));
-        }
-        return newLines;
-    },
-
-    onClickChange: function() {
-        this.setState({
-            lines: this.mkLines()
-        });
-    },
-
-    onClickMinus: function() {
-        var newFilter = !this.state.filter;
-        this.setState({
-            filter: newFilter,
-            lines: this.mkLines(newFilter),
-        });
-    },
-
     render: function() {
 
         var helpTb = {
-            change: <ActionIcon fa="gear" onClick={this.onClickChange} />,
-            minus: <ActionIcon fa="minus" onClick={this.onClickMinus} />,
+            plus: <ActionIcon fa="plus" onClick={this.onClickPlus} />,
             help: <ActionIcon icon=<GHelpIcon /> onClick={this.onClickHelp} />
         };
 
@@ -113,14 +192,7 @@ module.exports = React.createClass({
                             toolbar={helpTb} />
 
                         <ReactShuffle duration={1500} scale={false} fade={true}>
-                            { this.state.lines.map(function(num) {
-                                var key = 'key' + num;
-                                return (
-                                    <div key={key}>
-                                        {key + ' (click above reorder/filter)'}
-                                    </div>
-                                );
-                            })}
+                            { this.mkShuffleItems() }
                         </ReactShuffle>
 
                     </div>

@@ -27,7 +27,10 @@ module.exports = function(app) {
             ],
             all: [
                 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,22,24,40,41,42
-            ]
+            ],
+            stats: {
+                utilization: 10
+            }
         },
         {
             id: 2,
@@ -47,6 +50,9 @@ module.exports = function(app) {
             all: [
                 21,23,25,26,27,28,29,30,31,22,24,32,33
             ],
+            stats: {
+                utilization: 55
+            }
         },
         {
             id: 3,
@@ -65,7 +71,10 @@ module.exports = function(app) {
             ],
             all: [
                 33,50,51,52
-            ]
+            ],
+            stats: {
+                utilization: 85
+            }
         },
         {
             id: 4,
@@ -84,7 +93,54 @@ module.exports = function(app) {
             ],
             all: [
                 35,36,37,38,39,40,41,42,43
-            ]
+            ],
+            stats: {
+                utilization: 95
+            }
+        },
+        {
+            id: 5,
+            name: 'VLAN5',
+            untagged: [
+                '35-40'
+            ],
+            tagged: [
+                '41'
+            ],
+            access: [
+                '42'
+            ],
+            trunk: [
+                '43'
+            ],
+            all: [
+                35,36,37,38,39,40,41,42,43
+            ],
+            stats: {
+                utilization: 9
+            }
+        },
+        {
+            id: 6,
+            name: 'VLAN6',
+            untagged: [
+                '35-40'
+            ],
+            tagged: [
+                '41'
+            ],
+            access: [
+                '42'
+            ],
+            trunk: [
+                '43'
+            ],
+            all: [
+                35,36,37,38,39,40,41,42,43
+            ],
+            stats: {
+                utilization: 100
+            }
         }
     ];
 

@@ -12,7 +12,10 @@ var React = require('react/addons'),
     DashboardStore = require('DashboardStore'),
     StatusText = require('StatusText'),
     GMeter = require('grommet/components/Meter'),
-    ReactShuffle = require('react-shuffle');
+    ReactShuffle = require('react-shuffle'),
+    SystemInfoActions = require('SystemInfoActions'),
+    SystemStatsActions = require('SystemStatsActions'),
+    TopUtilizationActions = require('TopUtilizationActions');
 
 var AUTO_REFRESH_MILLIS = 10000,
     autoRefreshTimer;
@@ -24,8 +27,8 @@ function t(key) {
 function mkThresholds(maxVal) {
     return [
         { label: t('ok'), value: 0, colorIndex: 'ok' },
-        { label: t('warn'), value: maxVal * 0.75, colorIndex: 'warning' },
-        { label: t('err'), value: maxVal * 0.90, colorIndex: 'error' }
+        { label: t('warning'), value: maxVal * 0.75, colorIndex: 'warning' },
+        { label: t('error'), value: maxVal * 0.90, colorIndex: 'error' }
     ];
 }
 
@@ -48,11 +51,9 @@ module.exports = React.createClass({
     autoRefresh: function() {
         var recurFn = this.autoRefresh;
 
-        // FIXME actions
-        // DashboardActions.loadInfo();
-        // DashboardActions.loadStats();
-        // DashboardActions.loadTopPorts();
-        // DashboardActions.loadTopVlans();
+        SystemInfoActions.load();
+        SystemStatsActions.load();
+        TopUtilizationActions.load();
 
         autoRefreshTimer = setTimeout(function() {
             recurFn();
@@ -75,15 +76,17 @@ module.exports = React.createClass({
     },
 
     mkSysStatusPropData: function() {
-        var si = this.state.sysInfo;
-        // TODO: get system status data (fan, power)
+        var si = this.state.sysStats,
+            fan = si.fan_status,
+            pwr = si.power_status;
+
         return [
             [
                 t('fanStatus'),
-                <StatusText value="warning" text={t('warn')} />
+                fan ? <StatusText value={fan} text={t(fan)} /> : null
             ], [
                 t('powerStatus'),
-                <StatusText value="ok" text={t('ok')} />
+                pwr ? <StatusText value={pwr} text={t(pwr)} /> : null
             ],
             [ t('upTime'), si.up_time ]
         ];
@@ -116,25 +119,29 @@ module.exports = React.createClass({
     },
 
     mkPortUtlMeters: function() {
-        // TODO: get data
-        return [
-            this.mkUtlMeter(t('port'), '1', 50),
-            this.mkUtlMeter(t('port'), '2', 50),
-            this.mkUtlMeter(t('port'), '3', 50),
-            this.mkUtlMeter(t('port'), '4', 50),
-            this.mkUtlMeter(t('port'), '5', 50)
-        ];
+        var ports = this.state.topUtilPorts,
+            meters = [],
+            p;
+        for (var i=0; i<ports.length; i++) {
+            p = ports[i];
+            meters.push(
+                this.mkUtlMeter(t('port'), p.id, p.stats.utilization)
+            )
+        }
+        return meters;
     },
 
     mkVlanUtlMeters: function() {
-        // TODO: get data
-        return [
-            this.mkUtlMeter(t('vlan'), '1', 50),
-            this.mkUtlMeter(t('vlan'), '2', 50),
-            this.mkUtlMeter(t('vlan'), '3', 50),
-            this.mkUtlMeter(t('vlan'), '4', 50),
-            this.mkUtlMeter(t('vlan'), '5', 50)
-        ];
+        var vlans = this.state.topUtilVlans,
+            meters = [],
+            v;
+        for (var i=0; i<vlans.length; i++) {
+            v = vlans[i];
+            meters.push(
+                this.mkUtlMeter(t('vlan'), v.name, v.stats.utilization)
+            )
+        }
+        return meters;
     },
 
     render: function() {
@@ -143,15 +150,7 @@ module.exports = React.createClass({
                     fa="area-chart"
                     onClick={ this.onClickChart } />
             },
-            // TODO: get data
-            cpuVal = 0.3,
-            cpuMaxVal = 1.0,
-            storVal = 10,
-            storMaxVal = 100,
-            memVal = 15,
-            memMaxVal = 16,
-            tempVal = 33,
-            tempMaxVal = 70;
+            si = this.state.sysStats;
 
         return (
             <div id="dashboardView" className="viewRow">
@@ -177,40 +176,36 @@ module.exports = React.createClass({
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('cpu')} toolbar={tb} />
-                        {this.mkMeter(cpuVal, cpuMaxVal, '')}
+                        {this.mkMeter(si.cpu, si.cpu_max, '')}
                     </div>
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('storage')} toolbar={tb} />
-                        {this.mkMeter(storVal, storMaxVal, t('storageUnits'))}
+                        {this.mkMeter(si.stor, si.stor_max, t('storageUnits'))}
                     </div>
                 </div>
 
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('memory')} toolbar={tb} />
-                        {this.mkMeter(memVal, memMaxVal, t('memoryUnits'))}
+                        {this.mkMeter(si.mem, si.mem_max, t('memoryUnits'))}
                     </div>
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('temp')} toolbar={tb} />
-                        {this.mkMeter(tempVal, tempMaxVal, t('tempUnits'))}
+                        {this.mkMeter(si.temp, si.temp_max, t('tempUnits'))}
                     </div>
                 </div>
 
                 <div className="viewBox">
                     <ViewBoxHeader title={t('portTopUtil')} toolbar={tb} />
                     <div className="viewBoxContent">
-                        <ReactShuffle duration={3000} scale={false} fade={true}>
                             { this.mkPortUtlMeters() }
-                        </ReactShuffle>
                     </div>
                 </div>
 
                 <div className="viewBox">
                     <ViewBoxHeader title={t('vlanTopUtil')} toolbar={tb} />
                     <div className="viewBoxContent">
-                        <ReactShuffle duration={3000} scale={false} fade={true}>
                             { this.mkVlanUtlMeters() }
-                        </ReactShuffle>
                     </div>
                 </div>
 

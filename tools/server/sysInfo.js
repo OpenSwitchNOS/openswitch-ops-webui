@@ -1,5 +1,5 @@
 /*
- * Mock SystemInfo resources.
+ * Mock system info resources.
  * @author Frank Wood
  */
 
@@ -18,15 +18,8 @@ module.exports = function(app) {
             part_number: 'HPX8664',
             platform_name: 'Generic-x86-64',
             serial_number: 'X8664001',
-            vendor: 'HP Enterprise',
-            up_time: 0
+            vendor: 'HP Enterprise'
         };
-
-    function runner() {
-        data.up_time = Math.floor(new Date().getTime() / 1000);
-        setTimeout(function() { runner(); }, 1000);
-    }
-    runner();
 
     app.get('/ui/sysinfo', function (req, res) {
         setHdr(res);

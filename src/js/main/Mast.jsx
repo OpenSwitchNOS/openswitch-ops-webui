@@ -9,7 +9,6 @@ var React = require('react'),
     Reflux = require('reflux'),
     RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore'),
-    SystemInfoStore = require('SystemInfoStore'),
     SystemInfoActions = require('SystemInfoActions'),
     UserStore = require('UserStore'),
     ActionIcon = require('ActionIcon');
@@ -20,11 +19,11 @@ module.exports = React.createClass({
 
     mixins: [
         Reflux.connect(RenderStore, 'render'),
-        Reflux.connect(SystemInfoStore, 'sys'),
         Reflux.connect(UserStore, 'user')
     ],
 
     componentDidMount: function() {
+        // FIXME: create a MastStore I think.
         SystemInfoActions.load();
     },
 
@@ -34,7 +33,7 @@ module.exports = React.createClass({
             prod = 'Part#', //this.state.sys.product,
             sysName = 'Serial#', //this.state.sys.name,
             sysLoc = 'alswitch3.rose.hp.com', //this.state.sys.location,
-            user = this.state.user.name,
+            user = 'Carl Spangler',
             showToggleIcon = this.state.render.showNavPane,
             chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
             toggleIcon = (
