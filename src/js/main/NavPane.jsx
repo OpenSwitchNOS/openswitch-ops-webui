@@ -66,29 +66,34 @@ module.exports = React.createClass({
 
                 <NavGroup heading={t('general')}
                     routes={[
-                        'dashboard'
+                        'dashboard',
+                        'systemMonitor'
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('ports')}
                     routes={[
-                        'portMonitor',
-                        'portConfig'
-                    ]}
-                />
-                <NavGroup heading={t('vlans')}
-                    routes={[
-                        'vlans'
+                        'portMgmt',
+                        'portMonitor'
                     ]}
                 />
                 <hr />
-                <NavGroup heading={t('monitor')}
+                <NavGroup heading={t('vlans')}
                     routes={[
-                        'monitor'
+                        'vlanMgmt',
+                        'vlanPortConfig',
+                        'vlanMonitor'
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('routing')}
+                    routes={[
+                        'staticRoutes',
+                        'bgp',
+                    ]}
+                />
+                <hr />
+                <NavGroup heading={t('test')}
                     routes={[
                         'test1',
                         'test2',

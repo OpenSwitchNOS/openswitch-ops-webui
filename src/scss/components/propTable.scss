@@ -5,11 +5,6 @@
 
 .propTable {
 
-    // Default is to try and center the table horizontally within the parent
-    // container. However, it must have a width less than the parent for this
-    // to work.
-    margin: 0 auto;
-
     tr {
         height: 2em;
 

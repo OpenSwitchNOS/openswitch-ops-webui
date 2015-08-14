@@ -1,5 +1,5 @@
 /*
- * Ports view.
+ * Port monitor view.
  * @author Kelsey Dedoshka
  */
 

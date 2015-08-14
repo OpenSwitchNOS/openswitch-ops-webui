@@ -7,12 +7,10 @@ var React = require('react'),
     PropTypes = React.PropTypes,
     Reflux = require('reflux'),
     I18n = require('i18n'),
-    GTiles = require('grommet/components/Tiles'),
-    GTile = require('grommet/components/Tile'),
     GTable = require('grommet/components/Table'),
     GCheckBox = require('grommet/components/CheckBox'),
     GEditIcon = require('grommet/components/icons/Edit'),
-    TilePanel = require('TilePanel'),
+    ViewBoxHeader = require('ViewBoxHeader'),
     BoxGraphic = require('BoxGraphic'),
     Port = require('Port'),
     ColorBlock = require('ColorBlock'),
@@ -76,6 +74,8 @@ var VlanKey = React.createClass({
         color: PropTypes.string.isRequired,
         data: PropTypes.object.isRequired
     },
+
+    // FIXME: localize text
 
     render: function() {
         return (
@@ -214,21 +214,19 @@ module.exports = React.createClass({
     render: function() {
         var t = I18n.text;
         return (
-            <div>
-                <GTiles flush={false}>
-                    <GTile align="start">
-                        <TilePanel
-                            title={t('views.vlans.boxGraphic')}>
-                            <BoxGraphic
-                                    portConfig={this.state.data.boxPortConfig}
-                                    colors={this.state.data.colors}
-                                    selectedVlan={this.state.data.selectedVlan}
-                                    portSelected={this.portSelected}
-                                    vlanStatus={this.state.data.vlanDisplay} />
-                        </TilePanel>
-                    </GTile>
-                </GTiles>
-                <GTiles flush={false}>
+            <div className="viewFill viewCol">
+
+                <div className="viewBox">
+                    <ViewBoxHeader title={t('views.vlans.boxGraphic')} />
+                    <BoxGraphic
+                            portConfig={this.state.data.boxPortConfig}
+                            colors={this.state.data.colors}
+                            selectedVlan={this.state.data.selectedVlan}
+                            portSelected={this.portSelected}
+                            vlanStatus={this.state.data.vlanDisplay} />
+                </div>
+
+                <div className="viewBox viewFlex1">
                     {this.state.data.vlanDisplay.map(function(vlan) {
                         if (vlan.show) {
                             //var editToolbar = { edit: <GEditIcon /> };
@@ -243,31 +241,31 @@ module.exports = React.createClass({
                             //}
 
                             return (
-                                <GTile align="start" key={vlan.id}>
-                                    <TilePanel
+                                <div className="viewBox" key={vlan.id}>
+                                    <ViewBoxHeader
+                                        title={vlan.name} />
+                                        { /*
+
                                         onClickIcon=
                                             {this.editVlan.bind(this,
                                                     vlan.id, vlan.editDisplayState, colorElem)}
-                                        toolbar={{ edit: vlan.toolbar }}
-                                        title={vlan.name}>
+                                        toolbar={{ edit: vlan.toolbar }} />
                                         <VlanKey
                                                 color={colorElem.main}
                                                 accent={colorElem.accent}
                                                 data={vlan.data} />
-                                    </TilePanel>
-                                </GTile>
+                                        */ }
+                                </div>
                             );
                         }
                     }, this)}
-                </GTiles>
-                <GTiles flush={false}>
-                    <GTile align="start">
-                        <TilePanel
-                            title={"All VLANs"}>
-                            <AllVlansTable/>
-                        </TilePanel>
-                    </GTile>
-                </GTiles>
+                </div>
+
+                <div className="viewBox viewFlex1">
+                    <ViewBoxHeader title="All VLANs" />
+                    <AllVlansTable/>
+                </div>
+
             </div>
         );
     }

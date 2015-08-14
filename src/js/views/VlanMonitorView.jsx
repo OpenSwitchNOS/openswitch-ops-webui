@@ -1,5 +1,5 @@
 /*
- * IP view.
+ * VLAN monitor view.
  * @author Frank Wood
  */
 
@@ -8,13 +8,13 @@ var React = require('react'),
 
 module.exports = React.createClass({
 
-    displayName: 'IpView',
+    displayName: 'VlanMonitorView',
 
     render: function() {
         var t = I18n.text;
         return (
             <div>
-                <h1>{t('views.ip.name')}</h1>
+                <h1>{t('views.vlanMonitor.name')}</h1>
             </div>
         );
     }

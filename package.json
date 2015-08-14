@@ -34,7 +34,9 @@
     "font-awesome": "4.4.0",
     "lodash": "3.10.1",
     "grommet": "0.3.1",
-    "chart.js": "1.0.2"
+    "chart.js": "1.0.2",
+    "grommet": "0.3.1",
+    "react-shuffle": "0.1.0"
   },
   "devDependencies": {
     "webpack": "1.11.0",

@@ -43,11 +43,18 @@
     background-color: $viewBoxBackgroundColor;
     border-radius: 5px;
     box-shadow: $viewBoxShadow;
-    margin: 8px;
+    margin-top: 24px;
+    margin-left: 24px;
     padding: 8px;
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+}
+
+// Style the content portion of a viewBox. This is the area right below the
+// header (if there is one).
+.viewBoxContent {
+    margin: 16px;
 }
 
 // Style a view element relative to other siblings (1, 2, or 3).
