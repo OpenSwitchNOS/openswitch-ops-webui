@@ -15,9 +15,13 @@ var React = require('react/addons'),
     ReactShuffle = require('react-shuffle'),
     SystemInfoActions = require('SystemInfoActions'),
     SystemStatsActions = require('SystemStatsActions'),
-    TopUtilizationActions = require('TopUtilizationActions');
+    TopUtilizationActions = require('TopUtilizationActions'),
+    Lodash = require('lodash'),
+    ObjectPath = require('object-path');
 
 var AUTO_REFRESH_MILLIS = 10000,
+    NUM_UTL_VIEW_SLOTS = 5,
+    NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     autoRefreshTimer;
 
 function t(key) {
@@ -36,7 +40,24 @@ module.exports = React.createClass({
 
     displayName: 'DashboardView',
 
-    mixins: [ Reflux.connect(DashboardStore) ],
+    mixins: [ Reflux.listenTo(DashboardStore, 'onLoadAllCompleted') ],
+
+    getInitialState: function() {
+        var portSlots = [],
+            vlanSlots = [];
+        for (var i=0; i<NUM_UTL_SLOTS; i++) {
+            portSlots.push( { key: 'k' + i, init: true, val: 0 } );
+            vlanSlots.push( { key: 'k' + i, init: true, val: 0 } );
+        }
+        return {
+            portSlots: portSlots,
+            vlanSlots: vlanSlots,
+            sysInfo: {},
+            sysStats: {},
+            topUtilPorts: [],
+            topUtilVlans: []
+        };
+    },
 
     componentDidMount: function() {
         this.autoRefresh();
@@ -46,6 +67,74 @@ module.exports = React.createClass({
         if (autoRefreshTimer) {
             clearTimeout(autoRefreshTimer);
         }
+    },
+
+    onLoadAllCompleted: function(data) {
+        var newPortSlots,
+            newVlanSlots;
+
+        newPortSlots = this.updateSlots(this.state.portSlots, data.topUtilPorts,
+            'id', 'stats.utilization');
+
+        newVlanSlots = this.updateSlots(this.state.vlanSlots, data.topUtilVlans,
+            'id', 'stats.utilization');
+
+        this.setState({
+            sysInfo: data.sysInfo,
+            sysStats: data.sysStats,
+            topUtilPorts: data.topUtilPorts,
+            topUtilVlans: data.topUtilVlans,
+            portSlots: newPortSlots,
+            vlanSlots: newVlanSlots
+        });
+    },
+
+    updateSlots: function(slots, dataItems, idKey, valKey) {
+        var di, slotIdx, i, id, val,
+            newSlots = Lodash.cloneDeep(slots);
+
+        for (i=0; i<newSlots.length; i++) {
+            delete newSlots[i].init; // assume already inited by this point
+            newSlots[i].val = 0;
+        }
+
+        for (i=0; i<dataItems.length; i++) {
+            di = dataItems[i];
+            id = ObjectPath.get(di, idKey, 'id');
+            val = ObjectPath.get(di, valKey, 'val');
+            slotIdx = this.findSlotIdx(newSlots, id);
+            if (slotIdx >= 0) {
+                newSlots[slotIdx].id = id;
+                newSlots[slotIdx].val = val;
+            }
+        }
+
+        newSlots = newSlots.sort(function(a, b) {
+            return b.val - a.val;
+        });
+
+        for (i=NUM_UTL_VIEW_SLOTS; i<NUM_UTL_SLOTS; i++) {
+            delete newSlots[i].id;
+        }
+
+        return newSlots;
+    },
+
+    findSlotIdx: function(slots, id) {
+        var i;
+        // use existing slot if there is one
+        for (i=0; i<slots.length; i++) {
+            if (slots[i].id === id) {
+                return i;
+            }
+        }
+        // use first free slot
+        for (i=0; i<slots.length; i++) {
+            if (!slots[i].id) {
+                return i;
+            }
+        }
+        return -1;
     },
 
     autoRefresh: function() {
@@ -93,17 +182,19 @@ module.exports = React.createClass({
     },
 
     mkMeter: function(val, maxVal, units) {
+        var v = val || 0,
+            m = maxVal || 0,
+            u = units || '';
         return (
-            <GMeter className="viewBoxContent" type="arc" value={ val }
+            <GMeter className="viewBoxContent" type="arc" value={ v }
                 min={{ value: 0, label: '0 ' + units }}
-                max={{ value: maxVal, label: maxVal.toString() + ' ' + units }}
-                thresholds={ mkThresholds(maxVal) }
-                units={ units } />
+                max={{ value: m, label: m.toString() + ' ' + u }}
+                thresholds={ mkThresholds(m) }
+                units={ u } />
         );
     },
 
-    mkUtlMeter: function(title, name, val) {
-        var key = title + name;
+    mkUtlMeter: function(key, title, name, val) {
         return (
             <div key={key} className="utilizationRow">
                 <div>
@@ -118,28 +209,14 @@ module.exports = React.createClass({
         );
     },
 
-    mkPortUtlMeters: function() {
-        var ports = this.state.topUtilPorts,
-            meters = [],
-            p;
-        for (var i=0; i<ports.length; i++) {
-            p = ports[i];
+    mkUtlMeters: function(label, slots) {
+        var meters = [],
+            slot;
+        for (var i=0; i<NUM_UTL_VIEW_SLOTS; i++) {
+            slot = slots[i];
             meters.push(
-                this.mkUtlMeter(t('port'), p.id, p.stats.utilization)
-            )
-        }
-        return meters;
-    },
-
-    mkVlanUtlMeters: function() {
-        var vlans = this.state.topUtilVlans,
-            meters = [],
-            v;
-        for (var i=0; i<vlans.length; i++) {
-            v = vlans[i];
-            meters.push(
-                this.mkUtlMeter(t('vlan'), v.name, v.stats.utilization)
-            )
+                this.mkUtlMeter(slot.key, t(label), slot.id, slot.val)
+            );
         }
         return meters;
     },
@@ -198,14 +275,18 @@ module.exports = React.createClass({
                 <div className="viewBox">
                     <ViewBoxHeader title={t('portTopUtil')} toolbar={tb} />
                     <div className="viewBoxContent">
-                            { this.mkPortUtlMeters() }
+                        <ReactShuffle duration={1500} scale={false} fade={true}>
+                            { this.mkUtlMeters('port', this.state.portSlots) }
+                        </ReactShuffle>
                     </div>
                 </div>
 
                 <div className="viewBox">
                     <ViewBoxHeader title={t('vlanTopUtil')} toolbar={tb} />
                     <div className="viewBoxContent">
-                            { this.mkVlanUtlMeters() }
+                        <ReactShuffle duration={1500} scale={false} fade={true}>
+                            { this.mkUtlMeters('vlan', this.state.vlanSlots) }
+                        </ReactShuffle>
                     </div>
                 </div>
 

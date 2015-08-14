@@ -29,6 +29,10 @@ module.exports = function(app) {
 
     function runner() {
         data.up_time = Math.floor(new Date().getTime() / 1000);
+        data.cpu = Math.floor((Math.random() * 9) + 1) / 10;
+        data.stor = Math.floor((Math.random() * 100) + 1);
+        data.mem = Math.floor((Math.random() * 16) + 1);
+        data.temp = Math.floor((Math.random() * 70) + 1);
         setTimeout(function() { runner(); }, 1000);
     }
     runner();

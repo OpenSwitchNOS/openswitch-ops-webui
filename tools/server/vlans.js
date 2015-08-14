@@ -144,6 +144,14 @@ module.exports = function(app) {
         }
     ];
 
+    function runner() {
+        for (var i=0; i<vlans.length; i++) {
+            vlans[i].stats.utilization = Math.floor((Math.random() * 100) + 1);
+        }
+        setTimeout(function() { runner(); }, 1000);
+    }
+    runner();
+
     app.get('/ui/vlans', function (req, res) {
         setHdr(res);
         res.send(JSON.stringify(vlans));

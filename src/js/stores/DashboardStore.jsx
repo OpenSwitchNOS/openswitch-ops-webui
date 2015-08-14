@@ -26,12 +26,7 @@ module.exports = Reflux.createStore({
     // Data model.
     state: {
         sysInfo: { },
-        sysStats: {
-            cpu: 0, cpu_max: 0,
-            stor: 0, stor_max: 0,
-            mem: 0, mem_max: 0,
-            temp: 0, temp_max: 0
-        },
+        sysStats: { },
         topUtilPorts: { },
         topUtilVlans: { }
     },
@@ -45,12 +40,42 @@ module.exports = Reflux.createStore({
         console.log(data);
     },
 
+    processPorts: function(ports) {
+        var sortedPorts = ports.sort(function(p1, p2) {
+            var p1Val = 0,
+                p2Val = 0;
+            if (p1.stats && p1.stats.utilization) {
+                p1Val = p1.stats.utilization;
+            }
+            if (p2.stats && p2.stats.utilization) {
+                p2Val = p2.stats.utilization;
+            }
+            return p2Val - p1Val;
+        });
+        return sortedPorts.slice(0, 5);
+    },
+
+    processVlans: function(vlans) {
+        var sortedVlans = vlans.sort(function(p1, p2) {
+            var p1Val = 0,
+                p2Val = 0;
+            if (p1.stats && p1.stats.utilization) {
+                p1Val = p1.stats.utilization;
+            }
+            if (p2.stats && p2.stats.utilization) {
+                p2Val = p2.stats.utilization;
+            }
+            return p2Val - p1Val;
+        });
+        return sortedVlans.slice(0, 5);
+    },
+
     onAllCompleted: function(sysInfo, sysStats, topUtil) {
         console.log('DashboardStore.onAllCompleted:');
         this.state.sysInfo = sysInfo[0];
         this.state.sysStats = sysStats[0];
-        this.state.topUtilPorts = topUtil[0][0];
-        this.state.topUtilVlans = topUtil[0][1];
+        this.state.topUtilPorts = this.processPorts(topUtil[0][0]);
+        this.state.topUtilVlans = this.processVlans(topUtil[0][1]);
         console.log(this.state);
         this.trigger(this.state);
     }

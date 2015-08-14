@@ -19,9 +19,8 @@ module.exports = React.createClass({
     displayName: 'TestView',
 
     getInitialState: function() {
-        var numSlots = NUM_SLOTS,
-            slots = [];
-        for (var i=0; i<numSlots; i++) {
+        var slots = [];
+        for (var i=0; i<NUM_SLOTS; i++) {
             slots.push( { key: 'k' + i, init: true, val: 0 } );
         }
         return {
