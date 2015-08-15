@@ -55,12 +55,25 @@ module.exports = {
             systemMonitor: {
                 name: 'System Monitor'
             },
-            portMgmt: {
-                name: 'Management'
-            },
             portMonitor: {
                 name: 'Monitor',
-                portUtil: 'Port Utilization - Port '
+                portUtil: 'Port Utilization - Port ',
+            },
+            portMgmt: {
+                name: 'Management',
+                boxGraphic: 'Status',
+                allPorts: 'Ports',
+                th: {
+                    name: 'Name',
+                    adminState: 'Admin State',
+                    linkState: 'Link State',
+                    duplex: 'Duplex',
+                    speed: 'Speed',
+                    connector: 'Connector'
+                }
+            },
+            ip: {
+                name: 'IP'
             },
             vlanMgmt: {
                 name: 'Management'

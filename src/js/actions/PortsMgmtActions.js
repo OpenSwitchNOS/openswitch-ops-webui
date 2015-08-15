@@ -1,45 +1,22 @@
 /*
- * Actions for Port Monitor View.
+ * Actions for Port Mgmt View.
  * @author Kelsey Dedoshka
  */
 
 var Reflux = require('reflux'),
     RestUtils = require('restUtils');
 
-var PortsMonitorActions = Reflux.createActions({
+var PortsMgmtActions = Reflux.createActions({
 
     // Create the view's actions:
-    loadPortStats: { asyncResult: true },
     loadPorts: { asyncResult: true },
-    setChartContext: {},
-    setBarChartContext: {},
-    toggleGraphDisplay: {},
-    setActiveDetails: {},
-    resetGraph: {},
-    showStatus: {},
-    setPortSelected: {},
-    setInterval: {},
-    setPausePlayHandler: {}
 });
 
 //FIXME - for testing - will be removed
 var ip = 'http://15.108.28.69:8091';
 
-//handles the 'loadPortStats' action by requesting data from the server
-PortsMonitorActions.loadPortStats.listen(function(port) {
-
-    RestUtils.get(ip + '/system/Interface/' + port, function(err, res) {
-        if (err) {
-            console.log(err);
-        } else {
-            this.completed(res);
-        }
-    }.bind(this));
-
-});
-
 //handles the 'loadPorts' actions by requesting data from the server
-PortsMonitorActions.loadPorts.listen(function() {
+PortsMgmtActions.loadPorts.listen(function() {
     RestUtils.get(ip + '/system/bridges/bridge_normal/ports', function(err, res) {
         if (err) {
             console.log(err);
@@ -48,7 +25,8 @@ PortsMonitorActions.loadPorts.listen(function() {
             //remove ip var
             var res = res.data;
             for (var i=0; i<res.length; i++) {
-                res[i] = ip + res[i];
+                var port = res[i].split('/')[3];
+                res[i] = ip + '/system/Interface/' + port;
             }
             RestUtils.get(res, function(err2, res2) {
                 if (err2) {
@@ -61,4 +39,4 @@ PortsMonitorActions.loadPorts.listen(function() {
     }.bind(this));
 });
 
-module.exports = PortsMonitorActions;
+module.exports = PortsMgmtActions;

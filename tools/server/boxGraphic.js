@@ -11,10 +11,36 @@ module.exports = function(app) {
 
     var data = {
         style: "alternate",
-        startTop: 1,
-        endTop: 52,
-        startBottom: 2,
-        endBottom: 53
+        middlePorts: 25,
+        top: [
+            {
+                'type': 'group',
+                'start': 1,
+                'end': 47
+            },
+            {
+                'type': 'single',
+                'num': 49
+            },
+            {
+                'type': 'single',
+                'num': 52
+            }],
+        bottom: [
+            {
+                'type': 'group',
+                'start': 2,
+                'end': 48
+            },
+            {
+                'type': 'single',
+                'num': 50
+            },
+            {
+                'type': 'single',
+                'num': 53
+            }
+        ]
     };
 
     app.get('/ui/boxGraphic', function (req, res) {

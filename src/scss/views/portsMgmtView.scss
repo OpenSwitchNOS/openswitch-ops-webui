@@ -1,0 +1,44 @@
+/* 
+ * port mgmt view styles
+ * @author Kelsey Dedoshka
+ */
+
+.portStatusKey {
+
+    .keyTitle {
+        margin-left: 15px;
+        margin-right: 25px;
+    }
+
+    .ports {
+        &.active {
+            .fa {
+                color: $statusColorGreen;
+            }
+        }
+
+        &.interface {
+            display: inline-block;
+            width: 20px;
+            height: 17px;
+            border-radius: 2.0px;
+            background-color: black;
+            opacity: 0.6;
+        }
+
+        &.port {
+            display: inline-block;
+            width: 20px;
+            height: 17px;
+            border-radius: 2.0px;
+            background-color: black;
+
+        }
+
+        &.disabled {
+            .fa {
+                color: $statusColorRed;
+            }
+        }
+    }
+}

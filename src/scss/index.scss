@@ -37,6 +37,10 @@ $viewBoxHeaderFontWeight: 100;
 $iconNormalColor: #999;
 $iconHoverColor: black;
 
+//status colors - those used by by grommet
+$statusColorGreen: #08AA83;
+$statusColorRed: #F04953;
+
 @import '~grommet/scss/hpe/index';
 
 @import 'app.scss';
@@ -55,6 +59,7 @@ $iconHoverColor: black;
 // view styles
 @import 'views/dashboardView.scss';
 @import 'views/portsMonitorView.scss';
+@import 'views/portsMgmtView.scss';
 
 // Turn off all scroll bars?
 // ::-webkit-scrollbar {

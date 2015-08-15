@@ -14,7 +14,8 @@ var React = require('react'),
     I18n = require('i18n'),
     PortsMonitorActions = require('PortsMonitorActions'),
     PortsMonitorStore = require('PortsMonitorStore'),
-    Chart = require('chart.js/Chart');
+    Chart = require('chart.js/Chart'),
+    INTERVAL = 5000;
 
 
 //Creates the canvas componenet for the utilization chart
@@ -45,11 +46,10 @@ var ChartInstance = React.createClass({
 
         //set the context to 'chart' in the store
         PortsMonitorActions.setChartContext(portChart);
-
     },
 
     // stop the interval and reset graph when component unmounts
-    componentDidUnmount: function() {
+    componentWillUnmount: function() {
         PortsMonitorActions.resetGraph();
     },
 
@@ -61,11 +61,56 @@ var ChartInstance = React.createClass({
     render: function() {
         return (
             <div id="canvasWrapper">
-                <canvas id="portStatsChart" width="400" height="200"></canvas>
+                <canvas id="portStatsChart" height="350"></canvas>
             </div>
         );
     }
 });
+
+
+/*var BarChartInstance = React.createClass({
+
+    displayName: 'BarChartInstance',
+
+    mixins: [ Reflux.connect(PortsMonitorStore, 'data') ],
+
+    componentDidMount: function() {
+
+        var data = this.state.data;
+
+        //initialize the canvas context
+        var graphData = {
+            'labels': [],
+            'datasets': [
+                data.dataSets.rxData.graphData,
+                data.dataSets.txData.graphData,
+                data.dataSets.errorData.graphData,
+                data.dataSets.droppedData.graphData
+            ]
+        };
+
+        var barCtx = document.getElementById('barStatsChart').getContext('2d');
+        var barChart = new Chart(barCtx).Bar(graphData, this.state.data.barOptions);
+        //set the context to 'chart' in the store
+        PortsMonitorActions.setBarChartContext(barChart);
+
+    },
+
+    componentDidUnmount: function() {
+        PortsMonitorActions.resetGraph();
+    },
+
+    // start retreiving port stats
+    getPortData: function(port) {
+        PortsMonitorActions.loadPortStats(port);
+    },
+
+    render: function() {
+        return (
+            <canvas id="barStatsChart" height="150"></canvas>
+        );
+    }
+});*/
 
 //Component to create a key and toggle button for each data line
 //on the utillization chart
@@ -150,40 +195,6 @@ var PortDetails = React.createClass({
     }
 });
 
-//Component to generate the port selection dropdown menu
-//The dropdown menu is populated from the list of ports
-//Selecting a port will trigger a graph reset
-var PortSelection = React.createClass({
-
-    displayName: 'PortSelection',
-
-    propTypes: {
-        ports: PropTypes.object,
-        click: PropTypes.func
-    },
-
-    render: function() {
-        return (
-            <div>
-                <span>Select Port</span>
-                <span>
-                    <GMenu icon={<GDropCaret/>}>
-                        {this.props.ports.map(function(port) {
-                            return (
-                                <div className="portSelectionItem"
-                                    onClick={this.props.click.bind(this, port)}>
-                                    {port}
-                                </div>
-                            );
-                        }, this)}
-                    </GMenu>
-                </span>
-            </div>
-        );
-    }
-});
-
-
 module.exports = React.createClass({
 
     displayName: 'PortsMonitorView',
@@ -195,12 +206,7 @@ module.exports = React.createClass({
         //load the list of ports to populate the port list
         //dropdown menu
         PortsMonitorActions.loadPorts();
-
-        //start the interval to gather port stats data and
-        //set the interval variable in the store
-        var interval = setInterval(
-            this.getPortData.bind(this, this.state.data.selectedPort), 6000);
-        PortsMonitorActions.setInterval(interval);
+        this.startInterval(this.state.data.selectedPort);
     },
 
     //toggle the state of the graph being displayed on
@@ -211,19 +217,37 @@ module.exports = React.createClass({
 
     //show the status of the selected graph - WORK IN PROGRESS
     showGraphStatus: function(name) {
+        PortsMonitorActions.setActiveDetails(name);
         PortsMonitorActions.showStatus(name);
     },
 
     //handler for selected a port in the dropdown menu
     portSelected: function(port) {
         PortsMonitorActions.setPortSelected(port);
-        var interval = setInterval(this.getPortData.bind(this, port), 6000);
-        PortsMonitorActions.setInterval(interval);
+        this.startInterval(port);
     },
 
     //handler to get the port utilization data
     getPortData: function(port) {
         PortsMonitorActions.loadPortStats(port);
+    },
+
+    playGraph: function() {
+        PortsMonitorActions.setPausePlayHandler('play', false);
+        PortsMonitorActions.setPausePlayHandler('pause', true);
+        this.startInterval(this.state.data.selectedPort);
+    },
+
+    pauseGraph: function() {
+        PortsMonitorActions.setPausePlayHandler('play', true);
+        PortsMonitorActions.setPausePlayHandler('pause', false);
+        clearInterval(this.state.data.interval);
+    },
+
+    startInterval(port) {
+        var interval = setInterval(this.getPortData.bind(this, port),
+            INTERVAL);
+        PortsMonitorActions.setInterval(interval);
     },
 
     render: function() {
@@ -232,9 +256,30 @@ module.exports = React.createClass({
             detailsPanels = [];
 
         //append the port selection dropdown to the tile toolbar
-        toggleToolbar.select = (<PortSelection
-            ports={this.state.data.portList}
-            click={this.portSelected}/>);
+        toggleToolbar.select = (
+            <GMenu icon={<GDropCaret/>} label='Select Port'>
+                {this.state.data.portList.map(function(port) {
+                    return (
+                        <div className="portSelectionItem"
+                            onClick={this.portSelected.bind(this, port)}>
+                                {port}
+                        </div>
+                    );
+                }, this)}
+            </GMenu>
+        );
+
+
+        //append pause and play buttons to the tile toolbar
+        var pause = this.state.data.pauseHandler ? this.pauseGraph : null;
+        var play = this.state.data.playHandler ? this.playGraph : null;
+
+        toggleToolbar.play = (<ActionIcon fa='play'
+            onClick={play}
+            className="smallIcon" />);
+        toggleToolbar.pause = (<ActionIcon fa='pause'
+            onClick={pause}
+            className="smallIcon iconBorder right"/>);
 
         for (var i in this.state.data.dataSets) {
             if (this.state.data.dataSets.hasOwnProperty(i)) {
@@ -252,17 +297,16 @@ module.exports = React.createClass({
 
                 //create the status toolbar for the port details
                 //tiles
-                var statusToolbar = {
+                /*var statusToolbar = {
                     edit: <ActionIcon fa='bar-chart'
                         onClick={this.showGraphStatus.bind(this, i)}/>
-                };
+                };*/
 
                 //create the row of details tiles based on the
                 //datsets in the store
                 detailsPanels.push(
                     <div className="viewBox viewFlex1">
-                        <ViewBoxHeader title={data.title}
-                            toolbar={statusToolbar}/>
+                        <ViewBoxHeader title={data.title} />
                         <PortDetails color={color} data={data}/>
                     </div>
                 );
@@ -270,17 +314,15 @@ module.exports = React.createClass({
         }
 
         return (
-            <div>
-                <div className="viewFill viewCol">
-                    <div id="portStatsGraphTile" className="viewBox viewFlex0">
-                        <ViewBoxHeader title={t('views.portMonitor.portUtil') +
-                            this.state.data.selectedPort}
-                            toolbar= {toggleToolbar}/>
-                        <ChartInstance />
-                    </div>
-                    <div className="viewRow viewFlex0">
-                        {detailsPanels}
-                    </div>
+            <div className="viewFill viewCol">
+                <div id="portStatsGraphTile" className="viewBox viewFlex0">
+                    <ViewBoxHeader title={t('views.portMonitor.portUtil') +
+                        this.state.data.selectedPort}
+                        toolbar= {toggleToolbar}/>
+                    <ChartInstance />
+                </div>
+                <div className="viewRow viewFlex0">
+                    {detailsPanels}
                 </div>
             </div>
         );

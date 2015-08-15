@@ -73,8 +73,8 @@ module.exports = React.createClass({
                 <hr />
                 <NavGroup heading={t('ports')}
                     routes={[
-                        'portMgmt',
-                        'portMonitor'
+                        'portMonitor',
+                        'portMgmt'
                     ]}
                 />
                 <hr />
