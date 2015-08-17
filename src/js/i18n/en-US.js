@@ -45,7 +45,7 @@ module.exports = {
                 memoryUnits: 'GB',
                 storage: 'Storage',
                 storageUnits: 'GB',
-                temp: 'Temperature',
+                temp: 'Temperatures',
                 tempUnits: 'C',
                 portTopUtil: 'Top Port Utilization',
                 vlanTopUtil: 'Top VLAN Utilization',

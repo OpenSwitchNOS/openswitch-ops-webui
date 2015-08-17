@@ -24,6 +24,8 @@ var AUTO_REFRESH_MILLIS = 10000,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     autoRefreshTimer;
 
+// TODO: Fix for grommet max value (no bar).
+
 function t(key) {
     return I18n.text('views.dashboard.' + key);
 }
@@ -43,15 +45,12 @@ module.exports = React.createClass({
     mixins: [ Reflux.listenTo(DashboardStore, 'onLoadAllCompleted') ],
 
     getInitialState: function() {
-        var portSlots = [],
-            vlanSlots = [];
+        var portSlots = [];
         for (var i=0; i<NUM_UTL_SLOTS; i++) {
             portSlots.push( { key: 'k' + i, init: true, val: 0 } );
-            vlanSlots.push( { key: 'k' + i, init: true, val: 0 } );
         }
         return {
             portSlots: portSlots,
-            vlanSlots: vlanSlots,
             sysInfo: {},
             sysStats: {},
             topUtilPorts: [],
@@ -73,19 +72,15 @@ module.exports = React.createClass({
         var newPortSlots,
             newVlanSlots;
 
-        newPortSlots = this.updateSlots(this.state.portSlots, data.topUtilPorts,
-            'id', 'stats.utilization');
+        // newPortSlots = this.updateSlots(this.state.portSlots, data.topUtilPorts,
+        //     'id', 'stats.utilization');
 
-        newVlanSlots = this.updateSlots(this.state.vlanSlots, data.topUtilVlans,
-            'id', 'stats.utilization');
-
+        console.log(data);
         this.setState({
             sysInfo: data.sysInfo,
-            sysStats: data.sysStats,
-            topUtilPorts: data.topUtilPorts,
-            topUtilVlans: data.topUtilVlans,
-            portSlots: newPortSlots,
-            vlanSlots: newVlanSlots
+            sysStats: data.sysStats
+            // topUtilPorts: data.topUtilPorts,
+            // portSlots: newPortSlots,
         });
     },
 
@@ -156,11 +151,11 @@ module.exports = React.createClass({
     mkSysInfoPropData: function() {
         var si = this.state.sysInfo;
         return [
-            [ t('productName'), si.product_name ],
+            [ t('productName'), si.productName ],
             [ t('vendor'), si.vendor ],
             [ t('version'), si.version ],
-            [ t('onieVersion'), si.onie_version ],
-            [ t('baseMac'), si.base_mac_address ]
+            [ t('onieVersion'), si.onieVersion ],
+            [ t('baseMac'), si.baseMac ]
         ];
     },
 
@@ -187,10 +182,41 @@ module.exports = React.createClass({
             u = units || '';
         return (
             <GMeter className="viewBoxContent" type="arc" value={ v }
-                min={{ value: 0, label: '0 ' + units }}
+                min={{ value: 0, label: '0 ' + u }}
                 max={{ value: m, label: m.toString() + ' ' + u }}
-                thresholds={ mkThresholds(m) }
-                units={ u } />
+                thresholds={ mkThresholds(m) } />
+        );
+    },
+
+    mkTempMeter: function(item) {
+        var u = t('tempUnits'),
+            max = Number(item.max) + 0.1; // fix for grommet max value
+        return (
+            <div key={item.name} className="tempRow">
+                <GMeter
+                    value={item.val}
+                    small={true}
+                    min={{
+                        value: item.min,
+                        label: item.min.toString() + ' ' + u
+                    }}
+                    max={{
+                        value: max,
+                        label: max.toString() + ' ' + u
+                    }}
+                    thresholds={mkThresholds(item.max)} />
+            </div>
+        );
+    },
+
+    mkTempMeters: function() {
+        var temps = this.state.sysStats.temps || [];
+        return (
+            <div className="viewBoxContent">
+                { temps.map(function(item) {
+                    return this.mkTempMeter(item);
+                }.bind(this))}
+            </div>
         );
     },
 
@@ -234,16 +260,14 @@ module.exports = React.createClass({
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader
-                            title={t('systemInfo')} toolbar={tb} />
+                        <ViewBoxHeader title={t('systemInfo')} />
                         <PropTable
                             className="viewBoxContent"
                             data={this.mkSysInfoPropData()} />
                     </div>
 
                     <div className="viewBox box1">
-                        <ViewBoxHeader
-                            title={t('systemStatus')} toolbar={tb} />
+                        <ViewBoxHeader title={t('systemStatus')} />
                         <PropTable
                             className="viewBoxContent"
                             data={this.mkSysStatusPropData()} />
@@ -253,22 +277,23 @@ module.exports = React.createClass({
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('cpu')} toolbar={tb} />
-                        {this.mkMeter(si.cpu, si.cpu_max, '')}
+                        {this.mkMeter(si.cpuVal, si.cpuMax, '')}
                     </div>
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('storage')} toolbar={tb} />
-                        {this.mkMeter(si.stor, si.stor_max, t('storageUnits'))}
+                        {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
                     </div>
                 </div>
 
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('memory')} toolbar={tb} />
-                        {this.mkMeter(si.mem, si.mem_max, t('memoryUnits'))}
+                        {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
                     </div>
+
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('temp')} toolbar={tb} />
-                        {this.mkMeter(si.temp, si.temp_max, t('tempUnits'))}
+                        {this.mkTempMeters()}
                     </div>
                 </div>
 
@@ -277,15 +302,6 @@ module.exports = React.createClass({
                     <div className="viewBoxContent">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
                             { this.mkUtlMeters('port', this.state.portSlots) }
-                        </ReactShuffle>
-                    </div>
-                </div>
-
-                <div className="viewBox">
-                    <ViewBoxHeader title={t('vlanTopUtil')} toolbar={tb} />
-                    <div className="viewBoxContent">
-                        <ReactShuffle duration={1500} scale={false} fade={true}>
-                            { this.mkUtlMeters('vlan', this.state.vlanSlots) }
                         </ReactShuffle>
                     </div>
                 </div>

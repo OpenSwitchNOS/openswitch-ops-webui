@@ -4,7 +4,7 @@
  */
 
 var Reflux = require('reflux'),
-    Request = require('superagent');
+    RestUtils = require('restUtils');
 
 var SystemInfoActions = Reflux.createActions({
     // Actions: load, loadFailed, loadCompleted
@@ -12,13 +12,24 @@ var SystemInfoActions = Reflux.createActions({
 });
 
 SystemInfoActions.load.listen(function() {
-    Request.get('/ui/sysinfo').end(function(err, res) {
+
+    RestUtils.get('/system/subsystems/base', function(err, resBody) {
+        var otherInfo;
         if (err) {
             this.failed(err); // Callback action: loadFailed
         } else {
-            this.completed(res.body); // Callback action: loadCompleted
+            otherInfo = resBody.data.other_info;
+            this.completed({
+                onieVersion: otherInfo.onie_version,
+                baseMac: otherInfo.base_mac_address,
+                serialNum: otherInfo.serial_number,
+                vendor: otherInfo.vendor,
+                productName: otherInfo['Product Name'],
+                version: otherInfo.diag_version
+            }); // Callback action: loadCompleted
         }
     }.bind(this));
+
 });
 
 module.exports = SystemInfoActions;

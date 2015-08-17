@@ -14,13 +14,13 @@ module.exports = Reflux.createStore({
         this.joinTrailing(
             SystemInfoActions.load.completed,
             SystemStatsActions.load.completed,
-            TopUtilizationActions.load.completed,
+            // TopUtilizationActions.load.completed,
             this.onAllCompleted
         );
 
         this.listenTo(SystemInfoActions.load.failed, this.onAnyFailed);
         this.listenTo(SystemStatsActions.load.failed, this.onAnyFailed);
-        this.listenTo(TopUtilizationActions.load.failed, this.onAnyFailed);
+        // this.listenTo(TopUtilizationActions.load.failed, this.onAnyFailed);
     },
 
     // Data model.
@@ -72,11 +72,12 @@ module.exports = Reflux.createStore({
 
     onAllCompleted: function(sysInfo, sysStats, topUtil) {
         console.log('DashboardStore.onAllCompleted:');
+        console.log(sysInfo);
         this.state.sysInfo = sysInfo[0];
         this.state.sysStats = sysStats[0];
-        this.state.topUtilPorts = this.processPorts(topUtil[0][0]);
-        this.state.topUtilVlans = this.processVlans(topUtil[0][1]);
-        console.log(this.state);
+        // this.state.topUtilPorts = this.processPorts(topUtil[0][0]);
+        // this.state.topUtilVlans = this.processVlans(topUtil[0][1]);
+        // console.log(this.state);
         this.trigger(this.state);
     }
 
