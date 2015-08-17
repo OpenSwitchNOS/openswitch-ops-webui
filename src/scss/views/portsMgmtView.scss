@@ -10,8 +10,24 @@
         margin-right: 25px;
     }
 
+    &.up {
+        width: 100px;
+    }
+
+    &.port {
+        width: 110px;
+    }
+
+    &.interface {
+        width: 150px;
+    }
+
+    &.adminDisabled, &.linkDisabled {
+        width: 220px;
+    }
+
     .ports {
-        &.active {
+        &.up {
             .fa {
                 color: $statusColorGreen;
             }
@@ -23,7 +39,7 @@
             height: 17px;
             border-radius: 2.0px;
             background-color: black;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         &.port {
@@ -35,9 +51,15 @@
 
         }
 
-        &.disabled {
+        &.adminDisabled {
             .fa {
                 color: $statusColorRed;
+            }
+        }
+
+        &.linkDisabled {
+            .fa {
+                color: $statusColorOrange;
             }
         }
     }

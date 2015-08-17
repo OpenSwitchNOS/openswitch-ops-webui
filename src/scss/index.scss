@@ -38,8 +38,10 @@ $iconNormalColor: #999;
 $iconHoverColor: black;
 
 //status colors - those used by by grommet
-$statusColorGreen: #08AA83;
+$statusColorGreen: #4EB976;
 $statusColorRed: #F04953;
+//status color - not grommet
+$statusColorOrange: #FFB657;
 
 @import '~grommet/scss/grommet-core/index';
 

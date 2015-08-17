@@ -1,6 +1,6 @@
 /*
  * Test View.
- * @author Kelsey Dedoshka 
+ * @author Kelsey Dedoshka
  */
 
 describe('Test Suite For PortsMgmtView', function() {

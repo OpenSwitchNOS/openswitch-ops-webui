@@ -36,6 +36,7 @@ var PortList = React.createClass({
                     <th>{t('th.duplex')}</th>
                     <th>{t('th.speed')}</th>
                     <th>{t('th.connector')}</th>
+                    <th>{t('th.vendor')}</th>
                 </thead>
                 <tbody>
                     {this.props.ports.map(function(port) {
@@ -46,7 +47,8 @@ var PortList = React.createClass({
                                 <td>{port.data.link_state}</td>
                                 <td>{port.data.duplex}</td>
                                 <td>{port.data.link_speed}</td>
-                                <td>{port.data.hw_intf_info.connector}</td>
+                                <td>{port.data.pm_info.connector}</td>
+                                <td>{port.data.pm_info.vendor_name}</td>
                             </tr>
                         );
                     }, this)}
@@ -68,7 +70,7 @@ var KeyItem = React.createClass({
 
     render: function() {
         return (
-            <div className="portStatusKey">
+            <div className={'portStatusKey ' + this.props.cls}>
                 <span className={'ports ' + this.props.cls}>
                     {this.props.icon ?
                         <i className = {'fa fa-' +this.props.icon}></i>
@@ -93,8 +95,11 @@ module.exports = React.createClass({
     render: function() {
 
         var toolbar = {
-            active: <KeyItem cls='active' title='Active' icon='check'/>,
-            disabled: <KeyItem cls='disabled' title='Disabled' icon='times'/>,
+            active: <KeyItem cls='up' title='Up' icon='check'/>,
+            adminDisabled: <KeyItem cls='adminDisabled' title='Admin Disabled'
+                icon='times'/>,
+            linkDisabled: <KeyItem cls='linkDisabled' title='Link Disabled'
+                icon='times'/>,
             port: <KeyItem cls='port' title='Port' />,
             interface: <KeyItem cls='interface' title='Interface'/>
         };

@@ -31,9 +31,12 @@ module.exports = Reflux.createStore({
         for (var key in ports) {
             if (ports.hasOwnProperty(key)) {
                 var port = ports[key];
-                //FIXME - should this be link state or admin state
-                this.state.portStatus[port.data.name] =
-                    port.data.link_state;
+                //console.log(port.data);
+                this.state.portStatus[port.data.name] = {};
+                this.state.portStatus[port.data.name].adminState =
+                    port.data.admin_state[0];
+                this.state.portStatus[port.data.name].linkState =
+                    port.data.link_state[0];
             }
         }
 

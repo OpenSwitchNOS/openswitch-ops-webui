@@ -67,7 +67,7 @@ $portCornerRadius: 3px;
     background-color: black; 
     
     &.interface {
-        opacity: 0.6;
+        opacity: 0.5;
     }
 }
 
@@ -183,14 +183,23 @@ $portCornerRadius: 3px;
     &.icon {
         .fa-check {
             margin-top: 5px;
-            margin-left: 20px;
+            margin-left: 15px;
+            text-align: center;
             color: $statusColorGreen;
         }
 
         .fa-times {
-            margin-top: 5px;
-            margin-left: 20px;
-            color: $statusColorRed;
+            margin-left: 8px;
+
+            &.admin {
+                margin-top: 5px;
+                color: $statusColorRed;
+            }
+
+            &.link {
+                margin-top: 5px;
+                color: $statusColorOrange;
+            }
         }
     }
 }

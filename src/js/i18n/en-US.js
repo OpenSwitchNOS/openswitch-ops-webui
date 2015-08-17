@@ -74,7 +74,8 @@ module.exports = {
                     linkState: 'Link State',
                     duplex: 'Duplex',
                     speed: 'Speed',
-                    connector: 'Connector'
+                    connector: 'Connector',
+                    vendor: 'Vendor'
                 }
             },
             ip: {
