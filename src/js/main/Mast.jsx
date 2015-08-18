@@ -49,7 +49,7 @@ module.exports = React.createClass({
 
                 <span>
                     {toggleIcon}
-                    <img src="OpenHalonLogo.png" />
+                    <img src="OpenSwitchLogo.png" />
                 </span>
 
                 <span>
