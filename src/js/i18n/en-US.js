@@ -1,6 +1,7 @@
 /*
  * Localization for en-US.
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 module.exports = {
@@ -19,6 +20,7 @@ module.exports = {
         routing: 'Routing',
         partNum: 'Part #',
         serialNum: 'Serial #',
+        hostName: 'Hostname',
         test: 'Test',
 
         // Errors.

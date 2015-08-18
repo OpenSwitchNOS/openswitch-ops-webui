@@ -1,6 +1,7 @@
 /*
  * Actions for System information (rarely changes).
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 var Reflux = require('reflux'),
@@ -11,14 +12,15 @@ var SystemInfoActions = Reflux.createActions({
     load: { asyncResult: true },
 });
 
+// FIXME: determine best place to get hostname
 SystemInfoActions.load.listen(function() {
 
-    RestUtils.get('/system/subsystems/base', function(err, resBody) {
+    RestUtils.get(['/system/subsystems/base', '/system'], function(err, res) {
         var otherInfo;
         if (err) {
             this.failed(err); // Callback action: loadFailed
         } else {
-            otherInfo = resBody.data.other_info;
+            otherInfo = res[0].data.other_info;
             this.completed({
                 onieVersion: otherInfo.onie_version,
                 baseMac: otherInfo.base_mac_address.toUpperCase(),
@@ -26,7 +28,8 @@ SystemInfoActions.load.listen(function() {
                 vendor: otherInfo.vendor,
                 productName: otherInfo['Product Name'],
                 version: otherInfo.diag_version,
-                partNum: otherInfo.part_number
+                partNum: otherInfo.part_number,
+                hostName: res[1].data.hostname
             }); // Callback action: loadCompleted
         }
     }.bind(this));

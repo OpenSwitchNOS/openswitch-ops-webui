@@ -2,6 +2,7 @@
  * Mast component that contains the logo, user, etc.
  * @author Kelsey Dedoshka
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 var React = require('react'),
@@ -41,6 +42,7 @@ module.exports = React.createClass({
         var t = I18n.text,
             partNum = this.state.sysInfo && this.state.sysInfo.partNum,
             serialNum = this.state.sysInfo && this.state.sysInfo.serialNum,
+            hostName = this.state.sysInfo && this.state.sysInfo.hostName,
             user = 'Carl Spangler',
             showToggleIcon = this.state.render.showNavPane,
             chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
@@ -61,6 +63,8 @@ module.exports = React.createClass({
                 </span>
 
                 <span>
+                    <b>{t('hostName')}:</b>&nbsp;{hostName || ''}
+                    &nbsp;-&nbsp;
                     <b>{t('partNum')}:</b>&nbsp;{partNum || ''}
                     &nbsp;-&nbsp;
                     <b>{t('serialNum')}:</b>&nbsp;{serialNum || ''}
