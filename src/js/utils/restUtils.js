@@ -7,7 +7,7 @@ var Request = require('superagent'),
 
 var init = false,
     REST_IP_DEV_MODE = 'http://15.108.28.69:8091',
-    REST_IP = 'http://localhost:8091';
+    REST_IP = 'http://' + window.location.hostname + ':8091';
 
 // Wraps the superagent GET request in a form that can be used as an Asyc
 // callback (i.e. callback(err, res)).
