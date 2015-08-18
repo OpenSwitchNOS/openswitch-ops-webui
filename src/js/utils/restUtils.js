@@ -5,32 +5,31 @@
 var Request = require('superagent'),
     Async = require('async');
 
-
-// TODO: Comment out before release
-var REST_IP_DEV_MODE = 'http://15.108.28.69:8091';
-var REST_IP = 'http://localhost:8091';
+var init = false,
+    REST_IP_DEV_MODE = 'http://15.108.28.69:8091',
+    REST_IP = 'http://localhost:8091';
 
 // Wraps the superagent GET request in a form that can be used as an Asyc
 // callback (i.e. callback(err, res)).
 function getBody(url, callback) {
     var reqUrl = url;
 
-    console.log('RestUtils.getBody: "' + url + '"');
-
     if (window.webpackHotUpdate) {
+        if (!init) {
+            console.log('RestUtils DEV MODE: "' + REST_IP_DEV_MODE + '"');
+        }
         reqUrl = REST_IP_DEV_MODE + url;
-        console.log('*** DEV MODE REDIRECT TO: "' + reqUrl + '" ***');
-    } else {
+
+    } else if (!window.jasmine) {
+        if (!init) {
+            console.log('RestUtils PRODUCTION: "' + REST_IP + '"');
+        }
         reqUrl = REST_IP + url;
-        console.log('*** REDIRECT TO: "' + reqUrl + '" ***');
     }
 
+    init = true;
+
     Request.get(reqUrl).end(function(err, res) {
-        console.log('Response for: "' + reqUrl + '"');
-        console.log('err:');
-        console.log(err);
-        console.log('res.body:');
-        console.log(res.body);
         callback(err, err ? null : res.body);
     });
 }

@@ -21,11 +21,12 @@ SystemInfoActions.load.listen(function() {
             otherInfo = resBody.data.other_info;
             this.completed({
                 onieVersion: otherInfo.onie_version,
-                baseMac: otherInfo.base_mac_address,
+                baseMac: otherInfo.base_mac_address.toUpperCase(),
                 serialNum: otherInfo.serial_number,
                 vendor: otherInfo.vendor,
                 productName: otherInfo['Product Name'],
-                version: otherInfo.diag_version
+                version: otherInfo.diag_version,
+                partNum: otherInfo.part_number
             }); // Callback action: loadCompleted
         }
     }.bind(this));

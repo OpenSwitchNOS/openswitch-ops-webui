@@ -17,6 +17,8 @@ module.exports = {
         ports: 'Ports',
         vlans: 'VLANs',
         routing: 'Routing',
+        partNum: 'Part #',
+        serialNum: 'Serial #',
         test: 'Test',
 
         // Errors.
@@ -38,8 +40,8 @@ module.exports = {
                 error: 'Error',
                 warning: 'Warning',
                 ok: 'OK',
-                fanStatus: 'Fan Status',
-                powerStatus: 'Power Status',
+                fanStatus: 'Fans',
+                powerStatus: 'Power',
                 cpu: 'CPU Load',
                 memory: 'Memory',
                 memoryUnits: 'GB',
@@ -50,7 +52,10 @@ module.exports = {
                 portTopUtil: 'Top Port Utilization',
                 vlanTopUtil: 'Top VLAN Utilization',
                 port: 'Port',
-                vlan: 'VLAN'
+                vlan: 'VLAN',
+                tx: 'Tx',
+                rx: 'Rx',
+                txRx: ''
             },
             systemMonitor: {
                 name: 'System Monitor'
