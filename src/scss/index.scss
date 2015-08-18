@@ -23,7 +23,7 @@ $navGroupSeparatorColor: #383838;
 $navPaneBorderRightColor: #2e2e2e;
 $navItemNormalColor: #bbbbbb;
 $navItemHoverColor: white;
-$navItemActiveColor: #0096d6;
+$navItemActiveColor: #FF6F3E;
 
 // viewPane & viewBox
 $viewPaneBackgroundColor: #F5F5F5;
@@ -41,7 +41,7 @@ $iconHoverColor: black;
 $statusColorGreen: #08AA83;
 $statusColorRed: #F04953;
 
-@import '~grommet/scss/hpe/index';
+@import '~grommet/scss/grommet-core/index';
 
 @import 'app.scss';
 
