@@ -211,12 +211,12 @@ module.exports = Reflux.createStore({
 
         this.state.portList = list.sort(function(a, b) { return a-b; });
         this.state.selectedPort = this.state.portList[0];
-        this.trigger(this.state);
 
         // start the initial interval when the ports return
         var interval = setInterval(PortsMonitorActions
             .loadPortStats.bind(this, this.state.selectedPort), INTERVAL);
-        this.onSetInterval(interval);
+        this.state.interval = interval;
+        this.trigger(this.state);
     },
 
     //handler to set the state of the chart context
@@ -291,6 +291,8 @@ module.exports = Reflux.createStore({
         //reset the counters
         this.state.pointCount = 0;
         this.state.secondsCount = 0;
+        this.state.playHandler = false;
+        this.state.pauseHandler = true;
 
         //destroy current chart instance
         this.state.chart.destroy();
