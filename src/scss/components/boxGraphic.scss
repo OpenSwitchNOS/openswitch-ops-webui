@@ -62,9 +62,13 @@ $portCornerRadius: 3px;
 }
 
 .boxPortTop, .boxPortBottom {
-    background-color: black;
     height: 30px;
     width: 55px;
+    background-color: black; 
+    
+    &.interface {
+        opacity: 0.5;
+    }
 }
 
 .boxPortTop {
@@ -173,4 +177,29 @@ $portCornerRadius: 3px;
     width: 12px;
     border-radius: 1.0px !important;
     padding-right: 2px;
+}
+
+.portStatus {
+    &.icon {
+        .fa-check {
+            margin-top: 5px;
+            margin-left: 15px;
+            text-align: center;
+            color: $statusColorGreen;
+        }
+
+        .fa-times {
+            margin-left: 8px;
+
+            &.admin {
+                margin-top: 5px;
+                color: $statusColorRed;
+            }
+
+            &.link {
+                margin-top: 5px;
+                color: $statusColorOrange;
+            }
+        }
+    }
 }

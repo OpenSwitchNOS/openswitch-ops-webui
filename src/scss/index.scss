@@ -13,7 +13,7 @@ $mastTextColor: black;
 $mastBorderBottomColor: lightgrey;
 
 // NavPane, viewPane
-$navPaneWidth: 160px;
+$navPaneWidth: 170px;
 
 // NavPane
 $navPaneBackgroundColor: #404040;
@@ -23,7 +23,7 @@ $navGroupSeparatorColor: #383838;
 $navPaneBorderRightColor: #2e2e2e;
 $navItemNormalColor: #bbbbbb;
 $navItemHoverColor: white;
-$navItemActiveColor: #0096d6;
+$navItemActiveColor: #FF6F3E;
 
 // viewPane & viewBox
 $viewPaneBackgroundColor: #F5F5F5;
@@ -37,7 +37,13 @@ $viewBoxHeaderFontWeight: 100;
 $iconNormalColor: #999;
 $iconHoverColor: black;
 
-@import '~grommet/scss/hpe/index';
+//status colors - those used by by grommet
+$statusColorGreen: #4EB976;
+$statusColorRed: #F04953;
+//status color - not grommet
+$statusColorOrange: #FFB657;
+
+@import '~grommet/scss/grommet-core/index';
 
 @import 'app.scss';
 
@@ -55,6 +61,7 @@ $iconHoverColor: black;
 // view styles
 @import 'views/dashboardView.scss';
 @import 'views/portsMonitorView.scss';
+@import 'views/portsMgmtView.scss';
 
 // Turn off all scroll bars?
 // ::-webkit-scrollbar {

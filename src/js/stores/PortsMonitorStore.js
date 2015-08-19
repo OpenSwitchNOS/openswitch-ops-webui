@@ -7,16 +7,19 @@ var Reflux = require('reflux'),
     PortsMonitorActions = require('PortsMonitorActions'),
     _ = require('lodash'),
     Chart = require('chart.js/Chart'),
+    Calcs = require('calculations'),
     MAX_POINTS_ON_GRAPH = 25,
     STATS_LOW_START = 0,
     STATS_LOW_END = 40,
-    STATS_MED_END = 90;
+    STATS_MED_END = 90,
+    INTERVAL = 5000;
 
 /***** Class Constructors for graph data objects *******/
 
 //DataSets contains all data for a line graph object
-function DataSet(title, options, allData, stats, graphData) {
+function DataSet(title, index, options, allData, stats, graphData) {
     this.title = title;
+    this.index = index;
     this.options = options;
     this.allData = allData;
     this.stats = stats;
@@ -51,7 +54,7 @@ module.exports = Reflux.createStore({
         portList: [],
 
         //current selected port
-        selectedPort: 1,
+        selectedPort: null,
 
         //database query interval reference
         interval: null,
@@ -62,6 +65,12 @@ module.exports = Reflux.createStore({
         //seconds on the graph for x axis -- FIXME - this needs to
         //updatge by the interval time not 1
         secondsCount: 0,
+
+        //keep track of onclick handler for the pause button
+        pauseHandler: true,
+
+        //keep track of onclick handler for the play button
+        playHandler: false,
 
         //graph colors - stroke: line stroke
         //fill: fill under graph
@@ -90,16 +99,17 @@ module.exports = Reflux.createStore({
             droppedData: {}
         },
 
-        //chart options
+        //line chart options
         options: {
             animation: false,
             responsive: true,
             scaleBeginAtZero: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scaleLabel: "<%=value + '%'%>"
         },
 
         //chart context reference
-        chart: null,
+        chart: null
     },
 
     // initialize the store.
@@ -111,72 +121,42 @@ module.exports = Reflux.createStore({
 
     //create the graph objects
     loadGraphs: function() {
-        var initialStatsRx = new Stats();
-        var initialStatsTx = new Stats();
-        var initialStatsError = new Stats();
-        var initialStatsDropped = new Stats();
 
-        //receive data
-        var rxData = new DataSet(
-            'rx utilization', { show: 1, colorIndex: 0 }, [], initialStatsRx,
-            { label: 'rx packets',
-                fillColor: this.state.colors[0].fill,
-                strokeColor: this.state.colors[0].stroke,
-                pointColor: this.state.colors[0].stroke,
-                data: []
-            }
-        );
+        // the default graph types to initizalie the data sets
+        var graphTypes = [
+            { 'name': 'rxData', 'title': 'rx utilization' },
+            { 'name': 'txData', 'title': 'tx utilization' },
+            { 'name': 'droppedData', 'title': 'dropped utilization' },
+            { 'name': 'errorData', 'title': 'error utilization' }
+        ];
 
-        //transmit data
-        var txData = new DataSet(
-            'tx utilization', { show: 1, colorIndex: 1 }, [], initialStatsTx,
-            { label: 'tx packets',
-                fillColor: this.state.colors[1].fill,
-                strokeColor: this.state.colors[1].stroke,
-                pointColor: this.state.colors[1].stroke,
-                data: []
-            }
-        );
+        for (var i=0; i<graphTypes.length; i++) {
+            var initialStats = new Stats();
 
-        //error data
-        var errorData = new DataSet(
-            'error', { show: 1, colorIndex: 2 }, [], initialStatsError,
-            { label: 'error packets',
-                fillColor: this.state.colors[2].fill,
-                strokeColor: this.state.colors[2].stroke,
-                pointColor: this.state.colors[2].stroke,
-                data: []
-            }
-        );
+            var data = new DataSet(
+                graphTypes[i].name, i, { 'show': 1, 'colorIndex': i }, [],
+                initialStats,
+                { 'label': graphTypes[i].title,
+                    fillColor: this.state.colors[i].fill,
+                    strokeColor: this.state.colors[i].stroke,
+                    pointColor: this.state.colors[i].stroke
+                }
+            );
 
-        //dropped data
-        var droppedData = new DataSet(
-            'dropped', { show: 1, colorIndex: 3 }, [], initialStatsDropped,
-            { label: 'dropped packets',
-                fillColor: this.state.colors[3].fill,
-                strokeColor: this.state.colors[3].stroke,
-                pointColor: this.state.colors[3].stroke,
-                data: []
-            }
-        );
-
-        //set the graph objects to the datasets object
-        this.state.dataSets.rxData = rxData;
-        this.state.dataSets.txData = txData;
-        this.state.dataSets.errorData = errorData;
-        this.state.dataSets.droppedData = droppedData;
+            this.state.dataSets[graphTypes[i].name] = data;
+        }
     },
 
      // Callback for success of loading port stats data
     onLoadPortStatsCompleted: function(portStats) {
+
         var dataArray = [];
         var updateSeconds = 0;
-        var updateStats = 0;
 
         //Parse return data
-        var data = JSON.parse(portStats).data;
-        var linkSpeed = data.link_speed;
-        var stats = data.statistics;
+        var linkSpeed = portStats.data.link_speed;
+        var stats = portStats.data.statistics;
+        var duplex = portStats.data.duplex;
 
         //Update port counters and data points
         this.state.portStats.previous = _.cloneDeep(this.state.portStats.current);
@@ -185,28 +165,25 @@ module.exports = Reflux.createStore({
 
         for (var key in this.state.dataSets) {
             if (this.state.dataSets.hasOwnProperty(key)) {
+
                 var line = this.state.dataSets[key];
 
                 //calculate utilization based on link speed and data points
-                var num = this.calculateUtilization(linkSpeed, key);
+                var num = this.calculateUtilization(duplex, linkSpeed, key);
+                //var num = Math.floor(Math.random() * 100) + 0;
 
                 if (line.options.show) {
                     if (num !== null) {
                         line.allData.push(num);
                         dataArray.push(num);
+
+                        this.updatePortStats(line, num);
+                        this.updateAverage(line);
                         updateSeconds = 1;
-                        updateStats = 1;
                     }
                 } else {
                     dataArray.push(null);
                     updateSeconds = 1;
-                    updateStats = 0;
-                }
-
-                // update live stats data
-                if (updateStats) {
-                    this.updatePortStats(line, num);
-                    this.updateAverage(line);
                 }
             }
         }
@@ -214,7 +191,7 @@ module.exports = Reflux.createStore({
         //update x axis seconds and add data to live chart
         if (updateSeconds) {
             this.state.chart.addData(dataArray, this.state.secondsCount);
-            this.state.secondsCount = this.state.secondsCount + 1;
+            this.state.secondsCount = this.state.secondsCount + 5;
         }
 
         this.trigger(this.state);
@@ -222,18 +199,41 @@ module.exports = Reflux.createStore({
 
     //Callback for success of loading port list from server
     onLoadPortsCompleted: function(ports) {
+        var list = [];
         for (var i in ports) {
             if (ports.hasOwnProperty(i)) {
-                var data = JSON.parse(ports[i]).data;
-                this.state.portList.push(data.name);
+                var port = ports[i].data;
+                if (port.link_state[0] === 'up' && port.link_speed[0] > 0) {
+                    list.push(Number(port.name));
+                }
             }
         }
 
+        this.state.portList = list.sort(function(a, b) { return a-b; });
+        this.state.selectedPort = this.state.portList[0];
+
+        // start the initial interval when the ports return
+        var interval = setInterval(PortsMonitorActions
+            .loadPortStats.bind(this, this.state.selectedPort), INTERVAL);
+        this.state.interval = interval;
         this.trigger(this.state);
     },
 
     //handler to set the state of the chart context
-    onSetChartContext: function(chart) {
+    onSetChartContext: function(id) {
+        var graphData = {
+            'labels': [],
+            'datasets': [
+                this.state.dataSets.rxData.graphData,
+                this.state.dataSets.txData.graphData,
+                this.state.dataSets.errorData.graphData,
+                this.state.dataSets.droppedData.graphData
+            ]
+        };
+
+        var ctx = document.getElementById(id).getContext('2d');
+        var chart = new Chart(ctx).Line(graphData, this.state.options);
+
         this.state.chart = chart;
         this.trigger(this.state);
     },
@@ -250,29 +250,13 @@ module.exports = Reflux.createStore({
         this.resetGraph();
     },
 
-    //handler to show the selected data status - IN PROGRESS
-    onShowStatus: function(name) {
-        var datasets = this.state.chart.datasets;
-        for (var i in datasets) {
-            if (datasets.hasOwnProperty(i)) {
-                var data = this.state.dataSets;
-                var colorSet = this.state.colors[data[name].options.colorIndex];
-                var color = data[name].graphData.label === datasets[i].label ?
-                    'transparent' : colorSet.light;
-
-                this.setGraphColor(datasets[i], color);
-            }
-
-            this.state.chart.update();
-            this.trigger(this.state);
-        }
-    },
-
     //handler for user selected port in dropdown list
     onSetPortSelected: function(port) {
         clearInterval(this.state.interval);
         this.state.selectedPort = port;
+        this.clearStats();
         this.resetGraph();
+        this.onSetChartContext('portStatsChart');
         this.trigger(this.state);
     },
 
@@ -282,13 +266,18 @@ module.exports = Reflux.createStore({
         this.trigger(this.state);
     },
 
-    /*************** helper functions *****************/
+    //handler to set the name of the selected details to show
+    onSetActiveDetails: function(name) {
+        this.state.activeGraph = name;
+        this.trigger(this.state);
+    },
 
+    /*************** helper functions *****************/
     //clear the chart stats for each graph
     clearStats: function() {
-        for (var key in this.state.datasets) {
-            if (this.state.datasets.hasOwnProperty(key)) {
-                var data = this.state.datasets[key];
+        for (var key in this.state.dataSets) {
+            if (this.state.dataSets.hasOwnProperty(key)) {
+                var data = this.state.dataSets[key];
                 data.stats.average = 0;
                 data.stats.low = 0;
                 data.stats.med = 0;
@@ -299,22 +288,14 @@ module.exports = Reflux.createStore({
 
     //reset the graph and canvas
     resetGraph: function() {
+        //reset the counters
         this.state.pointCount = 0;
         this.state.secondsCount = 0;
+        this.state.playHandler = false;
+        this.state.pauseHandler = true;
 
         //destroy current chart instance
         this.state.chart.destroy();
-
-        //re-initialize chart instance
-        var ctx = document.getElementById('portStatsChart').getContext('2d');
-        var graphData = { 'labels': [], 'datasets': [
-            this.state.dataSets.rxData.graphData,
-            this.state.dataSets.txData.graphData,
-            this.state.dataSets.errorData.graphData,
-            this.state.dataSets.droppedData.graphData] };
-
-        var portChart = new Chart(ctx).Line(graphData, this.state.options);
-        this.state.chart = portChart;
         this.trigger(this.state);
     },
 
@@ -324,6 +305,8 @@ module.exports = Reflux.createStore({
         var pointCount = this.state.pointCount;
         if (pointCount === MAX_POINTS_ON_GRAPH) {
             this.state.chart.removeData();
+            //this.state.chart.allGraphData.shift();
+            //this.state.barChart.removeData();
         } else {
             this.state.pointCount = this.state.pointCount + 1;
         }
@@ -340,7 +323,7 @@ module.exports = Reflux.createStore({
         }
 
         if (index.allData.length > 0) {
-            index.stats.average = (sum / index.allData.length).toFixed(3);
+            index.stats.average = (sum / index.allData.length).toFixed(2);
         }
     },
 
@@ -356,26 +339,19 @@ module.exports = Reflux.createStore({
         }
     },
 
-    //change the color of a line instance
-    setGraphColor: function(dataset, color) {
-        dataset.fillColor = color;
-        dataset.strokeColor = color;
-        dataset.pointStrokeColor = color;
-        dataset.pointColor = color;
-
-        for (var j in dataset.points) {
-            if (dataset.points.hasOwnProperty(j)) {
-                dataset.points[j].fillColor = color;
-                dataset.points[j].strokeColor = color;
-            }
+    // pause play handler for graph
+    onSetPausePlayHandler: function(action, handler) {
+        if (action === 'play') {
+            this.state.playHandler = handler;
+        } else if (action === 'pause') {
+            this.state.pauseHandler = handler;
         }
+        this.trigger(this.state);
     },
 
-    //calcualte port utilization
-    calculateUtilization: function(linkSpeed, key) {
-        var stats = this.state.portStats;
+    // calculate utilization for full duplex
+    calculateFullDuplex: function(linkSpeed, key, stats) {
         var util, curr, prev;
-
         switch (key) {
             case 'rxData':
                 curr = stats.current ? Number(stats.current.rx_bytes) : null;
@@ -399,9 +375,19 @@ module.exports = Reflux.createStore({
                 break;
         }
 
-        if (curr !== null && prev !== null && Number(linkSpeed) !== 0) {
-            util = (((curr - prev) / Number(linkSpeed))*100).toFixed(2);
-        } else { util = null; }
+        util = (Calcs.calcFullUtil(prev, curr, linkSpeed)).toFixed(2);
+        return Number(util);
+    },
+
+    //calcualte port utilization
+    calculateUtilization: function(duplex, linkSpeed, key) {
+        var stats = this.state.portStats;
+        var util;
+
+        //FIXME - are there ever more than 1 items in the array?
+        if (duplex[0] === 'full') {
+            util = this.calculateFullDuplex(linkSpeed, key, stats);
+        }
 
         return util;
     }

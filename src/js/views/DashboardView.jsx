@@ -15,14 +15,17 @@ var React = require('react/addons'),
     ReactShuffle = require('react-shuffle'),
     SystemInfoActions = require('SystemInfoActions'),
     SystemStatsActions = require('SystemStatsActions'),
-    TopUtilizationActions = require('TopUtilizationActions'),
-    Lodash = require('lodash'),
-    ObjectPath = require('object-path');
+    InterfaceActions = require('InterfaceActions'),
+    Lodash = require('lodash');
 
 var AUTO_REFRESH_MILLIS = 10000,
     NUM_UTL_VIEW_SLOTS = 5,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
+    METER_MAX_VAL_ADJ = 0.1,
     autoRefreshTimer;
+
+// TODO: Fix for grommet max value (no bar).
+// TODO: Make sure data is consistent (strings vs numbers).
 
 function t(key) {
     return I18n.text('views.dashboard.' + key);
@@ -43,19 +46,18 @@ module.exports = React.createClass({
     mixins: [ Reflux.listenTo(DashboardStore, 'onLoadAllCompleted') ],
 
     getInitialState: function() {
-        var portSlots = [],
-            vlanSlots = [];
+        var portSlots = [];
         for (var i=0; i<NUM_UTL_SLOTS; i++) {
             portSlots.push( { key: 'k' + i, init: true, val: 0 } );
-            vlanSlots.push( { key: 'k' + i, init: true, val: 0 } );
         }
         return {
             portSlots: portSlots,
-            vlanSlots: vlanSlots,
             sysInfo: {},
-            sysStats: {},
-            topUtilPorts: [],
-            topUtilVlans: []
+            sysStats: {
+                fans: [],
+                powerSupplies: []
+            },
+            interfaces: []
         };
     },
 
@@ -70,28 +72,21 @@ module.exports = React.createClass({
     },
 
     onLoadAllCompleted: function(data) {
-        var newPortSlots,
-            newVlanSlots;
-
-        newPortSlots = this.updateSlots(this.state.portSlots, data.topUtilPorts,
-            'id', 'stats.utilization');
-
-        newVlanSlots = this.updateSlots(this.state.vlanSlots, data.topUtilVlans,
-            'id', 'stats.utilization');
+        var newPortSlots = this.updateSlots(
+                this.state.portSlots,
+                data.interfaces.topUtilization);
 
         this.setState({
             sysInfo: data.sysInfo,
             sysStats: data.sysStats,
-            topUtilPorts: data.topUtilPorts,
-            topUtilVlans: data.topUtilVlans,
-            portSlots: newPortSlots,
-            vlanSlots: newVlanSlots
+            interfaces: data.interfaces,
+            portSlots: newPortSlots
         });
     },
 
-    updateSlots: function(slots, dataItems, idKey, valKey) {
-        var di, slotIdx, i, id, val,
-            newSlots = Lodash.cloneDeep(slots);
+    updateSlots: function(currSlots, dataItems) {
+        var di, slotIdx, i, id,
+            newSlots = Lodash.cloneDeep(currSlots);
 
         for (i=0; i<newSlots.length; i++) {
             delete newSlots[i].init; // assume already inited by this point
@@ -100,16 +95,21 @@ module.exports = React.createClass({
 
         for (i=0; i<dataItems.length; i++) {
             di = dataItems[i];
-            id = ObjectPath.get(di, idKey, 'id');
-            val = ObjectPath.get(di, valKey, 'val');
+            id = di.ci.name + ' ' + t(di.dir); // (i.e. 3 Tx, 21 Rx, or 15)
             slotIdx = this.findSlotIdx(newSlots, id);
             if (slotIdx >= 0) {
                 newSlots[slotIdx].id = id;
-                newSlots[slotIdx].val = val;
+                newSlots[slotIdx].val = di.utl;
+                newSlots[slotIdx].dir = di.dir;
             }
         }
 
         newSlots = newSlots.sort(function(a, b) {
+            if (a.id && !b.id) {
+                return -1;
+            } else if (!a.id && b.id) {
+                return 1;
+            }
             return b.val - a.val;
         });
 
@@ -142,7 +142,7 @@ module.exports = React.createClass({
 
         SystemInfoActions.load();
         SystemStatsActions.load();
-        TopUtilizationActions.load();
+        InterfaceActions.load();
 
         autoRefreshTimer = setTimeout(function() {
             recurFn();
@@ -150,59 +150,125 @@ module.exports = React.createClass({
     },
 
     onClickChart: function() {
-        alert('Clicked chart icon.');
+        alert('Launch chart screen (not implemented yet).');
     },
 
     mkSysInfoPropData: function() {
         var si = this.state.sysInfo;
         return [
-            [ t('productName'), si.product_name ],
+            [ t('productName'), si.productName ],
             [ t('vendor'), si.vendor ],
             [ t('version'), si.version ],
-            [ t('onieVersion'), si.onie_version ],
-            [ t('baseMac'), si.base_mac_address ]
+            [ t('onieVersion'), si.onieVersion ],
+            [ t('baseMac'), si.baseMac ]
         ];
     },
 
     mkSysStatusPropData: function() {
         var si = this.state.sysStats,
-            fan = si.fan_status,
-            pwr = si.power_status;
+            fans = si.fans,
+            pwrs = si.powerSupplies,
+            fanPropVal,
+            status,
+            pwrPropKey1, pwrPropVal1,
+            pwrPropKey2, pwrPropVal2;
 
+        if (fans && fans.length > 0) {
+            status = 'ok';
+            for (var i=0; i<fans.length; i++) {
+                if (fans[i].status !== 'ok') {
+                    status = fans[i].status;
+                    break;
+                }
+            }
+            fanPropVal = <StatusText value={status} text={t(status)} />;
+        }
+        if (pwrs && pwrs.length === 2) {
+            pwrPropKey1 = t('powerStatus') + ' (' + pwrs[0].name + ')';
+            pwrPropVal1 = (
+                <StatusText value={pwrs[0].status} text={t(pwrs[0].status)} />
+            );
+            pwrPropKey2 = t('powerStatus') + ' (' + pwrs[1].name + ')';
+            pwrPropVal2 = (
+                <StatusText value={pwrs[1].status} text={t(pwrs[1].status)} />
+            );
+        }
+
+        // FIXME: dup key problem?
         return [
-            [
-                t('fanStatus'),
-                fan ? <StatusText value={fan} text={t(fan)} /> : null
-            ], [
-                t('powerStatus'),
-                pwr ? <StatusText value={pwr} text={t(pwr)} /> : null
-            ],
-            [ t('upTime'), si.up_time ]
+            [ t('fanStatus'), fanPropVal ],
+            [ pwrPropKey1, pwrPropVal1 ],
+            [ pwrPropKey2, pwrPropVal2 ]
         ];
     },
 
     mkMeter: function(val, maxVal, units) {
-        var v = val || 0,
-            m = maxVal || 0,
+        var v = Math.round((val || 0) * 10) / 10,
+            m = Math.round((maxVal || 0) * 10) / 10,
             u = units || '';
         return (
             <GMeter className="viewBoxContent" type="arc" value={ v }
-                min={{ value: 0, label: '0 ' + units }}
-                max={{ value: m, label: m.toString() + ' ' + u }}
-                thresholds={ mkThresholds(m) }
-                units={ u } />
+                min={{
+                    value: 0,
+                    label: '0 ' + u
+                }}
+                max={{
+                    value: m + METER_MAX_VAL_ADJ,
+                    label: m.toString() + ' ' + u
+                }}
+                thresholds={ mkThresholds(m) } />
         );
     },
 
-    mkUtlMeter: function(key, title, name, val) {
+    mkTempMeter: function(item) {
+        var u = t('tempUnits'),
+            max = (item.max * 1.5); // FIXME: temp val always max?
         return (
-            <div key={key} className="utilizationRow">
+            <div key={item.name} className="tempRow">
+                <GMeter
+                    value={Math.round(item.val * 10) / 10}
+                    small={true}
+                    min={{
+                        value: item.min,
+                        label: item.min.toFixed(1) + ' ' + u
+                    }}
+                    max={{
+                        value: max + METER_MAX_VAL_ADJ,
+                        label: max.toFixed(1) + ' ' + u
+                    }}
+                    thresholds={mkThresholds(max)}
+                    units={u} />
+            </div>
+        );
+    },
+
+    mkTempMeters: function() {
+        var temps = this.state.sysStats.temps || [];
+        return (
+            <div className="viewBoxContent">
+                { temps.map(function(item) {
+                    return this.mkTempMeter(item);
+                }.bind(this))}
+            </div>
+        );
+    },
+
+    mkUtlMeter: function(slot) {
+        return (
+            <div key={ slot.key } className="utilizationRow">
                 <div>
-                    <b>{ title }:&nbsp;</b><span>{ name }</span>
+                    <b>{ t('port') }:&nbsp;</b>
+                    <span>{ slot.id }</span>
                 </div>
-                <GMeter value={ val }
-                    min={ { value: 0, label: '0%' } }
-                    max={ { value: 100, label: '100%' } }
+                <GMeter value={ Math.round(slot.val * 10) / 10 }
+                    min={{
+                        value: 0,
+                        label: '0%'
+                    }}
+                    max={{
+                        value: 100 + METER_MAX_VAL_ADJ,
+                        label: '100%'
+                    }}
                     thresholds={ mkThresholds(100) }
                     units="%" />
             </div>
@@ -214,9 +280,7 @@ module.exports = React.createClass({
             slot;
         for (var i=0; i<NUM_UTL_VIEW_SLOTS; i++) {
             slot = slots[i];
-            meters.push(
-                this.mkUtlMeter(slot.key, t(label), slot.id, slot.val)
-            );
+            meters.push( this.mkUtlMeter(slot) );
         }
         return meters;
     },
@@ -234,16 +298,14 @@ module.exports = React.createClass({
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader
-                            title={t('systemInfo')} toolbar={tb} />
+                        <ViewBoxHeader title={t('systemInfo')} />
                         <PropTable
                             className="viewBoxContent"
                             data={this.mkSysInfoPropData()} />
                     </div>
 
                     <div className="viewBox box1">
-                        <ViewBoxHeader
-                            title={t('systemStatus')} toolbar={tb} />
+                        <ViewBoxHeader title={t('systemStatus')} />
                         <PropTable
                             className="viewBoxContent"
                             data={this.mkSysStatusPropData()} />
@@ -253,22 +315,23 @@ module.exports = React.createClass({
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('cpu')} toolbar={tb} />
-                        {this.mkMeter(si.cpu, si.cpu_max, '')}
+                        {this.mkMeter(si.cpuVal, si.cpuMax, '')}
                     </div>
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('storage')} toolbar={tb} />
-                        {this.mkMeter(si.stor, si.stor_max, t('storageUnits'))}
+                        {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
                     </div>
                 </div>
 
                 <div className="viewCol">
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('memory')} toolbar={tb} />
-                        {this.mkMeter(si.mem, si.mem_max, t('memoryUnits'))}
+                        {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
                     </div>
+
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('temp')} toolbar={tb} />
-                        {this.mkMeter(si.temp, si.temp_max, t('tempUnits'))}
+                        {this.mkTempMeters()}
                     </div>
                 </div>
 
@@ -277,15 +340,6 @@ module.exports = React.createClass({
                     <div className="viewBoxContent">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
                             { this.mkUtlMeters('port', this.state.portSlots) }
-                        </ReactShuffle>
-                    </div>
-                </div>
-
-                <div className="viewBox">
-                    <ViewBoxHeader title={t('vlanTopUtil')} toolbar={tb} />
-                    <div className="viewBoxContent">
-                        <ReactShuffle duration={1500} scale={false} fade={true}>
-                            { this.mkUtlMeters('vlan', this.state.vlanSlots) }
                         </ReactShuffle>
                     </div>
                 </div>

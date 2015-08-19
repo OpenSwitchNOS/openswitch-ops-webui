@@ -2,6 +2,7 @@
  * Mast component that contains the logo, user, etc.
  * @author Kelsey Dedoshka
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 var React = require('react'),
@@ -19,20 +20,29 @@ module.exports = React.createClass({
 
     mixins: [
         Reflux.connect(RenderStore, 'render'),
-        Reflux.connect(UserStore, 'user')
+        Reflux.connect(UserStore, 'user'),
+        // FIXME: create a MastStore I think.
+        Reflux.listenTo(SystemInfoActions.load.completed, 'onSysInfoLoaded')
     ],
 
     componentDidMount: function() {
         // FIXME: create a MastStore I think.
         SystemInfoActions.load();
+
+    },
+
+    onSysInfoLoaded: function(data) {
+        this.setState({
+            sysInfo: data
+        });
     },
 
     render: function() {
         // FIXME: bogus data
         var t = I18n.text,
-            prod = 'Part#', //this.state.sys.product,
-            sysName = 'Serial#', //this.state.sys.name,
-            sysLoc = 'alswitch3.rose.hp.com', //this.state.sys.location,
+            partNum = this.state.sysInfo && this.state.sysInfo.partNum,
+            serialNum = this.state.sysInfo && this.state.sysInfo.serialNum,
+            hostName = this.state.sysInfo && this.state.sysInfo.hostName,
             user = 'Carl Spangler',
             showToggleIcon = this.state.render.showNavPane,
             chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
@@ -49,11 +59,15 @@ module.exports = React.createClass({
 
                 <span>
                     {toggleIcon}
-                    <img id="mastLogo" src="OpenHalonLogo.png" />
+                    <img src="OpenSwitchLogo.png" />
                 </span>
 
                 <span>
-                    <b>{prod}&nbsp;-</b>&nbsp;{sysName}&nbsp;-&nbsp;{sysLoc}
+                    <b>{t('hostName')}:</b>&nbsp;{hostName || ''}
+                    &nbsp;-&nbsp;
+                    <b>{t('partNum')}:</b>&nbsp;{partNum || ''}
+                    &nbsp;-&nbsp;
+                    <b>{t('serialNum')}:</b>&nbsp;{serialNum || ''}
                 </span>
 
                 <span>

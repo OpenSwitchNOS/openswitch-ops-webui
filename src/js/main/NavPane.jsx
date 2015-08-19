@@ -2,6 +2,7 @@
  * Navigation pane that creates one or more navigation groups.
  * @author Kelsey Dedoshka
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 var React = require('react/addons'),
@@ -73,8 +74,8 @@ module.exports = React.createClass({
                 <hr />
                 <NavGroup heading={t('ports')}
                     routes={[
-                        'portMgmt',
-                        'portMonitor'
+                        'portMonitor',
+                        'portMgmt'
                     ]}
                 />
                 <hr />
@@ -82,22 +83,12 @@ module.exports = React.createClass({
                     routes={[
                         'vlanMgmt',
                         'vlanPortConfig',
-                        'vlanMonitor'
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('routing')}
                     routes={[
                         'staticRoutes',
-                        'bgp',
-                    ]}
-                />
-                <hr />
-                <NavGroup heading={t('test')}
-                    routes={[
-                        'test1',
-                        'test2',
-                        'test3'
                     ]}
                 />
 

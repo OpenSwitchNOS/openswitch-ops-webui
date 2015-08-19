@@ -8,13 +8,6 @@ $disabledHeight: $detailsHeight - 30;
 $disabledText: #575757;
 $activeText: white;
 
-//main chart wrapper
-#portStatsChart {
-    width: 100%;
-    height: 350px !important;
-    padding: 20px;
-}
-
 //key toggle toolbar wrapper
 .graphToggleWrapper {
 
@@ -83,4 +76,32 @@ $activeText: white;
     padding-top: 10px;
     padding-bottom: 10px;
     text-align: center;
+}
+
+//manage chart components together
+#canvasWrapper {
+    #portStatsChart {
+        width: 100%;
+        height: 350px !important;
+        padding: 20px;
+    }
+}
+
+#barStatsChart {
+    padding: 20px;
+    padding-bottom: 5px;
+    width: 100%;
+    height: 150px !important;
+}
+
+.iconBorder {
+    &.right {
+        border-right-color: lightgray;
+        border-right-style: solid;
+        border-right-width: 1px;
+        height: 100%;
+        padding-right: 20px;
+        margin-right: 20px;
+    }
+
 }

@@ -15,7 +15,8 @@ module.exports = Reflux.createStore({
     state: {
         screenType: 'normal',
         showNavPane: true,
-        autoCloseNavPane: false
+        autoCloseNavPane: false,
+        isAuth: false
     },
 
     // Can be used to initialize users of this store.
@@ -50,6 +51,11 @@ module.exports = Reflux.createStore({
     // Callback for RenderActions.toggleNavPane.
     onToggleNavPane: function() {
         this.state.showNavPane = !this.state.showNavPane;
+        this.trigger(this.state);
+    },
+
+    onLogin: function() {
+        this.state.isAuth = true;
         this.trigger(this.state);
     }
 

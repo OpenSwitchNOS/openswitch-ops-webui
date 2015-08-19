@@ -1,6 +1,7 @@
 /*
  * Localization for en-US.
  * @author Frank Wood
+ * @author Al Harrington
  */
 
 module.exports = {
@@ -17,6 +18,9 @@ module.exports = {
         ports: 'Ports',
         vlans: 'VLANs',
         routing: 'Routing',
+        partNum: 'Part #',
+        serialNum: 'Serial #',
+        hostName: 'Hostname',
         test: 'Test',
 
         // Errors.
@@ -38,29 +42,46 @@ module.exports = {
                 error: 'Error',
                 warning: 'Warning',
                 ok: 'OK',
-                fanStatus: 'Fan Status',
-                powerStatus: 'Power Status',
+                fanStatus: 'Fans',
+                powerStatus: 'Power',
                 cpu: 'CPU Load',
                 memory: 'Memory',
                 memoryUnits: 'GB',
                 storage: 'Storage',
                 storageUnits: 'GB',
-                temp: 'Temperature',
+                temp: 'Temperatures',
                 tempUnits: 'C',
                 portTopUtil: 'Top Port Utilization',
                 vlanTopUtil: 'Top VLAN Utilization',
                 port: 'Port',
-                vlan: 'VLAN'
+                vlan: 'VLAN',
+                tx: 'Tx',
+                rx: 'Rx',
+                txRx: ''
             },
             systemMonitor: {
                 name: 'System Monitor'
             },
-            portMgmt: {
-                name: 'Management'
-            },
             portMonitor: {
                 name: 'Monitor',
-                portUtil: 'Port Utilization - Port '
+                portUtil: 'Port Utilization - Port ',
+            },
+            portMgmt: {
+                name: 'Management',
+                boxGraphic: 'Status',
+                allPorts: 'Ports',
+                th: {
+                    name: 'Name',
+                    adminState: 'Admin State',
+                    linkState: 'Link State',
+                    duplex: 'Duplex',
+                    speed: 'Speed',
+                    connector: 'Connector',
+                    vendor: 'Vendor'
+                }
+            },
+            ip: {
+                name: 'IP'
             },
             vlanMgmt: {
                 name: 'Management'

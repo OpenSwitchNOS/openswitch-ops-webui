@@ -23,6 +23,11 @@
             color: $iconHoverColor;
         }
     }
+
+    // Style for smaller version of action icons
+    &.smallIcon {
+        font-size: 16px;
+    }
 }
 
 // Style the grommet icons for the disabled state.
@@ -40,3 +45,4 @@
         stroke: $iconNormalColor;
     }
 }
+

@@ -1,0 +1,66 @@
+/* 
+ * port mgmt view styles
+ * @author Kelsey Dedoshka
+ */
+
+.portStatusKey {
+
+    .keyTitle {
+        margin-left: 15px;
+        margin-right: 25px;
+    }
+
+    &.up {
+        width: 100px;
+    }
+
+    &.port {
+        width: 110px;
+    }
+
+    &.interface {
+        width: 150px;
+    }
+
+    &.adminDisabled, &.linkDisabled {
+        width: 220px;
+    }
+
+    .ports {
+        &.up {
+            .fa {
+                color: $statusColorGreen;
+            }
+        }
+
+        &.interface {
+            display: inline-block;
+            width: 20px;
+            height: 17px;
+            border-radius: 2.0px;
+            background-color: black;
+            opacity: 0.5;
+        }
+
+        &.port {
+            display: inline-block;
+            width: 20px;
+            height: 17px;
+            border-radius: 2.0px;
+            background-color: black;
+
+        }
+
+        &.adminDisabled {
+            .fa {
+                color: $statusColorRed;
+            }
+        }
+
+        &.linkDisabled {
+            .fa {
+                color: $statusColorOrange;
+            }
+        }
+    }
+}

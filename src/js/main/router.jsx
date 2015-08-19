@@ -9,12 +9,13 @@ var React = require('react'),
     Route = Router.Route,
     DefaultRoute = Router.DefaultRoute,
 
+    Login = require('Login'),
     BgpView = require('BgpView'),
-    DashboardView = require('DashboardView'),
-    PortMgmtView = require('PortMgmtView'),
-    PortMonitorView = require('PortMonitorView'),
     StaticRoutesView = require('StaticRoutesView'),
     SystemMonitorView = require('SystemMonitorView'),
+    DashboardView = require('DashboardView'),
+    PortMonitorView = require('PortMonitorView'),
+    PortMgmtView = require('PortMgmtView'),
     TestView1 = require('TestView1'),
     TestView2 = require('TestView2'),
     TestView3 = require('TestView3'),
@@ -26,6 +27,7 @@ var React = require('react'),
 
 var routes = (
     <Route name="app" path="/" handler={App}>
+        <Route name="login" handler={Login}/>
         <Route name="bgp" handler={BgpView}/>
         <Route name="dashboard" handler={DashboardView}/>
         <Route name="portMgmt" handler={PortMgmtView}/>
@@ -38,7 +40,7 @@ var routes = (
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
         <Route name="vlanMonitor" handler={VlanMonitorView}/>
         <Route name="vlanPortConfig" handler={VlanPortConfigView}/>
-        <DefaultRoute handler={DashboardView}/>
+        <DefaultRoute handler={Login}/>
     </Route>
 );
 
