@@ -33,8 +33,12 @@ function getBody(url, callback) {
     }
 
     Request.get(reqUrl).end(function(err, res) {
-        err.reqUrl = reqUrl;
-        callback(err, err ? null : res.body);
+        if (err) {
+            err.reqUrl = reqUrl;
+            callback(err, null);
+        } else {
+            callback(null, res.body);
+        }
     });
 }
 
