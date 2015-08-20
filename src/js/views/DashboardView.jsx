@@ -4,6 +4,10 @@
  * @author Al Harrington
  */
 
+// TODO: stagger load times so we don't wait 10 seconds.
+// TODO: show 'Fans: () OK (count 10);
+// TODO: show 'Power Supplies: () OK (base-1)'
+
 var React = require('react/addons'),
     Reflux = require('reflux'),
     I18n = require('i18n'),

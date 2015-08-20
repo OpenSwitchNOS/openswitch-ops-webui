@@ -24,26 +24,6 @@ html, body, {
 }
 
 /*
- * Style the grommet login (git rid of the layer container "white border").
- */
-.appLoginLayer {
-    z-index: 200; // must be larger than mast and navPane
-
-    .layer__container {
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
-
-    #appLoginForm {
-        .login-form__logo  {
-            width: 277px;
-            height: 96px;
-        }
-    }
-}
-
-/*
  * Mast
  *  -Fixed to the top of the browser
  *  -doesn't scroll
@@ -191,4 +171,38 @@ html, body, {
     &.navPaneShown {
         left: $navPaneWidth;
     }
+}
+
+/*
+ * Style the grommet login (git rid of the layer container "white border").
+ */
+.appLoginLayer {
+    z-index: 200; // must be larger than mast and navPane
+
+    .layer__container {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    #appLoginForm {
+        .login-form__logo  {
+            width: 277px;
+            height: 96px;
+        }
+    }
+}
+
+/*
+ * Style the grommet layer for the notification.
+ */
+.appNotificationLayer {
+    z-index: 300; // must be larger than mast, navpane & login
+
+    hr {
+        border: 0;
+        height: 1px;
+        background-color: $appNotificationDivderBackgroundColor;
+    }
+
 }

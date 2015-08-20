@@ -3,6 +3,8 @@
  * @author Kelsey Dedoshka
  */
 
+// TODO: make configurable and generic?
+
 var React = require('react'),
     PropTypes = React.PropTypes,
     Reflux = require('reflux'),

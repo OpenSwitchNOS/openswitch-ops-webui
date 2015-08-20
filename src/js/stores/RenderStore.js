@@ -3,8 +3,12 @@
  * @author Frank Wood
  */
 
+// TODO: Change name of render store to 'global app store' or something.
+
 var Reflux = require('reflux'),
     RenderActions = require('RenderActions');
+
+// Do all RenderActions have to go through the store?
 
 module.exports = Reflux.createStore({
 
@@ -16,7 +20,8 @@ module.exports = Reflux.createStore({
         screenType: 'normal',
         showNavPane: true,
         autoCloseNavPane: false,
-        isAuth: false
+        isAuth: false,
+        requestErr: null
     },
 
     // Can be used to initialize users of this store.
@@ -56,6 +61,16 @@ module.exports = Reflux.createStore({
 
     onLogin: function() {
         this.state.isAuth = true;
+        this.trigger(this.state);
+    },
+
+    onPostRequestErr: function(err) {
+        this.state.requestErr = err;
+        this.trigger(this.state);
+    },
+
+    onClearRequestErr: function() {
+        this.state.requestErr = null;
         this.trigger(this.state);
     }
 

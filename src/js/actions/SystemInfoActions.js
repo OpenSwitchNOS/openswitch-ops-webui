@@ -5,7 +5,8 @@
  */
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var SystemInfoActions = Reflux.createActions({
     // Actions: load, loadFailed, loadCompleted
@@ -34,6 +35,10 @@ SystemInfoActions.load.listen(function() {
         }
     }.bind(this));
 
+});
+
+SystemInfoActions.load.failed.listen(function(err) {
+    RenderActions.postRequestErr(err);
 });
 
 module.exports = SystemInfoActions;

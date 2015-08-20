@@ -6,7 +6,8 @@
 // TODO: make action file names consistent with stores (Port vs Ports).
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var InterfaceActions = Reflux.createActions({
     load: { asyncResult: true },
@@ -43,5 +44,10 @@ InterfaceActions.load.listen(function() {
     }.bind(this));
 
 });
+
+InterfaceActions.load.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
 
 module.exports = InterfaceActions;

@@ -11,7 +11,10 @@ module.exports = {
     messages: {
 
         // General text (try to keep in alpha order).
+        close: 'Close',
         user: 'User',
+        errReqUrl: 'Request',
+        errMsg: 'Error',
 
         // Navigation groups.
         general: 'General',

@@ -9,35 +9,31 @@ var init = false,
     REST_IP_DEV_MODE = 'http://15.108.28.69:8091',
     REST_IP = 'http://' + window.location.hostname + ':8091';
 
-// Wraps the superagent GET request in a form that can be used as an Asyc
+// Wraps the superagent GET request in a form that can be used as an Async
 // callback (i.e. callback(err, res)).
 function getBody(url, callback) {
     var reqUrl = url;
 
-    console.log('RestUtils.getBody: "' + url + '"');
-
     if (window.webpackHotUpdate) {
+
         if (!init) {
             console.log('RestUtils DEV MODE: "' + REST_IP_DEV_MODE + '"');
+            init = true;
         }
         reqUrl = REST_IP_DEV_MODE + url;
-        console.log('*** DEV MODE REDIRECT TO: "' + reqUrl + '" ***');
+
     } else if (!window.jasmine) {
+
         if (!init) {
             console.log('RestUtils PRODUCTION: "' + REST_IP + '"');
+            init = true;
         }
+
         reqUrl = REST_IP + url;
-        console.log('*** REDIRECT TO: "' + reqUrl + '" ***');
     }
 
-    init = true;
-
     Request.get(reqUrl).end(function(err, res) {
-        console.log('Response for: "' + reqUrl + '"');
-        console.log('err:');
-        console.log(err);
-        console.log('res.body:');
-        console.log(res.body);
+        err.reqUrl = reqUrl;
         callback(err, err ? null : res.body);
     });
 }
@@ -63,6 +59,8 @@ function getBody(url, callback) {
 // ])
 //      -would call 'get' on both URL arrays in parallel, in turn, this would
 //      -call 'getBody' on the first array and 'getBody' on the second array.
+//
+// Specifying silent as true, will hide any default error handling
 //
 function get(req, cb) {
     if (Array.isArray(req)) {

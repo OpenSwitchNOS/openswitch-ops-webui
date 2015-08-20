@@ -38,7 +38,7 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        // FIXME: bogus data
+        // FIXME: bogus data, clean up this.state below
         var t = I18n.text,
             partNum = this.state.sysInfo && this.state.sysInfo.partNum,
             serialNum = this.state.sysInfo && this.state.sysInfo.serialNum,

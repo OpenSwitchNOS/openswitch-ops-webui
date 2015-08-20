@@ -12,18 +12,24 @@ var React = require('react/addons'),
     RenderStore = require('RenderStore'),
     Mast = require('Mast'),
     NavPane = require('NavPane'),
-    ClassNames = require('classnames');
+    ClassNames = require('classnames'),
+    Notification = require('Notification');
 
 module.exports = React.createClass({
 
     displayName: 'App',
 
-    mixins: [ Reflux.connect(RenderStore, 'render') ],
+    mixins: [
+        Reflux.connect(RenderStore, 'render')
+    ],
 
     render: function() {
 
         var showNav = this.state.render.showNavPane,
+            err = this.state.render.requestErr,
             cls = ClassNames({ navPaneShown: showNav });
+
+        console.log(err);
 
         return (
             <div>
@@ -37,6 +43,7 @@ module.exports = React.createClass({
                     <RouteHandler />
                 </div>
 
+                {err ? <Notification requestErr={err} /> : null}
             </div>
         );
     }
