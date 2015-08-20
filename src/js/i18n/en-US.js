@@ -43,6 +43,8 @@ module.exports = {
                 warning: 'Warning',
                 ok: 'OK',
                 fanStatus: 'Fans',
+                powerSupplyLabel: 'Power supply',
+                powerSuppliesLabel: 'Power supplies',
                 powerStatus: 'Power',
                 cpu: 'CPU Load',
                 memory: 'Memory',
