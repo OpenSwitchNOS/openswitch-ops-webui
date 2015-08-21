@@ -25,47 +25,46 @@ $activeText: white;
 
     //color keys for toolbar key
     .color0 {
-        color: rgba(0,120,4,1);
+        color: rgba(255,111,62,1);
     }
 
     .color1 {
-        color: rgba(0,88,105,1);
+        color: rgba(61,141,155,1);
     }
 
     .color2 {
-        color: rgba(139,178,0,1);
+        color: rgba(211,154,66,1);
     }
 
     .color3 {
-        color: rgba(60,43,69,1);
+        color: rgba(101,57,164,1);
     }
 }
 
 //port details component styles
 .portDetails {
+    width: 100%;
+    margin-top: 15px;
+
     .title {
+        color: #545454;//#404040;
+        font-size: 20px;
         font-weight: normal;
-        color: black;
-        font-size: 22px;
         height: 20px;
-        margin-bottom: 10px;
     }
 
     .details {
-        font-weight: bold;
-        font-size: 35px;
+        font-size: 20px;
+        font-weight: normal;
     }
 
-    tr td:first-child {
-        padding-right: 20px;
-        border-right-color: lightgray;
-        border-right-width: 1px;
-        border-right-style: solid;
+
+    tr td {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        padding-left: 10px;
     }
 
-    tr td:nth-child(2) {
-        padding-left: 50px;
-    }
 }
 
 //details padding
@@ -82,10 +81,10 @@ $activeText: white;
 
 //manage chart components together
 #canvasWrapper {
-    #portStatsChart {
-        width: 100%;
-        height: 350px !important;
+    canvas {
+        height: 400px !important;
         padding: 20px;
+        width: 100%;
     }
 }
 
@@ -96,6 +95,7 @@ $activeText: white;
     height: 150px !important;
 }
 
+// icon border styling
 .iconBorder {
     &.right {
         border-right-color: lightgray;
@@ -105,5 +105,9 @@ $activeText: white;
         padding-right: 20px;
         margin-right: 20px;
     }
+}
 
+//tile min width for mobile
+.portDetailsWrapper .viewBox {
+    min-width: 405px;
 }

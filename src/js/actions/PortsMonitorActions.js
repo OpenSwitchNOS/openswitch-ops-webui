@@ -19,16 +19,13 @@ var PortsMonitorActions = Reflux.createActions({
     showStatus: {},
     setPortSelected: {},
     setInterval: {},
-    setPausePlayHandler: {}
+    setPausePlayHandler: {},
+    setBarChart: {}
 });
-
-//FIXME - for testing - will be removed
-//var ip = 'http://15.108.28.69:8091';
 
 //handles the 'loadPortStats' action by requesting data from the server
 PortsMonitorActions.loadPortStats.listen(function(port) {
-
-    // make sure port it not null
+    // make sure port is not null
     if (port) {
         RestUtils.get('/system/Interface/' + port, function(err, res) {
             if (err) {
@@ -46,12 +43,6 @@ PortsMonitorActions.loadPorts.listen(function() {
         if (err) {
             console.log(err);
         } else {
-            //FIXME - only needed while using ip var - remove when
-            //remove ip var
-            //var res = res.data;
-            //for (var i=0; i<res.length; i++) {
-            //    res[i] = ip + res[i];
-            //}
             var res = res.data;
             for (var i=0; i<res.length; i++) {
                 var port = res[i].split('/')[3];

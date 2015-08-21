@@ -13,15 +13,13 @@ var PortsMgmtActions = Reflux.createActions({
 });
 
 //var ip = 'http://15.108.28.69:8091';
-
+// FIXME - cleanup
 //handles the 'loadPorts' actions by requesting data from the server
 PortsMgmtActions.loadPorts.listen(function() {
     RestUtils.get('/system/bridges/bridge_normal/ports', function(err, res) {
         if (err) {
             console.log(err);
         } else {
-            //FIXME - only needed while using ip var - remove when
-            //remove ip var
             var res = res.data;
             for (var i=0; i<res.length; i++) {
                 var port = res[i].split('/')[3];

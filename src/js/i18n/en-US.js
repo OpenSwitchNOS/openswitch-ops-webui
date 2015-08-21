@@ -89,7 +89,19 @@ module.exports = {
                 name: 'IP'
             },
             vlanMgmt: {
-                name: 'Management'
+                name: 'Management',
+                boxGraphic: 'VLAN Membership',
+                allVlans: 'All VLANs',
+                th: {
+                    name: 'Name',
+                    id: 'ID',
+                    status: 'Status',
+                    untagged: 'Native-Untagged',
+                    tagged: 'Native-Tagged',
+                    access: 'Access',
+                    trunk: 'Trunk',
+                    display: 'Display'
+                }
             },
             vlanPortConfig: {
                 name: 'Port Config',
