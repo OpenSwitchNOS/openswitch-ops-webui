@@ -1,0 +1,49 @@
+/* vlan mgmt view css
+ * @author Kelsey Dedoshka
+ */
+
+//simulating the disabled checkbox
+.checkBox-disabled {
+    padding-left: 0px !important;
+    .disabled {
+        font-size: 30px;
+    }
+}
+
+.portEditLayer {
+
+    .layer__container {
+        height: 100%;
+        width: 400px;
+        padding: 55px;
+        margin-top: 47px;
+    }
+
+    .heading {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .subheader {
+        font-size: 22px;
+        margin-bottom: 30px;
+        margin-top: 40px;
+    }
+
+    .checkboxItem {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .divider {
+        border: 0;
+        height: 1px;
+        margin-top: 30px;
+        background-color: lightgray;
+    }
+
+    .portEditFooter button {
+        margin-right: 15px;
+    }
+}

@@ -29,3 +29,26 @@
 .editKeyContainer {
     padding-left: 20px;
 }
+
+/*.portTable tr td  {
+    padding-bottom: 4px;
+}*/
+
+
+.vlanKeyContainerSmall {
+    position: relative;
+    min-height: 40px;
+    min-width: 70px;
+    margin-right: 10px;
+    margin-bottom: 2px;
+    margin-left: 20px;
+}
+
+.vlanKeyItemWrapper {
+    width: 230px;
+}
+
+//Kelsey - FIXME
+.displayInline, .vlanKey, .vlanName, .vlanToolbar {
+    float: left;
+}

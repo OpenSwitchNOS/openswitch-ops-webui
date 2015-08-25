@@ -62,7 +62,6 @@ var ColorBadge = React.createClass({
 
     render: function() {
         var portData;
-        var portColors = [];
         var colors = this.props.colors;
 
         if (this.props.data && this.props.id in this.props.data) {

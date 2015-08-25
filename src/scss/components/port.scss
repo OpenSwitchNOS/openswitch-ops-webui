@@ -63,3 +63,62 @@ $portColor: #3D3D3D;
     height: 20px;
     background: linear-gradient(#3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%);
 }
+
+.portGraphicBaseSmall {
+    width: 40px;
+    height: 30px;
+    background-color: #DEDEDE;
+    border-color: $portColor;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 3px;
+    margin-top: 4px;
+    margin-left: 4px;
+    padding: 3px;
+    padding-top: 0px;
+}
+
+.portGraphicTier1Small {
+    background-color: $portColor;
+    width: 11px;
+    height: 4px;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    margin-left: 9px;
+    margin-top: 1px;
+}
+
+.portGraphicTier2Small {
+    background-color: $portColor;
+    width: 20px;
+    height: 4px;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    margin-left: 5px;
+}
+
+.portGraphicInnerBaseSmall {
+    background-color: $portColor;
+    width: 30px;
+    height:15px;
+    border-radius: 2px;
+    margin-left: 0px;
+    padding: 2px;
+    padding-bottom: 2px;
+}
+
+.prongSmall {
+    width: 2px;
+    height: 12px;
+    background: linear-gradient(#3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%);
+}
+
+.prongTableSmall {
+    width: 100%;
+    margin-top: 0px;
+    margin-left: 2px;
+
+    tr td {
+        padding: 0px;
+    }
+}
