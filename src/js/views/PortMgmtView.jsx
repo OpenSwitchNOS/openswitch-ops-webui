@@ -28,7 +28,7 @@ var PortList = React.createClass({
     render: function() {
 
         return (
-            <GTable className="defaultTable">
+            <GTable className="defaultTable portTable">
                 <thead>
                     <th>{t('th.name')}</th>
                     <th>{t('th.adminState')}</th>
@@ -100,12 +100,10 @@ module.exports = React.createClass({
                 icon='times'/>,
             linkDisabled: <KeyItem cls='linkDisabled' title='Link Disabled'
                 icon='times'/>,
-            port: <KeyItem cls='port' title='Port' />,
-            interface: <KeyItem cls='interface' title='Interface'/>
         };
 
         return (
-            <div className="viewFill viewCol">
+            <div id="portsMgmtView" className="viewFill viewCol">
                 <div className="viewBox viewFlex0">
                     <ViewBoxHeader
                         title={t('boxGraphic')}
@@ -115,7 +113,7 @@ module.exports = React.createClass({
                         'config': this.state.data.portStatus }}/>
                 </div>
                 <div className="viewBox viewFlex0">
-                    <ViewBoxHeader title={t('allPorts')}/>
+                    <ViewBoxHeader title={t('allInterfaces')}/>
                     <PortList ports={this.state.data.allPorts}/>
                 </div>
             </div>

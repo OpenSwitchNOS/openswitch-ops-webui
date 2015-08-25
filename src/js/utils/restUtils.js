@@ -2,6 +2,9 @@
  * REST utilities.
  */
 
+//FIXME - Kelsey reminder remove CORS from python server when making rest
+//requests
+
 var Request = require('superagent'),
     Async = require('async'),
     RenderStore = require('RenderStore'); // FIXME dependency in here is bad
@@ -22,7 +25,7 @@ function getBody(url, callback) {
         if (redirect) {
             reqUrl = URL_PREFIX + redirect + PORT_POSTFIX + url;
         } else {
-            reqUrl = REST_HOST + url
+            reqUrl = REST_HOST + url;
         }
     }
 

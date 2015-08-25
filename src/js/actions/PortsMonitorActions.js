@@ -4,7 +4,8 @@
  */
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var PortsMonitorActions = Reflux.createActions({
 
@@ -37,11 +38,16 @@ PortsMonitorActions.loadPortStats.listen(function(port) {
     }
 });
 
+//handles failure for loading ports stats
+PortsMonitorActions.loadPortStats.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
 //handles the 'loadPorts' actions by requesting data from the server
 PortsMonitorActions.loadPorts.listen(function() {
     RestUtils.get('/system/bridges/bridge_normal/ports', function(err, res) {
         if (err) {
-            console.log(err);
+            this.failed(err);
         } else {
             var res = res.data;
             for (var i=0; i<res.length; i++) {
@@ -51,7 +57,7 @@ PortsMonitorActions.loadPorts.listen(function() {
 
             RestUtils.get(res, function(err2, res2) {
                 if (err2) {
-                    console.log(err);
+                    this.failed(err2);
                 } else {
                     this.completed(res2);
                 }
@@ -59,5 +65,11 @@ PortsMonitorActions.loadPorts.listen(function() {
         }
     }.bind(this));
 });
+
+//handles failure for loading ports
+PortsMonitorActions.loadPorts.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
 
 module.exports = PortsMonitorActions;

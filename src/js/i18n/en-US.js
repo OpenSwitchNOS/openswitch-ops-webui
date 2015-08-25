@@ -74,7 +74,7 @@ module.exports = {
             portMgmt: {
                 name: 'Management',
                 boxGraphic: 'Status',
-                allPorts: 'Ports',
+                allInterfaces: 'Interfaces',
                 th: {
                     name: 'Name',
                     adminState: 'Admin State',
@@ -92,6 +92,7 @@ module.exports = {
                 name: 'Management',
                 boxGraphic: 'VLAN Membership',
                 allVlans: 'All VLANs',
+                noVlans: 'No VLANs are configured on this port',
                 th: {
                     name: 'Name',
                     id: 'ID',
@@ -100,7 +101,9 @@ module.exports = {
                     tagged: 'Native-Tagged',
                     access: 'Access',
                     trunk: 'Trunk',
-                    display: 'Display'
+                    display: 'Display',
+                    vlan: 'VLAN',
+                    portType: 'Port Type',
                 }
             },
             vlanPortConfig: {

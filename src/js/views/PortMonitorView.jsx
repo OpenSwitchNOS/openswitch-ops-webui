@@ -3,7 +3,6 @@
  * @author Kelsey Dedoshka
  */
 
-//FIXME - add react-chartjs to node module file
 var React = require('react'),
     Reflux = require('reflux'),
     PropTypes = React.PropTypes,
@@ -303,7 +302,7 @@ module.exports = React.createClass({
         }
 
         return (
-            <div className="viewFill viewCol">
+            <div id="portsMonitorView" className="viewFill viewCol">
                 <div id="portStatsGraphTile" className="viewBox viewFlex0">
                     <ViewBoxHeader title={t('views.portMonitor.portUtil') +
                         portNum}

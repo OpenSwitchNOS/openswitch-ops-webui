@@ -142,6 +142,7 @@ module.exports = Reflux.createStore({
             ];
         }
 
+        // create data sets and add to dataSets store variable
         for (var i=0; i<graphTypes.length; i++) {
             var initialStats = new Stats();
 

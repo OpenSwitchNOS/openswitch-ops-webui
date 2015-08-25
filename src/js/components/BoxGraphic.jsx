@@ -62,29 +62,33 @@ var ColorBadge = React.createClass({
 
     render: function() {
         var portData;
-        if (this.props.data) {
+        var portColors = [];
+        var colors = this.props.colors;
+
+        if (this.props.data && this.props.id in this.props.data) {
             portData = this.props.data[this.props.id];
         }
-
-        var colors = this.props.colors;
 
         // only load if the graphic is passed portData
         if (portData) {
             var status = this.props.vlanStatus;
             return (
                 <table className="portBadgeContainer"><tr>
-
                     {portData.vlans.map(function(vlan) {
-                        var style = {
-                            backgroundColor:
-                                colors[status[vlan].colorIndex].main
-                        };
+                        //Do not set the color style unless
+                        //the color index is valid
+                        if (colors[status[vlan].colorIndex]) {
+                            var style = {
+                                backgroundColor:
+                                    colors[status[vlan].colorIndex].main
+                            };
 
-                        if (status[vlan].show === true) {
-                            return (
-                                <td key={vlan.id}
-                                className="portBadge" style={style}></td>
-                            );
+                            if (status[vlan].show === true) {
+                                return (
+                                    <td key={vlan.id}
+                                        className="portBadge" style={style}></td>
+                                );
+                            }
                         }
                     }, this)}
                 </tr></table>
@@ -191,7 +195,6 @@ var BoxPorts = React.createClass({
         return (
             <tr className={'boxPortBackground' + this.props.type}>
                 {portsArray.map(function(num) {
-                    var portType = ' normal';
 
                     var portSelectedCallBack = null;
                     if (this.props.portSelected) {
@@ -199,20 +202,11 @@ var BoxPorts = React.createClass({
                             this.props.portSelected.bind(null, num);
                     }
 
-                    // For port status view - if the port is not in
-                    // the port table we can assume it is an interface
-                    // and style it like so
-                    if (this.props.portConfig.showPortStatus &&
-                        !(num in this.props.portConfig.config)) {
-                        portType = ' interface';
-                    }
-
                     return (
                         <td key={num} id={'portBox' + num}
                             className="portBoxContainer"
                             onClick={portSelectedCallBack}>
-                            <div id={'portBoxInner' + num} className={classType +
-                                portType}>
+                            <div id={'portBoxInner' + num} className={classType}>
 
                                <ColorBadge data={this.props.portConfig}
                                             id={num}
