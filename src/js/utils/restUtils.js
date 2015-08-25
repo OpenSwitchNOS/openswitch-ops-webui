@@ -3,33 +3,27 @@
  */
 
 var Request = require('superagent'),
-    Async = require('async');
+    Async = require('async'),
+    RenderStore = require('RenderStore'); // FIXME dependency in here is bad
 
-var init = false,
-    REST_IP_DEV_MODE = 'http://15.108.28.69:8091',
-    REST_IP = 'http://' + window.location.hostname + ':8091';
+var URL_PREFIX = 'http://',
+    PORT_POSTFIX = ':8091',
+    REST_HOST = URL_PREFIX + window.location.hostname + PORT_POSTFIX;
 
 // Wraps the superagent GET request in a form that can be used as an Async
 // callback (i.e. callback(err, res)).
 function getBody(url, callback) {
-    var reqUrl = url;
+    var reqUrl = url,
+        redirect;
 
-    if (window.webpackHotUpdate) {
-
-        if (!init) {
-            console.log('RestUtils DEV MODE: "' + REST_IP_DEV_MODE + '"');
-            init = true;
+    // If we are running the unit tests don't modify the URL at all!
+    if (!window.jasmine) {
+        redirect = RenderStore.state && RenderStore.state.restApiRedirect;
+        if (redirect) {
+            reqUrl = URL_PREFIX + redirect + PORT_POSTFIX + url;
+        } else {
+            reqUrl = REST_HOST + url
         }
-        reqUrl = REST_IP_DEV_MODE + url;
-
-    } else if (!window.jasmine) {
-
-        if (!init) {
-            console.log('RestUtils PRODUCTION: "' + REST_IP + '"');
-            init = true;
-        }
-
-        reqUrl = REST_IP + url;
     }
 
     Request.get(reqUrl).end(function(err, res) {

@@ -9,27 +9,36 @@ var React = require('react/addons'),
     Router = require('react-router'),
     RouteHandler = Router.RouteHandler,
     Reflux = require('reflux'),
+    RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore'),
     Mast = require('Mast'),
     NavPane = require('NavPane'),
     ClassNames = require('classnames'),
-    Notification = require('Notification');
+    Notification = require('Notification'),
+    QueryString = require('query-string');
 
 module.exports = React.createClass({
 
     displayName: 'App',
 
     mixins: [
-        Reflux.connect(RenderStore, 'render')
+        Reflux.connect(RenderStore, 'render'),
+        Router.State
     ],
+
+    componentWillMount: function() {
+        var qs = QueryString.parse(location.search);
+        if (qs && qs.restapi) {
+            console.log('REST API Redirect: ' + qs.restapi);
+            RenderActions.restApiRedirect(qs.restapi);
+        }
+    },
 
     render: function() {
 
         var showNav = this.state.render.showNavPane,
             err = this.state.render.requestErr,
             cls = ClassNames({ navPaneShown: showNav });
-
-        console.log(err);
 
         return (
             <div>

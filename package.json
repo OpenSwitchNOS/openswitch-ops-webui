@@ -35,7 +35,8 @@
     "lodash": "3.10.1",
     "grommet": "0.3.1",
     "react-shuffle": "0.1.0",
-    "react-chartjs": "0.6.0"
+    "react-chartjs": "0.6.0",
+    "query-string": "2.4.0"
   },
   "devDependencies": {
     "webpack": "1.11.0",

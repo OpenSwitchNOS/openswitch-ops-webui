@@ -15,5 +15,6 @@ module.exports = Reflux.createActions([
     'toggleNavPane',
     'login',
     'postRequestErr',
-    'clearRequestErr'
+    'clearRequestErr',
+    'restApiRedirect'
 ]);

@@ -21,7 +21,8 @@ module.exports = Reflux.createStore({
         showNavPane: true,
         autoCloseNavPane: false,
         isAuth: false,
-        requestErr: null
+        requestErr: null,
+        restApiRedirect: null
     },
 
     // Can be used to initialize users of this store.
@@ -71,6 +72,11 @@ module.exports = Reflux.createStore({
 
     onClearRequestErr: function() {
         this.state.requestErr = null;
+        this.trigger(this.state);
+    },
+
+    onRestApiRedirect: function(host) {
+        this.state.restApiRedirect = host;
         this.trigger(this.state);
     }
 
