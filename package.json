@@ -24,7 +24,7 @@
     "test": "karma start tools/test/karma.config.js --single-run"
   },
   "dependencies": {
-    "react": "0.13.3",
+    "react": "~0.13.3",
     "react-router": "0.13.3",
     "reflux": "0.2.12",
     "superagent": "1.3.0",
@@ -34,9 +34,8 @@
     "font-awesome": "4.4.0",
     "lodash": "3.10.1",
     "grommet": "0.3.1",
-    "chart.js": "1.0.2",
-    "grommet": "0.3.1",
-    "react-shuffle": "0.1.0"
+    "react-shuffle": "0.1.0",
+    "react-chartjs": "0.6.0"
   },
   "devDependencies": {
     "webpack": "1.11.0",
