@@ -63,9 +63,19 @@ function getBody(url, callback) {
 //
 // Specifying silent as true, will hide any default error handling
 //
+
+function hasArrayElement(arr) {
+    for (var i=0; i<arr.length; i++) {
+        if (Array.isArray(arr[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function get(req, cb) {
     if (Array.isArray(req)) {
-        if (req[0] && Array.isArray(req[0])) {
+        if (hasArrayElement(req)) {
             Async.map(req, get, cb);
         } else {
             Async.map(req, getBody, cb);
