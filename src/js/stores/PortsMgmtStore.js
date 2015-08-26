@@ -3,6 +3,8 @@
  * @author Kelsey Dedoshka
  */
 
+//FIXME - do not truncate and do toFixed in any store - always in the view
+
 var Reflux = require('reflux'),
     PortsMgmtActions = require('PortsMgmtActions');
 

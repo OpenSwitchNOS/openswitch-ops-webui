@@ -342,7 +342,8 @@ module.exports = Reflux.createStore({
 
         // set the high value
         if (graph.stats.high) {
-            graph.stats.high = num > graph.stats.high ? num : graph.stats.high;
+            graph.stats.high = num > graph.stats.high ? num :
+                graph.stats.high;
         } else {
             graph.stats.high = num;
         }

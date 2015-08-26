@@ -38,6 +38,8 @@ module.exports = Reflux.createStore({
 
     // Callback for success of loading vlan data
     onLoadVlansCompleted: function(data) {
+
+        console.log(data);
         var index, trunkVlans;
         var vlans = {};
 

@@ -4,12 +4,11 @@
  *
  */
 
-
 // calculates utilization based off parameters
 function calcUtil(prevBytes, currBytes, speed, intervalMs) {
 
     var maxBytesPerSec, bytesPerSec, utilization;
-    if (speed <= 0 || currBytes < prevBytes) {
+    if (speed <= 0 || currBytes < prevBytes || intervalMs <= 0) {
         return 0;
     }
 
