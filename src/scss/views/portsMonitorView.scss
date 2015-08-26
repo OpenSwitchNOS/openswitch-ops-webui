@@ -7,101 +7,111 @@ $detailsHeight: 200px;
 $disabledHeight: $detailsHeight - 30;
 $disabledText: #575757;
 $activeText: white;
+$colorKeyOrange: rgba(255,111,62,1);
+$colorKeyBlue: rgba(61,141,155,1);
+$colorKeyYellow: rgba(211,154,66,1);
+$colorKeyPurple: rgba(101,57,164,1);
 
-//key toggle toolbar wrapper
-.graphToggleWrapper {
+#portsMonitorView {
 
-    .toggleText {
-        margin-left: 10px;
-        margin-right: 10px;
-        font-size: 20px;
+    //wrapper for toolbar key items
+    .graphToggleWrapper {
+
+        .toggleText {
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        //suze of area chart icons in toolbar
+        .fa-area-chart {
+            font-size: 24px;
+        }
+
+        //color keys for area chart icons
+        .color0 {
+            color: $colorKeyOrange;
+        }
+
+        .color1 {
+            color: $colorKeyBlue;
+        }
+
+        .color2 {
+            color: $colorKeyYellow;
+        }
+
+        .color3 {
+            color: $colorKeyPurple;
+        }
     }
 
-    .fa-area-chart {
-        font-size: 24px;
-    }
-
-    //color keys for toolbar key
-    .color0 {
-        color: rgba(0,120,4,1);
-    }
-
-    .color1 {
-        color: rgba(0,88,105,1);
-    }
-
-    .color2 {
-        color: rgba(139,178,0,1);
-    }
-
-    .color3 {
-        color: rgba(60,43,69,1);
-    }
-}
-
-//port details component styles
-.portDetails {
-    .title {
-        font-weight: normal;
-        color: black;
-        font-size: 22px;
-        height: 20px;
-        margin-bottom: 10px;
-    }
-
-    .details {
-        font-weight: bold;
-        font-size: 35px;
-    }
-
-    tr td:first-child {
-        padding-right: 20px;
-        border-right-color: lightgray;
-        border-right-width: 1px;
-        border-right-style: solid;
-    }
-
-    tr td:nth-child(2) {
-        padding-left: 50px;
-    }
-}
-
-//details padding
-.innerContainer {
-    padding: 20px;
-}
-
-//port list drop down menu
-.portSelectionItem {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    text-align: center;
-}
-
-//manage chart components together
-#canvasWrapper {
-    #portStatsChart {
+    //port details component style
+    .portDetails {
         width: 100%;
-        height: 350px !important;
+        margin-top: 15px;
+
+        //title text
+        .title {
+            color: #545454;
+            font-size: 20px;
+            font-weight: normal;
+            height: 20px;
+        }
+
+        //details text
+        .details {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        //table formatting
+        tr td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            padding-left: 10px;
+        }
+
+    }
+
+    //content wrapper in tile
+    .innerContainer {
         padding: 20px;
     }
-}
 
-#barStatsChart {
-    padding: 20px;
-    padding-bottom: 5px;
-    width: 100%;
-    height: 150px !important;
-}
-
-.iconBorder {
-    &.right {
-        border-right-color: lightgray;
-        border-right-style: solid;
-        border-right-width: 1px;
-        height: 100%;
-        padding-right: 20px;
-        margin-right: 20px;
+    //port list drop down menu
+    .portSelectionItem {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: center;
     }
 
+    //manage chart components together
+    //line chart
+    #canvasWrapper {
+        canvas {
+            height: 400px !important;
+            padding: 20px;
+            width: 100%;
+        }
+    }
+
+    // icon border styling - horizantal
+    // diveder in toolbar between graph
+    // toggles and pause button
+    .iconBorder {
+        &.right {
+            border-right-color: lightgray;
+            border-right-style: solid;
+            border-right-width: 1px;
+            height: 100%;
+            padding-right: 20px;
+            margin-right: 20px;
+        }
+    }
+
+    //MOBILE - tile min width
+    .portDetailsWrapper .viewBox {
+        min-width: 405px;
+    }
 }

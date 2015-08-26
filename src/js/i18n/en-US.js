@@ -11,7 +11,10 @@ module.exports = {
     messages: {
 
         // General text (try to keep in alpha order).
+        close: 'Close',
         user: 'User',
+        errReqUrl: 'Request',
+        errMsg: 'Error',
 
         // Navigation groups.
         general: 'General',
@@ -43,7 +46,12 @@ module.exports = {
                 warning: 'Warning',
                 ok: 'OK',
                 fanStatus: 'Fans',
-                powerStatus: 'Power',
+                fanFault: 'Fault',
+                fanUninitialized: 'Uninitialized',
+                powerSupplyLabel: 'Power supply',
+                powerFaultInput: 'Input Fault',
+                powerFaultOutput: 'Output Fault',
+                powerAbsent: 'Absent',
                 cpu: 'CPU Load',
                 memory: 'Memory',
                 memoryUnits: 'GB',
@@ -69,7 +77,7 @@ module.exports = {
             portMgmt: {
                 name: 'Management',
                 boxGraphic: 'Status',
-                allPorts: 'Ports',
+                allInterfaces: 'Interfaces',
                 th: {
                     name: 'Name',
                     adminState: 'Admin State',
@@ -84,7 +92,22 @@ module.exports = {
                 name: 'IP'
             },
             vlanMgmt: {
-                name: 'Management'
+                name: 'Management',
+                boxGraphic: 'VLAN Membership',
+                allVlans: 'All VLANs',
+                noVlans: 'No VLANs are configured on this port',
+                th: {
+                    name: 'Name',
+                    id: 'ID',
+                    status: 'Status',
+                    untagged: 'Native-Untagged',
+                    tagged: 'Native-Tagged',
+                    access: 'Access',
+                    trunk: 'Trunk',
+                    display: 'Display',
+                    vlan: 'VLAN',
+                    portType: 'Port Type',
+                }
             },
             vlanPortConfig: {
                 name: 'Port Config',

@@ -4,7 +4,8 @@
  */
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var PortsMgmtActions = Reflux.createActions({
 
@@ -12,30 +13,28 @@ var PortsMgmtActions = Reflux.createActions({
     loadPorts: { asyncResult: true },
 });
 
-//var ip = 'http://15.108.28.69:8091';
-
-//handles the 'loadPorts' actions by requesting data from the server
+//Action to request the the list of ports
 PortsMgmtActions.loadPorts.listen(function() {
-    RestUtils.get('/system/bridges/bridge_normal/ports', function(err, res) {
+    RestUtils.get('/system/Interface', function(err, res) {
         if (err) {
-            console.log(err);
+            this.failed(err);
         } else {
-            //FIXME - only needed while using ip var - remove when
-            //remove ip var
-            var res = res.data;
-            for (var i=0; i<res.length; i++) {
-                var port = res[i].split('/')[3];
-                res[i] = '/system/Interface/' + port;
-            }
-            RestUtils.get(res, function(err2, res2) {
+
+            //on success - request returned list of URLs
+            RestUtils.get(res.data, function(err2, res2) {
                 if (err2) {
-                    console.log(err);
+                    this.failed(err2);
                 } else {
                     this.completed(res2);
                 }
             }.bind(this));
         }
     }.bind(this));
+});
+
+//on failure of the portss request
+PortsMgmtActions.loadPorts.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
 });
 
 module.exports = PortsMgmtActions;

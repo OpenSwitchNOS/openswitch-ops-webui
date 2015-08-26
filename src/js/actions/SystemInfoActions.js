@@ -5,20 +5,19 @@
  */
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var SystemInfoActions = Reflux.createActions({
-    // Actions: load, loadFailed, loadCompleted
     load: { asyncResult: true },
 });
 
-// FIXME: determine best place to get hostname
 SystemInfoActions.load.listen(function() {
 
     RestUtils.get(['/system/subsystems/base', '/system'], function(err, res) {
         var otherInfo;
         if (err) {
-            this.failed(err); // Callback action: loadFailed
+            this.failed(err);
         } else {
             otherInfo = res[0].data.other_info;
             this.completed({
@@ -30,10 +29,14 @@ SystemInfoActions.load.listen(function() {
                 version: otherInfo.diag_version,
                 partNum: otherInfo.part_number,
                 hostName: res[1].data.hostname
-            }); // Callback action: loadCompleted
+            });
         }
     }.bind(this));
 
+});
+
+SystemInfoActions.load.failed.listen(function(err) {
+    RenderActions.postRequestErr(err);
 });
 
 module.exports = SystemInfoActions;

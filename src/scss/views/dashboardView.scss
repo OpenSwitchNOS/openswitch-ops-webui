@@ -4,19 +4,22 @@
  */
 
 
-#dashboardView .utilizationRow {
-    border-bottom: $viewBoxHeaderBorderBottom;
-    margin-bottom: 24px;
-}
+#dashboardView {
 
-#dashboardView .viewBox.box1 {
-    height: 270px;
-}
+    .utilizationRow {
+        border-bottom: $viewBoxHeaderBorderBottom;
+        margin-bottom: 24px;
+    }
 
-#dashboardView td {
-    max-width: 220px;
-}
+    .viewBox.box1 {
+        height: 270px;
+    }
 
-#dashboardView .tempRow {
-    margin-bottom: 24px;
+    td {
+        max-width: 220px;
+    }
+
+    .tempRow {
+        margin-bottom: 24px;
+    }
 }

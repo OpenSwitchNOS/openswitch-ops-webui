@@ -10,7 +10,6 @@ var React = require('react'),
     DefaultRoute = Router.DefaultRoute,
 
     Login = require('Login'),
-    BgpView = require('BgpView'),
     StaticRoutesView = require('StaticRoutesView'),
     SystemMonitorView = require('SystemMonitorView'),
     DashboardView = require('DashboardView'),
@@ -28,7 +27,6 @@ var React = require('react'),
 var routes = (
     <Route name="app" path="/" handler={App}>
         <Route name="login" handler={Login}/>
-        <Route name="bgp" handler={BgpView}/>
         <Route name="dashboard" handler={DashboardView}/>
         <Route name="portMgmt" handler={PortMgmtView}/>
         <Route name="portMonitor" handler={PortMonitorView}/>

@@ -1,66 +1,69 @@
-/* 
+/*
  * port mgmt view styles
  * @author Kelsey Dedoshka
  */
 
-.portStatusKey {
+#portsMgmtView {
 
-    .keyTitle {
-        margin-left: 15px;
-        margin-right: 25px;
-    }
+    .portStatusKey {
 
-    &.up {
-        width: 100px;
-    }
-
-    &.port {
-        width: 110px;
-    }
-
-    &.interface {
-        width: 150px;
-    }
-
-    &.adminDisabled, &.linkDisabled {
-        width: 220px;
-    }
-
-    .ports {
-        &.up {
-            .fa {
-                color: $statusColorGreen;
-            }
+        //styles for the toolbar key
+        .keyTitle {
+            margin-left: 15px;
+            margin-right: 25px;
         }
 
-        &.interface {
-            display: inline-block;
-            width: 20px;
-            height: 17px;
-            border-radius: 2.0px;
-            background-color: black;
-            opacity: 0.5;
+        &.up {
+            width: 100px;
         }
 
         &.port {
-            display: inline-block;
-            width: 20px;
-            height: 17px;
-            border-radius: 2.0px;
-            background-color: black;
-
+            width: 110px;
         }
 
         &.adminDisabled {
-            .fa {
-                color: $statusColorRed;
-            }
+            width: 220px;
         }
 
         &.linkDisabled {
-            .fa {
-                color: $statusColorOrange;
+            width: 200px;
+        }
+
+        //styles for the ports and the
+        //status icons inside each port
+        .ports {
+            &.up {
+                .fa {
+                    color: $statusColorGreen;
+                }
+            }
+
+            &.interface {
+                display: inline-block;
+                width: 150px;
+                height: 17px;
+                border-radius: 2.0px;
+                background-color: black;
+
+            }
+
+            &.adminDisabled {
+                .fa {
+                    color: $statusColorRed;
+                }
+            }
+
+            &.linkDisabled {
+                .fa {
+                    color: $statusColorOrange;
+                }
             }
         }
+    }
+
+    //basic styling for port list table
+    .portTable {
+        height: 600px;
+        overflow-y: scroll;
     }
 }

@@ -4,7 +4,8 @@
  */
 
 var Reflux = require('reflux'),
-    RestUtils = require('restUtils');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var PortsMonitorActions = Reflux.createActions({
 
@@ -19,16 +20,13 @@ var PortsMonitorActions = Reflux.createActions({
     showStatus: {},
     setPortSelected: {},
     setInterval: {},
-    setPausePlayHandler: {}
+    setPausePlayHandler: {},
+    setBarChart: {}
 });
-
-//FIXME - for testing - will be removed
-//var ip = 'http://15.108.28.69:8091';
 
 //handles the 'loadPortStats' action by requesting data from the server
 PortsMonitorActions.loadPortStats.listen(function(port) {
-
-    // make sure port it not null
+    // make sure port is not null
     if (port) {
         RestUtils.get('/system/Interface/' + port, function(err, res) {
             if (err) {
@@ -40,18 +38,17 @@ PortsMonitorActions.loadPortStats.listen(function(port) {
     }
 });
 
+//handles failure for loading ports stats
+PortsMonitorActions.loadPortStats.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
 //handles the 'loadPorts' actions by requesting data from the server
 PortsMonitorActions.loadPorts.listen(function() {
     RestUtils.get('/system/bridges/bridge_normal/ports', function(err, res) {
         if (err) {
-            console.log(err);
+            this.failed(err);
         } else {
-            //FIXME - only needed while using ip var - remove when
-            //remove ip var
-            //var res = res.data;
-            //for (var i=0; i<res.length; i++) {
-            //    res[i] = ip + res[i];
-            //}
             var res = res.data;
             for (var i=0; i<res.length; i++) {
                 var port = res[i].split('/')[3];
@@ -60,7 +57,7 @@ PortsMonitorActions.loadPorts.listen(function() {
 
             RestUtils.get(res, function(err2, res2) {
                 if (err2) {
-                    console.log(err);
+                    this.failed(err2);
                 } else {
                     this.completed(res2);
                 }
@@ -68,5 +65,11 @@ PortsMonitorActions.loadPorts.listen(function() {
         }
     }.bind(this));
 });
+
+//handles failure for loading ports
+PortsMonitorActions.loadPorts.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
 
 module.exports = PortsMonitorActions;

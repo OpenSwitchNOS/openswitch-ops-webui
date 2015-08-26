@@ -1,7 +1,12 @@
 /*
  * Dashboard view.
  * @author Frank Wood
+ * @author Al Harrington
  */
+
+// TODO: stagger load times so we don't wait 10 seconds.
+// TODO: show 'Fans: () OK (count 10);
+// TODO: show 'Power Supplies: () OK (base-1)'
 
 var React = require('react/addons'),
     Reflux = require('reflux'),
@@ -170,10 +175,12 @@ module.exports = React.createClass({
             pwrs = si.powerSupplies,
             fanPropVal,
             status,
+            fanCount, fanLabel,
             pwrPropKey1, pwrPropVal1,
             pwrPropKey2, pwrPropVal2;
 
         if (fans && fans.length > 0) {
+            fanCount = fans.length;
             status = 'ok';
             for (var i=0; i<fans.length; i++) {
                 if (fans[i].status !== 'ok') {
@@ -181,22 +188,24 @@ module.exports = React.createClass({
                     break;
                 }
             }
+            fanLabel = t('fanStatus') + ' (' + fanCount + ')';
             fanPropVal = <StatusText value={status} text={t(status)} />;
         }
+        // TODO: add variable number of supplies read from DB
         if (pwrs && pwrs.length === 2) {
-            pwrPropKey1 = t('powerStatus') + ' (' + pwrs[0].name + ')';
+            pwrPropKey1 = t('powerSupplyLabel') + ' 1'; // + pwrs[0].name;
             pwrPropVal1 = (
-                <StatusText value={pwrs[0].status} text={t(pwrs[0].status)} />
+                <StatusText value={pwrs[0].status} text={t(pwrs[0].text)} />
             );
-            pwrPropKey2 = t('powerStatus') + ' (' + pwrs[1].name + ')';
+            pwrPropKey2 = t('powerSupplyLabel') + ' 2'; // + pwrs[1].name;
             pwrPropVal2 = (
-                <StatusText value={pwrs[1].status} text={t(pwrs[1].status)} />
+                <StatusText value={pwrs[1].status} text={t(pwrs[1].text)} />
             );
         }
 
         // FIXME: dup key problem?
         return [
-            [ t('fanStatus'), fanPropVal ],
+            [ fanLabel, fanPropVal ],
             [ pwrPropKey1, pwrPropVal1 ],
             [ pwrPropKey2, pwrPropVal2 ]
         ];

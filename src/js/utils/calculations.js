@@ -4,23 +4,22 @@
  *
  */
 
-function calcFullUtil(prev, curr, linkSpeed) {
-    //parameters should be passed as numbers but
-    //Number conversion done here for precausion
-    var currData = Number(curr);
-    var prevData = Number(prev);
-    var linkSpeedData = Number(linkSpeed);
+// calculates utilization based off parameters
+function calcUtil(prevBytes, currBytes, speed, intervalMs) {
 
-    //FIXME - the curr or prev could be 0 when passed it - invalid checked case
-    if (!currData || !prevData || !linkSpeedData) { return 0; }
+    var maxBytesPerSec, bytesPerSec, utilization;
+    if (speed <= 0 || currBytes < prevBytes || intervalMs <= 0) {
+        return 0;
+    }
 
-    var util = (((currData - prevData) / linkSpeedData) * 100);
-    if (util > 100) { util = 100; }
-    if (util < 0) { util = 0; }
+    maxBytesPerSec = speed / 8;
+    bytesPerSec = (currBytes - prevBytes) / (intervalMs / 1000);
+    utilization = 100 * (bytesPerSec / maxBytesPerSec);
 
-    return util;
+    return (utilization > 100) ? 100 : utilization;
+
 }
 
 module.exports = {
-    calcFullUtil: calcFullUtil
+    calcUtil: calcUtil
 };

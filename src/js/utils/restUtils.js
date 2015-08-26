@@ -2,43 +2,38 @@
  * REST utilities.
  */
 
+//FIXME - Kelsey reminder remove CORS from python server when making rest
+//requests
+
 var Request = require('superagent'),
     Async = require('async');
 
-var init = false,
-    REST_IP_DEV_MODE = 'http://15.108.28.69:8091',
-    REST_IP = 'http://' + window.location.hostname + ':8091';
+var URL_PREFIX = 'http://',
+    PORT_POSTFIX = ':8091',
+    REST_HOST = URL_PREFIX + window.location.hostname + PORT_POSTFIX,
+    redirect;
 
-// Wraps the superagent GET request in a form that can be used as an Asyc
+// Wraps the superagent GET request in a form that can be used as an Async
 // callback (i.e. callback(err, res)).
 function getBody(url, callback) {
     var reqUrl = url;
 
-    console.log('RestUtils.getBody: "' + url + '"');
-
-    if (window.webpackHotUpdate) {
-        if (!init) {
-            console.log('RestUtils DEV MODE: "' + REST_IP_DEV_MODE + '"');
+    // If we are running the unit tests don't modify the URL at all!
+    if (!window.jasmine) {
+        if (redirect) {
+            reqUrl = URL_PREFIX + redirect + PORT_POSTFIX + url;
+        } else {
+            reqUrl = REST_HOST + url;
         }
-        reqUrl = REST_IP_DEV_MODE + url;
-        console.log('*** DEV MODE REDIRECT TO: "' + reqUrl + '" ***');
-    } else if (!window.jasmine) {
-        if (!init) {
-            console.log('RestUtils PRODUCTION: "' + REST_IP + '"');
-        }
-        reqUrl = REST_IP + url;
-        console.log('*** REDIRECT TO: "' + reqUrl + '" ***');
     }
 
-    init = true;
-
     Request.get(reqUrl).end(function(err, res) {
-        console.log('Response for: "' + reqUrl + '"');
-        console.log('err:');
-        console.log(err);
-        console.log('res.body:');
-        console.log(res.body);
-        callback(err, err ? null : res.body);
+        if (err) {
+            err.reqUrl = reqUrl;
+            callback(err, null);
+        } else {
+            callback(null, res.body);
+        }
     });
 }
 
@@ -64,9 +59,21 @@ function getBody(url, callback) {
 //      -would call 'get' on both URL arrays in parallel, in turn, this would
 //      -call 'getBody' on the first array and 'getBody' on the second array.
 //
+// Specifying silent as true, will hide any default error handling
+//
+
+function hasArrayElement(arr) {
+    for (var i=0; i<arr.length; i++) {
+        if (Array.isArray(arr[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function get(req, cb) {
     if (Array.isArray(req)) {
-        if (req[0] && Array.isArray(req[0])) {
+        if (hasArrayElement(req)) {
             Async.map(req, get, cb);
         } else {
             Async.map(req, getBody, cb);
@@ -76,4 +83,13 @@ function get(req, cb) {
     }
 }
 
-module.exports = { get: get };
+module.exports = {
+
+    get: get,
+
+    setRestApiRedirect: function(host) {
+        redirect = host;
+        console.log('REST API Redirect: ' + redirect);
+    }
+
+};

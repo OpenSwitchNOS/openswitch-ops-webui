@@ -13,5 +13,8 @@ module.exports = Reflux.createActions([
     'showNavPane',
     'hideNavPane',
     'toggleNavPane',
-    'login'
+    'login',
+    'postRequestErr',
+    'clearRequestErr',
+    'restApiRedirect'
 ]);

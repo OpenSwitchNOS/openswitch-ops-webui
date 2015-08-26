@@ -37,3 +37,38 @@
     border-left-width: 12px;
     border-left-style: solid;
 }
+
+.accentColorSmall {
+    height: 38px;
+    width: 60px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.mainColorSmall {
+    height: 100%;
+    width: 8px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.triangleSmall {
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 11px;
+    margin-right: -8px;
+    border-top-width: 8px;
+    border-top-style: solid;
+    border-top-color: transparent;
+    border-bottom-width: 8px;
+    border-bottom-style: solid;
+    border-bottom-color: transparent;
+    border-left-width: 8px;
+    border-left-style: solid;
+}

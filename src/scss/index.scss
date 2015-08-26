@@ -37,11 +37,14 @@ $viewBoxHeaderFontWeight: 100;
 $iconNormalColor: #999;
 $iconHoverColor: black;
 
-//status colors - those used by by grommet
+// status colors - those used by by grommet
 $statusColorGreen: #4EB976;
 $statusColorRed: #F04953;
-//status color - not grommet
+// status color - not grommet
 $statusColorOrange: #FFB657;
+
+// App notification
+$appNotificationDivderBackgroundColor: lightgrey;
 
 @import '~grommet/scss/grommet-core/index';
 
@@ -62,6 +65,7 @@ $statusColorOrange: #FFB657;
 @import 'views/dashboardView.scss';
 @import 'views/portsMonitorView.scss';
 @import 'views/portsMgmtView.scss';
+@import 'views/vlanMgmtView.scss';
 
 // Turn off all scroll bars?
 // ::-webkit-scrollbar {
