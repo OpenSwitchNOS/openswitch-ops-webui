@@ -6,22 +6,20 @@
 //requests
 
 var Request = require('superagent'),
-    Async = require('async'),
-    RenderStore = require('RenderStore'); // FIXME dependency in here is bad
+    Async = require('async');
 
 var URL_PREFIX = 'http://',
     PORT_POSTFIX = ':8091',
-    REST_HOST = URL_PREFIX + window.location.hostname + PORT_POSTFIX;
+    REST_HOST = URL_PREFIX + window.location.hostname + PORT_POSTFIX,
+    redirect;
 
 // Wraps the superagent GET request in a form that can be used as an Async
 // callback (i.e. callback(err, res)).
 function getBody(url, callback) {
-    var reqUrl = url,
-        redirect;
+    var reqUrl = url;
 
     // If we are running the unit tests don't modify the URL at all!
     if (!window.jasmine) {
-        redirect = RenderStore.state && RenderStore.state.restApiRedirect;
         if (redirect) {
             reqUrl = URL_PREFIX + redirect + PORT_POSTFIX + url;
         } else {
@@ -85,4 +83,13 @@ function get(req, cb) {
     }
 }
 
-module.exports = { get: get };
+module.exports = {
+
+    get: get,
+
+    setRestApiRedirect: function(host) {
+        redirect = host;
+        console.log('REST API Redirect: ' + redirect);
+    }
+
+};

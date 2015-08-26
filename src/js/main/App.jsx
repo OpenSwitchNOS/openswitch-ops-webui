@@ -9,13 +9,13 @@ var React = require('react/addons'),
     Router = require('react-router'),
     RouteHandler = Router.RouteHandler,
     Reflux = require('reflux'),
-    RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore'),
     Mast = require('Mast'),
     NavPane = require('NavPane'),
     ClassNames = require('classnames'),
     Notification = require('Notification'),
-    QueryString = require('query-string');
+    QueryString = require('query-string'),
+    RestUtils = require('restUtils');
 
 module.exports = React.createClass({
 
@@ -29,8 +29,7 @@ module.exports = React.createClass({
     componentWillMount: function() {
         var qs = QueryString.parse(location.search);
         if (qs && qs.restapi) {
-            console.log('REST API Redirect: ' + qs.restapi);
-            RenderActions.restApiRedirect(qs.restapi);
+            RestUtils.setRestApiRedirect(qs.restapi);
         }
     },
 

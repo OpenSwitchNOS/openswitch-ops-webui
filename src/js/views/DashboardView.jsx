@@ -195,11 +195,11 @@ module.exports = React.createClass({
         if (pwrs && pwrs.length === 2) {
             pwrPropKey1 = t('powerSupplyLabel') + ' 1'; // + pwrs[0].name;
             pwrPropVal1 = (
-                <StatusText value={pwrs[0].status} text={t(pwrs[0].status)} />
+                <StatusText value={pwrs[0].status} text={t(pwrs[0].text)} />
             );
             pwrPropKey2 = t('powerSupplyLabel') + ' 2'; // + pwrs[1].name;
             pwrPropVal2 = (
-                <StatusText value={pwrs[1].status} text={t(pwrs[1].status)} />
+                <StatusText value={pwrs[1].status} text={t(pwrs[1].text)} />
             );
         }
 

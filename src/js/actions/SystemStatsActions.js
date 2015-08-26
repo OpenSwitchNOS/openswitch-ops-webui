@@ -33,9 +33,29 @@ function processCsvKbMaxVal(data, startIdx) {
     };
 }
 
+function processFanStatus(result) {
+    if (result === 'ok') {
+        return { text: 'ok', status: 'ok' };
+    } else if (result === 'fault') {
+        return { text: 'fanFault', status: 'error' };
+    }
+    return { text: 'fanUninitialized', status: 'warning' };
+}
+
+function processPwrStatus(result) {
+    if (result === 'ok') {
+        return { text: 'ok', status: 'ok' };
+    } else if (result === 'fault_input') {
+        return { text: 'powerFaultInput', status: 'warning' };
+    } else if (result === 'fault_output') {
+        return { text: 'powerFaultOutput', status: 'error' };
+    }
+    return { text: 'powerAbsent', status: 'warning' };
+}
+
 function processPass2(resBody) {
     var stats = resBody[0].data.statistics,
-        cpu, mem, stor, temps, fans, pwrs,
+        cpu, mem, stor,
         result = {};
 
     if (stats) {
@@ -62,16 +82,20 @@ function processPass2(resBody) {
     });
 
     result.fans = resBody[2].map(function(item) {
+        var textStatus = processFanStatus(item.data.status);
         return {
             name: item.data.name,
-            status: item.data.status
+            text: textStatus.text,
+            status: textStatus.status
         };
     });
 
     result.powerSupplies = resBody[3].map(function(item) {
+        var textStatus = processPwrStatus(item.data.status);
         return {
             name: item.data.name,
-            status: item.data.status
+            text: textStatus.text,
+            status: textStatus.status
         };
     });
 

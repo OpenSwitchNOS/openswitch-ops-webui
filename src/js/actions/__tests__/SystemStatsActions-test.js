@@ -42,17 +42,39 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         fan1 = {
-            testUrl: '/system/subsystems/base/fans/a1',
+            testUrl: '/system/subsystems/base/fans/f1',
             data: {
-                name: 'base-FAN 2R',
+                name: 'f1',
+                status: 'ok'
+            },
+            processed: {
+                name: 'f1',
+                text: 'ok',
                 status: 'ok'
             }
         },
         fan2 = {
-            testUrl: '/system/subsystems/base/fans/a2',
+            testUrl: '/system/subsystems/base/fans/f2',
             data: {
-                name: 'base-FAN 5L',
-                status: 'ok'
+                name: 'f2',
+                status: 'fault'
+            },
+            processed: {
+                name: 'f2',
+                text: 'fanFault',
+                status: 'error'
+            }
+        },
+        fan3 = {
+            testUrl: '/system/subsystems/base/fans/f3',
+            data: {
+                name: 'f3',
+                status: 'uninitialized'
+            },
+            processed: {
+                name: 'f3',
+                text: 'fanUninitialized',
+                status: 'warning'
             }
         },
         pwr1 = {
@@ -60,13 +82,47 @@ describe('Test Suite For SystemStatsActions', function() {
             data: {
                 name: 'base-1',
                 status: 'ok'
+            },
+            processed: {
+                name: 'base-1',
+                text: 'ok',
+                status: 'ok'
             }
         },
         pwr2 = {
             testUrl: '/system/subsystems/base/power_supplies/base-2',
             data: {
                 name: 'base-2',
-                status: 'ok'
+                status: 'fault_input'
+            },
+            processed: {
+                name: 'base-2',
+                text: 'powerFaultInput',
+                status: 'warning'
+            }
+        },
+        pwr3 = {
+            testUrl: '/system/subsystems/base/power_supplies/base-3',
+            data: {
+                name: 'base-3',
+                status: 'fault_output'
+            },
+            processed: {
+                name: 'base-3',
+                text: 'powerFaultOutput',
+                status: 'error'
+            }
+        },
+        pwr4 = {
+            testUrl: '/system/subsystems/base/power_supplies/base-4',
+            data: {
+                name: 'base-4',
+                status: 'absent'
+            },
+            processed: {
+                name: 'base-4',
+                text: 'powerAbsent',
+                status: 'warning'
             }
         },
         pass1temps = {
@@ -75,11 +131,11 @@ describe('Test Suite For SystemStatsActions', function() {
         },
         pass1fans = {
             testUrl: '/system/subsystems/base/fans',
-            data: [ fan1.testUrl, fan2.testUrl ]
+            data: [ fan1.testUrl, fan2.testUrl, fan3.testUrl ]
         },
         pass1pwrs = {
             testUrl: '/system/subsystems/base/power_supplies',
-            data: [ pwr1.testUrl, pwr2.testUrl ]
+            data: [ pwr1.testUrl, pwr2.testUrl, pwr3.testUrl, pwr4.testUrl ]
         },
         sys = {
             testUrl: '/system',
@@ -99,8 +155,17 @@ describe('Test Suite For SystemStatsActions', function() {
             storVal: 0.289484,
             storMax: 1.998672,
             temps: [ temp1.processed, temp2.processed ],
-            fans: [ fan1.data, fan2.data ],
-            powerSupplies: [ pwr1.data, pwr2.data ]
+            fans: [
+                fan1.processed,
+                fan2.processed,
+                fan3.processed
+            ],
+            powerSupplies: [
+                pwr1.processed,
+                pwr2.processed,
+                pwr3.processed,
+                pwr4.processed
+            ]
         },
         SystemStatsActions,
         RenderActions; // FIXME: rename this
@@ -118,8 +183,11 @@ describe('Test Suite For SystemStatsActions', function() {
         AjaxStubRequest(temp2.testUrl, temp2);
         AjaxStubRequest(fan1.testUrl, fan1);
         AjaxStubRequest(fan2.testUrl, fan2);
+        AjaxStubRequest(fan3.testUrl, fan3);
         AjaxStubRequest(pwr1.testUrl, pwr1);
         AjaxStubRequest(pwr2.testUrl, pwr2);
+        AjaxStubRequest(pwr3.testUrl, pwr3);
+        AjaxStubRequest(pwr4.testUrl, pwr4);
         AjaxStubRequest(sys.testUrl, sys);
 
         spyOn(SystemStatsActions.load, 'completed');
@@ -158,8 +226,11 @@ describe('Test Suite For SystemStatsActions', function() {
         AjaxStubRequest(temp2.testUrl, temp2);
         AjaxStubRequest(fan1.testUrl, fan1);
         AjaxStubRequest(fan2.testUrl, fan2);
+        AjaxStubRequest(fan3.testUrl, fan3);
         AjaxStubRequest(pwr1.testUrl, pwr1);
         AjaxStubRequest(pwr2.testUrl, {}, 500);
+        AjaxStubRequest(pwr3.testUrl, pwr3);
+        AjaxStubRequest(pwr4.testUrl, pwr4);
         AjaxStubRequest(sys.testUrl, sys);
 
         spyOn(SystemStatsActions.load, 'completed');
