@@ -68,7 +68,11 @@ module.exports = {
                 txRx: ''
             },
             systemMonitor: {
-                name: 'System Monitor'
+                name: 'System Monitor',
+                cpu: 'CPU Load',
+                memory: 'Memory',
+                storage: 'Storage',
+                temperature: 'Temperature'
             },
             portMonitor: {
                 name: 'Monitor',

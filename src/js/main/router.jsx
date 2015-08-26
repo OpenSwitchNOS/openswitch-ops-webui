@@ -31,7 +31,9 @@ var routes = (
         <Route name="portMgmt" handler={PortMgmtView}/>
         <Route name="portMonitor" handler={PortMonitorView}/>
         <Route name="staticRoutes" handler={StaticRoutesView}/>
-        <Route name="systemMonitor" handler={SystemMonitorView}/>
+        <Route name="systemMonitor" handler={SystemMonitorView}>
+            <Route path=":type" handler={SystemMonitorView}/>
+        </Route>
         <Route name="test1" handler={TestView1}/>
         <Route name="test2" handler={TestView2}/>
         <Route name="test3" handler={TestView3}/>
