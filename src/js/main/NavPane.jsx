@@ -21,7 +21,10 @@ var NavGroup = React.createClass({
 
     propTypes: {
         heading: PropTypes.string,
-        routes: PropTypes.arrayOf(PropTypes.string).isRequired
+        routes: PropTypes.arrayOf(PropTypes.shape({
+            to: PropTypes.string.isRequired,
+            name: PropTypes.string
+        })).isRequired
     },
 
     mixins: [ Reflux.connect(RenderStore, 'render') ],
@@ -43,10 +46,12 @@ var NavGroup = React.createClass({
                 {hd}
                 <ul>
                     { this.props.routes.map(function(route) {
-                        var name = t('views.' + route + '.name');
+                        var to = route.to,
+                            nameKey = route.viewName || to,
+                            name = t('views.' + nameKey + '.name');
                         return (
                             <li key={name}>
-                                <Link onClick={clickFn} to={route}>{name}</Link>
+                                <Link onClick={clickFn} to={to}>{name}</Link>
                             </li>
                         );
                     })}
@@ -67,28 +72,28 @@ module.exports = React.createClass({
 
                 <NavGroup heading={t('general')}
                     routes={[
-                        'dashboard',
-                        'systemMonitor'
+                        { to: 'dashboard' },
+                        { to: '/systemMonitor/cpu', viewName: 'systemMonitor' }
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('ports')}
                     routes={[
-                        'portMgmt',
-                        'portMonitor'
+                        { to: 'portMgmt' },
+                        { to: 'portMonitor' }
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('vlans')}
                     routes={[
-                        'vlanMgmt',
-                        'vlanPortConfig',
+                        { to: 'vlanMgmt' },
+                        { to: 'vlanPortConfig' }
                     ]}
                 />
                 <hr />
                 <NavGroup heading={t('routing')}
                     routes={[
-                        'staticRoutes',
+                        { to: 'staticRoutes' }
                     ]}
                 />
 
