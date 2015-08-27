@@ -34,7 +34,6 @@ module.exports = Reflux.createStore({
         ts: [],
         cpu: mkDataEntry(),
         memory: mkDataEntry(),
-        storage: mkDataEntry(),
         temps: []
     },
 
@@ -54,7 +53,6 @@ module.exports = Reflux.createStore({
             s.ts = [];
             s.cpu = mkDataEntry();
             s.mem = mkDataEntry();
-            s.storage = mkDataEntry();
             s.temps = [];
             for (i=0; i<stats.temps.length; i++) {
                 s.temps.push(mkTempEntry());
@@ -68,9 +66,6 @@ module.exports = Reflux.createStore({
 
         s.memory.max = stats.memMax;
         pushTrim(s.memory.data, stats.memVal);
-
-        s.storage.max = stats.storMax;
-        pushTrim(s.storage.data, stats.storVal);
 
         for (i=0; i<s.temps.length; i++) {
             t = stats.temps[i];
