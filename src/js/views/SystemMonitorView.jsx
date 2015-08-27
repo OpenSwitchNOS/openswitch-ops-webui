@@ -13,32 +13,11 @@ var React = require('react'),
     Router = require('react-router'),
     Link = Router.Link,
     SystemStatsActions = require('SystemStatsActions'),
-    SystemMonitorStore = require('SystemMonitorStore');
+    SystemMonitorStore = require('SystemMonitorStore'),
+    ChartUtils = require('chartUtils');
 
 var AUTO_REFRESH_MILLIS = 5000,
-    autoRefreshTimer,
-    CHART_COLORS = [ // FIXME put this is global settings?
-        {
-            stroke: 'rgba(255,111,62,1)',
-            fill: 'rgba(255,111,62,0.3)',
-            light: 'rgba(255,111,62,0.1)'
-        },
-        {
-            stroke: 'rgba(61,141,155,1)',
-            fill: 'rgba(61,141,155,0.3)',
-            light: 'rgba(61,141,155,0.1)'
-        },
-        {
-            stroke: 'rgba(211,154,66,1)',
-            fill: 'rgba(211,154,66,0.3)',
-            light: 'rgba(211,154,66,0.1)'
-        },
-        {
-            stroke: 'rgba(101,57,164,1)',
-            fill: 'rgba(101,57,164,0.3)',
-            light: 'rgba(101,57,164,0.1)'
-        }
-    ];
+    autoRefreshTimer;
 
 function t(key) {
     return I18n.text('views.systemMonitor.' + key);
@@ -96,20 +75,21 @@ module.exports = React.createClass({
 
         if (type === 'temperature') {
             for (var i=0; i<s.temps.length; i++) {
-                ci = i % CHART_COLORS.length;
+                ci = i % ChartUtils.colors.length;
                 datasets.push({
+                    label: s.temps[i].name,
                     data: s.temps[i].data,
-                    fillColor: CHART_COLORS[ci].fill,
-                    pointColor: CHART_COLORS[ci].paint,
-                    strokeColor: CHART_COLORS[ci].stroke
+                    fillColor: ChartUtils.colors[ci].fill,
+                    pointColor: ChartUtils.colors[ci].paint,
+                    strokeColor: ChartUtils.colors[ci].stroke
                 });
             }
         } else {
             datasets.push({
                 data: s[type].data,
-                fillColor: CHART_COLORS[0].fill,
-                pointColor: CHART_COLORS[0].paint,
-                strokeColor: CHART_COLORS[0].stroke
+                fillColor: ChartUtils.colors[0].fill,
+                pointColor: ChartUtils.colors[0].paint,
+                strokeColor: ChartUtils.colors[0].stroke
             });
         }
 
@@ -126,7 +106,8 @@ module.exports = React.createClass({
                 responsive: true,
                 scaleBeginAtZero: true,
                 maintainAspectRatio: false,
-                scaleLabel: function(v) { return scaleLabel(v.value, type); }
+                scaleLabel: function(v) { return scaleLabel(v.value, type); },
+                multiTooltipTemplate: '<%= datasetLabel %> - <%= value %>'
             };
 
         return (
@@ -138,7 +119,6 @@ module.exports = React.createClass({
                                 {this.mkLink('cpu')}
                                 {this.mkLink('memory')}
                                 {this.mkLink('temperature')}
-                                {this.mkLink('storage')}
                             </GMenu>
                         />
                         <div id="systemMonitorViewCanvas">

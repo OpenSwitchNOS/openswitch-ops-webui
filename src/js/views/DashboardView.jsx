@@ -10,6 +10,7 @@
 
 var React = require('react/addons'),
     Reflux = require('reflux'),
+    Navigation = require('react-router').Navigation,
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
     ActionIcon = require('ActionIcon'),
@@ -48,7 +49,10 @@ module.exports = React.createClass({
 
     displayName: 'DashboardView',
 
-    mixins: [ Reflux.listenTo(DashboardStore, 'onLoadAllCompleted') ],
+    mixins: [
+        Reflux.listenTo(DashboardStore, 'onLoadAllCompleted'),
+        Navigation
+    ],
 
     getInitialState: function() {
         var portSlots = [];
@@ -294,6 +298,17 @@ module.exports = React.createClass({
         return meters;
     },
 
+    mkTb: function(type) {
+        var transTo = this.transitionTo,
+            toFn = function() { transTo('/systemMonitor/' + type); };
+        return {
+            edit: <ActionIcon
+                fa="area-chart"
+                onClick={ toFn }
+            />
+        };
+    },
+
     render: function() {
         var tb = {
                 edit: <ActionIcon
@@ -323,23 +338,29 @@ module.exports = React.createClass({
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('cpu')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('cpu')}
+                            toolbar={this.mkTb('cpu')} />
                         {this.mkMeter(si.cpuVal, si.cpuMax, '')}
                     </div>
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('storage')} toolbar={tb} />
+                        <ViewBoxHeader title={t('storage')} />
                         {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
                     </div>
                 </div>
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('memory')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('memory')}
+                            toolbar={this.mkTb('memory')} />
                         {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
                     </div>
 
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('temp')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('temp')}
+                            toolbar={this.mkTb('temperature')} />
                         {this.mkTempMeters()}
                     </div>
                 </div>
