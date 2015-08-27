@@ -61,6 +61,8 @@ var NavGroup = React.createClass({
     }
 });
 
+// FIXME: not highlighting when systemMonitor/memory (ActiveStore or query params)
+
 module.exports = React.createClass({
 
     displayName: 'NavPane',

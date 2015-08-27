@@ -24,11 +24,17 @@ var React = require('react/addons'),
     InterfaceActions = require('InterfaceActions'),
     Lodash = require('lodash');
 
-var AUTO_REFRESH_MILLIS = 10000,
+var AUTO_REFRESH_MILLIS = 5000,
     NUM_UTL_VIEW_SLOTS = 5,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     METER_MAX_VAL_ADJ = 0.1,
-    autoRefreshTimer;
+    autoRefreshTimer,
+    infSlots = [],
+    infSlotIdx;
+
+for (infSlotIdx=0; infSlotIdx<NUM_UTL_SLOTS; infSlotIdx++) {
+    infSlots.push({ key: 'k' + infSlotIdx, init: true, val: 0 });
+};
 
 // TODO: Fix for grommet max value (no bar).
 // TODO: Make sure data is consistent (strings vs numbers).
@@ -45,30 +51,31 @@ function mkThresholds(maxVal) {
     ];
 }
 
+function findSlotIdx(slots, id) {
+    var i;
+    // use existing slot if there is one
+    for (i=0; i<slots.length; i++) {
+        if (slots[i].id === id) {
+            return i;
+        }
+    }
+    // use first free slot
+    for (i=0; i<slots.length; i++) {
+        if (!slots[i].id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 module.exports = React.createClass({
 
     displayName: 'DashboardView',
 
     mixins: [
-        Reflux.listenTo(DashboardStore, 'onLoadAllCompleted'),
+        Reflux.connect(DashboardStore),
         Navigation
     ],
-
-    getInitialState: function() {
-        var portSlots = [];
-        for (var i=0; i<NUM_UTL_SLOTS; i++) {
-            portSlots.push( { key: 'k' + i, init: true, val: 0 } );
-        }
-        return {
-            portSlots: portSlots,
-            sysInfo: {},
-            sysStats: {
-                fans: [],
-                powerSupplies: []
-            },
-            interfaces: []
-        };
-    },
 
     componentDidMount: function() {
         this.autoRefresh();
@@ -80,40 +87,37 @@ module.exports = React.createClass({
         }
     },
 
-    onLoadAllCompleted: function(data) {
-        var newPortSlots = this.updateSlots(
-                this.state.portSlots,
-                data.interfaces.topUtilization);
+    updateInfSlots: function() {
+        var i,
+            topInf,
+            slotIdx,
+            topInfId,
+            newInfSlots,
+            newTopUtilInfs = this.state.interfaceStats.topUtilization;
 
-        this.setState({
-            sysInfo: data.sysInfo,
-            sysStats: data.sysStats,
-            interfaces: data.interfaces,
-            portSlots: newPortSlots
-        });
-    },
-
-    updateSlots: function(currSlots, dataItems) {
-        var di, slotIdx, i, id,
-            newSlots = Lodash.cloneDeep(currSlots);
-
-        for (i=0; i<newSlots.length; i++) {
-            delete newSlots[i].init; // assume already inited by this point
-            newSlots[i].val = 0;
+        if (!newTopUtilInfs) {
+            return;
         }
 
-        for (i=0; i<dataItems.length; i++) {
-            di = dataItems[i];
-            id = di.ci.name + ' ' + t(di.dir); // (i.e. 3 Tx, 21 Rx, or 15)
-            slotIdx = this.findSlotIdx(newSlots, id);
+        newInfSlots = Lodash.cloneDeep(infSlots);
+
+        for (i=0; i<newInfSlots.length; i++) {
+            delete newInfSlots[i].init; // assume already inited by this point
+            newInfSlots[i].val = 0;
+        }
+
+        for (i=0; i<newTopUtilInfs.length; i++) {
+            topInf = newTopUtilInfs[i];
+            topInfId = topInf.ci.name + ' ' + t(topInf.dir); // (i.e. 3 Tx)
+            slotIdx = findSlotIdx(newInfSlots, topInfId);
             if (slotIdx >= 0) {
-                newSlots[slotIdx].id = id;
-                newSlots[slotIdx].val = di.utl;
-                newSlots[slotIdx].dir = di.dir;
+                newInfSlots[slotIdx].id = topInfId;
+                newInfSlots[slotIdx].val = topInf.utl;
+                newInfSlots[slotIdx].dir = topInf.dir;
             }
         }
 
-        newSlots = newSlots.sort(function(a, b) {
+        newInfSlots = newInfSlots.sort(function(a, b) {
             if (a.id && !b.id) {
                 return -1;
             } else if (!a.id && b.id) {
@@ -123,27 +127,10 @@ module.exports = React.createClass({
         });
 
         for (i=NUM_UTL_VIEW_SLOTS; i<NUM_UTL_SLOTS; i++) {
-            delete newSlots[i].id;
+            delete newInfSlots[i].id;
         }
 
-        return newSlots;
-    },
-
-    findSlotIdx: function(slots, id) {
-        var i;
-        // use existing slot if there is one
-        for (i=0; i<slots.length; i++) {
-            if (slots[i].id === id) {
-                return i;
-            }
-        }
-        // use first free slot
-        for (i=0; i<slots.length; i++) {
-            if (!slots[i].id) {
-                return i;
-            }
-        }
-        return -1;
+        infSlots = newInfSlots;
     },
 
     autoRefresh: function() {
@@ -288,12 +275,10 @@ module.exports = React.createClass({
         );
     },
 
-    mkUtlMeters: function(label, slots) {
-        var meters = [],
-            slot;
+    mkUtlMeters: function() {
+        var meters = [];
         for (var i=0; i<NUM_UTL_VIEW_SLOTS; i++) {
-            slot = slots[i];
-            meters.push( this.mkUtlMeter(slot) );
+            meters.push( this.mkUtlMeter(infSlots[i]) );
         }
         return meters;
     },
@@ -316,6 +301,8 @@ module.exports = React.createClass({
                     onClick={ this.onClickChart } />
             },
             si = this.state.sysStats;
+
+        this.updateInfSlots();
 
         return (
             <div id="dashboardView" className="viewRow">
@@ -369,7 +356,7 @@ module.exports = React.createClass({
                     <ViewBoxHeader title={t('portTopUtil')} toolbar={tb} />
                     <div className="viewBoxContent">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
-                            { this.mkUtlMeters('port', this.state.portSlots) }
+                            {this.mkUtlMeters()}
                         </ReactShuffle>
                     </div>
                 </div>

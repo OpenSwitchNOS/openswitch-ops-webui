@@ -5,7 +5,8 @@
 
 var Reflux = require('reflux'),
     InterfaceActions = require('InterfaceActions'),
-    Lodash = require('lodash');
+    Lodash = require('lodash'),
+    Calc = require('calculations');
 
 module.exports = Reflux.createStore({
 
@@ -19,17 +20,6 @@ module.exports = Reflux.createStore({
 
     getInitialState: function() {
         return this.state;
-    },
-
-    utl: function(speed, prevBytes, currBytes, intervalMs) {
-        var maxBytesPerSec, bytesPerSec, utilization;
-        if (speed <= 0 || currBytes < prevBytes) {
-            return 0;
-        }
-        maxBytesPerSec = speed / 8;
-        bytesPerSec = (currBytes - prevBytes) / (intervalMs / 1000);
-        utilization = 100 * (bytesPerSec / maxBytesPerSec);
-        return (utilization > 100) ? 100 : utilization;
     },
 
     processInterfaces: function(interfaces) {
@@ -60,18 +50,22 @@ module.exports = Reflux.createStore({
             }
 
             if (ci.duplex === 'full') {
-                ci.rxUtl = this.utl(ci.speed, pi.rxBytes, ci.rxBytes, interMs);
+                ci.rxUtl = Calc.calcUtil(
+                    pi.rxBytes, ci.rxBytes, ci.speed, interMs
+                );
                 topUtls.push({ utl: ci.rxUtl, dir: 'rx', ci: ci });
 
-                ci.txUtl = this.utl(ci.speed, pi.txBytes, ci.txBytes, interMs);
+                ci.txUtl = Calc.calcUtil(
+                    pi.txBytes, ci.txBytes, ci.speed, interMs
+                );
                 topUtls.push({ utl: ci.txUtl, dir: 'tx', ci: ci });
 
             } else if (ci.duplex === 'half') {
 
-                ci.txUtl = ci.rxUtl = this.utl(
-                    ci.speed,
+                ci.txUtl = ci.rxUtl = Calc.calcUtil(
                     pi.txBytes + pi.rxBytes,
                     ci.txBytes + ci.rxBytes,
+                    ci.speed,
                     interMs);
                 topUtls.push({ utl: ci.txUtl, dir: 'txRx', ci: ci });
             }

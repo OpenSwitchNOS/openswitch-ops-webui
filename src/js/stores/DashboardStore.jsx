@@ -6,48 +6,41 @@
 var Reflux = require('reflux'),
     SystemInfoActions = require('SystemInfoActions'),
     SystemStatsActions = require('SystemStatsActions'),
-    InterfaceActions = require('InterfaceActions'),
     InterfaceStatsStore = require('InterfaceStatsStore');
 
 module.exports = Reflux.createStore({
 
     init: function() {
-        this.joinTrailing(
-            SystemInfoActions.load.completed,
-            SystemStatsActions.load.completed,
-            InterfaceStatsStore,
-            this.onAllCompleted
-        );
-
-        this.listenTo(InterfaceActions.load.failed, this.onAnyFailed);
-        this.listenTo(SystemInfoActions.load.failed, this.onAnyFailed);
-        this.listenTo(SystemStatsActions.load.failed, this.onAnyFailed);
+        this.listenTo(SystemInfoActions.load.completed, 'onInfo');
+        this.listenTo(SystemStatsActions.load.completed, 'onStats');
+        this.listenTo(InterfaceStatsStore, 'onInterfaceStats');
     },
 
-    // Data model.
-    // TODO: Make sure this is needed (cause not connected directly to view).
     state: {
-        sysInfo: { },
+        sysInfo: {},
         sysStats: {
             fans: [],
             powerSupplies: []
         },
-        topUtilPorts: { }
+        interfaceStats: {}
     },
 
     getInitialState: function() {
         return this.state;
     },
 
-    onAnyFailed: function(data) {
-        console.log('DashboardStore.onAnyFailed:');
-        console.log(data);
+    onInfo: function(info) {
+        this.state.sysInfo = info;
+        this.trigger(this.state);
     },
 
-    onAllCompleted: function(sysInfo, sysStats, interfacesStatsState) {
-        this.state.sysInfo = sysInfo[0];
-        this.state.sysStats = sysStats[0];
-        this.state.interfaces = interfacesStatsState[0];
+    onStats: function(stats) {
+        this.state.sysStats = stats;
+        this.trigger(this.state);
+    },
+
+    onInterfaceStats: function(interfaceStats) {
+        this.state.interfaceStats = interfaceStats;
         this.trigger(this.state);
     }
 
