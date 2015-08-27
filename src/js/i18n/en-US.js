@@ -72,7 +72,9 @@ module.exports = {
                 cpu: 'CPU Load',
                 memory: 'Memory',
                 storage: 'Storage',
-                temperature: 'Temperature'
+                temperature: 'Temperature',
+                gb: 'GB',
+                deg: 'C'
             },
             portMonitor: {
                 name: 'Monitor',

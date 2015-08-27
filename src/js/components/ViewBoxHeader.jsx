@@ -12,7 +12,7 @@ module.exports = React.createClass({
     displayName: 'ViewBoxHeader',
 
     propTypes: {
-        title: PropTypes.string.isRequired,
+        title: PropTypes.node.isRequired,
         toolbar: PropTypes.object
     },
 
