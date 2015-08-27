@@ -12,8 +12,6 @@ var React = require('react'),
     GEditIcon = require('grommet/components/icons/Edit'),
     ViewBoxHeader = require('ViewBoxHeader'),
     BoxGraphic = require('BoxGraphic'),
-    Port = require('Port'),
-    ColorBlock = require('ColorBlock'),
     VlansActions = require('VlansActions'),
     VlansStore = require('VlansStore'),
     DISPLAY_STATE = 0,
@@ -65,7 +63,7 @@ var AllVlansTable = React.createClass({
     }
 });
 
-var VlanKey = React.createClass({
+/*var VlanKey = React.createClass({
 
     displayName: 'VlanKey',
 
@@ -116,7 +114,7 @@ var VlanKey = React.createClass({
             </table>
         );
     }
-});
+});*/
 
 var EditElement = React.createClass({
 
@@ -231,8 +229,8 @@ module.exports = React.createClass({
                         if (vlan.show) {
                             //var editToolbar = { edit: <GEditIcon /> };
                             //var displayState = DISPLAY_STATE;
-                            var colorElem =
-                                this.state.data.colors[vlan.colorIndex];
+                            //var colorElem =
+                            //    this.state.data.colors[vlan.colorIndex];
 
                             //if (vlan.id === this.state.selectedPort) {
                             //    editToolbar = { edit: <EditElement

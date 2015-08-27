@@ -11,6 +11,7 @@ var PortsMgmtActions = Reflux.createActions({
 
     // Create the view's actions:
     loadPorts: { asyncResult: true },
+    setPorts: {}
 });
 
 //Action to request the the list of ports

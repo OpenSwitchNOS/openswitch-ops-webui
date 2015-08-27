@@ -29,7 +29,9 @@ var routes = (
         <Route name="login" handler={Login}/>
         <Route name="dashboard" handler={DashboardView}/>
         <Route name="portMgmt" handler={PortMgmtView}/>
-        <Route name="portMonitor" handler={PortMonitorView}/>
+        <Route name="portMonitor" handler={PortMonitorView}>
+            <Route path=":port" handler={PortMonitorView}/>
+        </Route>
         <Route name="staticRoutes" handler={StaticRoutesView}/>
         <Route name="systemMonitor" handler={SystemMonitorView}>
             <Route path=":type" handler={SystemMonitorView}/>

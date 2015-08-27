@@ -7,6 +7,8 @@ var Reflux = require('reflux'),
     PortsMonitorActions = require('PortsMonitorActions'),
     _ = require('lodash'),
     Calcs = require('calculations'),
+    Cnvs = require('conversions'),
+    DateStamp = require('dateStamp'),
     MAX_POINTS_ON_GRAPH = 25,
     INTERVAL = 5000;
 
@@ -26,8 +28,8 @@ function DataSet(title, index, options, allData, stats, graphData, desc) {
 //Stats contains all data for a stats object in
 //a DataSet
 function Stats() {
-    this.high = null;
-    this.low = null;
+    this.high = '';
+    this.low = '';
     this.average = 0.00;
     this.total = 0;
 }
@@ -130,15 +132,15 @@ module.exports = Reflux.createStore({
         if (duplex === 'half') {
             graphTypes = [
                 { 'name': 'halfData', 'title': 'port utilization' },
-                { 'name': 'droppedData', 'title': 'dropped utilization' },
-                { 'name': 'errorData', 'title': 'error utilization' }
+                { 'name': 'droppedData', 'title': 'Dropped' },
+                { 'name': 'errorData', 'title': 'Error' }
             ];
         } else {
             graphTypes = [
-                { 'name': 'rxData', 'title': 'rx utilization' },
-                { 'name': 'txData', 'title': 'tx utilization' },
-                { 'name': 'droppedData', 'title': 'dropped utilization' },
-                { 'name': 'errorData', 'title': 'error utilization' }
+                { 'name': 'rxData', 'title': 'Rx utilization' },
+                { 'name': 'txData', 'title': 'Tx utilization' },
+                { 'name': 'droppedData', 'title': 'Dropped' },
+                { 'name': 'errorData', 'title': 'Error' }
             ];
         }
 
@@ -212,8 +214,8 @@ module.exports = Reflux.createStore({
                 this.state.pointCount = this.state.pointCount + 1;
             }
 
-            //FIXME - timestamp
-            this.state.labels.push('');
+            var date = DateStamp.hrsSecs(portStats.date);
+            this.state.labels.push(date);
             this.trigger(this.state);
         }
     },
@@ -258,9 +260,9 @@ module.exports = Reflux.createStore({
     //handler for user selected port in dropdown list
     onSetPortSelected: function(port) {
         clearInterval(this.state.interval);
+        this.resetGraph();
         this.state.selectedPort = port;
         this.clearStats();
-        this.resetGraph();
         this.trigger(this.state);
     },
 
@@ -308,6 +310,9 @@ module.exports = Reflux.createStore({
         this.state.pointCount = 0;
         this.state.secondsCount = 0;
         this.state.initialLoad = 1;
+        this.state.portStats.current = null;
+        this.state.portStats.prev = null;
+        this.state.portSelected = null;
         this.state.playHandler = false;
         this.state.pauseHandler = true;
 
@@ -333,7 +338,7 @@ module.exports = Reflux.createStore({
         }
 
         if (index.allData.length > 0) {
-            index.stats.average = (sum / index.allData.length).toFixed(2);
+            index.stats.average = Cnvs.round1D((sum / index.allData.length));
         }
     },
 
@@ -454,7 +459,7 @@ module.exports = Reflux.createStore({
                     + Number(stats.previous.tx_bytes) : null;
         }
 
-        util = (Calcs.calcUtil(prev, curr, linkSpeed, INTERVAL)).toFixed(2);
+        util = Cnvs.round1D((Calcs.calcUtil(prev, curr, linkSpeed, INTERVAL)));
         return Number(util);
     },
 
@@ -466,4 +471,5 @@ module.exports = Reflux.createStore({
         util = this.calculateUtil(linkSpeed, key, stats);
         return util;
     }
+
 });

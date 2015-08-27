@@ -1,9 +1,7 @@
 /*
- * Tile panel that contains header text, content and an optional edit button.
+ * Draws the Box Graphic
  * @author Kelsey Dedoshka
  */
-
-// TODO: make configurable and generic?
 
 var React = require('react'),
     PropTypes = React.PropTypes,
@@ -37,7 +35,9 @@ function generatePortArray(type, data) {
 
                 //data as single port: eg. 10
                 } else if (item.type === 'single') {
-                    portArray.push(item.num);
+                    for (var k=0; k<item.num.length; k++) {
+                        portArray.push(item.num[k]);
+                    }
                 }
             }
         }
@@ -57,7 +57,7 @@ var ColorBadge = React.createClass({
         data: PropTypes.object,
         id: PropTypes.number,
         colors: PropTypes.array,
-        vlanStatus: PropTypes.array
+        vlanStatus: PropTypes.object
     },
 
     render: function() {
@@ -108,7 +108,7 @@ var PortStatus = React.createClass({
 
     propTypes: {
         port: PropTypes.number,
-        data: PropTypes.string
+        data: PropTypes.object
     },
 
     render: function() {
@@ -150,7 +150,7 @@ var PortStatus = React.createClass({
             for (var i=0; i<icon.length; i++) {
                 var iconCls = cls[i] ? cls[i] : null;
                 icons.push(
-                    <i className={iconCls + ' fa fa-' + icon[i]}></i>
+                    <i key={i} className={iconCls + ' fa fa-' + icon[i]}></i>
                 );
             }
 
@@ -179,21 +179,23 @@ var BoxPorts = React.createClass({
         ports: PropTypes.object,
         type: PropTypes.string,
         portConfig: PropTypes.object,
-        colors: PropTypes.array,
-        vlanStatus: PropTypes.array,
-        portSelected: PropTypes.func
+        vlanStatus: PropTypes.object,
+        portSelected: PropTypes.func,
+        hwData: PropTypes.object
     },
-
-    //mixins: [ Reflux.connect(BoxGraphicStore, 'ports')],
 
     render: function() {
         var classType = 'boxPort' + this.props.type;
+        var hwPort = null;
         var portsArray = generatePortArray(this.props.type,
-            this.props.ports.data);
+            this.props.ports);
 
         return (
             <tr className={'boxPortBackground' + this.props.type}>
                 {portsArray.map(function(num) {
+                    if (this.props.hwData[num]) {
+                        hwPort = this.props.hwData[num].portType;
+                    }
 
                     var portSelectedCallBack = null;
                     if (this.props.portSelected) {
@@ -205,22 +207,58 @@ var BoxPorts = React.createClass({
                         <td key={num} id={'portBox' + num}
                             className="portBoxContainer"
                             onClick={portSelectedCallBack}>
-                            <div id={'portBoxInner' + num} className={classType}>
-
-                               <ColorBadge data={this.props.portConfig}
-                                            id={num}
-                                            colors={this.props.colors}
-                                            vlanStatus={this.props.vlanStatus}/>
-
-                                {this.props.portConfig.showPortStatus ?
-                                    <PortStatus data={this.props.portConfig.config}
-                                        port={num}/>
-                                    : null}
-                            </div>
+                            <Port
+                                num={num}
+                                classType={classType}
+                                hwPort={hwPort}
+                                portConfig={this.props.portConfig}
+                                vlanStatus={this.props.vlanStatus}
+                            />
                         </td>
                     );
                 }, this)}
            </tr>
+        );
+    }
+});
+
+
+// The Port component which acts as the port
+// component inside the port table td. This div
+// provides all of the styling for the port
+// ports are styled by their hwPort type
+var Port = React.createClass({
+
+    displayName: 'Port',
+
+    propTypes: {
+        num: PropTypes.number,
+        classType: PropTypes.string,
+        hwPort: PropTypes.string,
+        portConfig: PropTypes.object,
+        vlanStatus: PropTypes.object
+    },
+
+    render: function() {
+        var num = this.props.num;
+        var classType = this.props.classType;
+        var hwPort = this.props.hwPort;
+
+        return (
+                <div id={'portBoxInner' + num} className={classType + ' '
+                    + hwPort}>
+                    {this.props.portConfig.showVlans ?
+                        <ColorBadge data={this.props.portConfig.data}
+                            id={num}
+                            colors={this.props.portConfig.colors}
+                            vlanStatus={this.props.vlanStatus}/>
+                    : null}
+
+                    {this.props.portConfig.showPortStatus ?
+                        <PortStatus data={this.props.portConfig.config}
+                            port={num}/>
+                    : null}
+                </div>
         );
     }
 });
@@ -232,36 +270,101 @@ var BoxMiddle = React.createClass({
     displayName: 'BoxMiddle',
 
     propTypes: {
-        ports: PropTypes.object
+        ports: PropTypes.object,
+        hwData: PropTypes.object
     },
 
     render: function() {
-        var middleArray = [];
 
-        // store holds data to represent how many middle sections
-        // need to be drawn to align with the ports
-        for (var i=0; i<=this.props.ports.data.middlePorts; i++) {
-            middleArray.push(i);
+        var middleArray = [];
+        var middle = this.props.ports.middle;
+
+        // determine how to draw the middle ports based on
+        // the middle component of the data config
+        // the middle component can either list a number of
+        // indexes to draw (numIndexes) or the actual
+        // indexes to draw(indexes)
+        if ('numIndexes' in middle) {
+            for (var i=0; i<=middle.numIndexes; i++) {
+                middleArray.push(i);
+            }
+        } else if ('indexes' in middle) {
+            for (var j=0; j<middle.indexes.length; j++) {
+                middleArray.push(middle.indexes[j]);
+            }
         }
 
+        // draw middle based on hwPort type
         return (
             <tr className='boxPortBackgroundMiddle'>
                 {middleArray.map(function(index) {
-                    return (
-                        <td key={index}>
-                            <div className="boxMiddle">
-                                <div className="boxBlack boxBlackTop"></div>
-                                <div className="arrowBlack boxArrowUp"></div>
-                                <div className="arrowBlack boxArrowDown"></div>
-                                <div className="boxBlack boxBlackBottom"></div>
-                            </div>
-                        </td>
-                    );
+                    if (this.props.hwData[index]) {
+                        var hwPort = this.props.hwData[index].portType;
+                        if (hwPort === 'SFP_PLUS') {
+                            return (
+                                <MiddleSfpPlus key={index} index={index}/>
+                            );
+                        } else if (hwPort === 'QSFP_PLUS') {
+                            return (
+                                <MiddleQSfpPlus key={index} index={index}/>
+                            );
+                        }
+                    }
                 }, this)}
             </tr>
         );
     }
 });
+
+
+// MiddleSfpPlus component draws the middle component
+// for an SFP_PLUS port
+var MiddleSfpPlus = React.createClass({
+
+    displayName: 'MiddleSfpPlus',
+
+    propTypes: {
+        index: PropTypes.number
+    },
+
+    render: function() {
+        return (
+            <td key={this.props.index}>
+                <div className="boxMiddle SFP_PLUS">
+                    <div className="boxBlack boxBlackTop"></div>
+                    <div className="arrowBlack boxArrowUp"></div>
+                    <div className="arrowBlack boxArrowDown"></div>
+                    <div className="boxBlack boxBlackBottom"></div>
+                </div>
+            </td>
+        );
+    }
+});
+
+// MiddleQSfpPlus component draws the middle component
+// for an QSFP_PLUS port
+var MiddleQSfpPlus = React.createClass({
+
+    displayName: 'MiddleQSfpPlus',
+
+    propTypes: {
+        index: PropTypes.number
+    },
+
+    render: function() {
+        return (
+            <td key={this.props.index}>
+                <div className="boxMiddle QSFP_PLUS">
+                    <div className="arrowBlack boxArrowUp"></div>
+                    <div className="circleBlack left"></div>
+                    <div className="circleBlack right"></div>
+                    <div className="arrowBlack boxArrowDown"></div>
+                </div>
+            </td>
+       );
+    }
+});
+
 
 // Component to draw the port labels on the graphic
 // Based off of the ports list from the store
@@ -270,22 +373,29 @@ var BoxPortLabels = React.createClass({
     displayName: 'BoxPortLabels',
 
     propTypes: {
-        ports: PropTypes.object
+        ports: PropTypes.object,
+        hwData: PropTypes.object
     },
 
     render: function() {
 
         //generate port list for both top and bottom ports
-        var portNumsTop = generatePortArray('Top', this.props.ports.data);
-        var portNumsBottom = generatePortArray('Bottom', this.props.ports.data);
+        var portNumsTop = generatePortArray('Top', this.props.ports);
+        var portNumsBottom = generatePortArray('Bottom', this.props.ports);
         var tableRows = [];
 
         // for as5712 we know that there are as many bottom ports as top ports
         // so the numbers can be based off the list of tops ports
         for (var i=0; i<portNumsTop.length; i++) {
+            var hwPort = null;
+            if (this.props.hwData[portNumsTop[i]]) {
+                hwPort = this.props.hwData[portNumsTop[i]].portType;
+            }
+
+            // push the port labels to the tableRows
             tableRows.push(
                 <td key={i}>
-                    <div className="boxLabels">
+                    <div className={'boxLabels ' + hwPort}>
                         <div className="boxNumLabels boxTopLabels">
                             {portNumsTop[i]}
                         </div>
@@ -307,6 +417,76 @@ var BoxPortLabels = React.createClass({
     }
 });
 
+// BoxPortExtras draws the extra ports from the data
+// config specification
+var BoxPortExtras = React.createClass({
+
+    displayName: 'BoxPortExtras',
+
+    propTypes: {
+        ports: PropTypes.object,
+        hwData: PropTypes.object,
+        vlanStatus: PropTypes.object,
+        portConfig: PropTypes.object,
+        portSelected: PropTypes.func
+    },
+
+    render: function() {
+        var extras = [];
+        var data = this.props.ports;
+        var classType = 'boxPortTop';
+
+        // loop through the data indexes to draw the
+        // extra ports
+        for (var i=0; i<data.indexes; i++) {
+
+            // if there is no list of ports - draw an empty
+            // td to keep the correct index alignment
+            if (!data.ports) {
+                extras.push(<td key={i}></td>);
+            } else {
+
+                //draw the ports
+                var idx = data.ports[i];
+
+                //get the hwPort type
+                if (this.props.hwData[idx]) {
+                    var hwPort = this.props.hwData[idx].portType;
+
+                    // get the onClick callback if present
+                    var portSelectedCallBack = null;
+                    if (this.props.portSelected) {
+                        portSelectedCallBack =
+                            this.props.portSelected.bind(null, idx);
+                    }
+
+                    //push the port onto the extras list
+                    extras.push(
+                        <td key={idx} id={'portBox' + idx}
+                            className="portBoxContainer"
+                            onClick={portSelectedCallBack}>
+                            <Port
+                                num={idx}
+                                classType={classType}
+                                hwPort={hwPort}
+                                portConfig={this.props.portConfig}
+                                vlanStatus={this.props.vlanStatus}
+                            />
+                            <div className="portExtraNum">{idx}</div>
+                        </td>
+                    );
+                }
+            }
+        }
+
+        return (
+            <tr>
+                {extras}
+            </tr>
+        );
+    }
+});
+
 //Main box graphic component
 module.exports = React.createClass({
 
@@ -315,7 +495,7 @@ module.exports = React.createClass({
     propTypes: {
         portConfig: PropTypes.object,
         colors: PropTypes.array,
-        vlanStatus: PropTypes.array,
+        vlanStatus: PropTypes.object,
         selectedVlan: PropTypes.number,
         portSelected: PropTypes.func
     },
@@ -324,6 +504,7 @@ module.exports = React.createClass({
 
     componentDidMount: function() {
         // load the box graphic configuration data
+        BoxGraphicActions.loadHwPorts();
         BoxGraphicActions.loadBoxGraphic();
     },
 
@@ -331,28 +512,45 @@ module.exports = React.createClass({
     // row to represent middle graphic,
     // row of bottom ports and a row of port nums
     render: function() {
+        var key = 0;
         return (
             <div className="boxContainer">
+                {this.state.ports.loadCompleted ?
                 <table className="innerBoxTable">
-                    <BoxPorts type={"Top"}
-                        ports={this.state.ports}
-                        portConfig={this.props.portConfig}
-                        colors={this.props.colors}
-                        selectedVlan={this.props.selectedVlan}
-                        portSelected={this.props.portSelected}
-                        vlanStatus={this.props.vlanStatus}/>
-                    <BoxMiddle ports={this.state.ports}/>
-                    <BoxPorts type={"Bottom"}
-                        ports={this.state.ports}
-                        portConfig={this.props.portConfig}
-                        colors={this.props.colors}
-                        selectedVlan={this.props.selectedVlan}
-                        portSelected={this.props.portSelected}
-                        vlanStatus={this.props.vlanStatus}/>
-                    <BoxPortLabels ports={this.state.ports}/>
+                    <tr>
+                        {this.state.ports.data.base.map(function(group) {
+                            return (
+                                <td key={key++} className="portsWrapper">
+                                    <table>
+                                        <BoxPorts type={"Top"}
+                                            ports={group}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}
+                                            hwData={this.state.ports.hwData}/>
+                                        <BoxMiddle ports={group}
+                                            hwData={this.state.ports.hwData}/>
+                                        <BoxPorts type={"Bottom"}
+                                            ports={group}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}
+                                            hwData={this.state.ports.hwData}/>
+                                        <BoxPortLabels ports={group}
+                                            hwData={this.state.ports.hwData}/>
+                                        <BoxPortExtras ports={group.extra}
+                                            hwData={this.state.ports.hwData}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}/>
+                                    </table>
+                                </td>
+                            );
+                        }, this)}
+                    </tr>
                 </table>
+                : null}
             </div>
         );
     }
-
 });

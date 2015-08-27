@@ -30,6 +30,12 @@ module.exports = {
         err: {
         },
 
+        // Units.
+        units: {
+            gbps: ' Gbps',
+            mb: ' MB'
+        },
+
         // View specific text.
         views: {
             dashboard: {
@@ -92,7 +98,8 @@ module.exports = {
                     speed: 'Speed',
                     connector: 'Connector',
                     vendor: 'Vendor'
-                }
+                },
+                gbps: ' Gbps'
             },
             ip: {
                 name: 'IP'

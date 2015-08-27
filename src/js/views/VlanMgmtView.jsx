@@ -8,9 +8,8 @@ var React = require('react'),
     Reflux = require('reflux'),
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
-    ActionIcon = require('ActionIcon'),
     GTable = require('grommet/components/Table'),
-    GCheckBox = require('grommet/components/CheckBox'),
+    CheckBox = require('CheckBox'),
     BoxGraphic = require('BoxGraphic'),
     GLayer = require('grommet/components/Layer'),
     GButton = require('grommet/components/Button'),
@@ -53,7 +52,6 @@ var AllVlansTable = React.createClass({
     },
 
     render: function() {
-
         // iterate through the vlans object and generate the table
         // rows to be displayed with vlan data
         var tableRows = [];
@@ -67,16 +65,7 @@ var AllVlansTable = React.createClass({
                     'access': [],
                     'trunk': []
                 };
-
-                // work around until checkbox supports disabled
-                // property - determine whether to display checkbox
-                // or box icon based on state
-                var display = (
-                    <GCheckBox id={vlan.data.id}
-                        onChange={this.toggleVlanDisplay}
-                    />
-                );
-                var state = 'enabled';
+                var status = false;
 
                 // generate ports list by vlan mode for VLAN table rows
                 for (var i in vlan.ports) {
@@ -92,10 +81,7 @@ var AllVlansTable = React.createClass({
                 // displayed in graphic
                 if (this.props.selectedVlans === MAX_VLANS_TO_DISPLAY &&
                     !this.props.vlanStatus[vlan.data.id].show) {
-                    display = (
-                        <ActionIcon fa='square-o' className="disabled"/>
-                    );
-                    state = 'disabled';
+                    status = true;
                 }
 
                 //push the table row to be rendered below
@@ -108,7 +94,11 @@ var AllVlansTable = React.createClass({
                         <td>{formatPorts(ports['native-tagged'])}</td>
                         <td>{formatPorts(ports.access)}</td>
                         <td>{formatPorts(ports.trunk)}</td>
-                        <td className={'checkBox-' + state}>{display}</td>
+                        <td>
+                            <CheckBox id={vlan.data.id}
+                                onChange={this.toggleVlanDisplay}
+                                disabled={status}/>
+                        </td>
                     </tr>
                 );
             }
@@ -341,18 +331,17 @@ module.exports = React.createClass({
                         vlanData={vlan}/>);
                 }
             }
+
         }
 
         return (
             <div>
-                <div className="viewFill viewCol">
+                <div id="vlanMgmtView" className="viewFill viewCol">
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('boxGraphic')}
                             toolbar={keyToolbar}/>
                         <BoxGraphic
                             portConfig={this.state.data.boxPortConfig}
-                            colors={this.state.data.colors}
-                            selectedVlan={this.state.data.selectedVlan}
                             portSelected={this.portSelected}
                             vlanStatus={this.state.data.vlanDisplay} />
                     </div>

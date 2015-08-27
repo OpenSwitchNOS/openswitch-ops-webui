@@ -35,7 +35,8 @@ module.exports = Reflux.createStore({
     state: {
         //list of ports on the device to display for selection
         allPorts: [],
-        portStatus: {}
+        portStatus: {},
+        loadCompleted: 0
     },
 
     // initialize the store.
