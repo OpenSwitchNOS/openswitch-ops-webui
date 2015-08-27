@@ -22,7 +22,7 @@ BoxGraphicActions.loadBoxGraphic.listen(function() {
         }
     }.bind(this));*/
     var data = {
-        style: "alternate",
+        style: 'alternate',
         middlePorts: 25,
         top: [
             {

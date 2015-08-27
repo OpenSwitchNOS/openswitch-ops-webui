@@ -49,13 +49,13 @@ PortsMonitorActions.loadPorts.listen(function() {
         if (err) {
             this.failed(err);
         } else {
-            var res = res.data;
-            for (var i=0; i<res.length; i++) {
-                var port = res[i].split('/')[3];
-                res[i] = '/system/Interface/' + port;
+            var res1 = res.data;
+            for (var i=0; i<res1.length; i++) {
+                var port = res1[i].split('/')[3];
+                res1[i] = '/system/Interface/' + port;
             }
 
-            RestUtils.get(res, function(err2, res2) {
+            RestUtils.get(res1, function(err2, res2) {
                 if (err2) {
                     this.failed(err2);
                 } else {
