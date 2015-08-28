@@ -11,6 +11,7 @@ var React = require('react'),
     GTable = require('grommet/components/Table'),
     CheckBox = require('CheckBox'),
     BoxGraphic = require('BoxGraphic'),
+    StatusText = require('StatusText'),
     GLayer = require('grommet/components/Layer'),
     GButton = require('grommet/components/Button'),
     GFooter = require('grommet/components/Footer'),
@@ -347,10 +348,14 @@ module.exports = React.createClass({
                     </div>
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('allVlans')}/>
-                        <AllVlansTable
-                            data={this.state.data.vlans}
-                            selectedVlans={this.state.data.numberOfSelectedVlans}
-                            vlanStatus={this.state.data.vlanDisplay}/>
+                        {Object.keys(this.state.data.vlans).length !== 0 ?
+                            <AllVlansTable
+                                data={this.state.data.vlans}
+                                selectedVlans={this.state.data.numberOfSelectedVlans}
+                                vlanStatus={this.state.data.vlanDisplay}/>
+                        : <StatusText value='warning'
+                            text={t('noConfiguredVlans')}/>
+                        }
                     </div>
                 </div>
                 {this.state.data.portDetails.show ?

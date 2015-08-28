@@ -16,6 +16,7 @@ var React = require('react'),
     I18n = require('i18n'),
     PortsMonitorActions = require('PortsMonitorActions'),
     PortsMonitorStore = require('PortsMonitorStore'),
+    StatusText = require('StatusText'),
     LineChart = require('react-chartjs').Line,
     BarChart = require('react-chartjs').Bar,
     INTERVAL = 5000;
@@ -41,7 +42,7 @@ var GraphToggleButton = React.createClass({
         text: PropTypes.string,
         click: PropTypes.func,
         index: PropTypes.number,
-        show: PropTypes.bool
+        show: PropTypes.number
     },
 
     render: function() {
@@ -242,6 +243,7 @@ module.exports = React.createClass({
                 {this.state.data.portList.map(function(port) {
                     return (
                         <Link to={'/portMonitor/' + port}
+                            key={port}
                             params={{ 'port': port }}
                             onClick={this.portSelected.bind(this, port)}>
                             {port}
@@ -296,7 +298,7 @@ module.exports = React.createClass({
                 //create the row of details tiles based on the
                 //datsets in the store
                 detailsPanels.push(
-                    <div className="viewBox viewFlex1">
+                    <div key={i} className="viewBox viewFlex1">
                         <ViewBoxHeader title={data.desc}
                             toolbar={statusToolbar}/>
                         <PortDetails color={color} data={data}/>
@@ -356,7 +358,10 @@ module.exports = React.createClass({
                         portNum}
                         toolbar= {toggleToolbar}/>
                         <div id="canvasWrapper">
-                            {chart}
+                            {this.state.data.portList.length ? chart :
+                                <StatusText value='warning'
+                                    text={t('noPorts')} />
+                            }
                         </div>
                 </div>
                 <div className="portDetailsWrapper viewRow viewFlex0">

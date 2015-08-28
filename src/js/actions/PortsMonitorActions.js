@@ -45,17 +45,13 @@ PortsMonitorActions.loadPortStats.failed.listen(function(e) {
 
 //handles the 'loadPorts' actions by requesting data from the server
 PortsMonitorActions.loadPorts.listen(function() {
-    RestUtils.get('/system/bridges/bridge_normal/ports', function(err, res) {
+    RestUtils.get('/system/Interface', function(err, res) {
         if (err) {
             this.failed(err);
         } else {
-            var res1 = res.data;
-            for (var i=0; i<res1.length; i++) {
-                var port = res1[i].split('/')[3];
-                res1[i] = '/system/Interface/' + port;
-            }
 
-            RestUtils.get(res1, function(err2, res2) {
+            //on success - request returned list of URLs
+            RestUtils.get(res.data, function(err2, res2) {
                 if (err2) {
                     this.failed(err2);
                 } else {

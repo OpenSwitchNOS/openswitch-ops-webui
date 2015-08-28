@@ -11,11 +11,11 @@ describe('Test Suite For PortsMgmtStore', function() {
     var ports = {
         test1: {
             url: 'system/Interface/1',
-            data: [1]
+            data: 1
         },
         test2: {
             url: 'system/Interface/34',
-            data: [34]
+            data: 34
         },
         test3: {
             urls: {
@@ -68,7 +68,7 @@ describe('Test Suite For PortsMgmtStore', function() {
 
         jasmine.clock().tick(); // allow action
         expect(err).toBeNull();
-        expect(result).toEqual([1]);
+        expect(result).toEqual(1);
 
 
         // TEST 2
@@ -81,7 +81,7 @@ describe('Test Suite For PortsMgmtStore', function() {
 
         jasmine.clock().tick(); // allow action
         expect(err).toBeNull();
-        expect(result).toEqual([34]);
+        expect(result).toEqual(34);
 
     });
 
@@ -133,7 +133,6 @@ describe('Test Suite For PortsMgmtStore', function() {
         jasmine.clock().tick();
         expect(err).toBeNull();
         expect(result).toEqual([{ 2: 'up' }, { 4: 'up' }, { 10: 'down' }]);
-
     });
 
 });

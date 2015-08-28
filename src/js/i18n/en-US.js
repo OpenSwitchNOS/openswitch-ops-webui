@@ -85,6 +85,8 @@ module.exports = {
             portMonitor: {
                 name: 'Monitor',
                 portUtil: 'Port Utilization - Port ',
+                noPorts: 'There are no active ports on this device. ' +
+                    'Please enabled a port to view utilization'
             },
             portMgmt: {
                 name: 'Management',
@@ -108,6 +110,7 @@ module.exports = {
                 name: 'Management',
                 boxGraphic: 'VLAN Membership',
                 allVlans: 'All VLANs',
+                noConfiguredVlans: 'There are no configured VLANs.',
                 noVlans: 'No VLANs are configured on this port',
                 th: {
                     name: 'Name',

@@ -60,19 +60,19 @@ describe('Test Suite For PortsMonitorStore', function() {
 
         //toggle rx off then on
         PortsMonitorStore.onToggleGraphDisplay('rxData');
-        expect(PortsMonitorStore.state.dataSets.rxData.options.show).toBe(false);
+        expect(PortsMonitorStore.state.dataSets.rxData.options.show).toBe(0);
         PortsMonitorStore.onToggleGraphDisplay('rxData');
-        expect(PortsMonitorStore.state.dataSets.rxData.options.show).toBe(true);
+        expect(PortsMonitorStore.state.dataSets.rxData.options.show).toBe(1);
 
         //toggle error off then tx off then tx on then error on
         PortsMonitorStore.onToggleGraphDisplay('errorData');
-        expect(PortsMonitorStore.state.dataSets.errorData.options.show).toBe(false);
+        expect(PortsMonitorStore.state.dataSets.errorData.options.show).toBe(0);
         PortsMonitorStore.onToggleGraphDisplay('txData');
-        expect(PortsMonitorStore.state.dataSets.txData.options.show).toBe(false);
+        expect(PortsMonitorStore.state.dataSets.txData.options.show).toBe(0);
         PortsMonitorStore.onToggleGraphDisplay('txData');
-        expect(PortsMonitorStore.state.dataSets.txData.options.show).toBe(true);
+        expect(PortsMonitorStore.state.dataSets.txData.options.show).toBe(1);
         PortsMonitorStore.onToggleGraphDisplay('errorData');
-        expect(PortsMonitorStore.state.dataSets.errorData.options.show).toBe(true);
+        expect(PortsMonitorStore.state.dataSets.errorData.options.show).toBe(1);
 
     });
 

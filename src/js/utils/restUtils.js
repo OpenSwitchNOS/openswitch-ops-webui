@@ -32,7 +32,9 @@ function getBody(url, callback) {
             err.reqUrl = reqUrl;
             callback(err, null);
         } else {
-            res.body.date = res.header.date;
+            if (res.header.date) {
+                res.body.date = res.header.date;
+            }
             callback(null, res.body);
         }
     });

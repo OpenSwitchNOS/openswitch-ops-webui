@@ -222,12 +222,18 @@ module.exports = Reflux.createStore({
 
     //Callback for success of loading port list from server
     onLoadPortsCompleted: function(ports) {
+
+        // loop through all interfaces and determine
+        // if they are a port or not
         var list = [];
         for (var i in ports) {
             if (ports.hasOwnProperty(i)) {
                 var port = ports[i].data;
-                if (port.link_state[0] === 'up' && port.link_speed[0] > 0) {
-                    list.push(Number(port.name));
+                //port type as empty string means it is a port
+                if (port.type === '') {
+                    if (port.link_state[0] === 'up' && port.link_speed[0] > 0) {
+                        list.push(Number(port.name));
+                    }
                 }
             }
         }
@@ -248,7 +254,7 @@ module.exports = Reflux.createStore({
     //handler to toggle the graph display
     onToggleGraphDisplay: function(key) {
         this.state.dataSets[key].options.show =
-            !(this.state.dataSets[key].options.show);
+            1 - (this.state.dataSets[key].options.show);
         this.trigger(this.state);
     },
 
