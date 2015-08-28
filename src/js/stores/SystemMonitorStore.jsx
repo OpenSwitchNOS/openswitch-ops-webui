@@ -8,9 +8,6 @@ var Reflux = require('reflux'),
 
 var DATA_SIZE = 25;
 
-// FIXME: just till we have timestamps
-var TS = 1001;
-
 function mkDataEntry() {
     return { max: 0, data: [] };
 }
@@ -31,7 +28,7 @@ module.exports = Reflux.createStore({
     listenables: [ SystemStatsActions ],
 
     state: {
-        ts: [],
+        dates: [],
         cpu: mkDataEntry(),
         memory: mkDataEntry(),
         temps: []
@@ -59,7 +56,7 @@ module.exports = Reflux.createStore({
             }
         }
 
-        pushTrim(s.ts, TS++);
+        pushTrim(s.dates, stats.date);
 
         s.cpu.max = stats.cpuMax;
         pushTrim(s.cpu.data, stats.cpuVal);

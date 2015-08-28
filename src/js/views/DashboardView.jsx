@@ -24,10 +24,11 @@ var React = require('react/addons'),
     InterfaceActions = require('InterfaceActions'),
     Lodash = require('lodash');
 
-var AUTO_REFRESH_MILLIS = 5000,
+var AUTO_REFRESH_MILLIS = 10000,
     NUM_UTL_VIEW_SLOTS = 5,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     METER_MAX_VAL_ADJ = 0.1,
+    autoRefreshCount = 0,
     autoRefreshTimer,
     infSlots = [],
     infSlotIdx;
@@ -78,6 +79,7 @@ module.exports = React.createClass({
     ],
 
     componentDidMount: function() {
+        SystemInfoActions.load();
         this.autoRefresh();
     },
 
@@ -85,6 +87,37 @@ module.exports = React.createClass({
         if (autoRefreshTimer) {
             clearTimeout(autoRefreshTimer);
         }
+    },
+
+    staggerLoad: function(dataGroup) {
+        var mod;
+        if (autoRefreshCount === 0) {
+            return true;
+        }
+        mod = autoRefreshCount % 2;
+        if (dataGroup === 'stats') {
+            return mod === 0;
+        }
+        if (dataGroup === 'infs') {
+            return mod === 1;
+        }
+        return false;
+    },
+
+    autoRefresh: function() {
+        var recurFn = this.autoRefresh;
+
+        if (autoRefreshCount % 2 === 0) {
+            SystemStatsActions.load();
+        } else if (autoRefreshCount % 2 === 1) {
+            InterfaceActions.load();
+        }
+
+        autoRefreshCount++;
+
+        autoRefreshTimer = setTimeout(function() {
+            recurFn();
+        }, AUTO_REFRESH_MILLIS);
     },
 
     updateInfSlots: function() {
@@ -114,6 +147,7 @@ module.exports = React.createClass({
                 newInfSlots[slotIdx].id = topInfId;
                 newInfSlots[slotIdx].val = topInf.utl;
                 newInfSlots[slotIdx].dir = topInf.dir;
+                newInfSlots[slotIdx].name = topInf.ci.name;
             }
         }
 
@@ -131,22 +165,6 @@ module.exports = React.createClass({
         }
 
         infSlots = newInfSlots;
-    },
-
-    autoRefresh: function() {
-        var recurFn = this.autoRefresh;
-
-        SystemInfoActions.load();
-        SystemStatsActions.load();
-        InterfaceActions.load();
-
-        autoRefreshTimer = setTimeout(function() {
-            recurFn();
-        }, AUTO_REFRESH_MILLIS);
-    },
-
-    onClickChart: function() {
-        alert('Launch chart screen (not implemented yet).');
     },
 
     mkSysInfoPropData: function() {
@@ -283,7 +301,23 @@ module.exports = React.createClass({
         return meters;
     },
 
-    mkTb: function(type) {
+    mkUtlTb: function() {
+        var transTo = this.transitionTo,
+            toFn;
+
+        if (infSlots.length > 0) {
+            toFn = function() { transTo('/portMonitor/' + infSlots[0].name); };
+            return {
+                edit: <ActionIcon
+                    fa="area-chart"
+                    onClick={ toFn }
+                />
+            };
+        }
+        return {};
+    },
+
+    mkSysTb: function(type) {
         var transTo = this.transitionTo,
             toFn = function() { transTo('/systemMonitor/' + type); };
         return {
@@ -295,12 +329,7 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var tb = {
-                edit: <ActionIcon
-                    fa="area-chart"
-                    onClick={ this.onClickChart } />
-            },
-            si = this.state.sysStats;
+        var si = this.state.sysStats;
 
         this.updateInfSlots();
 
@@ -327,7 +356,7 @@ module.exports = React.createClass({
                     <div className="viewBox box1">
                         <ViewBoxHeader
                             title={t('cpu')}
-                            toolbar={this.mkTb('cpu')} />
+                            toolbar={this.mkSysTb('cpu')} />
                         {this.mkMeter(si.cpuVal, si.cpuMax, '')}
                     </div>
                     <div className="viewBox box1">
@@ -340,20 +369,22 @@ module.exports = React.createClass({
                     <div className="viewBox box1">
                         <ViewBoxHeader
                             title={t('memory')}
-                            toolbar={this.mkTb('memory')} />
+                            toolbar={this.mkSysTb('memory')} />
                         {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
                     </div>
 
                     <div className="viewBox box1">
                         <ViewBoxHeader
                             title={t('temp')}
-                            toolbar={this.mkTb('temperature')} />
+                            toolbar={this.mkSysTb('temperature')} />
                         {this.mkTempMeters()}
                     </div>
                 </div>
 
                 <div className="viewBox">
-                    <ViewBoxHeader title={t('portTopUtil')} toolbar={tb} />
+                    <ViewBoxHeader
+                        title={t('portTopUtil')}
+                        toolbar={this.mkUtlTb()} />
                     <div className="viewBoxContent">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
                             {this.mkUtlMeters()}

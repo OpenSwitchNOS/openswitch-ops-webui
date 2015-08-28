@@ -94,7 +94,11 @@ module.exports = React.createClass({
         }
 
         return {
-            labels: this.state.ts,
+            labels: this.state.dates.map(function(ts) {
+                return new Date(ts).toLocaleTimeString(I18n.locale, {
+                    hour12: false
+                });
+            }),
             datasets: datasets
         };
     },
