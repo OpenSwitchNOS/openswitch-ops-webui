@@ -5,115 +5,40 @@
 
 var React = require('react'),
     I18n = require('i18n'),
-    Reflux = require('reflux'),
-    ReactChart = require('react-chartjs'),
-    BarChart = ReactChart.Bar,
     ViewBoxHeader = require('ViewBoxHeader'),
     GMenu = require('grommet/components/Menu'),
     Router = require('react-router'),
-    Link = Router.Link,
-    SystemStatsActions = require('SystemStatsActions'),
-    SystemMonitorStore = require('SystemMonitorStore'),
-    ChartUtils = require('chartUtils');
-
-var AUTO_REFRESH_MILLIS = 5000,
-    autoRefreshTimer;
+    RouteHandler = Router.RouteHandler,
+    Link = Router.Link;
 
 function t(key) {
     return I18n.text('views.systemMonitor.' + key);
 }
 
-function scaleLabel(value, type) {
-    var units = '';
-
-    if (type === 'memory' || type === 'storage') {
-        units = t('gb');
-    } else if (type === 'temperature') {
-        units = t('deg');
-    }
-
-    return Number(value).toFixed(1) + ' ' + units;
-}
-
 module.exports = React.createClass({
 
-    displayName: 'SystemMonitor',
+    displayName: 'SystemMonitorView',
 
     mixins: [
-        Reflux.connect(SystemMonitorStore),
+        Router.Navigation,
         Router.State
     ],
 
-    componentDidMount: function() {
-        this.autoRefresh();
-    },
-
-    componentWillUnmount: function() {
-        if (autoRefreshTimer) {
-            clearTimeout(autoRefreshTimer);
+    componentWillMount: function() {
+        if (!this.getParams().type) {
+            this.transitionTo('/systemMonitor/cpu');
         }
-    },
-
-    autoRefresh: function() {
-        var recurFn = this.autoRefresh;
-
-        SystemStatsActions.load();
-
-        autoRefreshTimer = setTimeout(function() {
-            recurFn();
-        }, AUTO_REFRESH_MILLIS);
     },
 
     mkLink: function(type) {
-        return ( <Link to={'/systemMonitor/' + type}>{t(type)}</Link> );
-    },
-
-    mkChartData: function(type) {
-        var s = this.state,
-            datasets = [],
-            ci;
-
-        if (type === 'temperature') {
-            for (var i=0; i<s.temps.length; i++) {
-                ci = i % ChartUtils.colors.length;
-                datasets.push({
-                    label: s.temps[i].name,
-                    data: s.temps[i].data,
-                    fillColor: ChartUtils.colors[ci].fill,
-                    pointColor: ChartUtils.colors[ci].paint,
-                    strokeColor: ChartUtils.colors[ci].stroke
-                });
-            }
-        } else {
-            datasets.push({
-                data: s[type].data,
-                fillColor: ChartUtils.colors[0].fill,
-                pointColor: ChartUtils.colors[0].paint,
-                strokeColor: ChartUtils.colors[0].stroke
-            });
-        }
-
-        return {
-            labels: this.state.dates.map(function(ts) {
-                return new Date(ts).toLocaleTimeString(I18n.locale, {
-                    hour12: false
-                });
-            }),
-            datasets: datasets
-        };
+        return (
+            <Link to={'/systemMonitor/' + type}>
+                {t(type)}
+            </Link>
+        );
     },
 
     render: function() {
-        var type = this.getParams().type,
-            chartOptions = {
-                animation: false,
-                responsive: true,
-                scaleBeginAtZero: true,
-                maintainAspectRatio: false,
-                scaleLabel: function(v) { return scaleLabel(v.value, type); },
-                multiTooltipTemplate: '<%= datasetLabel %> - <%= value %>'
-            };
-
         return (
             <div id="systemMonitorView" className="viewFill viewCol">
                 <div className="viewRow">
@@ -125,13 +50,7 @@ module.exports = React.createClass({
                                 {this.mkLink('temperature')}
                             </GMenu>
                         />
-                        <div id="systemMonitorViewCanvas">
-                        <BarChart
-                            data={this.mkChartData(type)}
-                            options={chartOptions}
-                            redraw
-                        />
-                        </div>
+                        <RouteHandler />
                     </div>
                 </div>
             </div>

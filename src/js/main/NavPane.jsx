@@ -75,7 +75,7 @@ module.exports = React.createClass({
                 <NavGroup heading={t('general')}
                     routes={[
                         { to: 'dashboard' },
-                        { to: '/systemMonitor/cpu', viewName: 'systemMonitor' }
+                        { to: 'systemMonitor' }
                     ]}
                 />
                 <hr />

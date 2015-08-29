@@ -7,6 +7,7 @@
 // TODO: stagger load times so we don't wait 10 seconds.
 // TODO: show 'Fans: () OK (count 10);
 // TODO: show 'Power Supplies: () OK (base-1)'
+// TODO: Warning: setState(...): Can only update a mounted or mounting component. This usually means you called setState() on an unmounted component. This is a no-op.
 
 var React = require('react/addons'),
     Reflux = require('reflux'),

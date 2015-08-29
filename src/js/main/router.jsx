@@ -12,6 +12,7 @@ var React = require('react'),
     Login = require('Login'),
     StaticRoutesView = require('StaticRoutesView'),
     SystemMonitorView = require('SystemMonitorView'),
+    SystemMonitorChart = require('SystemMonitorChart'),
     DashboardView = require('DashboardView'),
     PortMonitorView = require('PortMonitorView'),
     PortMgmtView = require('PortMgmtView'),
@@ -34,7 +35,7 @@ var routes = (
         </Route>
         <Route name="staticRoutes" handler={StaticRoutesView}/>
         <Route name="systemMonitor" handler={SystemMonitorView}>
-            <Route path=":type" handler={SystemMonitorView}/>
+            <Route path=":type" handler={SystemMonitorChart}/>
         </Route>
         <Route name="test1" handler={TestView1}/>
         <Route name="test2" handler={TestView2}/>
