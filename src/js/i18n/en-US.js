@@ -114,15 +114,13 @@ module.exports = {
                 noVlans: 'No VLANs are configured on this port',
                 th: {
                     name: 'Name',
-                    id: 'ID',
+                    id: 'VLAN',
                     status: 'Status',
-                    untagged: 'Native-Untagged',
-                    tagged: 'Native-Tagged',
-                    access: 'Access',
-                    trunk: 'Trunk',
+                    reason: 'Reason',
+                    ports: 'Ports',
                     display: 'Display',
                     vlan: 'VLAN',
-                    portType: 'Port Type',
+                    vlanStatus: 'VLAN Status'
                 }
             },
             vlanPortConfig: {

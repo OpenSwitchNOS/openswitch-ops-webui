@@ -196,8 +196,10 @@ module.exports = React.createClass({
 
     //start the graph interval and set the state in the store
     startInterval(port) {
-        var interval = setInterval(this.getPortData.bind(this, port),
-            INTERVAL);
+        var interval = setInterval(
+            this.getPortData.bind(this, port),
+            INTERVAL
+        );
         PortsMonitorActions.setInterval(interval);
     },
 
@@ -227,20 +229,20 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var dataSets = [],
+        var st = this.state,
+            dataSets = [],
             toggleToolbar = {},
             detailsPanels = [],
             chart, graphData, barGraphData, portNum,
             pause, play;
 
         // get port number to display in the title
-        portNum = this.state.data.selectedPort ?
-                this.state.data.selectedPort : '';
+        portNum = st.data.selectedPort ? st.data.selectedPort : '';
 
         //append the port selection dropdown to the tile toolbar
         toggleToolbar.select = (
             <GMenu icon={<GDropCaret/>} label='Select Port'>
-                {this.state.data.portList.map(function(port) {
+                {st.data.portList.map(function(port) {
                     return (
                         <Link to={'/portMonitor/' + port}
                             key={port}
@@ -254,15 +256,15 @@ module.exports = React.createClass({
         );
 
         //append pause and play buttons to the tile toolbar
-        pause = this.state.data.pauseHandler ? this.pauseGraph : null;
-        play = this.state.data.playHandler ? this.playGraph : null;
+        pause = st.data.pauseHandler ? this.pauseGraph : null;
+        play = st.data.playHandler ? this.playGraph : null;
         toggleToolbar.play = this.initPlay(play);
         toggleToolbar.pause = this.initPause(pause);
 
         // create the rest of the toggle toolbar based on the data sets
-        for (var i in this.state.data.dataSets) {
-            if (this.state.data.dataSets.hasOwnProperty(i)) {
-                var dt = this.state.data,
+        for (var i in st.data.dataSets) {
+            if (st.data.dataSets.hasOwnProperty(i)) {
+                var dt = st.data,
                     data = dt.dataSets[i],
                     color = dt.colors[data.options.colorIndex].stroke,
                     onclick = this.toggleGraph.bind(this, i),
@@ -314,16 +316,16 @@ module.exports = React.createClass({
         // Generate line graph data and keep it updating
         // as the state data updates
         graphData = {
-            'labels': this.state.data.labels,
+            'labels': st.data.labels,
             'datasets': dataSets
         };
 
         // Generate bar graph data and keep it updating
         // as the state data updates
-        barGraphData = this.state.data.activeDetails ? {
-            'labels': this.state.data.labels,
+        barGraphData = st.data.activeDetails ? {
+            'labels': st.data.labels,
             'datasets': [
-                this.state.data.dataSets[this.state.data.activeDetails].graphData
+                st.data.dataSets[st.data.activeDetails].graphData
             ]
         } : null;
 
@@ -333,17 +335,17 @@ module.exports = React.createClass({
             chart = (
                 <LineChart
                     data={graphData}
-                    options={this.state.data.options}
+                    options={st.data.options}
                     width={600}
                     height={300}
                     redraw
                 />
             );
-        } else if (this.state.data.chartType === 'bar') {
+        } else if (st.data.chartType === 'bar') {
             chart = (
                 <BarChart
                     data={barGraphData}
-                    options={this.state.data.options}
+                    options={st.data.options}
                     width={600}
                     height={300}
                     redraw
@@ -358,9 +360,11 @@ module.exports = React.createClass({
                         portNum}
                         toolbar= {toggleToolbar}/>
                         <div id="canvasWrapper">
-                            {this.state.data.portList.length ? chart :
-                                <StatusText value='warning'
-                                    text={t('noPorts')} />
+                            {st.data.portList.length ? chart :
+                                st.data.showStatusText ?
+                                    <StatusText value='disabled'
+                                        text={t('noPorts')} />
+                                : null
                             }
                         </div>
                 </div>

@@ -55,12 +55,13 @@ var AllVlansTable = React.createClass({
     render: function() {
         // iterate through the vlans object and generate the table
         // rows to be displayed with vlan data
-        var tableRows = [];
+        var tableRows = [],
+            data = this.props.data;
 
-        for (var key in this.props.data) {
+        for (var key in data) {
 
-            if (this.props.data.hasOwnProperty(key)) {
-                var vlan = this.props.data[key];
+            if (data.hasOwnProperty(key)) {
+                var vlan = data[key];
                 var ports = { 'native-tagged': [],
                     'native-untagged': [],
                     'access': [],
@@ -91,10 +92,8 @@ var AllVlansTable = React.createClass({
                         <td>{vlan.data.name}</td>
                         <td>{vlan.data.id}</td>
                         <td>{vlan.data.oper_state}</td>
-                        <td>{formatPorts(ports['native-untagged'])}</td>
-                        <td>{formatPorts(ports['native-tagged'])}</td>
-                        <td>{formatPorts(ports.access)}</td>
-                        <td>{formatPorts(ports.trunk)}</td>
+                        <td>{vlan.data.oper_state_reason}</td>
+                        <td>{formatPorts(vlan.ports)}</td>
                         <td>
                             <CheckBox id={vlan.data.id}
                                 onChange={this.toggleVlanDisplay}
@@ -106,15 +105,13 @@ var AllVlansTable = React.createClass({
         }
 
         return (
-            <GTable className="defaultTable allVlanTable">
+            <GTable className="defaultTable allVlanTable" scrollable={true}>
                 <thead>
                     <th>{t('th.name')}</th>
                     <th>{t('th.id')}</th>
                     <th>{t('th.status')}</th>
-                    <th>{t('th.untagged')}</th>
-                    <th>{t('th.tagged')}</th>
-                    <th>{t('th.access')}</th>
-                    <th>{t('th.trunk')}</th>
+                    <th>{t('th.reason')}</th>
+                    <th>{t('th.ports')}</th>
                     <th>{t('th.display')}</th>
                 </thead>
                 <tbody>
@@ -195,7 +192,7 @@ var MembershipTable = React.createClass({
     // array. return index or -1 if not found
     getPortIndex: function(ports, port) {
         for (var i=0; i<ports.length; i++ ) {
-            if (Number(ports[i].name) === port) {
+            if (Number(ports[i]) === port) {
                 return i;
             }
         }
@@ -204,14 +201,15 @@ var MembershipTable = React.createClass({
     },
 
     render: function() {
-        var tableRows = [];
-        var displayTable = true;
+        var tableRows = [],
+            displayTable = true,
+            data = this.props.data;
 
         // generate the table rows for the membership table
-        for (var key in this.props.data.vlans) {
-            if (this.props.data.vlans.hasOwnProperty(key)) {
+        for (var key in data.vlans) {
+            if (data.vlans.hasOwnProperty(key)) {
 
-                var vlan = this.props.data.vlans[key];
+                var vlan = data.vlans[key];
                 if (vlan) {
 
                     //get the port index to list appropriate vlan mode
@@ -220,7 +218,7 @@ var MembershipTable = React.createClass({
                         tableRows.push(
                             <tr>
                                 <td>{vlan.data.name}</td>
-                                <td>{vlan.ports[index].vlan_mode}</td>
+                                <td>{vlan.data.oper_state}</td>
                             </tr>
                         );
                     }
@@ -239,7 +237,7 @@ var MembershipTable = React.createClass({
                 <GTable className="defaultTable">
                     <thead>
                         <th>{t('th.vlan')}</th>
-                        <th>{t('th.portType')}</th>
+                        <th>{t('th.vlanStatus')}</th>
                     </thead>
                     <tbody>
                         {tableRows}
@@ -314,15 +312,16 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var keyToolbar = {};
+        var keyToolbar = {},
+            data = this.state.data;
 
         // generate the VLAN keys based on what VLANs
         // are selected to display
-        for (var key in this.state.data.vlanDisplay) {
-            if (this.state.data.vlanDisplay.hasOwnProperty(key)) {
-                var vlan = this.state.data.vlanDisplay[key];
+        for (var key in data.vlanDisplay) {
+            if (data.vlanDisplay.hasOwnProperty(key)) {
+                var vlan = data.vlanDisplay[key];
                 if (vlan.show) {
-                    var colorElem = this.state.data.colors[vlan.colorIndex];
+                    var colorElem = data.colors[vlan.colorIndex];
                     var vlanId = vlan.data.id;
 
                     // keyToolbar contains VLAN key items that appear
@@ -342,26 +341,28 @@ module.exports = React.createClass({
                         <ViewBoxHeader title={t('boxGraphic')}
                             toolbar={keyToolbar}/>
                         <BoxGraphic
-                            portConfig={this.state.data.boxPortConfig}
+                            portConfig={data.boxPortConfig}
                             portSelected={this.portSelected}
-                            vlanStatus={this.state.data.vlanDisplay} />
+                            vlanStatus={data.vlanDisplay} />
                     </div>
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('allVlans')}/>
-                        {Object.keys(this.state.data.vlans).length !== 0 ?
+                        {Object.keys(data.vlans).length !== 0 ?
                             <AllVlansTable
-                                data={this.state.data.vlans}
-                                selectedVlans={this.state.data.numberOfSelectedVlans}
-                                vlanStatus={this.state.data.vlanDisplay}/>
-                        : <StatusText value='warning'
-                            text={t('noConfiguredVlans')}/>
+                                data={data.vlans}
+                                selectedVlans={data.numberOfSelectedVlans}
+                                vlanStatus={data.vlanDisplay}/>
+                            : data.showStatusText ?
+                                <StatusText value='disabled'
+                                    text={t('noConfiguredVlans')}/>
+                                : null
                         }
                     </div>
                 </div>
-                {this.state.data.portDetails.show ?
+                {data.portDetails.show ?
                     <PortDetails
-                        port={this.state.data.portDetails.port}
-                        data={this.state.data}/>
+                        port={data.portDetails.port}
+                        data={data}/>
                 : null}
             </div>
         );

@@ -31,7 +31,8 @@ module.exports = Reflux.createStore({
         selectedVlan: -1,
         colorIndexes: [false, false, false, false],
         numberOfSelectedVlans: 0,
-        portDetails: { 'show': false, 'port': 0 }
+        portDetails: { 'show': false, 'port': 0 },
+        showStatusText: 0
     },
 
     // initialize the store.
@@ -42,8 +43,9 @@ module.exports = Reflux.createStore({
 
     // Callback for success of loading vlan data
     onLoadVlansCompleted: function(data) {
-        var index, trunkVlans;
-        var vlans = {};
+        var index,
+            trunkVlans,
+            vlans = {};
 
         // loop through returned vlans are create
         // entries in the object
@@ -57,44 +59,21 @@ module.exports = Reflux.createStore({
                 vlans[elem.id] = data[i];
                 vlans[elem.id].ports = [];
             } else if ('vlan_mode' in elem) {
-                switch (elem.vlan_mode[0]) {
-                    case 'trunk':
-                        trunkVlans = elem.trunks;
-                        for (var j=0; j<trunkVlans.length; j++) {
-                            index = Number(trunkVlans[j]);
-                            if (vlans[index]) {
-                                vlans[index].ports = vlans[index].ports || [];
-                                vlans[index].ports.push({ 'name': elem.name,
-                                    'vlan_mode': elem.vlan_mode[0] });
-                            }
-                        }
-                        break;
-                    case 'access':
-                    case 'native-untagged':
-                    case 'native-tagged':
-                        index = Number(elem.tag);
-                        if (vlans[index]) {
-                            vlans[index].ports = vlans[index].ports || [];
-                            vlans[index].ports.push({ 'name': elem.name,
-                                'vlan_mode': elem.vlan_mode[0] });
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                // extra case for trunk ports when the vlan_mode
-                // is not set to trunk
-                if (elem.trunks !== [] && elem.vlan_mode[0] !== 'trunk') {
+                if (elem.trunks !== []) {
                     trunkVlans = elem.trunks;
-                    for (var k=0; k<trunkVlans.length; k++) {
-                        index = Number(trunkVlans[k]);
+                    for (var j=0; j<trunkVlans.length; j++) {
+                        index = Number(trunkVlans[j]);
                         if (vlans[index]) {
                             vlans[index].ports = vlans[index].ports || [];
-                            vlans[index].ports.push({ 'name': elem.name,
-                                'vlan_mode': elem.vlan_mode[0] });
+                            vlans[index].ports.push(elem.name);
                         }
                     }
+                }
+
+                index = Number(elem.tag);
+                if (vlans[index]) {
+                    vlans[index].ports = vlans[index].ports || [];
+                    vlans[index].ports.push(elem.name);
                 }
             }
         }
@@ -118,6 +97,14 @@ module.exports = Reflux.createStore({
         this.state.vlans = vlans;
         this.state.vlansGraphic = _.cloneDeep(vlans);
         this.loadBoxGraphic(vlans);
+
+        // if there are no vlans set the status text. Set this here
+        // so that the user does not see the warning message for a
+        // few seconds as the data loads
+        if (Object.keys(vlans).length === 0 ) {
+            this.state.showStatusText = 1;
+        }
+
         this.trigger(this.state);
     },
 
@@ -137,11 +124,11 @@ module.exports = Reflux.createStore({
                 var data = vlans[key].ports;
                 for (var i=0; i<data.length; i++) {
                     var port = data[i];
-                    if (port.name in this.state.boxPortConfig.data) {
-                        this.state.boxPortConfig.data[port.name].vlans
+                    if (port in this.state.boxPortConfig.data) {
+                        this.state.boxPortConfig.data[port].vlans
                             .push(vlans[key].data.id);
                     } else {
-                        this.state.boxPortConfig.data[port.name] =
+                        this.state.boxPortConfig.data[port] =
                             { 'vlans': [vlans[key].data.id],
                                 'status': false };
                     }
@@ -204,4 +191,5 @@ module.exports = Reflux.createStore({
         this.state.numberOfSelectedVlans = 0;
         this.trigger(this.state);
     }
+
 });

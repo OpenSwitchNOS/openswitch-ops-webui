@@ -64,11 +64,14 @@ var ColorBadge = React.createClass({
         var portData;
         var colors = this.props.colors;
 
+        //console.log(this.props.data);
+        //console.log(this.props.id);
         if (this.props.data && this.props.id in this.props.data) {
             portData = this.props.data[this.props.id];
         }
 
         // only load if the graphic is passed portData
+        //console.log('data: ' + JSON.stringify(portData));
         if (portData) {
             var status = this.props.vlanStatus;
             return (
@@ -504,7 +507,6 @@ module.exports = React.createClass({
 
     componentDidMount: function() {
         // load the box graphic configuration data
-        BoxGraphicActions.loadHwPorts();
         BoxGraphicActions.loadBoxGraphic();
     },
 

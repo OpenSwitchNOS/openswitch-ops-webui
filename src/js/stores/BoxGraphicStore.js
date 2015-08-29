@@ -4,12 +4,18 @@
  */
 
 var Reflux = require('reflux'),
+    PortsActions = require('PortsActions'),
     BoxGraphicActions = require('BoxGraphicActions');
 
 module.exports = Reflux.createStore({
 
     // I want callbacks on these actions.
-    listenables: [ BoxGraphicActions ],
+    listenables: [ BoxGraphicActions, PortsActions ],
+
+    init: function() {
+        //PortsActions.loadPorts();
+        this.listenTo(PortsActions.loadPorts.completed, 'loadHwPorts');
+    },
 
     // Data model for box graphic state
     state: {
@@ -32,23 +38,12 @@ module.exports = Reflux.createStore({
         this.trigger(this.state);
     },
 
-    onLoadHwPortsCompleted: function(data) {
+    loadHwPorts: function(data) {
 
-        // loop through all interfaces and determine
-        // if they are a port or not
-        for (var key in data) {
-            if (data.hasOwnProperty(key)) {
-                var port = data[key];
-
-                // empty string as type means it is a port
-                if (port.data.type === '') {
-                    this.state.ports.push(port);
-
-                    //generate hw port data
-                    this.state.hwData[port.data.name] =
-                        { 'portType': port.data.hw_intf_info.connector };
-                }
-            }
+        for (var i=0; i<data.length; i++) {
+            var port = data[i];
+            this.state.hwData[port.data.name] =
+                { 'portType': port.data.hw_intf_info.connector };
         }
 
         this.state.loadCompleted = 1;

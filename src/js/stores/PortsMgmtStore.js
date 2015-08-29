@@ -6,6 +6,7 @@
 //FIXME - do not truncate and do toFixed in any store - always in the view
 
 var Reflux = require('reflux'),
+    PortsActions = require('PortsActions'),
     PortsMgmtActions = require('PortsMgmtActions');
 
 //HELPER FUNCTIONS
@@ -31,6 +32,11 @@ module.exports = Reflux.createStore({
 
     listenables: [ PortsMgmtActions ],
 
+    init: function() {
+        PortsActions.loadPorts();
+        this.listenTo(PortsActions.loadPorts.completed, 'setPorts');
+    },
+
     // Data model port graph data, colors, and graph config
     state: {
         //list of ports on the device to display for selection
@@ -45,28 +51,15 @@ module.exports = Reflux.createStore({
     },
 
     //Callback for success of loading port list from server
-    onLoadPortsCompleted: function(interfaces) {
-        var ports = [];
+    setPorts: function(ports) {
+        var portStatus = this.state.portStatus;
 
-        // loop through all interfaces and determine
-        // if they are a port or not
-        for (var key in interfaces) {
-            if (interfaces.hasOwnProperty(key)) {
-                var port = interfaces[key];
-
-                // empty string as type means it is a port
-                if (port.data.type === '') {
-                    ports.push(port);
-
-                    //add port to portStatus object
-                    this.state.portStatus[port.data.name] = {};
-                    this.state.portStatus[port.data.name].adminState =
-                        port.data.admin_state[0];
-                    this.state.portStatus[port.data.name].linkState =
-                        port.data.link_state[0];
-                }
-
-            }
+        for (var i=0; i<ports.length; i++) {
+            //add port to portStatus object
+            var port = ports[i];
+            portStatus[port.data.name] = {};
+            portStatus[port.data.name].adminState = port.data.admin_state[0];
+            portStatus[port.data.name].linkState = port.data.link_state[0];
         }
 
         // sort the ports by number

@@ -35,7 +35,7 @@ var PortList = React.createClass({
     render: function() {
 
         return (
-            <GTable className="defaultTable portTable">
+            <GTable className="defaultTable portTable" scrollable={true}>
                 <thead>
                     <th>{t('th.name')}</th>
                     <th>{t('th.adminState')}</th>
