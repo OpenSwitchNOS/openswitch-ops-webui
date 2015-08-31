@@ -46,7 +46,35 @@ $statusColorOrange: #FFB657;
 // App notification
 $appNotificationDivderBackgroundColor: lightgrey;
 
+// grommet imports
+// Pack fonts so that grommet won't go out looking for them.
+// (see grommet _settings.font.scss).
+// TODO: stop grommet from attempting to load the remote font.
 @import '~grommet/scss/grommet-core/index';
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  src: url(../font/SourceSansPro-Light.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../font/SourceSansPro-Regular.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../font/SourceSansPro-Bold.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  src: url(../font/SourceSansPro-Italic.ttf) format('truetype');
+}
 
 @import 'app.scss';
 
