@@ -22,6 +22,7 @@ var React = require('react'),
     VlanMgmtView = require('VlanMgmtView'),
     VlanMonitorView = require('VlanMonitorView'),
     VlanPortConfigView = require('VlanPortConfigView'),
+    MgmtIntfView = require('MgmtIntfView'),
 
     App = require('App');
 
@@ -43,6 +44,7 @@ var routes = (
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
         <Route name="vlanMonitor" handler={VlanMonitorView}/>
         <Route name="vlanPortConfig" handler={VlanPortConfigView}/>
+        <Route name="mgmtIntf" handler={MgmtIntfView}/>
         <DefaultRoute handler={Login}/>
     </Route>
 );

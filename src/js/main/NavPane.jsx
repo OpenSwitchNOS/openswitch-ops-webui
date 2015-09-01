@@ -14,12 +14,12 @@ var React = require('react/addons'),
     RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore');
 
-
 var NavGroup = React.createClass({
 
     displayName: 'NavGroup',
 
     propTypes: {
+        autoClose: PropTypes.bool,
         heading: PropTypes.string,
         routes: PropTypes.arrayOf(PropTypes.shape({
             to: PropTypes.string.isRequired,
@@ -30,7 +30,7 @@ var NavGroup = React.createClass({
     mixins: [ Reflux.connect(RenderStore, 'render') ],
 
     onClickLink: function() {
-        if (this.state.autoCloseNavPane) {
+        if (this.props.autoClose) {
             RenderActions.hideNavPane();
         }
     },
@@ -67,19 +67,25 @@ module.exports = React.createClass({
 
     displayName: 'NavPane',
 
+    propTypes: {
+        autoClose: PropTypes.bool,
+    },
+
     render: function() {
-        var t = I18n.text;
+        var t = I18n.text,
+            ac = this.props.autoClose;
         return (
             <div id="navPane">
 
-                <NavGroup heading={t('general')}
+                <NavGroup autoClose={ac} heading={t('general')}
                     routes={[
                         { to: 'dashboard' },
-                        { to: 'systemMonitor' }
+                        { to: 'systemMonitor' },
+                        { to: 'mgmtIntf' },
                     ]}
                 />
                 <hr />
-                <NavGroup heading={t('ports')}
+                <NavGroup autoClose={ac} heading={t('ports')}
                     routes={[
                         { to: 'portMgmt' },
                         { to: 'portMonitor' },
@@ -87,7 +93,7 @@ module.exports = React.createClass({
                     ]}
                 />
                 <hr />
-                <NavGroup heading={t('vlans')}
+                <NavGroup autoClose={ac} heading={t('vlans')}
                     routes={[
                         { to: 'vlanMgmt' },
                         { to: 'vlanPortConfig' }
