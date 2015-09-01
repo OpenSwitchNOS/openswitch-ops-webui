@@ -17,6 +17,8 @@ var React = require('react/addons'),
     QueryString = require('query-string'),
     RestUtils = require('restUtils');
 
+var MAX_AUTO_CLOSE_NAV_WIDTH = 640;
+
 module.exports = React.createClass({
 
     displayName: 'App',
@@ -31,6 +33,26 @@ module.exports = React.createClass({
         if (qs && qs.restapi) {
             RestUtils.setRestApiRedirect(qs.restapi);
         }
+        this.updateDimensions();
+    },
+
+    componentDidMount: function() {
+        window.addEventListener('resize', this.updateDimensions);
+    },
+
+    componentWillUnmount: function() {
+        window.removeEventListener('resize', this.updateDimensions);
+    },
+
+    shouldAutoCloseNavPane: function() {
+        // TODO: works but first click on resize small - not auto close?
+        return window.innerWidth <= MAX_AUTO_CLOSE_NAV_WIDTH;
+    },
+
+    updateDimensions: function() {
+        this.setState({
+            width: window.innerWidth, height: window.innerHeight
+        });
     },
 
     render: function() {
@@ -39,12 +61,16 @@ module.exports = React.createClass({
             err = this.state.render.requestErr,
             cls = ClassNames({ navPaneShown: showNav });
 
+        console.log(this.state);
+
         return (
             <div>
                 <Mast />
 
                 <ReactCSSTransitionGroup transitionName="navPaneTrans">
-                    {showNav ? <NavPane /> : null}
+                    {showNav ?
+                        <NavPane autoClose={this.shouldAutoCloseNavPane()}/> :
+                        null}
                 </ReactCSSTransitionGroup>
 
                 <div id="viewPane" className={cls}>
