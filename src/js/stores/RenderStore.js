@@ -17,9 +17,7 @@ module.exports = Reflux.createStore({
 
     // Data model.
     state: {
-        screenType: 'normal',
         showNavPane: true,
-        autoCloseNavPane: false,
         isAuth: false,
         requestErr: null,
         restApiRedirect: null
@@ -28,18 +26,6 @@ module.exports = Reflux.createStore({
     // Can be used to initialize users of this store.
     getInitialState: function() {
         return this.state;
-    },
-
-    // Callback for RenderActions.smallScreen.
-    onSmallScreen: function() {
-        this.state.screenType = 'small';
-        this.trigger(this.state);
-    },
-
-    // Callback for RenderActions.normalScreen.
-    onNormalScreen: function() {
-        this.state.screenType = 'normal';
-        this.trigger(this.state);
     },
 
     // Callback for RenderActions.showNavPane.

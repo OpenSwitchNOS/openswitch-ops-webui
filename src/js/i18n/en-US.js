@@ -155,8 +155,16 @@ module.exports = {
                 macInUse: 'MAC In Use',
                 lacpCurrent: 'LACP Current',
             },
-            bgp: {
-                name: 'BGP'
+            mgmtIntf: {
+                name: 'Management Interface',
+                mgmtIntf: 'Mangement Interface',
+                intfName: 'Interface',
+                mode: 'Mode',
+                subnetMask: 'Subnet Mask',
+                defaultGateway: 'Default Gateway',
+                ipv6: 'IPv6',
+                dnsServer1: 'DNS Server 1',
+                dnsServer2: 'DNS Server 2'
             },
             test1: {
                 name: 'Test1',
