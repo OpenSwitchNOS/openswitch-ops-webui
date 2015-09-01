@@ -130,8 +130,30 @@ module.exports = {
             vlanMonitor: {
                 name: 'Monitor'
             },
-            staticRoutes: {
-                name: 'Static Routes'
+            lag: {
+                name: 'LAG',
+                linkAggrGroups: 'Link Aggregate Groups',
+                sysId: 'System ID',
+                sysPri: 'Priority',
+                lagName: 'Name',
+                mode: 'Mode',
+                bondStatus: 'Bond Status',
+                bondStatusReason: 'Bond Status Reason',
+                bondSpeed: 'Bond Speed',
+                actorKey: 'Actor Key',
+                actorState: 'Actor State',
+                actorPortId: 'Actor Port ID',
+                actorSysId: 'Actor System ID',
+                partnerKey: 'Partner Key',
+                partnerState: 'Partner State',
+                partnerPortId: 'Partner Port ID',
+                partnerSysId: 'Partner System ID',
+                infs: 'Interfaces',
+                infsNoneLoaded: '(no link aggregate group selected)',
+                infName: 'Name',
+                mac: 'MAC',
+                macInUse: 'MAC In Use',
+                lacpCurrent: 'LACP Current',
             },
             bgp: {
                 name: 'BGP'

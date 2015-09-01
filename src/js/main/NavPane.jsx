@@ -82,7 +82,8 @@ module.exports = React.createClass({
                 <NavGroup heading={t('ports')}
                     routes={[
                         { to: 'portMgmt' },
-                        { to: 'portMonitor' }
+                        { to: 'portMonitor' },
+                        { to: 'lag' }
                     ]}
                 />
                 <hr />
@@ -90,12 +91,6 @@ module.exports = React.createClass({
                     routes={[
                         { to: 'vlanMgmt' },
                         { to: 'vlanPortConfig' }
-                    ]}
-                />
-                <hr />
-                <NavGroup heading={t('routing')}
-                    routes={[
-                        { to: 'staticRoutes' }
                     ]}
                 />
 
