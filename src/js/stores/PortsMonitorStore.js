@@ -167,6 +167,14 @@ module.exports = Reflux.createStore({
 
             this.state.dataSets[graphTypes[i].name] = data;
         }
+
+        // when selecting a new port make sure the
+        // bar graph colors are set if the chartType
+        // is bar
+        if (this.state.chartType === 'bar') {
+            this.setBarColors();
+        }
+
     },
 
     onLoadPortStatsCompleted: function(portStats) {

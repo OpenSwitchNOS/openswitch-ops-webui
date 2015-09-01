@@ -105,7 +105,7 @@ var AllVlansTable = React.createClass({
         }
 
         return (
-            <GTable className="defaultTable allVlanTable" scrollable={true}>
+            <GTable className="defaultTable allVlanTable">
                 <thead>
                     <th>{t('th.name')}</th>
                     <th>{t('th.id')}</th>

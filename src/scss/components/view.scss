@@ -91,5 +91,9 @@
     //flex icons inline with div components
     .flexIcons {
         display: inline-flex;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
     }
 }
