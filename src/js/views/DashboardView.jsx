@@ -307,7 +307,9 @@ module.exports = React.createClass({
             toFn;
 
         if (infSlots.length > 0) {
-            toFn = function() { transTo('/portMonitor/' + infSlots[0].name); };
+            toFn = infSlots[0].name ?
+                function() { transTo('/portMonitor/' + infSlots[0].name); }
+                : null;
             return {
                 edit: <ActionIcon
                     fa="area-chart"

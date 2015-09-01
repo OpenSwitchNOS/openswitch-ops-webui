@@ -185,7 +185,7 @@ var MembershipTable = React.createClass({
 
     propTypes: {
         data: PropTypes.object,
-        port: PropTypes.object
+        port: PropTypes.number
     },
 
     // get the index of the port in the ports
@@ -216,7 +216,7 @@ var MembershipTable = React.createClass({
                     var index = this.getPortIndex(vlan.ports, this.props.port);
                     if (index !== -1) {
                         tableRows.push(
-                            <tr>
+                            <tr key={vlan.data.id}>
                                 <td>{vlan.data.name}</td>
                                 <td>{vlan.data.oper_state}</td>
                             </tr>
@@ -234,7 +234,7 @@ var MembershipTable = React.createClass({
         return (
             <div>
             {displayTable ?
-                <GTable className="defaultTable">
+                <GTable className="defaultTable membershipTable">
                     <thead>
                         <th>{t('th.vlan')}</th>
                         <th>{t('th.vlanStatus')}</th>
@@ -258,7 +258,7 @@ var PortDetails = React.createClass({
     displayName: 'PortDetails',
 
     propTypes: {
-        port: PropTypes.string,
+        port: PropTypes.number,
         data: PropTypes.object
     },
 
@@ -276,7 +276,7 @@ var PortDetails = React.createClass({
                 onClose={this.closeLayerPanel}>
 
                 <div className="heading">{'Port ' + this.props.port}</div>
-                <div className="subheader">VLAN Membership</div>
+                <div className="subheader">{t('vlanMem')}</div>
                 <MembershipTable data={this.props.data} port={this.props.port}/>
 
                 <hr className="divider"/>
@@ -338,7 +338,7 @@ module.exports = React.createClass({
             <div>
                 <div id="vlanMgmtView" className="viewFill viewCol">
                     <div className="viewBox viewFlex0">
-                        <ViewBoxHeader title={t('boxGraphic')}
+                        <ViewBoxHeader title={t('vlanMem')}
                             toolbar={keyToolbar}/>
                         <BoxGraphic
                             portConfig={data.boxPortConfig}

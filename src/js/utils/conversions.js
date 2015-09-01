@@ -7,6 +7,8 @@
 // convert bps to gbps
 function bpsToGbps(bps) {
     var CONVERSION_RATE = 1000000000;
+
+    if (bps <= 0) { return 0; }
     return (Number(bps)/CONVERSION_RATE);
 }
 

@@ -64,19 +64,16 @@ var ColorBadge = React.createClass({
         var portData;
         var colors = this.props.colors;
 
-        //console.log(this.props.data);
-        //console.log(this.props.id);
         if (this.props.data && this.props.id in this.props.data) {
             portData = this.props.data[this.props.id];
         }
 
         // only load if the graphic is passed portData
-        //console.log('data: ' + JSON.stringify(portData));
         if (portData) {
             var status = this.props.vlanStatus;
             return (
                 <table className="portBadgeContainer"><tr>
-                    {portData.vlans.map(function(vlan) {
+                    {portData.vlans.map(function(vlan, i) {
                         //Do not set the color style unless
                         //the color index is valid
                         if (colors[status[vlan].colorIndex]) {
@@ -87,7 +84,7 @@ var ColorBadge = React.createClass({
 
                             if (status[vlan].show === true) {
                                 return (
-                                    <td key={vlan.id}
+                                    <td key={i}
                                         className="portBadge" style={style}></td>
                                 );
                             }
@@ -98,7 +95,7 @@ var ColorBadge = React.createClass({
         }
 
         // otherwise return null
-        return ( null );
+        return null;
     }
 });
 

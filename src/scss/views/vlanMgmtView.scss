@@ -6,6 +6,8 @@
 //the layer component is rendered outside of
 //the view container so it is not wrapper in the
 //container div css
+
+//FIXME - wrapper div
     
 .portEditLayer {
 
@@ -14,6 +16,7 @@
         width: 400px;
         padding: 55px;
         margin-top: 47px;
+        overflow-y: scroll;
     }
 
     .heading {

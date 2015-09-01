@@ -108,7 +108,7 @@ module.exports = {
             },
             vlanMgmt: {
                 name: 'Management',
-                boxGraphic: 'VLAN Membership',
+                vlanMem: 'VLAN Membership',
                 allVlans: 'All VLANs',
                 noConfiguredVlans: 'There are no configured VLANs.',
                 noVlans: 'No VLANs are configured on this port',

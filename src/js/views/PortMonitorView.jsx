@@ -6,6 +6,7 @@
 var React = require('react'),
     Reflux = require('reflux'),
     Router = require('react-router'),
+    Navigation = require('react-router').Navigation,
     PropTypes = React.PropTypes,
     Link = Router.Link,
     Cnvs = require('conversions'),
@@ -142,19 +143,41 @@ module.exports = React.createClass({
     //set data as reference to the ports store state data
     mixins: [
         Reflux.connect(PortsMonitorStore, 'data'),
-        Router.State
+        Router.State,
+        Reflux.listenerMixin,
+        Navigation
     ],
+
+    /*componentWillMount: function() {
+        if (this.getParams().port) {
+            PortsMonitorActions.setPortSelected(this.getParams().port);
+        }
+    },*/
 
     componentDidMount: function() {
         //load the list of ports to populate the port list
         //dropdown menu
         PortsMonitorActions.loadPorts();
+        this.listenTo(PortsMonitorActions.loadPorts.completed, this.onPortsLoad);
     },
 
     componentWillUnmount: function() {
         //stop the graph interval when component unmounts
         clearInterval(this.state.data.interval);
         PortsMonitorActions.resetGraph();
+    },
+
+    //listener call back to start interval when ports load
+    onPortsLoad: function() {
+        var port;
+        if (this.getParams().port) {
+            port = this.getParams().port;
+        } else {
+            port = this.state.data.selectedPort;
+            this.transitionTo('/portMonitor/' + port);
+        }
+
+        this.portSelected(port);
     },
 
     //toggle the state of the graph being displayed on
@@ -236,7 +259,6 @@ module.exports = React.createClass({
             chart, graphData, barGraphData, portNum,
             pause, play;
 
-        // get port number to display in the title
         portNum = st.data.selectedPort ? st.data.selectedPort : '';
 
         //append the port selection dropdown to the tile toolbar

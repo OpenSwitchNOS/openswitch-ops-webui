@@ -253,7 +253,9 @@ module.exports = Reflux.createStore({
 
         // sort port list by number
         st.portList = list.sort(function(a, b) { return a-b; });
-        st.selectedPort = st.portList[0];
+        if (!st.selectedPort) {
+            st.selectedPort = st.portList[0];
+        }
         this.clearStats();
 
         //determine whether or not to set the status text
@@ -261,11 +263,6 @@ module.exports = Reflux.createStore({
             st.showStatusText = 1;
         }
 
-        // start the initial interval based off of
-        // the first port returned in the port list
-        var interval = setInterval(PortsMonitorActions.loadPortStats
-            .bind(this, st.selectedPort), INTERVAL);
-        st.interval = interval;
         this.trigger(this.state);
     },
 
