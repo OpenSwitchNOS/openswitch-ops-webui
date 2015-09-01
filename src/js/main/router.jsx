@@ -10,7 +10,7 @@ var React = require('react'),
     DefaultRoute = Router.DefaultRoute,
 
     Login = require('Login'),
-    StaticRoutesView = require('StaticRoutesView'),
+    LagView = require('LagView'),
     SystemMonitorView = require('SystemMonitorView'),
     SystemMonitorChart = require('SystemMonitorChart'),
     DashboardView = require('DashboardView'),
@@ -33,7 +33,7 @@ var routes = (
         <Route name="portMonitor" handler={PortMonitorView}>
             <Route path=":port" handler={PortMonitorView}/>
         </Route>
-        <Route name="staticRoutes" handler={StaticRoutesView}/>
+        <Route name="lag" handler={LagView}/>
         <Route name="systemMonitor" handler={SystemMonitorView}>
             <Route path=":type" handler={SystemMonitorChart}/>
         </Route>
