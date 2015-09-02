@@ -95,8 +95,7 @@ module.exports = React.createClass({
                 <hr />
                 <NavGroup autoClose={ac} heading={t('vlans')}
                     routes={[
-                        { to: 'vlanMgmt' },
-                        { to: 'vlanPortConfig' }
+                        { to: 'vlanMgmt' }
                     ]}
                 />
 

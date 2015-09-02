@@ -158,10 +158,12 @@ module.exports = {
             mgmtIntf: {
                 name: 'Management Interface',
                 mgmtIntf: 'Management Interface',
-                intfName: 'Interface',
+                intfName: 'Name',
                 mode: 'Mode',
+                modeDHCP: 'DHCP',
                 subnetMask: 'Subnet Mask',
                 defaultGateway: 'Default Gateway',
+                ip: 'IP',
                 ipv6: 'IPv6',
                 dnsServer1: 'DNS Server 1',
                 dnsServer2: 'DNS Server 2'

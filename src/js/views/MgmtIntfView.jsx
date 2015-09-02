@@ -33,12 +33,29 @@ module.exports = React.createClass({
         if (si.mode) {
             result.push([ t('mode'), si.mode ]);
             if (si.mode === 'static') {
-                result.push([ t('subnetMask'), si.subnetMask ]);
-                result.push([ t('defaultGateway'), si.defaultGateway ]);
-                result.push([ t('ipv6'), si.ipv6 ]);
-                result.push([ t('dnsServer1'), si.dnsServer1 ]);
-                result.push([ t('dnsServer2'), si.dnsServer2 ]);
+                if ( si.ip ) {
+                    result.push([ t('ip'), si.ip ]);
+                }
+                if ( si.subnetMask ) {
+                    result.push([ t('subnetMask'), si.subnetMask ]);
+                }
+                if ( si.defaultGateway ) {
+                    result.push([ t('defaultGateway'), si.defaultGateway ]);
+                }
+                if ( si.ipv6 ) {
+                    result.push([ t('ipv6'), si.ipv6 ]);
+                }
+                if ( si.dnsServer1 ) {
+                    result.push([ t('dnsServer1'), si.dnsServer1 ]);
+                }
+                if ( si.dnsServer2 ) {
+                    result.push([ t('dnsServer2'), si.dnsServer2 ]);
+                }
+            } else {
+                result.push([ t('mode'), t('modeDHCP') ]);
             }
+        } else {
+            result.push([ t('mode'), t('modeDHCP') ]);
         }
         return result;
     },
