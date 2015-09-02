@@ -20,7 +20,12 @@ html, body, {
 
     // Makes sure the html/body fills the entire browser view.
     // This is needed so that the child containers can fill as well.
-    height: 100%
+    height: 100%;
+
+    // remove the scrollbar styling from the page
+    ::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 /*

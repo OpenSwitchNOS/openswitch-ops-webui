@@ -226,7 +226,7 @@ module.exports = React.createClass({
             m = Math.round((maxVal || 0) * 10) / 10,
             u = units || '';
         return (
-            <GMeter className="viewBoxContent" type="arc" value={ v }
+            <GMeter className="viewBoxContent margin" type="arc" value={ v }
                 min={{
                     value: 0,
                     label: '0 ' + u
@@ -264,7 +264,7 @@ module.exports = React.createClass({
     mkTempMeters: function() {
         var temps = this.state.sysStats.temps || [];
         return (
-            <div className="viewBoxContent">
+            <div className="viewBoxContent margin">
                 { temps.map(function(item) {
                     return this.mkTempMeter(item);
                 }.bind(this))}
@@ -343,14 +343,14 @@ module.exports = React.createClass({
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('systemInfo')} />
                         <PropTable
-                            className="viewBoxContent"
+                            className="viewBoxContent margin"
                             data={this.mkSysInfoPropData()} />
                     </div>
 
                     <div className="viewBox box1">
                         <ViewBoxHeader title={t('systemStatus')} />
                         <PropTable
-                            className="viewBoxContent"
+                            className="viewBoxContent margin"
                             data={this.mkSysStatusPropData()} />
                     </div>
                 </div>
@@ -388,7 +388,7 @@ module.exports = React.createClass({
                     <ViewBoxHeader
                         title={t('portTopUtil')}
                         toolbar={this.mkUtlTb()} />
-                    <div className="viewBoxContent">
+                    <div className="viewBoxContent margin">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
                             {this.mkUtlMeters()}
                         </ReactShuffle>

@@ -21,19 +21,21 @@ module.exports = React.createClass({
         // the graphic. Defaults to larger size
         var size = this.props.size;
         return (
-            <div className= {'portGraphicBase' + size}>
-                <div className={'portGraphicTier1' + size}></div>
-                <div className={'portGraphicTier2' + size}></div>
-                <div className={'portGraphicInnerBase' + size}>
-                    <table className={'prongTable' + size}>
-                        <tr>
-                            <td><div className={'prong' + size}></div></td>
-                            <td><div className={'prong' + size}></div></td>
-                            <td><div className={'prong' + size}></div></td>
-                            <td><div className={'prong' + size}></div></td>
-                            <td><div className={'prong' + size}></div></td>
-                        </tr>
-                    </table>
+            <div className="portComponent">
+                <div className= {'portGraphicBase ' + size}>
+                    <div className={'portGraphicTier1 ' + size}></div>
+                    <div className={'portGraphicTier2 ' + size}></div>
+                    <div className={'portGraphicInnerBase ' + size}>
+                        <table className={'prongTable ' + size}>
+                            <tr>
+                                <td><div className={'prong ' + size}></div></td>
+                                <td><div className={'prong ' + size}></div></td>
+                                <td><div className={'prong ' + size}></div></td>
+                                <td><div className={'prong ' + size}></div></td>
+                                <td><div className={'prong ' + size}></div></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         );

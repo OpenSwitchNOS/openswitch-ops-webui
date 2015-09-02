@@ -136,14 +136,14 @@ var VlanKey = React.createClass({
 
     render: function() {
         return (
-            <div className="vlanKeyContainerSmall">
+            <div className="vlanKeyContainer small">
                 <div className="colorBlockKeyContainer">
                     <ColorBlock accent={this.props.accent}
                         main={this.props.color}
-                        size={"Small"}/>
+                        size={"small"}/>
                 </div>
                 <div className="portKeyContainer">
-                    <Port size={"Small"}/>
+                    <Port size={"small"}/>
                 </div>
             </div>
         );
@@ -340,23 +340,27 @@ module.exports = React.createClass({
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('vlanMem')}
                             toolbar={keyToolbar}/>
-                        <BoxGraphic
-                            portConfig={data.boxPortConfig}
-                            portSelected={this.portSelected}
-                            vlanStatus={data.vlanDisplay} />
+                        <div className="viewBoxContent">
+                            <BoxGraphic
+                                portConfig={data.boxPortConfig}
+                                portSelected={this.portSelected}
+                                vlanStatus={data.vlanDisplay} />
+                        </div>
                     </div>
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('allVlans')}/>
-                        {Object.keys(data.vlans).length !== 0 ?
-                            <AllVlansTable
-                                data={data.vlans}
-                                selectedVlans={data.numberOfSelectedVlans}
-                                vlanStatus={data.vlanDisplay}/>
-                            : data.showStatusText ?
-                                <StatusText value='disabled'
-                                    text={t('noConfiguredVlans')}/>
-                                : null
-                        }
+                        <div className="viewBoxContent">
+                            {Object.keys(data.vlans).length !== 0 ?
+                                <AllVlansTable
+                                    data={data.vlans}
+                                    selectedVlans={data.numberOfSelectedVlans}
+                                    vlanStatus={data.vlanDisplay}/>
+                                : data.showStatusText ?
+                                    <StatusText value='disabled'
+                                        text={t('noConfiguredVlans')}/>
+                                    : null
+                            }
+                        </div>
                     </div>
                 </div>
                 {data.portDetails.show ?

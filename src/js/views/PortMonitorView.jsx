@@ -43,7 +43,8 @@ var GraphToggleButton = React.createClass({
         text: PropTypes.string,
         click: PropTypes.func,
         index: PropTypes.number,
-        show: PropTypes.number
+        show: PropTypes.number,
+        cls: PropTypes.string
     },
 
     render: function() {
@@ -55,7 +56,7 @@ var GraphToggleButton = React.createClass({
         }
 
         return (
-            <span className="graphToggleWrapper">
+            <span className={'graphToggleWrapper ' + this.props.cls}>
                 <ActionIcon fa="area-chart"
                     onClick={this.props.click}
                     color={this.props.color}
@@ -300,6 +301,7 @@ module.exports = React.createClass({
                 //append the graph key and toggle buttons to the
                 //tile toolbar
                 toggleToolbar[i] = (<GraphToggleButton
+                    cls = {data.title}
                     color = {dt.colors[data.options.colorIndex].stroke}
                     text = {data.desc}
                     click = {onclick}
@@ -322,10 +324,12 @@ module.exports = React.createClass({
                 //create the row of details tiles based on the
                 //datsets in the store
                 detailsPanels.push(
-                    <div key={i} className="viewBox viewFlex1">
+                    <div key={i} className="viewBox fillRow">
                         <ViewBoxHeader title={data.desc}
                             toolbar={statusToolbar}/>
-                        <PortDetails color={color} data={data}/>
+                        <div className="viewBoxContent">
+                            <PortDetails color={color} data={data}/>
+                        </div>
                     </div>
                 );
 
@@ -381,13 +385,14 @@ module.exports = React.createClass({
                     <ViewBoxHeader title={t('portUtil') +
                         portNum}
                         toolbar= {toggleToolbar}/>
-                        <div id="canvasWrapper">
-                            {st.data.portList.length ? chart :
-                                st.data.showStatusText ?
-                                    <StatusText value='disabled'
-                                        text={t('noPorts')} />
-                                : null
-                            }
+                        <div className="viewBoxContent">
+                            <div id="canvasWrapper">
+                                {st.data.portList.length ? chart :
+                                    st.data.showStatusText ?
+                                        <StatusText value='disabled'
+                                            text={t('noPorts')} />
+                                    : null}
+                            </div>
                         </div>
                 </div>
                 <div className="portDetailsWrapper viewRow viewFlex0">

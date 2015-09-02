@@ -1,54 +1,53 @@
 /*
- * VLAN key styles.
+ * VLAN key styles - used inthe box graphic toolbar.
  * @author Kelsey Dedoshka
  */
 
-.vlanKeyWrapper {
-    margin-left: 20px;
-}
-
-.vlanKeyContainer {
-    position: relative;
-    min-height: 100px;
-    min-width: 150px;
-}
-
-.colorBlockKeyContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.portKeyContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: 2px;
-}
-
-.editKeyContainer {
-    padding-left: 20px;
-}
-
-/*.portTable tr td  {
-    padding-bottom: 4px;
-}*/
-
-
-.vlanKeyContainerSmall {
-    position: relative;
-    min-height: 40px;
-    min-width: 70px;
-    margin-right: 10px;
-    margin-bottom: 2px;
-    margin-left: 20px;
-}
-
+// main wrapper for the vlan key item
 .vlanKeyItemWrapper {
     width: 230px;
-}
 
-//Kelsey - FIXME
-.displayInline, .vlanKey, .vlanName, .vlanToolbar {
-    float: left;
+    // the genral container for a key
+    // element including position relative
+    // to the key text
+    .vlanKeyContainer {
+        position: relative;
+        min-height: 100px;
+        min-width: 150px;
+
+        // small version
+        &.small {
+            position: relative;
+            min-height: 40px;
+            min-width: 70px;
+            margin-right: 10px;
+            margin-bottom: 2px;
+            margin-left: 20px;
+        }
+    }
+
+    // wrapper for the color block element
+    .colorBlockKeyContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    // container for the port element
+    .portKeyContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-left: 2px;
+    }
+
+    // when editing - this contains edit styles
+    .editKeyContainer {
+        padding-left: 20px;
+    }
+
+    // alignment of the key items
+    .displayInline, .vlanKey, .vlanName, .vlanToolbar {
+        float: left;
+    }
 }
