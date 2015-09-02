@@ -117,13 +117,17 @@ module.exports = React.createClass({
                     <ViewBoxHeader
                         title={t('boxGraphic')}
                         toolbar={toolbar} />
-                    <BoxGraphic portConfig = {{
-                        'showPortStatus': true,
-                        'config': this.state.data.portStatus }}/>
+                    <div className="viewBoxContent">
+                        <BoxGraphic portConfig = {{
+                            'showPortStatus': true,
+                            'config': this.state.data.portStatus }}/>
+                    </div>
                 </div>
                 <div className="viewBox viewFlex0">
                     <ViewBoxHeader title={t('allInterfaces')}/>
-                    <PortList ports={this.state.data.allPorts}/>
+                    <div className="viewBoxContent">
+                        <PortList ports={this.state.data.allPorts}/>
+                    </div>
                 </div>
             </div>
         );

@@ -4,121 +4,126 @@
  */
 
 $portColor: #3D3D3D;
+$prongGradient: #3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%;
 
-.portGraphicBase {
-    width: 65px;
-    height: 55px;
-    background-color: #DEDEDE;
-    border-color: $portColor;
-    border-style: solid;
-    border-width: 3px;
-    border-radius: 4px;
-    margin-top: 15px;
-    margin-left: 10px;
-    padding: 5px;
-    padding-top: 0px;
-}
+// main div wrapper for the port component
+.portComponent {
 
-.portGraphicTier1 {
-    background-color: $portColor;
-    width: 20px;
-    height: 5px;
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
-    margin-left: 15px;
-    margin-top: 1px;
-}
+    // base div for the port
+    .portGraphicBase {
+        width: 65px;
+        height: 55px;
+        background-color: #DEDEDE;
+        border-color: $portColor;
+        border-style: solid;
+        border-width: 3px;
+        border-radius: 4px;
+        margin-top: 15px;
+        margin-left: 10px;
+        padding: 5px;
+        padding-top: 0px;
 
-.portGraphicTier2 {
-    background-color: $portColor;
-    width: 30px;
-    height: 5px;
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
-    margin-left: 10px;
-}
-
-.portGraphicInnerBase {
-    background-color: $portColor;
-    width: 50px;
-    height: 30px;
-    border-radius: 2px;
-    margin-left: 0px;
-    padding: 5px;
-    padding-bottom: 2px;
-}
-
-.prongTable {
-    width: 100%;
-    margin-top: 2px;
-    margin-left: 3px;
-
-    tr td {
-        padding: 0px;
+        // small version
+        &.small {
+            width: 40px;
+            height: 30px;
+            border-width: 2px;
+            border-radius: 3px;
+            margin-top: 4px;
+            margin-left: 4px;
+            padding: 3px;
+            padding-top: 0px;
+        }
     }
-}
 
-.prong {
-    width: 3px;
-    height: 20px;
-    background: linear-gradient(#3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%);
-}
+    // first level of inner port shape
+    // rectangle at the top of the dark
+    // gray port shape
+    .portGraphicTier1 {
+        background-color: $portColor;
+        width: 20px;
+        height: 5px;
+        border-top-right-radius: 2px;
+        border-top-left-radius: 2px;
+        margin-left: 15px;
+        margin-top: 1px;
 
-.portGraphicBaseSmall {
-    width: 40px;
-    height: 30px;
-    background-color: #DEDEDE;
-    border-color: $portColor;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 3px;
-    margin-top: 4px;
-    margin-left: 4px;
-    padding: 3px;
-    padding-top: 0px;
-}
+        //small version
+        &.small {
+            width: 11px;
+            height: 4px;
+            margin-left: 9px;
+        }
+    }
 
-.portGraphicTier1Small {
-    background-color: $portColor;
-    width: 11px;
-    height: 4px;
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
-    margin-left: 9px;
-    margin-top: 1px;
-}
+    // second level of inner port shape
+    // middle rectangle of dark gray
+    // port shape
+    .portGraphicTier2 {
+        background-color: $portColor;
+        width: 30px;
+        height: 5px;
+        border-top-right-radius: 2px;
+        border-top-left-radius: 2px;
+        margin-left: 10px;
 
-.portGraphicTier2Small {
-    background-color: $portColor;
-    width: 20px;
-    height: 4px;
-    border-top-right-radius: 2px;
-    border-top-left-radius: 2px;
-    margin-left: 5px;
-}
+        // small version
+        &.small {
+            width: 20px;
+            height: 4px;
+            margin-left: 5px;
+        }
+    }
 
-.portGraphicInnerBaseSmall {
-    background-color: $portColor;
-    width: 30px;
-    height:15px;
-    border-radius: 2px;
-    margin-left: 0px;
-    padding: 2px;
-    padding-bottom: 2px;
-}
+    // main base of inner port shape
+    // base also contains the prongs
+    .portGraphicInnerBase {
+        background-color: $portColor;
+        width: 50px;
+        height: 30px;
+        border-radius: 2px;
+        margin-left: 0px;
+        padding: 5px;
+        padding-bottom: 2px;
 
-.prongSmall {
-    width: 2px;
-    height: 12px;
-    background: linear-gradient(#3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%);
-}
+        // small version
+        &.small {
+            width: 30px;
+            height: 15px;
+            padding: 2px;
+            padding-bottom: 2px;
+        }
+    }
 
-.prongTableSmall {
-    width: 100%;
-    margin-top: 0px;
-    margin-left: 2px;
+    // prong table - lays out the
+    // prongs displayed in a line
+    .prongTable {
+        width: 100%;
+        margin-top: 2px;
+        margin-left: 3px;
 
-    tr td {
-        padding: 0px;
+        tr td {
+            padding: 0px;
+        }
+
+        // small version
+        &.small {
+            margin-top: 0px;
+            margin-left: 2px;
+        }
+    }
+
+    // main prong styles
+    .prong {
+        width: 3px;
+        height: 20px;
+        background: linear-gradient($prongGradient);
+        background: -webkit-linear-gradient($prongGradient);
+
+        // small version
+        &.small {
+            width: 2px;
+            height: 12px;
+        }
     }
 }

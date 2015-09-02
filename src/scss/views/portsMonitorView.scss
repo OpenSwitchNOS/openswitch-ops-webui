@@ -23,7 +23,7 @@ $colorKeyPurple: rgba(101,57,164,1);
             font-size: 20px;
         }
 
-        //suze of area chart icons in toolbar
+        //size of area chart icons in toolbar
         .fa-area-chart {
             font-size: 24px;
         }
@@ -70,13 +70,14 @@ $colorKeyPurple: rgba(101,57,164,1);
             padding-top: 15px;
             padding-bottom: 15px;
             padding-left: 10px;
+            padding-right: 10px;
         }
-
     }
 
     //content wrapper in tile
     .innerContainer {
-        padding: 20px;
+        padding: 10px;
+        padding-bottom: 5px;
     }
 
     //port list drop down menu
@@ -108,10 +109,5 @@ $colorKeyPurple: rgba(101,57,164,1);
             padding-right: 20px;
             margin-right: 20px;
         }
-    }
-
-    //MOBILE - tile min width
-    .portDetailsWrapper .viewBox {
-        min-width: 405px;
     }
 }

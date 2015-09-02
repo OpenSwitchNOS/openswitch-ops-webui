@@ -21,6 +21,7 @@
     flex-direction: row;
     -webkit-flex-direction: row;
     flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
@@ -45,16 +46,26 @@
     box-shadow: $viewBoxShadow;
     margin-top: 24px;
     margin-left: 24px;
+    margin-right: 24px;
     padding: 8px;
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+
+    &.fillRow {
+        -flex-grow: 1;
+        -webkit-flex-grow: 1;
+    }
 }
 
 // Style the content portion of a viewBox. This is the area right below the
 // header (if there is one).
 .viewBoxContent {
-    margin: 16px;
+    overflow: scroll;
+
+    &.margin {
+        margin: 16px;
+    }
 }
 
 // Style a view element relative to other siblings (1, 2, or 3).
@@ -63,8 +74,8 @@
     -webkit-flex: 0 0 auto;
 }
 .viewFlex1 {
-    flex: 1;
-    -webkit-flex: 1;
+    flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
 }
 .viewFlex2 {
     flex: 2;
@@ -83,6 +94,8 @@
     display: -webkit-flex;
     justify-content: space-between;
     -webkit-justify-content: space-between;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
     font-size: $viewBoxHeaderFontSize;
     line-height: $viewBoxHeaderFontSize;
     font-weight: $viewBoxHeaderFontWeight;
@@ -90,9 +103,9 @@
 
     //flex icons inline with div components
     .flexIcons {
-        display: inline-flex;
+        flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
         display: -webkit-box;
-        display: -moz-box;
         display: -ms-flexbox;
         display: -webkit-flex;
     }

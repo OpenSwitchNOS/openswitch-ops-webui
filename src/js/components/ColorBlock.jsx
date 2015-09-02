@@ -37,16 +37,17 @@ module.exports = React.createClass({
         };
 
         return (
-            <div className={'accentColor' + this.props.size}
-                     style={accentStyle}>
-                <div className={'mainColor' + this.props.size}
+            <div className='colorBlockComponent'>
+                <div className={'accentColor ' + this.props.size}
+                    style={accentStyle}>
+                    <div className={'mainColor ' + this.props.size}
                         style={mainStyle}>
-                    <div className={'triangle' + this.props.size}
-                        style={mainTri}>
+                        <div className={'triangle ' + this.props.size}
+                            style={mainTri}>
+                        </div>
                     </div>
                 </div>
             </div>
-
         );
     }
 });
