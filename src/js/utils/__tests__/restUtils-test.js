@@ -40,7 +40,7 @@ describe('Test Suite For restUtils', function() {
         },
         port0 = {
             testUrl: '/system/bridges/BRIDGE-0/ports/PORT-0',
-            name: 'port0'
+            name: 'port0',
         },
         port1 = {
             testUrl: '/system/bridges/BRIDGE-0/ports/PORT-1',

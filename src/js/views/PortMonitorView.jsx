@@ -5,7 +5,11 @@
 
 var React = require('react'),
     Reflux = require('reflux'),
+    Router = require('react-router'),
+    Navigation = require('react-router').Navigation,
     PropTypes = React.PropTypes,
+    Link = Router.Link,
+    Cnvs = require('conversions'),
     ActionIcon = require('ActionIcon'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GMenu = require('grommet/components/Menu'),
@@ -13,10 +17,20 @@ var React = require('react'),
     I18n = require('i18n'),
     PortsMonitorActions = require('PortsMonitorActions'),
     PortsMonitorStore = require('PortsMonitorStore'),
+    StatusText = require('StatusText'),
     LineChart = require('react-chartjs').Line,
     BarChart = require('react-chartjs').Bar,
     INTERVAL = 5000;
 
+// internationalization for this view
+function t(key) {
+    return I18n.text('views.portMonitor.' + key);
+}
+
+// internationalization for units
+function tUnits(key) {
+    return I18n.text('units.' + key);
+}
 
 //Component to create a key and toggle button for each data line
 //on the utillization chart
@@ -29,7 +43,7 @@ var GraphToggleButton = React.createClass({
         text: PropTypes.string,
         click: PropTypes.func,
         index: PropTypes.number,
-        show: PropTypes.bool
+        show: PropTypes.number
     },
 
     render: function() {
@@ -66,7 +80,6 @@ var PortDetails = React.createClass({
     },
 
     render: function() {
-
         // determine color to display
         // table stats text as
         var color = { color: this.props.color },
@@ -91,7 +104,9 @@ var PortDetails = React.createClass({
                         </td>
                         <td>
                             <div className="details" style={color}>
-                                {data.stats.total}
+                                {Cnvs.round1D(
+                                    Cnvs.bytesToMbytes(data.stats.total)
+                                ) + tUnits('mb')}
                             </div>
                         </td>
                     </tr>
@@ -126,18 +141,43 @@ module.exports = React.createClass({
     displayName: 'PortsMonitorView',
 
     //set data as reference to the ports store state data
-    mixins: [ Reflux.connect(PortsMonitorStore, 'data') ],
+    mixins: [
+        Reflux.connect(PortsMonitorStore, 'data'),
+        Router.State,
+        Reflux.listenerMixin,
+        Navigation
+    ],
+
+    /*componentWillMount: function() {
+        if (this.getParams().port) {
+            PortsMonitorActions.setPortSelected(this.getParams().port);
+        }
+    },*/
 
     componentDidMount: function() {
         //load the list of ports to populate the port list
         //dropdown menu
         PortsMonitorActions.loadPorts();
+        this.listenTo(PortsMonitorActions.loadPorts.completed, this.onPortsLoad);
     },
 
     componentWillUnmount: function() {
         //stop the graph interval when component unmounts
         clearInterval(this.state.data.interval);
         PortsMonitorActions.resetGraph();
+    },
+
+    //listener call back to start interval when ports load
+    onPortsLoad: function() {
+        var port;
+        if (this.getParams().port) {
+            port = this.getParams().port;
+        } else {
+            port = this.state.data.selectedPort;
+            this.transitionTo('/portMonitor/' + port);
+        }
+
+        this.portSelected(port);
     },
 
     //toggle the state of the graph being displayed on
@@ -179,77 +219,98 @@ module.exports = React.createClass({
 
     //start the graph interval and set the state in the store
     startInterval(port) {
-        var interval = setInterval(this.getPortData.bind(this, port),
-            INTERVAL);
+        var interval = setInterval(
+            this.getPortData.bind(this, port),
+            INTERVAL
+        );
         PortsMonitorActions.setInterval(interval);
     },
 
+    //initialize pause button
+    initPause: function(pause) {
+        return (
+            <ActionIcon fa='pause'
+                onClick={pause}
+                className="smallIcon iconBorder right"
+            />
+        );
+    },
+
+    //initialize play button
+    initPlay: function(play) {
+        return (
+            <ActionIcon fa='play'
+                onClick={play}
+                className="smallIcon"
+            />
+        );
+    },
+
+    //determine details graph icon style
+    iconType: function(details, i) {
+        return (details === i ? 'area-chart' : 'bar-chart');
+    },
+
     render: function() {
-        var t = I18n.text,
+        var st = this.state,
             dataSets = [],
             toggleToolbar = {},
             detailsPanels = [],
             chart, graphData, barGraphData, portNum,
             pause, play;
 
-        // get port number to display in the title
-        portNum = this.state.data.selectedPort ?
-            this.state.data.selectedPort : '';
+        portNum = st.data.selectedPort ? st.data.selectedPort : '';
 
         //append the port selection dropdown to the tile toolbar
         toggleToolbar.select = (
             <GMenu icon={<GDropCaret/>} label='Select Port'>
-                {this.state.data.portList.map(function(port) {
+                {st.data.portList.map(function(port) {
                     return (
-                        <div className="portSelectionItem"
+                        <Link to={'/portMonitor/' + port}
+                            key={port}
+                            params={{ 'port': port }}
                             onClick={this.portSelected.bind(this, port)}>
-                                {port}
-                        </div>
+                            {port}
+                        </Link>
                     );
                 }, this)}
             </GMenu>
         );
 
         //append pause and play buttons to the tile toolbar
-        pause = this.state.data.pauseHandler ? this.pauseGraph : null;
-        play = this.state.data.playHandler ? this.playGraph : null;
-
-        toggleToolbar.play = (<ActionIcon fa='play'
-            onClick={play}
-            className="smallIcon" />);
-
-        toggleToolbar.pause = (<ActionIcon fa='pause'
-            onClick={pause}
-            className="smallIcon iconBorder right"/>);
+        pause = st.data.pauseHandler ? this.pauseGraph : null;
+        play = st.data.playHandler ? this.playGraph : null;
+        toggleToolbar.play = this.initPlay(play);
+        toggleToolbar.pause = this.initPause(pause);
 
         // create the rest of the toggle toolbar based on the data sets
-        for (var i in this.state.data.dataSets) {
-            if (this.state.data.dataSets.hasOwnProperty(i)) {
-                var data = this.state.data.dataSets[i];
-                var color = this.state.data.colors[data.options.colorIndex].stroke;
-                var onclick = this.toggleGraph.bind(this, i);
+        for (var i in st.data.dataSets) {
+            if (st.data.dataSets.hasOwnProperty(i)) {
+                var dt = st.data,
+                    data = dt.dataSets[i],
+                    color = dt.colors[data.options.colorIndex].stroke,
+                    onclick = this.toggleGraph.bind(this, i),
+                    icon;
 
                 // disable the toggle buttons when it is a bar graph
-                if (this.state.data.activeDetails !== null) {
+                if (dt.activeDetails !== null) {
                     onclick = null;
                 }
 
                 //append the graph key and toggle buttons to the
                 //tile toolbar
                 toggleToolbar[i] = (<GraphToggleButton
-                    color = {this.state.data.colors[data.options.colorIndex].stroke}
+                    color = {dt.colors[data.options.colorIndex].stroke}
                     text = {data.desc}
                     click = {onclick}
                     index = {data.options.colorIndex}
-                    show = {data.options.show} />);
+                    show = {data.options.show} />
+                );
 
 
                 // show correct icon to reflect switching between
                 // graph types - line and bar
-                var icon = 'bar-chart';
-                if (this.state.data.activeDetails === i) {
-                    icon = 'area-chart';
-                }
+                icon = this.iconType(dt.activeDetails, i);
 
                 // create status toolbar to switch between
                 // graph types - line and bar
@@ -261,7 +322,7 @@ module.exports = React.createClass({
                 //create the row of details tiles based on the
                 //datsets in the store
                 detailsPanels.push(
-                    <div className="viewBox viewFlex1">
+                    <div key={i} className="viewBox viewFlex1">
                         <ViewBoxHeader title={data.desc}
                             toolbar={statusToolbar}/>
                         <PortDetails color={color} data={data}/>
@@ -274,41 +335,59 @@ module.exports = React.createClass({
 
         }
 
-
         // Generate line graph data and keep it updating
         // as the state data updates
         graphData = {
-            'labels': this.state.data.labels,
+            'labels': st.data.labels,
             'datasets': dataSets
         };
 
         // Generate bar graph data and keep it updating
         // as the state data updates
-        barGraphData = this.state.data.activeDetails ? {
-            'labels': this.state.data.labels,
+        barGraphData = st.data.activeDetails ? {
+            'labels': st.data.labels,
             'datasets': [
-                this.state.data.dataSets[this.state.data.activeDetails].graphData
+                st.data.dataSets[st.data.activeDetails].graphData
             ]
         } : null;
 
         // determine if the chart shold be a line or bar
         // chart based off of the chartType in the store
         if (this.state.data.chartType === 'line') {
-            chart = (<LineChart data={graphData} options={this.state.data.options}
-                width={600} height={300} redraw/>);
-        } else if (this.state.data.chartType === 'bar') {
-            chart = (<BarChart data={barGraphData} options={this.state.data.options}
-                width={600} height={300} redraw/>);
+            chart = (
+                <LineChart
+                    data={graphData}
+                    options={st.data.options}
+                    width={600}
+                    height={300}
+                    redraw
+                />
+            );
+        } else if (st.data.chartType === 'bar') {
+            chart = (
+                <BarChart
+                    data={barGraphData}
+                    options={st.data.options}
+                    width={600}
+                    height={300}
+                    redraw
+                />
+            );
         }
 
         return (
             <div id="portsMonitorView" className="viewFill viewCol">
                 <div id="portStatsGraphTile" className="viewBox viewFlex0">
-                    <ViewBoxHeader title={t('views.portMonitor.portUtil') +
+                    <ViewBoxHeader title={t('portUtil') +
                         portNum}
                         toolbar= {toggleToolbar}/>
                         <div id="canvasWrapper">
-                            {chart}
+                            {st.data.portList.length ? chart :
+                                st.data.showStatusText ?
+                                    <StatusText value='disabled'
+                                        text={t('noPorts')} />
+                                : null
+                            }
                         </div>
                 </div>
                 <div className="portDetailsWrapper viewRow viewFlex0">

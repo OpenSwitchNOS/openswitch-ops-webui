@@ -1,0 +1,66 @@
+/*
+ * check box component
+ * @author Kelsey Dedoshka
+ */
+
+.checkBox__component {
+
+    // wrapper styles
+    width: 30px;
+    position: relative;
+    margin-bottom: 10px;
+
+    // to hide default checkbox style
+    input[type="checkbox"] {
+        visibility: hidden;
+    }
+
+    //disbaled styling
+    input[disabled] + label {
+        border: 2px solid lightgray;
+    }
+
+    //Label is used for the new styling
+    label {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        top: 0;
+        left: 0;
+        background: transparent;
+        border: 2px solid gray;
+        border-radius: 3px;
+    
+        &:after {
+            opacity: 0.2;
+            position: absolute;
+            width: 9px;
+            height: 5px;
+            background: transparent;
+            top: 8px;
+            left: 7px;
+            border: 3px solid #333;
+            border-top: none;
+            border-right: none;
+        } 
+
+        &:hover {
+            border: 2px solid black;
+        }
+
+        &:disabled {
+            border: 2px solid lightgray;
+        }  
+    }
+
+    //checked styling
+    input[type="checkbox"]:checked + label:after {
+        content: '';
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+        opacity: 0.8;
+    }
+}

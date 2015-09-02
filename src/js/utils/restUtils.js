@@ -28,11 +28,17 @@ function getBody(url, callback) {
     }
 
     Request.get(reqUrl).end(function(err, res) {
+        var result, date;
         if (err) {
             err.reqUrl = reqUrl;
             callback(err, null);
         } else {
-            callback(null, res.body);
+            result = res.body;
+            date = res.header.date;
+            if (date) {
+                result.date = Date.parse(date);
+            }
+            callback(null, result);
         }
     });
 }

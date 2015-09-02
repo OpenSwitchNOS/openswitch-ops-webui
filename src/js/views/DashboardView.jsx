@@ -7,9 +7,11 @@
 // TODO: stagger load times so we don't wait 10 seconds.
 // TODO: show 'Fans: () OK (count 10);
 // TODO: show 'Power Supplies: () OK (base-1)'
+// TODO: Warning: setState(...): Can only update a mounted or mounting component. This usually means you called setState() on an unmounted component. This is a no-op.
 
 var React = require('react/addons'),
     Reflux = require('reflux'),
+    Navigation = require('react-router').Navigation,
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
     ActionIcon = require('ActionIcon'),
@@ -27,7 +29,14 @@ var AUTO_REFRESH_MILLIS = 10000,
     NUM_UTL_VIEW_SLOTS = 5,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     METER_MAX_VAL_ADJ = 0.1,
-    autoRefreshTimer;
+    autoRefreshCount = 0,
+    autoRefreshTimer,
+    infSlots = [],
+    infSlotIdx;
+
+for (infSlotIdx=0; infSlotIdx<NUM_UTL_SLOTS; infSlotIdx++) {
+    infSlots.push({ key: 'k' + infSlotIdx, init: true, val: 0 });
+};
 
 // TODO: Fix for grommet max value (no bar).
 // TODO: Make sure data is consistent (strings vs numbers).
@@ -44,29 +53,34 @@ function mkThresholds(maxVal) {
     ];
 }
 
+function findSlotIdx(slots, id) {
+    var i;
+    // use existing slot if there is one
+    for (i=0; i<slots.length; i++) {
+        if (slots[i].id === id) {
+            return i;
+        }
+    }
+    // use first free slot
+    for (i=0; i<slots.length; i++) {
+        if (!slots[i].id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 module.exports = React.createClass({
 
     displayName: 'DashboardView',
 
-    mixins: [ Reflux.listenTo(DashboardStore, 'onLoadAllCompleted') ],
-
-    getInitialState: function() {
-        var portSlots = [];
-        for (var i=0; i<NUM_UTL_SLOTS; i++) {
-            portSlots.push( { key: 'k' + i, init: true, val: 0 } );
-        }
-        return {
-            portSlots: portSlots,
-            sysInfo: {},
-            sysStats: {
-                fans: [],
-                powerSupplies: []
-            },
-            interfaces: []
-        };
-    },
+    mixins: [
+        Reflux.connect(DashboardStore),
+        Navigation
+    ],
 
     componentDidMount: function() {
+        SystemInfoActions.load();
         this.autoRefresh();
     },
 
@@ -76,40 +90,69 @@ module.exports = React.createClass({
         }
     },
 
-    onLoadAllCompleted: function(data) {
-        var newPortSlots = this.updateSlots(
-                this.state.portSlots,
-                data.interfaces.topUtilization);
-
-        this.setState({
-            sysInfo: data.sysInfo,
-            sysStats: data.sysStats,
-            interfaces: data.interfaces,
-            portSlots: newPortSlots
-        });
+    staggerLoad: function(dataGroup) {
+        var mod;
+        if (autoRefreshCount === 0) {
+            return true;
+        }
+        mod = autoRefreshCount % 2;
+        if (dataGroup === 'stats') {
+            return mod === 0;
+        }
+        if (dataGroup === 'infs') {
+            return mod === 1;
+        }
+        return false;
     },
 
-    updateSlots: function(currSlots, dataItems) {
-        var di, slotIdx, i, id,
-            newSlots = Lodash.cloneDeep(currSlots);
+    autoRefresh: function() {
+        var recurFn = this.autoRefresh;
 
-        for (i=0; i<newSlots.length; i++) {
-            delete newSlots[i].init; // assume already inited by this point
-            newSlots[i].val = 0;
+        if (autoRefreshCount % 2 === 0) {
+            SystemStatsActions.load();
+        } else if (autoRefreshCount % 2 === 1) {
+            InterfaceActions.load();
         }
 
-        for (i=0; i<dataItems.length; i++) {
-            di = dataItems[i];
-            id = di.ci.name + ' ' + t(di.dir); // (i.e. 3 Tx, 21 Rx, or 15)
-            slotIdx = this.findSlotIdx(newSlots, id);
+        autoRefreshCount++;
+
+        autoRefreshTimer = setTimeout(function() {
+            recurFn();
+        }, AUTO_REFRESH_MILLIS);
+    },
+
+    updateInfSlots: function() {
+        var i,
+            topInf,
+            slotIdx,
+            topInfId,
+            newInfSlots,
+            newTopUtilInfs = this.state.interfaceStats.topUtilization;
+
+        if (!newTopUtilInfs) {
+            return;
+        }
+
+        newInfSlots = Lodash.cloneDeep(infSlots);
+
+        for (i=0; i<newInfSlots.length; i++) {
+            delete newInfSlots[i].init; // assume already inited by this point
+            newInfSlots[i].val = 0;
+        }
+
+        for (i=0; i<newTopUtilInfs.length; i++) {
+            topInf = newTopUtilInfs[i];
+            topInfId = topInf.ci.name + ' ' + t(topInf.dir); // (i.e. 3 Tx)
+            slotIdx = findSlotIdx(newInfSlots, topInfId);
             if (slotIdx >= 0) {
-                newSlots[slotIdx].id = id;
-                newSlots[slotIdx].val = di.utl;
-                newSlots[slotIdx].dir = di.dir;
+                newInfSlots[slotIdx].id = topInfId;
+                newInfSlots[slotIdx].val = topInf.utl;
+                newInfSlots[slotIdx].dir = topInf.dir;
+                newInfSlots[slotIdx].name = topInf.ci.name;
             }
         }
 
-        newSlots = newSlots.sort(function(a, b) {
+        newInfSlots = newInfSlots.sort(function(a, b) {
             if (a.id && !b.id) {
                 return -1;
             } else if (!a.id && b.id) {
@@ -119,43 +162,10 @@ module.exports = React.createClass({
         });
 
         for (i=NUM_UTL_VIEW_SLOTS; i<NUM_UTL_SLOTS; i++) {
-            delete newSlots[i].id;
+            delete newInfSlots[i].id;
         }
 
-        return newSlots;
-    },
-
-    findSlotIdx: function(slots, id) {
-        var i;
-        // use existing slot if there is one
-        for (i=0; i<slots.length; i++) {
-            if (slots[i].id === id) {
-                return i;
-            }
-        }
-        // use first free slot
-        for (i=0; i<slots.length; i++) {
-            if (!slots[i].id) {
-                return i;
-            }
-        }
-        return -1;
-    },
-
-    autoRefresh: function() {
-        var recurFn = this.autoRefresh;
-
-        SystemInfoActions.load();
-        SystemStatsActions.load();
-        InterfaceActions.load();
-
-        autoRefreshTimer = setTimeout(function() {
-            recurFn();
-        }, AUTO_REFRESH_MILLIS);
-    },
-
-    onClickChart: function() {
-        alert('Launch chart screen (not implemented yet).');
+        infSlots = newInfSlots;
     },
 
     mkSysInfoPropData: function() {
@@ -284,23 +294,47 @@ module.exports = React.createClass({
         );
     },
 
-    mkUtlMeters: function(label, slots) {
-        var meters = [],
-            slot;
+    mkUtlMeters: function() {
+        var meters = [];
         for (var i=0; i<NUM_UTL_VIEW_SLOTS; i++) {
-            slot = slots[i];
-            meters.push( this.mkUtlMeter(slot) );
+            meters.push( this.mkUtlMeter(infSlots[i]) );
         }
         return meters;
     },
 
-    render: function() {
-        var tb = {
+    mkUtlTb: function() {
+        var transTo = this.transitionTo,
+            toFn;
+
+        if (infSlots.length > 0) {
+            toFn = infSlots[0].name ?
+                function() { transTo('/portMonitor/' + infSlots[0].name); }
+                : null;
+            return {
                 edit: <ActionIcon
                     fa="area-chart"
-                    onClick={ this.onClickChart } />
-            },
-            si = this.state.sysStats;
+                    onClick={ toFn }
+                />
+            };
+        }
+        return {};
+    },
+
+    mkSysTb: function(type) {
+        var transTo = this.transitionTo,
+            toFn = function() { transTo('/systemMonitor/' + type); };
+        return {
+            edit: <ActionIcon
+                fa="area-chart"
+                onClick={ toFn }
+            />
+        };
+    },
+
+    render: function() {
+        var si = this.state.sysStats;
+
+        this.updateInfSlots();
 
         return (
             <div id="dashboardView" className="viewRow">
@@ -323,32 +357,40 @@ module.exports = React.createClass({
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('cpu')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('cpu')}
+                            toolbar={this.mkSysTb('cpu')} />
                         {this.mkMeter(si.cpuVal, si.cpuMax, '')}
                     </div>
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('storage')} toolbar={tb} />
+                        <ViewBoxHeader title={t('storage')} />
                         {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
                     </div>
                 </div>
 
                 <div className="viewCol">
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('memory')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('memory')}
+                            toolbar={this.mkSysTb('memory')} />
                         {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
                     </div>
 
                     <div className="viewBox box1">
-                        <ViewBoxHeader title={t('temp')} toolbar={tb} />
+                        <ViewBoxHeader
+                            title={t('temp')}
+                            toolbar={this.mkSysTb('temperature')} />
                         {this.mkTempMeters()}
                     </div>
                 </div>
 
                 <div className="viewBox">
-                    <ViewBoxHeader title={t('portTopUtil')} toolbar={tb} />
+                    <ViewBoxHeader
+                        title={t('portTopUtil')}
+                        toolbar={this.mkUtlTb()} />
                     <div className="viewBoxContent">
                         <ReactShuffle duration={1500} scale={false} fade={true}>
-                            { this.mkUtlMeters('port', this.state.portSlots) }
+                            {this.mkUtlMeters()}
                         </ReactShuffle>
                     </div>
                 </div>

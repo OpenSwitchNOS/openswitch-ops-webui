@@ -7,10 +7,9 @@ $portCornerRadius: 3px;
 
 .boxContainer {
     width: 100%;
-    height: 160px;
+    height: 190px;
     border-radius: 5px;
     background-color: #303030;
-    padding: 10px;
     padding-right: 15px;
     padding-left: 50px;
     overflow-x: scroll;
@@ -24,8 +23,6 @@ $portCornerRadius: 3px;
 
 .innerBoxTable {
     width: 100%;
-    /*background-color: gray;*/
-    /*border-radius: 4px;*/
     margin-top: 5px;
 }
 
@@ -62,12 +59,16 @@ $portCornerRadius: 3px;
 }
 
 .boxPortTop, .boxPortBottom {
-    height: 30px;
-    width: 55px;
     background-color: black; 
-    
-    &.interface {
-        opacity: 0.5;
+
+    &.SFP_PLUS {
+        height: 30px;
+        width: 55px;
+    }
+
+    &.QSFP_PLUS {
+        height: 30px;
+        width: 70px;
     }
 }
 
@@ -81,9 +82,14 @@ $portCornerRadius: 3px;
     border-bottom-right-radius: $portCornerRadius;
 }
 
-.boxMiddle, .boxLabels {
+.boxMiddle {
     position: relative;
     height: 30px;
+}
+
+.boxLabels {
+    position: relative;
+    height: 25px;
 }
 
 .boxBlack {
@@ -115,14 +121,56 @@ $portCornerRadius: 3px;
     margin-top: 10px;
 }
 
-.boxArrowUp {
-    border-bottom: 10px solid black;
-    margin-left: 17px;
-}
+.boxMiddle {
 
-.boxArrowDown {
-    border-top: 10px black solid;
-    margin-left: 32px;
+    .boxArrowUp {
+        border-bottom: 10px solid black;
+    }
+
+    .boxArrowDown {
+        border-top: 10px solid black;
+    }
+
+    &.SFP_PLUS {
+        .boxArrowUp {
+            margin-left: 17px;
+        }
+
+        .boxArrowDown {
+            margin-left: 32px;
+        }
+    }
+
+    &.QSFP_PLUS {
+        .boxArrowUp {
+            margin-left: 10px;
+        }
+
+        .boxArrowDown {
+            margin-left: 55px;
+        }
+
+        .circleBlack {
+
+            &.left {
+                margin-left: 25px;
+            }
+
+            &.right {
+                margin-left: 40px;
+            }
+
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-top: 10px;
+            background-color: black;
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+        }
+
+    }
 }
 
 .boxPortLabels {
@@ -136,15 +184,45 @@ $portCornerRadius: 3px;
     top: 5px;
 }
 
-.boxTopLabels {
-    margin-left: 9px;
-}
+.boxLabels {
+    &.SFP_PLUS {
+        .boxTopLabels {
+            margin-left: 9px;
+        }
 
-.boxBottomLabels {
-    right: 0;
-    margin-right: 7px;
-}
+        .boxBottomLabels {
+            right: 0;
+            margin-right: 7px;
+        }
 
+        .boxArrowUpLabel {
+            margin-left: 24px;
+        }
+
+        .boxArrowDownLabel {
+            margin-left: 32px;
+        }
+    }
+
+    &.QSFP_PLUS {
+        .boxTopLabels {
+            margin-left: 10px;
+        }
+
+        .boxBottomLabels {
+            right: 0;
+            margin-right: 7px;
+        }
+
+        .boxArrowUpLabel {
+            margin-left: 30px;
+        }
+
+        .boxArrowDownLabel {
+            margin-left: 42px;
+        }
+    }
+}
 .arrowWhite {
     width: 0;
     height: 0;
@@ -202,4 +280,14 @@ $portCornerRadius: 3px;
             }
         }
     }
+}
+
+.portsWrapper {
+    vertical-align: text-top;
+}
+
+.portExtraNum {
+    color: white;
+    font-size: 12px;
+    text-align: center;
 }

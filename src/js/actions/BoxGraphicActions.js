@@ -4,59 +4,94 @@
  */
 
 var Reflux = require('reflux'),
-    Request = require('superagent');
+    RestUtils = require('restUtils'),
+    RenderActions = require('RenderActions');
 
 var BoxGraphicActions = Reflux.createActions({
     // Create the actions:
     //  loadVlans, loadVlansFailed, loadVlansCompleted
-    loadBoxGraphic: { asyncResult: true }
+    loadBoxGraphic: { asyncResult: true },
+    loadHwPorts: { asyncResult: true }
 });
 
-// Self-handle the 'loadVlans' action by requesting server data.
-BoxGraphicActions.loadBoxGraphic.listen(function() {
-    /*Request.get('/ui/boxGraphic').end(function(err, res) {
+
+BoxGraphicActions.loadHwPorts.listen(function() {
+    RestUtils.get('/system/Interface', function(err, res) {
         if (err) {
-            this.failed(err); // Action: loadVlansFailed
+            this.failed(err);
         } else {
-            this.completed(res.body); // Action: loadVlansCompleted
+            //on success - request returned list of URLs
+            RestUtils.get(res.data, function(err2, res2) {
+                if (err2) {
+                    this.failed(err2);
+                } else {
+                    this.completed(res2);
+                }
+            }.bind(this));
         }
-    }.bind(this));*/
+    }.bind(this));
+});
+
+//on failure of the ports request
+BoxGraphicActions.loadHwPorts.failed.listen(function(e) {
+    RenderActions.postRequestErr(e);
+});
+
+// Self-handle the 'loadBoxGraphic' action by requesting server data.
+BoxGraphicActions.loadBoxGraphic.listen(function() {
+
     var data = {
-        style: "alternate",
-        middlePorts: 25,
-        top: [
-            {
-                'type': 'group',
-                'start': 1,
-                'end': 47
+        base: [{
+            style: 'alternate',
+            middle: {
+                numIndexes: 24
             },
-            {
-                'type': 'single',
-                'num': 49
-            },
-            {
-                'type': 'single',
-                'num': 52
-            }],
-        bottom: [
-            {
-                'type': 'group',
-                'start': 2,
-                'end': 48
-            },
-            {
-                'type': 'single',
-                'num': 50
-            },
-            {
-                'type': 'single',
-                'num': 53
+            top: [
+                {
+                    'type': 'group',
+                    'start': 1,
+                    'end': 47
+                }
+            ],
+            bottom: [
+                {
+                    'type': 'group',
+                    'start': 2,
+                    'end': 48
+                }
+            ],
+            extra: {
+                indexes: 25,
+                ports: null
             }
-        ]
+        },
+        {
+            style: 'alternate',
+            middle: {
+                indexes: [49, 52]
+            },
+            top: [
+                {
+                    'type': 'single',
+                    'num': [49, 52]
+                }
+            ],
+            bottom: [
+                {
+                    'type': 'single',
+                    'num': [50, 53]
+                }
+            ],
+            extra: {
+                indexes: 2,
+                ports: [51, 54]
+            }
+        }],
     };
 
     this.completed(data);
 
 });
+
 
 module.exports = BoxGraphicActions;

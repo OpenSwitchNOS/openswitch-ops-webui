@@ -54,9 +54,12 @@ function processPwrStatus(result) {
 }
 
 function processPass2(resBody) {
-    var stats = resBody[0].data.statistics,
-        cpu, mem, stor,
-        result = {};
+    var cpu, mem, stor,
+        date = resBody[0].date,
+        result = {
+            date: (date ? date : 0)
+        },
+        stats = resBody[0].data.statistics;
 
     if (stats) {
         cpu = processCsvCpu(stats.load_average);

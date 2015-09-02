@@ -10,8 +10,9 @@ var React = require('react'),
     DefaultRoute = Router.DefaultRoute,
 
     Login = require('Login'),
-    StaticRoutesView = require('StaticRoutesView'),
+    LagView = require('LagView'),
     SystemMonitorView = require('SystemMonitorView'),
+    SystemMonitorChart = require('SystemMonitorChart'),
     DashboardView = require('DashboardView'),
     PortMonitorView = require('PortMonitorView'),
     PortMgmtView = require('PortMgmtView'),
@@ -21,6 +22,7 @@ var React = require('react'),
     VlanMgmtView = require('VlanMgmtView'),
     VlanMonitorView = require('VlanMonitorView'),
     VlanPortConfigView = require('VlanPortConfigView'),
+    MgmtIntfView = require('MgmtIntfView'),
 
     App = require('App');
 
@@ -29,15 +31,20 @@ var routes = (
         <Route name="login" handler={Login}/>
         <Route name="dashboard" handler={DashboardView}/>
         <Route name="portMgmt" handler={PortMgmtView}/>
-        <Route name="portMonitor" handler={PortMonitorView}/>
-        <Route name="staticRoutes" handler={StaticRoutesView}/>
-        <Route name="systemMonitor" handler={SystemMonitorView}/>
+        <Route name="portMonitor" handler={PortMonitorView}>
+            <Route path=":port" handler={PortMonitorView}/>
+        </Route>
+        <Route name="lag" handler={LagView}/>
+        <Route name="systemMonitor" handler={SystemMonitorView}>
+            <Route path=":type" handler={SystemMonitorChart}/>
+        </Route>
         <Route name="test1" handler={TestView1}/>
         <Route name="test2" handler={TestView2}/>
         <Route name="test3" handler={TestView3}/>
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
         <Route name="vlanMonitor" handler={VlanMonitorView}/>
         <Route name="vlanPortConfig" handler={VlanPortConfigView}/>
+        <Route name="mgmtIntf" handler={MgmtIntfView}/>
         <DefaultRoute handler={Login}/>
     </Route>
 );

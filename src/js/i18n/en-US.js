@@ -30,6 +30,12 @@ module.exports = {
         err: {
         },
 
+        // Units.
+        units: {
+            gbps: ' Gbps',
+            mb: ' MB'
+        },
+
         // View specific text.
         views: {
             dashboard: {
@@ -68,11 +74,19 @@ module.exports = {
                 txRx: ''
             },
             systemMonitor: {
-                name: 'System Monitor'
+                name: 'System Monitor',
+                cpu: 'CPU Load',
+                memory: 'Memory',
+                storage: 'Storage',
+                temperature: 'Temperature',
+                gb: 'GB',
+                deg: 'C'
             },
             portMonitor: {
                 name: 'Monitor',
                 portUtil: 'Port Utilization - Port ',
+                noPorts: 'There are no active ports on this device. ' +
+                    'Please enabled a port to view utilization'
             },
             portMgmt: {
                 name: 'Management',
@@ -86,27 +100,27 @@ module.exports = {
                     speed: 'Speed',
                     connector: 'Connector',
                     vendor: 'Vendor'
-                }
+                },
+                gbps: ' Gbps'
             },
             ip: {
                 name: 'IP'
             },
             vlanMgmt: {
                 name: 'Management',
-                boxGraphic: 'VLAN Membership',
+                vlanMem: 'VLAN Membership',
                 allVlans: 'All VLANs',
+                noConfiguredVlans: 'There are no configured VLANs.',
                 noVlans: 'No VLANs are configured on this port',
                 th: {
                     name: 'Name',
-                    id: 'ID',
+                    id: 'VLAN',
                     status: 'Status',
-                    untagged: 'Native-Untagged',
-                    tagged: 'Native-Tagged',
-                    access: 'Access',
-                    trunk: 'Trunk',
+                    reason: 'Reason',
+                    ports: 'Ports',
                     display: 'Display',
                     vlan: 'VLAN',
-                    portType: 'Port Type',
+                    vlanStatus: 'VLAN Status'
                 }
             },
             vlanPortConfig: {
@@ -116,11 +130,43 @@ module.exports = {
             vlanMonitor: {
                 name: 'Monitor'
             },
-            staticRoutes: {
-                name: 'Static Routes'
+            lag: {
+                name: 'LAG',
+                linkAggrGroups: 'Link Aggregate Groups',
+                sysId: 'System ID',
+                sysPri: 'Priority',
+                lagName: 'Name',
+                mode: 'Mode',
+                bondStatus: 'Bond Status',
+                bondStatusReason: 'Bond Status Reason',
+                bondSpeed: 'Bond Speed',
+                actorKey: 'Actor Key',
+                actorState: 'Actor State',
+                actorPortId: 'Actor Port ID',
+                actorSysId: 'Actor System ID',
+                partnerKey: 'Partner Key',
+                partnerState: 'Partner State',
+                partnerPortId: 'Partner Port ID',
+                partnerSysId: 'Partner System ID',
+                infs: 'Interfaces',
+                infsNoneLoaded: '(no link aggregate group selected)',
+                infName: 'Name',
+                mac: 'MAC',
+                macInUse: 'MAC In Use',
+                lacpCurrent: 'LACP Current',
             },
-            bgp: {
-                name: 'BGP'
+            mgmtIntf: {
+                name: 'Management Interface',
+                mgmtIntf: 'Management Interface',
+                intfName: 'Name',
+                mode: 'Mode',
+                modeDHCP: 'DHCP',
+                subnetMask: 'Subnet Mask',
+                defaultGateway: 'Default Gateway',
+                ip: 'IP',
+                ipv6: 'IPv6',
+                dnsServer1: 'DNS Server 1',
+                dnsServer2: 'DNS Server 2'
             },
             test1: {
                 name: 'Test1',

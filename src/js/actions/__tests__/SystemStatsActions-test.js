@@ -165,7 +165,8 @@ describe('Test Suite For SystemStatsActions', function() {
                 pwr2.processed,
                 pwr3.processed,
                 pwr4.processed
-            ]
+            ],
+            date: 0
         },
         SystemStatsActions,
         RenderActions; // FIXME: rename this

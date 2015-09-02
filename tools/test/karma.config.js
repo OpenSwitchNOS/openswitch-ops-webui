@@ -41,7 +41,6 @@ module.exports = function(config) {
         // Please don't spam the console when running in karma.
         webpackServer: { noInfo: true },
 
-        // Show the test names and progress.
-        reporters: [ 'spec' ]
+        reporters: [ 'mocha' ]
     });
 };

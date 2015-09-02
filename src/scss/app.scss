@@ -206,23 +206,3 @@ html, body, {
     }
 
 }
-
-/*
- * style grommet menu to allow divs in a menu
- */
-
-//FIXME - menu can be changed to routes and this can be removed
-.menu__drop {
-    .box {
-        div {
-            padding-top: 10px;
-            padding-bottom: 10px;
-            text-align: center;
-
-            &:hover {
-                background-color: $navItemActiveColor;
-                color: white;
-            }
-        }
-    }
-}

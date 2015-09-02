@@ -7,14 +7,21 @@ var React = require('react'),
     Reflux = require('reflux'),
     I18n = require('i18n'),
     PropTypes = React.PropTypes,
+    Cnvs = require('conversions'),
     PortsMgmtActions = require('PortsMgmtActions'),
     PortsMgmtStore = require('PortsMgmtStore'),
     BoxGraphic = require('BoxGraphic'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GTable = require('grommet/components/Table');
 
+// internationalization for the view
 function t(key) {
     return I18n.text('views.portMgmt.' + key);
+}
+
+// internationalization for units
+function tUnits(key) {
+    return I18n.text('units.' + key);
 }
 
 var PortList = React.createClass({
@@ -22,7 +29,7 @@ var PortList = React.createClass({
     displayName: 'PortList',
 
     propTypes: {
-        ports: PropTypes.object
+        ports: PropTypes.array
     },
 
     render: function() {
@@ -41,12 +48,14 @@ var PortList = React.createClass({
                 <tbody>
                     {this.props.ports.map(function(port) {
                         return (
-                            <tr>
+                            <tr key={port.data.name}>
                                 <td>{port.data.name}</td>
                                 <td>{port.data.admin_state}</td>
                                 <td>{port.data.link_state}</td>
                                 <td>{port.data.duplex}</td>
-                                <td>{port.data.link_speed}</td>
+                                <td>{Cnvs.bpsToGbps(port.data.link_speed)
+                                        + tUnits('gbps')}
+                                </td>
                                 <td>{port.data.pm_info.connector}</td>
                                 <td>{port.data.pm_info.vendor_name}</td>
                             </tr>

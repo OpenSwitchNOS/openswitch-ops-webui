@@ -12,7 +12,7 @@ module.exports = React.createClass({
     displayName: 'ViewBoxHeader',
 
     propTypes: {
-        title: PropTypes.string.isRequired,
+        title: PropTypes.node.isRequired,
         toolbar: PropTypes.object
     },
 
@@ -33,7 +33,7 @@ module.exports = React.createClass({
         return (
             <div className="viewBoxHeader">
                 {this.props.title}
-                <div className="flexIcons">{icons}</div>
+                <span className="flexIcons">{icons}</span>
             </div>
         );
     }

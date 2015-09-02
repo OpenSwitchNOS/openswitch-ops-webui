@@ -14,20 +14,23 @@ var React = require('react/addons'),
     RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore');
 
-
 var NavGroup = React.createClass({
 
     displayName: 'NavGroup',
 
     propTypes: {
+        autoClose: PropTypes.bool,
         heading: PropTypes.string,
-        routes: PropTypes.arrayOf(PropTypes.string).isRequired
+        routes: PropTypes.arrayOf(PropTypes.shape({
+            to: PropTypes.string.isRequired,
+            name: PropTypes.string
+        })).isRequired
     },
 
     mixins: [ Reflux.connect(RenderStore, 'render') ],
 
     onClickLink: function() {
-        if (this.state.autoCloseNavPane) {
+        if (this.props.autoClose) {
             RenderActions.hideNavPane();
         }
     },
@@ -43,10 +46,12 @@ var NavGroup = React.createClass({
                 {hd}
                 <ul>
                     { this.props.routes.map(function(route) {
-                        var name = t('views.' + route + '.name');
+                        var to = route.to,
+                            nameKey = route.viewName || to,
+                            name = t('views.' + nameKey + '.name');
                         return (
                             <li key={name}>
-                                <Link onClick={clickFn} to={route}>{name}</Link>
+                                <Link onClick={clickFn} to={to}>{name}</Link>
                             </li>
                         );
                     })}
@@ -56,39 +61,41 @@ var NavGroup = React.createClass({
     }
 });
 
+// FIXME: not highlighting when systemMonitor/memory (ActiveStore or query params)
+
 module.exports = React.createClass({
 
     displayName: 'NavPane',
 
+    propTypes: {
+        autoClose: PropTypes.bool,
+    },
+
     render: function() {
-        var t = I18n.text;
+        var t = I18n.text,
+            ac = this.props.autoClose;
         return (
             <div id="navPane">
 
-                <NavGroup heading={t('general')}
+                <NavGroup autoClose={ac} heading={t('general')}
                     routes={[
-                        'dashboard',
-                        'systemMonitor'
+                        { to: 'dashboard' },
+                        { to: 'systemMonitor' },
+                        { to: 'mgmtIntf' },
                     ]}
                 />
                 <hr />
-                <NavGroup heading={t('ports')}
+                <NavGroup autoClose={ac} heading={t('ports')}
                     routes={[
-                        'portMgmt',
-                        'portMonitor'
+                        { to: 'portMgmt' },
+                        { to: 'portMonitor' },
+                        { to: 'lag' }
                     ]}
                 />
                 <hr />
-                <NavGroup heading={t('vlans')}
+                <NavGroup autoClose={ac} heading={t('vlans')}
                     routes={[
-                        'vlanMgmt',
-                        'vlanPortConfig',
-                    ]}
-                />
-                <hr />
-                <NavGroup heading={t('routing')}
-                    routes={[
-                        'staticRoutes',
+                        { to: 'vlanMgmt' }
                     ]}
                 />
 

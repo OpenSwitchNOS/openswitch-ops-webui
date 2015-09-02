@@ -1,5 +1,5 @@
 /*
- * Actions for Port Mgmt View.
+ * Actions for Port Store.
  * @author Kelsey Dedoshka
  */
 
@@ -7,15 +7,14 @@ var Reflux = require('reflux'),
     RestUtils = require('restUtils'),
     RenderActions = require('RenderActions');
 
-var PortsMgmtActions = Reflux.createActions({
+var PortsActions = Reflux.createActions({
 
     // Create the view's actions:
     loadPorts: { asyncResult: true },
-    setPorts: {}
 });
 
 //Action to request the the list of ports
-PortsMgmtActions.loadPorts.listen(function() {
+PortsActions.loadPorts.listen(function() {
     RestUtils.get('/system/Interface', function(err, res) {
         if (err) {
             this.failed(err);
@@ -26,7 +25,17 @@ PortsMgmtActions.loadPorts.listen(function() {
                 if (err2) {
                     this.failed(err2);
                 } else {
-                    this.completed(res2);
+                    var ports = [];
+                    for (var i=0; i<res2.length; i++) {
+                        var port = res2[i];
+
+                        // empty string as type means it is a port
+                        if (port.data.type === '') {
+                            ports.push(port);
+                        }
+                    }
+
+                    this.completed(ports);
                 }
             }.bind(this));
         }
@@ -34,8 +43,8 @@ PortsMgmtActions.loadPorts.listen(function() {
 });
 
 //on failure of the portss request
-PortsMgmtActions.loadPorts.failed.listen(function(e) {
+PortsActions.loadPorts.failed.listen(function(e) {
     RenderActions.postRequestErr(e);
 });
 
-module.exports = PortsMgmtActions;
+module.exports = PortsActions;

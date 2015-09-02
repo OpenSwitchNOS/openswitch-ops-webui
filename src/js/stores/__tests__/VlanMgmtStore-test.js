@@ -21,8 +21,8 @@ describe('Test Suite For VlanMgmtStore', function() {
                 'ports': [
                         48,
                         'native-untagged'
-                    ]
-            }]
+                    ],
+            }],
         }
     };
 
@@ -43,7 +43,10 @@ describe('Test Suite For VlanMgmtStore', function() {
         expect(VlanMgmtStore.state.vlans).toEqual({});
         expect(VlanMgmtStore.state.vlansGraphic).toEqual({});
         expect(VlanMgmtStore.state.vlanDisplay).toEqual({});
-        expect(VlanMgmtStore.state.boxPortConfig).toEqual({});
+        expect(VlanMgmtStore.state.boxPortConfig).toEqual({
+            'showVlans': true,
+            'data': {}
+        });
         expect(VlanMgmtStore.state.colors).toEqual([
             { 'accent': '#FF6F3E', 'main': '#FF9E7D' },
             { 'accent': '#6539A4', 'main': '#9B78CF' },
