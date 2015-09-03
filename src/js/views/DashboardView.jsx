@@ -185,9 +185,9 @@ module.exports = React.createClass({
             pwrs = si.powerSupplies,
             fanPropVal,
             status,
-            fanCount, fanLabel,
-            pwrPropKey1, pwrPropVal1,
-            pwrPropKey2, pwrPropVal2;
+            fanCount,
+            pwrPropVal1,
+            pwrPropVal2;
 
         if (fans && fans.length > 0) {
             fanCount = fans.length;
@@ -198,26 +198,28 @@ module.exports = React.createClass({
                     break;
                 }
             }
-            fanLabel = t('fanStatus') + ' (' + fanCount + ')';
-            fanPropVal = <StatusText value={status} text={t(status)} />;
+            fanPropVal = (
+                <StatusText
+                    value={status}
+                    text={t(status) + ' (' + fanCount + ')'}
+                />
+            );
         }
+
         // TODO: add variable number of supplies read from DB
         if (pwrs && pwrs.length === 2) {
-            pwrPropKey1 = t('powerSupplyLabel') + ' 1'; // + pwrs[0].name;
             pwrPropVal1 = (
                 <StatusText value={pwrs[0].status} text={t(pwrs[0].text)} />
             );
-            pwrPropKey2 = t('powerSupplyLabel') + ' 2'; // + pwrs[1].name;
             pwrPropVal2 = (
                 <StatusText value={pwrs[1].status} text={t(pwrs[1].text)} />
             );
         }
 
-        // FIXME: dup key problem?
         return [
-            [ fanLabel, fanPropVal ],
-            [ pwrPropKey1, pwrPropVal1 ],
-            [ pwrPropKey2, pwrPropVal2 ]
+            [ t('fanStatus'), fanPropVal ],
+            [ t('powerSupplyLabel') + ' 1', pwrPropVal1 ],
+            [ t('powerSupplyLabel') + ' 2', pwrPropVal2 ]
         ];
     },
 
