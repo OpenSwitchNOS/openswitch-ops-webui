@@ -19,6 +19,7 @@ module.exports = {
         // Navigation groups.
         general: 'General',
         ports: 'Ports',
+        interfaces: 'Interfaces',
         vlans: 'VLANs',
         routing: 'Routing',
         partNum: 'Part #',

@@ -85,7 +85,7 @@ module.exports = React.createClass({
                     ]}
                 />
                 <hr />
-                <NavGroup autoClose={ac} heading={t('ports')}
+                <NavGroup autoClose={ac} heading={t('interfaces')}
                     routes={[
                         { to: 'portMgmt' },
                         { to: 'portMonitor' },
