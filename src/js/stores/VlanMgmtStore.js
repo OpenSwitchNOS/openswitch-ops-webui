@@ -42,15 +42,20 @@ module.exports = Reflux.createStore({
     },
 
     // Callback for success of loading vlan data
-    onLoadVlansCompleted: function(data) {
+    onLoadVlansCompleted: function(res) {
         var index,
             trunkVlans,
             vlans = {};
 
+        console.log('VLANS:');
+        console.log(res[0]);
+        console.log('Infs:');
+        console.log(res[1]);
+
         // loop through returned vlans are create
         // entries in the object
-        for (var i=0; i<data.length; i++) {
-            var elem = data[i].data;
+        for (var i=0; i<res.length; i++) {
+            var elem = res[i].body;
 
             // id in elem - the data set is a vlan
             // vlan_mode in elem - data set is a port

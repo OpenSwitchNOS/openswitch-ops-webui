@@ -56,16 +56,18 @@ module.exports = Reflux.createStore({
 
         for (var i=0; i<ports.length; i++) {
             //add port to portStatus object
-            var port = ports[i];
-            portStatus[port.data.name] = {};
-            portStatus[port.data.name].adminState = port.data.admin_state[0];
-            portStatus[port.data.name].linkState = port.data.link_state[0];
+            var pcfg = ports[i].configuration,
+                psts = ports[i].status;
+
+            portStatus[pcfg.name] = {};
+            portStatus[pcfg.name].adminState = psts.admin_state[0];
+            portStatus[pcfg.name].linkState = psts.link_state[0];
         }
 
         // sort the ports by number
         this.state.allPorts = ports.sort(function(a, b) {
-            var numA = a.data.name;
-            var numB = b.data.name;
+            var numA = a.configuration.name;
+            var numB = b.configuration.name;
 
             // case 1: neither port has a dash - sort normally
             // case 2: if one port has a dash and one does not

@@ -48,16 +48,16 @@ var PortList = React.createClass({
                 <tbody>
                     {this.props.ports.map(function(port) {
                         return (
-                            <tr key={port.data.name}>
-                                <td>{port.data.name}</td>
-                                <td>{port.data.admin_state}</td>
-                                <td>{port.data.link_state}</td>
-                                <td>{port.data.duplex}</td>
-                                <td>{Cnvs.bpsToGbps(port.data.link_speed)
+                            <tr key={port.configuration.name}>
+                                <td>{port.configuration.name}</td>
+                                <td>{port.status.admin_state}</td>
+                                <td>{port.status.link_state}</td>
+                                <td>{port.status.duplex}</td>
+                                <td>{Cnvs.bpsToGbps(port.status.link_speed)
                                         + tUnits('gbps')}
                                 </td>
-                                <td>{port.data.pm_info.connector}</td>
-                                <td>{port.data.pm_info.vendor_name}</td>
+                                <td>{port.status.pm_info.connector}</td>
+                                <td>{port.status.pm_info.vendor_name}</td>
                             </tr>
                         );
                     }, this)}

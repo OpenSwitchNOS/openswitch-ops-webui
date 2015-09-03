@@ -8,7 +8,6 @@ var Reflux = require('reflux'),
     RenderActions = require('RenderActions');
 
 var VlanMgmtActions = Reflux.createActions({
-    // Create the actions:
     loadVlans: { asyncResult: true },
     toggleVlanDisplay: {},
     setSelectedVlan: {},
@@ -24,34 +23,25 @@ var VlanMgmtActions = Reflux.createActions({
 VlanMgmtActions.loadVlans.listen(function() {
 
     var requests = [
-        '/system/bridges/bridge_normal/vlans',
-        '/system/bridges/bridge_normal/ports'
+        '/rest/v1/system/bridges/bridge_normal/vlans',
+        '/rest/v1/system/bridges/bridge_normal/ports'
     ];
 
-    RestUtils.get(requests, function(err, res) {
-        if (err) {
-            this.failed(err);
+    RestUtils.get(requests, function(e1, r1) {
+        if (e1) {
+            this.failed(e1);
         } else {
-            var dataRequests = [];
-            for (var i=0; i<res.length; i++) {
-                var urls = res[i].data;
-                for (var j=0; j<urls.length; j++) {
-                    dataRequests.push(urls[j]);
-                }
-            }
-
-            RestUtils.get(dataRequests, function(err2, res2) {
-                if (err) {
-                    this.failed(err2);
+            RestUtils.get([ r1[0].body, r1[1].body ], function(e2, r2) {
+                if (e2) {
+                    this.failed(e2);
                 } else {
-                    this.completed(res2);
+                    this.completed(r2);
                 }
             }.bind(this));
         }
     }.bind(this));
 });
 
-//Fail handler for loading vlans
 VlanMgmtActions.loadVlans.failed.listen(function(e) {
     RenderActions.postRequestErr(e);
 });

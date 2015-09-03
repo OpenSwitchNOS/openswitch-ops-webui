@@ -8,33 +8,26 @@ var Reflux = require('reflux'),
     RenderActions = require('RenderActions');
 
 var PortsActions = Reflux.createActions({
-
-    // Create the view's actions:
     loadPorts: { asyncResult: true },
 });
 
-//Action to request the the list of ports
 PortsActions.loadPorts.listen(function() {
-    RestUtils.get('/system/Interface', function(err, res) {
-        if (err) {
-            this.failed(err);
+    RestUtils.get('/rest/v1/system/interfaces', function(e1, r1) {
+        if (e1) {
+            this.failed(e1);
         } else {
-
-            //on success - request returned list of URLs
-            RestUtils.get(res.data, function(err2, res2) {
-                if (err2) {
-                    this.failed(err2);
+            RestUtils.get(r1.body, function(e2, r2) {
+                var port, ports = [];
+                if (e2) {
+                    this.failed(e2);
                 } else {
-                    var ports = [];
-                    for (var i=0; i<res2.length; i++) {
-                        var port = res2[i];
-
+                    for (var i=0; i<r2.length; i++) {
+                        port = r2[i].body;
                         // empty string as type means it is a port
-                        if (port.data.type === '') {
+                        if (port.configuration.type === '') {
                             ports.push(port);
                         }
                     }
-
                     this.completed(ports);
                 }
             }.bind(this));
@@ -42,7 +35,6 @@ PortsActions.loadPorts.listen(function() {
     }.bind(this));
 });
 
-//on failure of the portss request
 PortsActions.loadPorts.failed.listen(function(e) {
     RenderActions.postRequestErr(e);
 });

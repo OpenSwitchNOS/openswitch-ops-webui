@@ -14,12 +14,15 @@ var SystemInfoActions = Reflux.createActions({
 
 SystemInfoActions.load.listen(function() {
 
-    RestUtils.get(['/system/subsystems/base', '/system'], function(err, res) {
+    RestUtils.get([
+        '/rest/v1/system/subsystems/base',
+        '/rest/v1/system'
+    ], function(err, res) {
         var otherInfo;
         if (err) {
             this.failed(err);
         } else {
-            otherInfo = res[0].data.other_info;
+            otherInfo = res[0].body.status.other_info;
             this.completed({
                 onieVersion: otherInfo.onie_version,
                 baseMac: otherInfo.base_mac_address.toUpperCase(),
@@ -28,7 +31,7 @@ SystemInfoActions.load.listen(function() {
                 productName: otherInfo['Product Name'],
                 version: otherInfo.diag_version,
                 partNum: otherInfo.part_number,
-                hostName: res[1].data.hostname
+                hostName: res[1].body.configuration.hostname
             });
         }
     }.bind(this));

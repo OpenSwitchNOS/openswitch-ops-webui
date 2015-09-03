@@ -15,7 +15,7 @@ var URL_PREFIX = 'http://',
 
 // Wraps the superagent GET request in a form that can be used as an Async
 // callback (i.e. callback(err, res)).
-function getBody(url, callback) {
+function requestGet(url, callback) {
     var reqUrl = url;
 
     // If we are running the unit tests don't modify the URL at all!
@@ -28,17 +28,11 @@ function getBody(url, callback) {
     }
 
     Request.get(reqUrl).end(function(err, res) {
-        var result, date;
         if (err) {
             err.reqUrl = reqUrl;
             callback(err, null);
         } else {
-            result = res.body;
-            date = res.header.date;
-            if (date) {
-                result.date = Date.parse(date);
-            }
-            callback(null, result);
+            callback(null, res);
         }
     });
 }
@@ -82,10 +76,10 @@ function get(req, cb) {
         if (hasArrayElement(req)) {
             Async.map(req, get, cb);
         } else {
-            Async.map(req, getBody, cb);
+            Async.map(req, requestGet, cb);
         }
     } else {
-        getBody(req, cb);
+        requestGet(req, cb);
     }
 }
 

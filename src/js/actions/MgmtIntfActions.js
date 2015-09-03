@@ -13,12 +13,12 @@ var MgmtIntfActions = Reflux.createActions({
 
 MgmtIntfActions.load.listen(function() {
 
-    RestUtils.get('/system', function(err, res) {
+    RestUtils.get('/rest/v1/system', function(err, res) {
         var result = {};
         if (err) {
             this.failed(err);
         } else {
-            var mgmtIntf = res.data.mgmt_intf;
+            var mgmtIntf = res.body.configuration.mgmt_intf;
             if ( mgmtIntf.name ) {
                 result.name = mgmtIntf.name;
             }

@@ -14,20 +14,22 @@ var LagActions = Reflux.createActions({
     loadInterfaces: { asyncResult: true },
 });
 
-function processConfig(data) {
-    if (Object.keys(data.lacp_config).length > 0) {
+function processConfig(res) {
+    var cfg = res.body.configuration;
+
+    if (Object.keys(cfg.lacp_config).length > 0) {
         return {
-            sysId: data.lacp_config.lacp_system_id,
-            sysPri: data.lacp_config.lacp_system_priority
+            sysId: cfg.lacp_config.lacp_system_id,
+            sysPri: cfg.lacp_config.lacp_system_priority
         };
     }
     return {};
 }
 
-function lacpPortVal(data) {
+function lacpPortVal(portCfg) {
     var lacpVal;
-    if (data.lacp && data.lacp.length > 0) {
-        lacpVal = data.lacp[0];
+    if (portCfg.lacp && portCfg.lacp.length > 0) {
+        lacpVal = portCfg.lacp[0];
         if (lacpVal === 'off' || lacpVal === 'active' ||
                 lacpVal === 'passive') {
             return lacpVal;
@@ -36,19 +38,20 @@ function lacpPortVal(data) {
     return null;
 }
 
-function processPorts(ports) {
-    var result = [], data, lacpVal;
-    for (var i=0; i<ports.length; i++) {
-        data = ports[i].data;
-        lacpVal = lacpPortVal(data);
+function processPorts(res) {
+    var result = [], portCfg, portStatus, lacpVal;
+    for (var i=0; i<res.length; i++) {
+        portCfg = res[i].body.configuration;
+        portStatus = res[i].body.status;
+        lacpVal = lacpPortVal(portCfg);
         if (lacpVal) {
             result.push({
-                name: data.name,
+                name: portCfg.name,
                 mode: lacpVal,
-                bondSpeed: data.lacp_status.bond_speed,
-                bondStatusReason: data.lacp_status.bond_status_reason,
-                bondStatus: data.lacp_status.bond_status,
-                infUrl: data.interfaces
+                bondSpeed: portStatus.lacp_status.bond_speed,
+                bondStatusReason: portStatus.lacp_status.bond_status_reason,
+                bondStatus: portStatus.lacp_status.bond_status,
+                infUrl: portCfg.interfaces
             });
         }
     }
@@ -58,18 +61,18 @@ function processPorts(ports) {
 LagActions.loadLags.listen(function() {
 
     RestUtils.get([
-        '/system',
-        '/system/bridges/bridge_normal/ports'
+        '/rest/v1/system',
+        '/rest/v1/system/bridges/bridge_normal/ports'
     ], function(e1, r1) {
         if (e1) {
             this.failed(e1);
         } else {
-            RestUtils.get(r1[1].data, function(e2, r2) {
+            RestUtils.get(r1[1].body, function(e2, r2) {
                 if (e2) {
                     this.failed(e2);
                 } else {
                     this.completed({
-                        config: processConfig(r1[0].data),
+                        config: processConfig(r1[0]),
                         lags: processPorts(r2)
                     });
                 }
@@ -90,20 +93,20 @@ function macInUse(data) {
     return null;
 }
 
-function processInfs(infs) {
-    var result = [], ri, data, s;
-    for (var i=0; i<infs.length; i++) {
+function processInfs(res) {
+    var result = [], ri, cfg, status, s;
+    for (var i=0; i<res.length; i++) {
         ri = {};
+        cfg = res[i].body.configuration;
+        status = res[i].body.status;
 
-        data = infs[i].data;
+        ri.name = cfg.name;
+        ri.mac = status.hw_intf_info.mac_addr.toUpperCase();
+        ri.macInUse = macInUse(status);
 
-        ri.name = data.name;
-        ri.mac = data.hw_intf_info.mac_addr.toUpperCase();
-        ri.macInUse = macInUse(data);
-
-        if (Object.keys(data.lacp_status).length > 0) {
-            s = data.lacp_status;
-            ri.lacpCurrent = data.lacp_current[0];
+        if (Object.keys(status.lacp_status).length > 0) {
+            ri.lacpCurrent = status.lacp_current[0];
+            s = status.lacp_status;
             ri.partnerKey = s.partner_key;
             ri.partnerState = s.partner_state;
             ri.partnerPortId = s.partner_port_id;
@@ -125,20 +128,14 @@ LagActions.loadInterfaces.listen(function(lag) {
         if (e1) {
             this.failed(e1);
         } else {
-            RestUtils.get(r1.data, function(e2, r2) {
-                if (e2) {
-                    this.failed(e2);
-                } else {
-                    this.completed(lag, processInfs(r2));
-                }
-            }.bind(this));
+            this.completed(lag, processInfs(r1));
         }
     }.bind(this));
 
 });
 
-LagActions.loadInterfaces.failed.listen(function(e) {
-    RenderActions.postRequestErr(e);
+LagActions.loadInterfaces.failed.listen(function(err, res) {
+    RenderActions.postRequestErr(err, res);
 });
 
 module.exports = LagActions;

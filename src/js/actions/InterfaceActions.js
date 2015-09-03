@@ -13,27 +13,28 @@ var InterfaceActions = Reflux.createActions({
     load: { asyncResult: true },
 });
 
-function processResponse(interfaces) {
-    return interfaces.map(function(item) {
-        var data = item.data;
+function processResponse(res) {
+    return res.map(function(r) {
+        var sts = r.body.status,
+            stats = r.body.statistics.statistics;
         return {
-            link: data.link_state[0],
-            duplex: data.duplex[0],
-            speed: Number(data.link_speed[0]),
-            name: data.name,
-            rxBytes: Number(data.statistics.rx_bytes),
-            txBytes: Number(data.statistics.tx_bytes)
+            link: sts.link_state[0],
+            duplex: sts.duplex[0],
+            speed: Number(sts.link_speed[0]),
+            name: r.body.configuration.name,
+            rxBytes: Number(stats.rx_bytes),
+            txBytes: Number(stats.tx_bytes)
         };
     });
 }
 
 InterfaceActions.load.listen(function() {
 
-    RestUtils.get('/system/Interface', function(e1, r1) {
+    RestUtils.get('/rest/v1/system/interfaces', function(e1, r1) {
         if (e1) {
             this.failed(e1);
         } else {
-            RestUtils.get(r1.data, function(e2, r2) {
+            RestUtils.get(r1.body, function(e2, r2) {
                 if (e2) {
                     this.failed(e2);
                 } else {
@@ -48,6 +49,5 @@ InterfaceActions.load.listen(function() {
 InterfaceActions.load.failed.listen(function(e) {
     RenderActions.postRequestErr(e);
 });
-
 
 module.exports = InterfaceActions;

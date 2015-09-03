@@ -61,8 +61,6 @@ module.exports = React.createClass({
             err = this.state.render.requestErr,
             cls = ClassNames({ navPaneShown: showNav });
 
-        console.log(this.state);
-
         return (
             <div>
                 <Mast />

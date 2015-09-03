@@ -8,24 +8,21 @@ var Reflux = require('reflux'),
     RenderActions = require('RenderActions');
 
 var BoxGraphicActions = Reflux.createActions({
-    // Create the actions:
-    //  loadVlans, loadVlansFailed, loadVlansCompleted
     loadBoxGraphic: { asyncResult: true },
     loadHwPorts: { asyncResult: true }
 });
 
 
 BoxGraphicActions.loadHwPorts.listen(function() {
-    RestUtils.get('/system/Interface', function(err, res) {
-        if (err) {
-            this.failed(err);
+    RestUtils.get('/rest/v1/system/interfaces', function(e1, r1) {
+        if (e1) {
+            this.failed(e1);
         } else {
-            //on success - request returned list of URLs
-            RestUtils.get(res.data, function(err2, res2) {
+            RestUtils.get(r1.body, function(e2, r2) {
                 if (err2) {
-                    this.failed(err2);
+                    this.failed(e2);
                 } else {
-                    this.completed(res2);
+                    this.completed(r2);
                 }
             }.bind(this));
         }

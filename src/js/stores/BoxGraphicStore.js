@@ -38,12 +38,13 @@ module.exports = Reflux.createStore({
         this.trigger(this.state);
     },
 
-    loadHwPorts: function(data) {
-
-        for (var i=0; i<data.length; i++) {
-            var port = data[i];
-            this.state.hwData[port.data.name] =
-                { 'portType': port.data.hw_intf_info.connector };
+    loadHwPorts: function(ports) {
+        var name, port;
+        for (var i=0; i<ports.length; i++) {
+            port = ports[i];
+            name = port.configuration.name;
+            this.state.hwData[name] =
+                { 'portType': port.status.hw_intf_info.connector };
         }
 
         this.state.loadCompleted = 1;

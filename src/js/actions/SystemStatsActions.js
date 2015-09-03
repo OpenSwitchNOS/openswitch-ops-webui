@@ -14,9 +14,9 @@ var SystemStatsActions = Reflux.createActions({
 });
 
 var URLS_PASS_1 = [
-    '/system/subsystems/base/temp_sensors',
-    '/system/subsystems/base/fans',
-    '/system/subsystems/base/power_supplies'
+    '/rest/v1/system/subsystems/base/temp_sensors',
+    '/rest/v1/system/subsystems/base/fans',
+    '/rest/v1/system/subsystems/base/power_supplies'
 ];
 
 function processCsvCpu(data) {
@@ -53,13 +53,13 @@ function processPwrStatus(result) {
     return { text: 'powerAbsent', status: 'warning' };
 }
 
-function processPass2(resBody) {
+function processPass2(res) {
     var cpu, mem, stor,
-        date = resBody[0].date,
+        date = Date.parse(res[0].headers.date),
         result = {
             date: (date ? date : 0)
         },
-        stats = resBody[0].data.statistics;
+        stats = res[0].body.statistics.statistics;
 
     if (stats) {
         cpu = processCsvCpu(stats.load_average);
@@ -74,29 +74,29 @@ function processPass2(resBody) {
         result.storMax = stor.max;
     }
 
-    result.temps = resBody[1].map(function(item) {
+    result.temps = res[1].map(function(r) {
         return {
-            name: item.data.name,
-            loc: item.data.location,
-            max: Number(item.data.max) / 1000,
-            min: Number(item.data.min) / 1000,
-            val: Number(item.data.temperature) / 1000
+            name: r.body.status.name,
+            loc: r.body.status.location,
+            max: Number(r.body.status.max) / 1000,
+            min: Number(r.body.status.min) / 1000,
+            val: Number(r.body.status.temperature) / 1000
         };
     });
 
-    result.fans = resBody[2].map(function(item) {
-        var textStatus = processFanStatus(item.data.status);
+    result.fans = res[2].map(function(r) {
+        var textStatus = processFanStatus(r.body.status.status);
         return {
-            name: item.data.name,
+            name: r.body.status.name,
             text: textStatus.text,
             status: textStatus.status
         };
     });
 
-    result.powerSupplies = resBody[3].map(function(item) {
-        var textStatus = processPwrStatus(item.data.status);
+    result.powerSupplies = res[3].map(function(r) {
+        var textStatus = processPwrStatus(r.body.status.status);
         return {
-            name: item.data.name,
+            name: r.body.status.name,
             text: textStatus.text,
             status: textStatus.status
         };
@@ -112,10 +112,10 @@ SystemStatsActions.load.listen(function() {
             this.failed(e1);
         } else {
             urlsPass2 = [
-                '/system',
-                pass1[0].data,
-                pass1[1].data,
-                pass1[2].data,
+                '/rest/v1/system',
+                pass1[0].body,
+                pass1[1].body,
+                pass1[2].body,
             ];
             RestUtils.get(urlsPass2, function(e2, pass2) {
                 if (e2) {
