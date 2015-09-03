@@ -6,8 +6,7 @@
 //FIXME - do not truncate and do toFixed in any store - always in the view
 
 var Reflux = require('reflux'),
-    PortsActions = require('PortsActions'),
-    PortsMgmtActions = require('PortsMgmtActions');
+    PortsActions = require('PortsActions');
 
 //HELPER FUNCTIONS
 
@@ -30,8 +29,6 @@ function splitPort(elem, index) {
 
 module.exports = Reflux.createStore({
 
-    listenables: [ PortsMgmtActions ],
-
     init: function() {
         PortsActions.loadPorts();
         this.listenTo(PortsActions.loadPorts.completed, 'setPorts');
@@ -50,9 +47,29 @@ module.exports = Reflux.createStore({
         return this.state;
     },
 
+    // parse the response data for the keys
+    // needed for the view
+    parseResponse: function(port) {
+        var pcfg = port.configuration;
+        var psts = port.status;
+        var portData = {};
+
+        portData.name = pcfg.name;
+        portData.adminState = psts.admin_state;
+        portData.linkState = psts.link_state;
+        portData.duplex = psts.duplex;
+        portData.linkSpeed = psts.link_speed;
+        portData.connector = psts.pm_info.connector;
+        portData.vendorName = psts.pm_info.vendor_name;
+
+        return portData;
+    },
+
     //Callback for success of loading port list from server
     setPorts: function(ports) {
         var portStatus = this.state.portStatus;
+        //var portData = parseResPorMgmt();
+        var portData = [];
 
         for (var i=0; i<ports.length; i++) {
             //add port to portStatus object
@@ -62,12 +79,17 @@ module.exports = Reflux.createStore({
             portStatus[pcfg.name] = {};
             portStatus[pcfg.name].adminState = psts.admin_state[0];
             portStatus[pcfg.name].linkState = psts.link_state[0];
+
+            // create port data obejct from the response with
+            // the data keys needed for the view
+            portData[i] = {};
+            portData[i] = this.parseResponse(ports[i]);
         }
 
         // sort the ports by number
-        this.state.allPorts = ports.sort(function(a, b) {
-            var numA = a.configuration.name;
-            var numB = b.configuration.name;
+        this.state.allPorts = portData.sort(function(a, b) {
+            var numA = a.name;
+            var numB = b.name;
 
             // case 1: neither port has a dash - sort normally
             // case 2: if one port has a dash and one does not
