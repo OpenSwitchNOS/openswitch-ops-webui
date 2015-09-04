@@ -62,7 +62,7 @@ module.exports = React.createClass({
                     <img src="OpenSwitchLogo.png" />
                 </span>
 
-                <span>
+                <span id='mastDeviceInfo'>
                     <b>{t('hostName')}:</b>&nbsp;{hostName || ''}
                     &nbsp;-&nbsp;
                     <b>{t('partNum')}:</b>&nbsp;{partNum || ''}
@@ -70,7 +70,7 @@ module.exports = React.createClass({
                     <b>{t('serialNum')}:</b>&nbsp;{serialNum || ''}
                 </span>
 
-                <span>
+                <span id='mastUserInfo'>
                     <b>{t('user')}:</b>&nbsp;{user}
                 </span>
 

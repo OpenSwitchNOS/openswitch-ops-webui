@@ -6,6 +6,7 @@
 
 // mast, routeView
 $mastHeight: 3em;
+$mastHeightSmallScreen: 5em;
 
 // mast
 $mastBackgroundColor: white;
@@ -14,6 +15,7 @@ $mastBorderBottomColor: lightgrey;
 
 // NavPane, viewPane
 $navPaneWidth: 170px;
+$navPaneWidthSmallScreen: 400px;
 
 // NavPane
 $navPaneBackgroundColor: #404040;
@@ -24,6 +26,9 @@ $navPaneBorderRightColor: #2e2e2e;
 $navItemNormalColor: #bbbbbb;
 $navItemHoverColor: white;
 $navItemActiveColor: #FF6F3E;
+$navItemLineHeight: 1.5em;
+$navItemFontSizeSmallScreen: 2.5em;
+$navHeadingFontSizeSmallScreen: 2.2em;
 
 // viewPane & viewBox
 $viewPaneMargin: 24px;

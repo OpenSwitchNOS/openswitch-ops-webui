@@ -42,6 +42,7 @@ $portCornerRadius: 3px;
 
 // Style the port table cell element
 .portBoxContainer {
+    cursor: pointer;
 
     //small screen
     @media #{$smallScreen} {
