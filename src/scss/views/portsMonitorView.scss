@@ -20,12 +20,12 @@ $colorKeyPurple: rgba(101,57,164,1);
         .toggleText {
             margin-left: 10px;
             margin-right: 10px;
-            font-size: 20px;
+            //font-size: 20px;
         }
 
         //size of area chart icons in toolbar
         .fa-area-chart {
-            font-size: 24px;
+            //font-size: 24px;
         }
 
         //color keys for area chart icons
@@ -52,23 +52,31 @@ $colorKeyPurple: rgba(101,57,164,1);
         margin-top: 15px;
 
         //title text
-        .title {
+        .main {
             color: #545454;
-            font-size: 20px;
             font-weight: normal;
-            height: 20px;
+            padding: 5px;
         }
 
         //details text
         .details {
-            font-size: 20px;
             font-weight: normal;
         }
 
         //table formatting
         tr td {
-            padding-top: 15px;
-            padding-bottom: 15px;
+
+            @media #{$smallScreen} {
+                font-size: 2.0rem;
+            }
+
+            @media #{$largeScreen} {
+                font-size: $tableFontSizeMedium;
+            }
+
+            line-height: 2.0rem;
+            padding-top: 5px;
+            padding-bottom: 5px;
             padding-left: 10px;
             padding-right: 10px;
         }

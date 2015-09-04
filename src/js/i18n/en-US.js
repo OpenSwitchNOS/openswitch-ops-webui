@@ -87,7 +87,13 @@ module.exports = {
                 name: 'Monitor',
                 portUtil: 'Port Utilization - Port ',
                 noPorts: 'There are no active ports on this device. ' +
-                    'Please enabled a port to view utilization'
+                    'Please enable a port to view utilization',
+                details: {
+                    avg: 'Average',
+                    bytes: 'Total Bytes',
+                    low: 'Lowest Utilization',
+                    high: 'Highest Utilization'
+                }
             },
             portMgmt: {
                 name: 'Management',

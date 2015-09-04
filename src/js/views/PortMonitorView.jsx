@@ -91,7 +91,7 @@ var PortDetails = React.createClass({
                 <table className="portDetails defaultTable">
                     <tr>
                         <td className="average">
-                            <div className="title">Average</div>
+                            <div className="main">{t('details.avg')}</div>
                         </td>
                         <td>
                             <div className="details" style={color}>
@@ -101,7 +101,7 @@ var PortDetails = React.createClass({
                     </tr>
                     <tr>
                         <td>
-                            <div className="title">Total Bytes</div>
+                            <div className="main">{t('details.bytes')}</div>
                         </td>
                         <td>
                             <div className="details" style={color}>
@@ -113,7 +113,7 @@ var PortDetails = React.createClass({
                     </tr>
                     <tr>
                         <td>
-                            <div className="title">Highest Utilization</div>
+                            <div className="main">{t('details.high')}</div>
                         </td>
                         <td>
                             <div className="details" style={color}>
@@ -123,7 +123,7 @@ var PortDetails = React.createClass({
                     </tr>
                     <tr>
                         <td>
-                            <div className="title">Lowest Utilization</div>
+                            <div className="main">{t('details.low')}</div>
                         </td>
                         <td>
                             <div className="details" style={color}>

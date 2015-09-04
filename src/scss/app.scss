@@ -26,6 +26,9 @@ html, body, {
     ::-webkit-scrollbar {
         display: none;
     }
+
+    //remove scrollbars (IE)
+    -ms-overflow-style: none;
 }
 
 /*
@@ -209,5 +212,15 @@ html, body, {
         height: 1px;
         background-color: $appNotificationDivderBackgroundColor;
     }
+}
 
+/*
+ * disabling general grommet styles affecting css
+ */
+.menu {
+    font-size: inherit;
+}
+
+.table th {
+    font-size: inherit;
 }

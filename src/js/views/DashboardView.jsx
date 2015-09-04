@@ -341,15 +341,15 @@ module.exports = React.createClass({
         return (
             <div id="dashboardView" className="viewRow">
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('systemInfo')} />
                         <PropTable
                             className="viewBoxContent margin"
                             data={this.mkSysInfoPropData()} />
                     </div>
 
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('systemStatus')} />
                         <PropTable
                             className="viewBoxContent margin"
@@ -357,28 +357,34 @@ module.exports = React.createClass({
                     </div>
                 </div>
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('cpu')}
                             toolbar={this.mkSysTb('cpu')} />
-                        {this.mkMeter(si.cpuVal, si.cpuMax, '')}
+                            <div className="viewBoxContent margin center">
+                                {this.mkMeter(si.cpuVal, si.cpuMax, '')}
+                            </div>
                     </div>
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('storage')} />
-                        {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
+                        <div className="viewBoxContent margin center">
+                            {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('memory')}
                             toolbar={this.mkSysTb('memory')} />
-                        {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                            <div className="viewBoxContent margin center">
+                                {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                            </div>
                     </div>
 
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('temp')}
                             toolbar={this.mkSysTb('temperature')} />
@@ -386,7 +392,7 @@ module.exports = React.createClass({
                     </div>
                 </div>
 
-                <div className="viewBox">
+                <div className="viewBox fillColumn">
                     <ViewBoxHeader
                         title={t('portTopUtil')}
                         toolbar={this.mkUtlTb()} />

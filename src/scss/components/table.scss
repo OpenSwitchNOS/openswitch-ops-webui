@@ -3,7 +3,43 @@
  * @author Kelsey Dedoshka
  */
 
+tbody, thead {
+
+    line-height: 1em;
+    font-weight: normal;
+
+    @media #{$smallScreen} {
+        font-size: $tableFontSizeLarge;
+    }
+
+    @media #{$mediumScreen} {
+        font-size: $tableFontSize;
+    }
+
+    @media #{$largeScreen} {
+        font-size: $tableFontSize;
+    }
+}
+
 .defaultTable {
+
+    //@media #{$smallScreen} {
+   //     font-size: $tableFontSizeLarge;
+   // }
+
+   // @media #{$mediumScreen} {
+   //     font-size: $tableFontSize;
+   // }
+
+   // @media #{$largeScreen} {
+   //     font-size: $tableFontSize;
+    //}
+
+   // line-height: 1em;
+   // font-weight: normal;
+
+    // style even rows - alternate table
+    // row colors
     tr:nth-child(even) {
         background-color: #F2F2F2;
     }
