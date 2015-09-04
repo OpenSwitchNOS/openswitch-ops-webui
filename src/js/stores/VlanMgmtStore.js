@@ -56,6 +56,29 @@ module.exports = Reflux.createStore({
         return vlanData;
     },
 
+    // because responses for both ports and vlans come
+    // back in one array - need to determine which
+    // responses are VLAN responses and which are
+    // port responses for parsing the data
+    //
+    // return true if a vlan request
+    isVlanRequest: function(res) {
+        var reqUrl = res.req.url;
+        if (reqUrl.indexOf('vlans') >= 0) {
+            return true;
+        }
+        return false;
+    },
+
+    // return true if a port request
+    isPortRequest: function(res) {
+        var reqUrl = res.req.url;
+        if (reqUrl.indexOf('ports') >= 0) {
+            return true;
+        }
+        return false;
+    },
+
     // Callback for success of loading vlan data
     onLoadVlansCompleted: function(res) {
         var index,
@@ -67,18 +90,17 @@ module.exports = Reflux.createStore({
         for (var i=0; i<res.length; i++) {
             for (var idx=0; idx<res[i].length; idx++) {
                 var elem = res[i][idx];
-                // id in elem - the data set is a vlan
-                // vlan_mode in elem - data set is a port
-                // confgured on a vlan
-                //FIXME - find a better way to determine which of these indicates
-                // ports and vlans
                 var cfg = elem.body.configuration;
-                if ('id' in cfg) {
+
+                // handle data for the vlan response
+                if (this.isVlanRequest(elem)) {
                     // parse the response for keys needed in view
                     vlans[cfg.id] = this.parseVlanResponse(elem);
                     vlans[cfg.id].ports = [];
-                } else if ('vlan_mode' in cfg) {
+                }
 
+                // handle data for the port response
+                if (this.isPortRequest(elem)) {
                     // make sure the trunk array is not empty
                     if (cfg.trunks !== []) {
                         trunkVlans = cfg.trunks;

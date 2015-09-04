@@ -26,7 +26,7 @@ $prongGradient: #3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%;
         // small version
         &.small {
             width: 40px;
-            height: 30px;
+            height: 27px;
             border-width: 2px;
             border-radius: 3px;
             margin-top: 4px;
@@ -51,7 +51,7 @@ $prongGradient: #3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%;
         //small version
         &.small {
             width: 11px;
-            height: 4px;
+            height: 3px;
             margin-left: 9px;
         }
     }
@@ -70,7 +70,7 @@ $prongGradient: #3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%;
         // small version
         &.small {
             width: 20px;
-            height: 4px;
+            height: 3px;
             margin-left: 5px;
         }
     }
@@ -88,10 +88,11 @@ $prongGradient: #3D3D3D 10%, #8F7E50 85%, #F2ECDC 90%, #8F7E50 97%;
 
         // small version
         &.small {
-            width: 30px;
-            height: 15px;
-            padding: 2px;
-            padding-bottom: 2px;
+            width: 28px;
+            height: 14px;
+            margin-left: 1px;
+            padding: 1px;
+            padding-bottom: 0px;
         }
     }
 
