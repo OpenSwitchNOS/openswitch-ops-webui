@@ -62,6 +62,7 @@ $tableFontSizeLarge: 1.75rem;
 // Pack fonts so that grommet won't go out looking for them.
 // (see grommet _settings.font.scss).
 // TODO: stop grommet from attempting to load the remote font.
+@import '_openswitch.defaults.scss';
 @import '~grommet/scss/grommet-core/index';
 
 @font-face {

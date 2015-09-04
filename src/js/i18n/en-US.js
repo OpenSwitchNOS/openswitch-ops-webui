@@ -42,7 +42,7 @@ module.exports = {
             dashboard: {
                 name: 'Overview',
                 systemInfo: 'Information',
-                systemStatus: 'Status',
+                systemStatus: 'Other Status',
                 productName: 'Product',
                 baseMac: 'Base MAC',
                 version: 'Version',
@@ -66,8 +66,7 @@ module.exports = {
                 storageUnits: 'GB',
                 temp: 'Temperatures',
                 tempUnits: 'C',
-                portTopUtil: 'Top Port Utilization',
-                vlanTopUtil: 'Top VLAN Utilization',
+                portTopUtil: 'Top Interface Utilization',
                 port: 'Port',
                 vlan: 'VLAN',
                 tx: 'Tx',

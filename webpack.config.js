@@ -39,6 +39,12 @@ module.exports = {
                     Path.resolve(__dirname, 'node_modules/grommet/mixins')
                 ],
             },
+            // Match all .js|.jsx files -> .js
+            // Strips out any sourcemap comment lines.
+            {
+                test: /\.(js|jsx)$/,
+                loader: require.resolve('./tools/loader/strip-sourcemap-loader')
+            },
             // Match all .woff (web open font format) files.
             // Needed by Grommet & FontAwesome
             {
@@ -57,7 +63,9 @@ module.exports = {
             //  direcotry under 'node_modules'.
             {
                 test: /\.scss$/,
-                loader: 'style!css!sass?outputStyle=expanded&' +
+                loader: 'style!css' +
+                    '!' + require.resolve(__dirname + '/tools/loader/strip-ext-url-loader') +
+                    '!sass?outputStyle=expanded&' +
                     'includePaths[]=' +
                         (Path.resolve(__dirname, 'node_modules/grommet/node_modules')) + '&' +
                         (Path.resolve(__dirname, 'node_modules'))
