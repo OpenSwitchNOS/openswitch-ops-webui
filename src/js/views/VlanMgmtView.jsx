@@ -9,7 +9,7 @@ var React = require('react'),
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GTable = require('grommet/components/Table'),
-    CheckBox = require('CheckBox'),
+    GCheckBox = require('grommet/components/CheckBox'),
     BoxGraphic = require('BoxGraphic'),
     StatusText = require('StatusText'),
     GLayer = require('grommet/components/Layer'),
@@ -80,7 +80,7 @@ var AllVlansTable = React.createClass({
                         <td>{vlan.reason}</td>
                         <td>{formatPorts(vlan.ports)}</td>
                         <td>
-                            <CheckBox id={vlan.id}
+                            <GCheckBox id={vlan.id}
                                 onChange={this.toggleVlanDisplay}
                                 disabled={status}/>
                         </td>
