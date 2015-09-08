@@ -29,7 +29,15 @@ var NavGroup = React.createClass({
 
     mixins: [ Reflux.connect(RenderStore, 'render') ],
 
+    componentWillMount: function() {
+        this.updateNavPaneState();
+    },
+
     onClickLink: function() {
+        this.updateNavPaneState();
+    },
+
+    updateNavPaneState: function() {
         if (this.props.autoClose) {
             RenderActions.hideNavPane();
         }

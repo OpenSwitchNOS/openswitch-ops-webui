@@ -46,7 +46,7 @@ module.exports = React.createClass({
 
     shouldAutoCloseNavPane: function() {
         // TODO: works but first click on resize small - not auto close?
-        return window.innerWidth <= MAX_AUTO_CLOSE_NAV_WIDTH;
+        return screen.availWidth <= MAX_AUTO_CLOSE_NAV_WIDTH;
     },
 
     updateDimensions: function() {
