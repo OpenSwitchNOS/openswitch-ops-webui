@@ -96,45 +96,48 @@ module.exports = React.createClass({
 
                 <div className="viewBox viewFlex1">
                     <ViewBoxHeader title={this.mkLinkAggrTitle()} />
-                    <GTable className="defaultTable"
-                        selectable={true}
-                        onSelect={this.selectLag}>
-                        <thead>
-                            <th>{t('lagName')}</th>
-                            <th>{t('mode')}</th>
-                            <th>{t('bondStatus')}</th>
-                            <th>{t('bondStatusReason')}</th>
-                            <th>{t('bondSpeed')}</th>
-                        </thead>
-                        <tbody>
-                            {lags}
-                        </tbody>
-                    </GTable>
+                    <div className="viewBoxContent">
+                        <GTable className="defaultTable"
+                            selectable={true}
+                            onSelect={this.selectLag}>
+                            <thead>
+                                <th>{t('lagName')}</th>
+                                <th>{t('mode')}</th>
+                                <th>{t('bondStatus')}</th>
+                                <th>{t('bondStatusReason')}</th>
+                                <th>{t('bondSpeed')}</th>
+                            </thead>
+                            <tbody>
+                                {lags}
+                            </tbody>
+                        </GTable>
+                    </div>
                 </div>
 
                 <div className="viewBox viewFlex1">
                     <ViewBoxHeader title={this.mkInfsTitle()} />
-                    <GTable className="defaultTable">
-                        <thead>
-                            <th>{t('infName')}</th>
-                            <th>{t('mac')}</th>
-                            <th>{t('macInUse')}</th>
-                            <th>{t('lacpCurrent')}</th>
-                            <th>{t('actorKey')}</th>
-                            <th>{t('actorState')}</th>
-                            <th>{t('actorPortId')}</th>
-                            <th>{t('actorSysId')}</th>
-                            <th>{t('partnerKey')}</th>
-                            <th>{t('partnerState')}</th>
-                            <th>{t('partnerPortId')}</th>
-                            <th>{t('partnerSysId')}</th>
-                        </thead>
-                        <tbody>
-                            {infs}
-                        </tbody>
-                    </GTable>
+                    <div className="viewBoxContent">
+                        <GTable className="defaultTable">
+                            <thead>
+                                <th>{t('infName')}</th>
+                                <th>{t('mac')}</th>
+                                <th>{t('macInUse')}</th>
+                                <th>{t('lacpCurrent')}</th>
+                                <th>{t('actorKey')}</th>
+                                <th>{t('actorState')}</th>
+                                <th>{t('actorPortId')}</th>
+                                <th>{t('actorSysId')}</th>
+                                <th>{t('partnerKey')}</th>
+                                <th>{t('partnerState')}</th>
+                                <th>{t('partnerPortId')}</th>
+                                <th>{t('partnerSysId')}</th>
+                            </thead>
+                            <tbody>
+                                {infs}
+                            </tbody>
+                        </GTable>
+                    </div>
                 </div>
-
             </div>
         );
     }

@@ -51,6 +51,7 @@
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+    overflow: auto;
 }
 
 // Style the contents to fill the flex container
@@ -62,7 +63,7 @@
 // Style the content portion of a viewBox. This is the area right below the
 // header (if there is one).
 .viewBoxContent {
-    overflow: scroll;
+    overflow: auto;
 
     // center contents in viewBoxContent
     &.center {
