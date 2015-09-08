@@ -31,7 +31,7 @@ module.exports = React.createClass({
         }
 
         return (
-            <div className="viewBoxHeader">
+            <div className="viewBoxHeader headerFont">
                 {this.props.title}
                 <span className="flexIcons">{icons}</span>
             </div>

@@ -42,7 +42,7 @@ var NavGroup = React.createClass({
             hd = heading ? <div className="heading">{heading}</div> : null;
 
         return (
-            <div className="group">
+            <div className="group headerFont">
                 {hd}
                 <ul>
                     { this.props.routes.map(function(route) {

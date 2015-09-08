@@ -90,6 +90,10 @@ $tableFontSizeLarge: 1.75rem;
   src: url(../font/SourceSansPro-Italic.ttf) format('truetype');
 }
 
+.headerFont {
+  font-family:'Exo', Arial, sans-serif;
+}
+
 // Notes on media CSS...
 //
 // If [device width] is greater than or equal to min-width than do...
