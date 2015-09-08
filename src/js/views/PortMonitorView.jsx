@@ -10,6 +10,7 @@ var React = require('react'),
     PropTypes = React.PropTypes,
     Link = Router.Link,
     Cnvs = require('conversions'),
+    DateParse = require('dateParse'),
     ActionIcon = require('ActionIcon'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GMenu = require('grommet/components/Menu'),
@@ -342,14 +343,18 @@ module.exports = React.createClass({
         // Generate line graph data and keep it updating
         // as the state data updates
         graphData = {
-            'labels': st.data.labels,
+            'labels': st.data.labels.map(function(ts) {
+                return DateParse.convert(ts);
+            }),
             'datasets': dataSets
         };
 
         // Generate bar graph data and keep it updating
         // as the state data updates
         barGraphData = st.data.activeDetails ? {
-            'labels': st.data.labels,
+            'labels': st.data.labels.map(function(ts) {
+                return DateParse.convert(ts);
+            }),
             'datasets': [
                 st.data.dataSets[st.data.activeDetails].graphData
             ]

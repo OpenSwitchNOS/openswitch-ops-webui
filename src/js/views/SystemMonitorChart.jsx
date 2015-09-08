@@ -11,6 +11,7 @@ var React = require('react'),
     Router = require('react-router'),
     SystemMonitorStore = require('SystemMonitorStore'),
     SystemStatsActions = require('SystemStatsActions'),
+    DateParse = require('dateParse'),
     ChartUtils = require('chartUtils');
 
 var AUTO_REFRESH_MILLIS = 5000,
@@ -88,9 +89,7 @@ module.exports = React.createClass({
 
         return {
             labels: this.state.dates.map(function(ts) {
-                return new Date(ts).toLocaleTimeString(I18n.locale, {
-                    hour12: false
-                });
+                return DateParse.convert(ts);
             }),
             datasets: datasets
         };

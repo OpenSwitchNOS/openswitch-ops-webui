@@ -8,7 +8,6 @@ var Reflux = require('reflux'),
     _ = require('lodash'),
     Calcs = require('calculations'),
     Cnvs = require('conversions'),
-    I18n = require('i18n'),
     MAX_POINTS_ON_GRAPH = 25,
     INTERVAL = 5000;
 
@@ -229,12 +228,7 @@ module.exports = Reflux.createStore({
                 st.pointCount = st.pointCount + 1;
             }
 
-            this.state.labels.push(
-                new Date(Date.parse(res.headers.date)).toLocaleTimeString(
-                    I18n.locale, { hour12: false }
-                )
-            );
-
+            this.state.labels.push(Date.parse(res.headers.date));
             this.trigger(this.state);
         }
     },
