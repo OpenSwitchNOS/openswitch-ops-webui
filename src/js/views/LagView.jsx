@@ -101,8 +101,6 @@ module.exports = React.createClass({
             return (
                 <tr key={i.name}>
                     <td>{i.name}</td>
-                    <td>{i.mac}</td>
-                    <td>{i.macInUse}</td>
                     <td>{i.lacpCurrent}</td>
                     <td>{this.mkActorPartnerPropTable('actor', i)}</td>
                     <td>{this.mkActorPartnerPropTable('partner', i)}</td>
@@ -111,9 +109,9 @@ module.exports = React.createClass({
         }.bind(this));
 
         return (
-            <div id='lagView' className="viewFill viewCol">
+            <div id='lagView' className="viewCol">
 
-                <div className="viewBox viewFlex1">
+                <div className="viewBox">
                     <ViewBoxHeader title={this.mkLinkAggrTitle()} />
                     <div className="viewBoxContent">
                         <GTable className="defaultTable"
@@ -133,14 +131,12 @@ module.exports = React.createClass({
                     </div>
                 </div>
 
-                <div className="viewBox viewFlex1">
+                <div className="viewBox">
                     <ViewBoxHeader title={this.mkInfsTitle()} />
                     <div className="viewBoxContent">
                         <GTable className="defaultTable">
                             <thead>
                                 <th>{t('infName')}</th>
-                                <th>{t('mac')}</th>
-                                <th>{t('macInUse')}</th>
                                 <th>{t('lacpCurrent')}</th>
                                 <th>{t('actor')}</th>
                                 <th>{t('partner')}</th>
@@ -151,6 +147,8 @@ module.exports = React.createClass({
                         </GTable>
                     </div>
                 </div>
+
+
             </div>
         );
     }
