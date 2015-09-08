@@ -40,7 +40,7 @@ tbody, thead {
 
     // style even rows - alternate table
     // row colors
-    tr:nth-child(even) {
+    > table > tbody > tr:nth-child(even) {
         background-color: #F2F2F2;
     }
 

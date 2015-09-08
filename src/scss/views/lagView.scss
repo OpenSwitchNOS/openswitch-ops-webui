@@ -1,0 +1,25 @@
+/*
+ * LAG view styles.
+ * @author Frank Wood
+ */
+
+
+#lagView {
+
+    .actorPartnerProps {
+
+        margin: 0px;
+
+        tr > td:first-child {
+            font-weight: 100;
+        }
+
+        td {
+            padding-top: 0px;
+            padding-right: 0px;
+            padding-left: 0px;
+            padding-bottom: 4px;
+        }
+    }
+
+}

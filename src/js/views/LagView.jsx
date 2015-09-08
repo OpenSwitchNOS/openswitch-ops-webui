@@ -56,6 +56,31 @@ module.exports = React.createClass({
         }
     },
 
+    mkActorPartnerPropTable: function(actorOrPartner, intf) {
+        return (
+            <table className="actorPartnerProps">
+                <tbody>
+                    <tr>
+                        <td>{t('key')}:</td>
+                        <td>{intf[actorOrPartner + 'Key']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('state')}:</td>
+                        <td>{intf[actorOrPartner + 'State']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('portId')}:</td>
+                        <td>{intf[actorOrPartner + 'PortId']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('sysId')}:</td>
+                        <td>{intf[actorOrPartner + 'SysId']}</td>
+                    </tr>
+                </tbody>
+            </table>
+        );
+    },
+
     render: function() {
         var lags,
             infs;
@@ -79,20 +104,14 @@ module.exports = React.createClass({
                     <td>{i.mac}</td>
                     <td>{i.macInUse}</td>
                     <td>{i.lacpCurrent}</td>
-                    <td>{i.actorKey}</td>
-                    <td>{i.actorState}</td>
-                    <td>{i.actorPortId}</td>
-                    <td>{i.actorSysId}</td>
-                    <td>{i.partnerKey}</td>
-                    <td>{i.partnerState}</td>
-                    <td>{i.partnerPortId}</td>
-                    <td>{i.partnerSysId}</td>
+                    <td>{this.mkActorPartnerPropTable('actor', i)}</td>
+                    <td>{this.mkActorPartnerPropTable('partner', i)}</td>
                 </tr>
             );
-        });
+        }.bind(this));
 
         return (
-            <div className="viewFill viewCol">
+            <div id='lagView' className="viewFill viewCol">
 
                 <div className="viewBox viewFlex1">
                     <ViewBoxHeader title={this.mkLinkAggrTitle()} />
@@ -123,14 +142,8 @@ module.exports = React.createClass({
                                 <th>{t('mac')}</th>
                                 <th>{t('macInUse')}</th>
                                 <th>{t('lacpCurrent')}</th>
-                                <th>{t('actorKey')}</th>
-                                <th>{t('actorState')}</th>
-                                <th>{t('actorPortId')}</th>
-                                <th>{t('actorSysId')}</th>
-                                <th>{t('partnerKey')}</th>
-                                <th>{t('partnerState')}</th>
-                                <th>{t('partnerPortId')}</th>
-                                <th>{t('partnerSysId')}</th>
+                                <th>{t('actor')}</th>
+                                <th>{t('partner')}</th>
                             </thead>
                             <tbody>
                                 {infs}
