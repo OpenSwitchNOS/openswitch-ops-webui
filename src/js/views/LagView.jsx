@@ -21,6 +21,10 @@ module.exports = React.createClass({
 
     mixins: [ Reflux.connect(LagStore) ],
 
+    getInitialState: function() {
+        return { sel: null };
+    },
+
     componentDidMount: function() {
         LagActions.loadLags();
     },
@@ -52,7 +56,14 @@ module.exports = React.createClass({
     selectLag: function(selection) {
         var sel = this.state.lags[selection];
         if (sel) {
+            this.setState({
+                sel: selection
+            });
             LagActions.loadInterfaces(sel);
+        } else {
+            this.setState({
+                sel: null
+            });
         }
     },
 
@@ -83,7 +94,8 @@ module.exports = React.createClass({
 
     render: function() {
         var lags,
-            infs;
+            infs,
+            initSel = this.state.sel !== null ? [this.state.sel] : null;
 
         lags = this.state.lags.map(function(i) {
             return (
@@ -116,6 +128,7 @@ module.exports = React.createClass({
                     <div className="viewBoxContent">
                         <GTable className="defaultTable"
                             selectable={true}
+                            selection={initSel}
                             onSelect={this.selectLag}>
                             <thead>
                                 <th>{t('lagName')}</th>
