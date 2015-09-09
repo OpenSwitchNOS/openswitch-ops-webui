@@ -155,7 +155,16 @@ module.exports = {
                 key: 'Key',
                 state: 'State',
                 portId: 'Port ID',
-                sysId: 'Sys ID'
+                sysId: 'Sys ID',
+                actorPartnerTooltip:
+                    'Activ: LACP Activity (1-active, 0-passive)' +
+                    '\n\nTmOut: LACP Timeout (1-long, 0-short)' +
+                    '\n\nAggr: Aggregation (1-individual, 0-aggregatable)' +
+                    '\n\nSync: Synchronization (1-yes, 0-no)' +
+                    '\n\nCol: Collecting (1-enabled, 0-disabled)' +
+                    '\n\nDist: Distributing (1-enabled, 0-disabled)' +
+                    '\n\nDef: Defaulted Partner Info (1-true, 0-false)' +
+                    '\n\nExp: Expired (1-true, 0-false)'
             },
             mgmtIntf: {
                 name: 'Management Interface',

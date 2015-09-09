@@ -114,8 +114,12 @@ module.exports = React.createClass({
                 <tr key={i.name}>
                     <td>{i.name}</td>
                     <td>{i.lacpCurrent}</td>
-                    <td>{this.mkActorPartnerPropTable('actor', i)}</td>
-                    <td>{this.mkActorPartnerPropTable('partner', i)}</td>
+                    <td title={t('actorPartnerTooltip')}>
+                        {this.mkActorPartnerPropTable('actor', i)}
+                    </td>
+                    <td title={t('actorPartnerTooltip')}>
+                        {this.mkActorPartnerPropTable('partner', i)}
+                    </td>
                 </tr>
             );
         }.bind(this));
