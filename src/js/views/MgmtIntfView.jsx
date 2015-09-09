@@ -67,7 +67,7 @@ module.exports = React.createClass({
                 <div className="viewBox">
                     <ViewBoxHeader title={t('mgmtIntf')} />
                     <PropTable
-                        className="viewBoxContent"
+                        className="viewBoxContent margin"
                         data={this.mkPropData()} />
                 </div>
 

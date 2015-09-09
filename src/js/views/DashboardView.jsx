@@ -185,9 +185,9 @@ module.exports = React.createClass({
             pwrs = si.powerSupplies,
             fanPropVal,
             status,
-            fanCount, fanLabel,
-            pwrPropKey1, pwrPropVal1,
-            pwrPropKey2, pwrPropVal2;
+            fanCount,
+            pwrPropVal1,
+            pwrPropVal2;
 
         if (fans && fans.length > 0) {
             fanCount = fans.length;
@@ -198,26 +198,28 @@ module.exports = React.createClass({
                     break;
                 }
             }
-            fanLabel = t('fanStatus') + ' (' + fanCount + ')';
-            fanPropVal = <StatusText value={status} text={t(status)} />;
+            fanPropVal = (
+                <StatusText
+                    value={status}
+                    text={t(status) + ' (' + fanCount + ')'}
+                />
+            );
         }
+
         // TODO: add variable number of supplies read from DB
         if (pwrs && pwrs.length === 2) {
-            pwrPropKey1 = t('powerSupplyLabel') + ' 1'; // + pwrs[0].name;
             pwrPropVal1 = (
                 <StatusText value={pwrs[0].status} text={t(pwrs[0].text)} />
             );
-            pwrPropKey2 = t('powerSupplyLabel') + ' 2'; // + pwrs[1].name;
             pwrPropVal2 = (
                 <StatusText value={pwrs[1].status} text={t(pwrs[1].text)} />
             );
         }
 
-        // FIXME: dup key problem?
         return [
-            [ fanLabel, fanPropVal ],
-            [ pwrPropKey1, pwrPropVal1 ],
-            [ pwrPropKey2, pwrPropVal2 ]
+            [ t('fanStatus'), fanPropVal ],
+            [ t('powerSupplyLabel') + ' 1', pwrPropVal1 ],
+            [ t('powerSupplyLabel') + ' 2', pwrPropVal2 ]
         ];
     },
 
@@ -339,15 +341,15 @@ module.exports = React.createClass({
         return (
             <div id="dashboardView" className="viewRow">
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('systemInfo')} />
                         <PropTable
                             className="viewBoxContent margin"
                             data={this.mkSysInfoPropData()} />
                     </div>
 
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('systemStatus')} />
                         <PropTable
                             className="viewBoxContent margin"
@@ -355,28 +357,34 @@ module.exports = React.createClass({
                     </div>
                 </div>
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('cpu')}
                             toolbar={this.mkSysTb('cpu')} />
-                        {this.mkMeter(si.cpuVal, si.cpuMax, '')}
+                            <div className="viewBoxContent margin center">
+                                {this.mkMeter(si.cpuVal, si.cpuMax, '')}
+                            </div>
                     </div>
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader title={t('storage')} />
-                        {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
+                        <div className="viewBoxContent margin center">
+                            {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="viewCol">
-                    <div className="viewBox box1">
+                <div className="viewCol fillRow">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('memory')}
                             toolbar={this.mkSysTb('memory')} />
-                        {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                            <div className="viewBoxContent margin center">
+                                {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                            </div>
                     </div>
 
-                    <div className="viewBox box1">
+                    <div className="viewBox box1 fillColumn">
                         <ViewBoxHeader
                             title={t('temp')}
                             toolbar={this.mkSysTb('temperature')} />
@@ -384,7 +392,7 @@ module.exports = React.createClass({
                     </div>
                 </div>
 
-                <div className="viewBox">
+                <div className="viewBox fillColumn">
                     <ViewBoxHeader
                         title={t('portTopUtil')}
                         toolbar={this.mkUtlTb()} />

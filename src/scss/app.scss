@@ -26,6 +26,9 @@ html, body, {
     ::-webkit-scrollbar {
         display: none;
     }
+
+    //remove scrollbars (IE)
+    -ms-overflow-style: none;
 }
 
 /*
@@ -35,12 +38,21 @@ html, body, {
  */
 
 #mast {
+    //small screen
+    @media #{$smallScreen} {
+        height: $mastHeightSmallScreen;
+    }
+
+    //default - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        height: $mastHeight;
+    }
+
     position: fixed;
     top: 0px;
     left: 0px;
     right: 0px;
 
-    height: $mastHeight;
     line-height: $mastHeight;
 
     z-index: 100;
@@ -59,13 +71,35 @@ html, body, {
     justify-content: space-between;
 
     img {
+
+        //small screen
+        @media #{$smallScreen} {
+            height: $mastHeightSmallScreen;
+        }
+
+        //default - medium + large screens
+        @media #{$mediumScreen, $largeScreen} {
+            height: $mastHeight;
+        }
+
         box-sizing: border-box;
-        height: $mastHeight;
         padding: 4px;
     }
 
     i {
         box-sizing: border-box;
+    }
+
+    #mastDeviceInfo, #mastUserInfo {
+        //small screen
+        @media #{$smallScreen} {
+            display: none;
+        }
+
+        //default - medium + large screens
+        @media #{$mediumScreen, $largeScreen} {
+            display: visible;
+        }
     }
 }
 
@@ -79,9 +113,20 @@ html, body, {
  */
 
 #navPane {
+
+    //small screen
+    @media #{$smallScreen} {
+        width: $navPaneWidthSmallScreen;
+        top: $mastHeightSmallScreen;
+    }
+
+    //defualt - medium and large screens
+    @media #{$mediumScreen, $largeScreen} {
+        width: $navPaneWidth;
+        top: $mastHeight;
+    }
+
     position: absolute;
-    top: $mastHeight;
-    width: $navPaneWidth;
     bottom: 0px;
 
     z-index: 10;
@@ -100,6 +145,11 @@ html, body, {
         margin: 20px;
 
         .heading {
+            //small screen
+            @media #{$smallScreen} {
+                font-size: $navHeadingFontSizeSmallScreen;
+            }
+
             font-weight: bold;
             color: $navGroupHeadingColor;
             padding: 5px;
@@ -117,8 +167,19 @@ html, body, {
         }
 
         a {
+            //small screen
+            @media #{$smallScreen} {
+                font-size: $navItemFontSizeSmallScreen;
+            }
+
+            //default - medium + large screens
+            @media #{$mediumScreen, $largeScreen} {
+                font-size: $navItemFontSize;
+            }
+
             color: $navItemNormalColor;
             text-decoration: none;
+            line-height: $navItemLineHeight;
             &:hover {
                 color: $navItemHoverColor;
             }
@@ -140,6 +201,7 @@ html, body, {
 .navPaneTrans-enter {
     left: -$navPaneWidth;
     transition: 0.3s;
+    -webkit-transition: 0.3s;
 }
 
 .navPaneTrans-enter-active {
@@ -148,7 +210,8 @@ html, body, {
 
 .navPaneTrans-leave {
     left: 0px;
-    transition: 0.3s
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
 }
 
 .navPaneTrans-leave-active {
@@ -163,8 +226,17 @@ html, body, {
  */
 
 #viewPane {
+    //small screen
+    @media #{$smallScreen} {
+        top: $mastHeightSmallScreen;
+    }
+
+    //defualt - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        top: $mastHeight;
+    }
+
     position: absolute;
-    top: $mastHeight;
     left: 0;
     bottom: 0px;
     right: 0px;
@@ -209,5 +281,19 @@ html, body, {
         height: 1px;
         background-color: $appNotificationDivderBackgroundColor;
     }
+}
 
+/*
+ * disabling general grommet styles affecting css
+ */
+.button {
+    border-radius: 4px;
+}
+
+.menu {
+    font-size: inherit;
+}
+
+.table th {
+    font-size: inherit;
 }

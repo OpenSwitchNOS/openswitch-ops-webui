@@ -21,6 +21,10 @@ module.exports = React.createClass({
 
     mixins: [ Reflux.connect(LagStore) ],
 
+    getInitialState: function() {
+        return { sel: null };
+    },
+
     componentDidMount: function() {
         LagActions.loadLags();
     },
@@ -52,13 +56,46 @@ module.exports = React.createClass({
     selectLag: function(selection) {
         var sel = this.state.lags[selection];
         if (sel) {
+            this.setState({
+                sel: selection
+            });
             LagActions.loadInterfaces(sel);
+        } else {
+            this.setState({
+                sel: null
+            });
         }
+    },
+
+    mkActorPartnerPropTable: function(actorOrPartner, intf) {
+        return (
+            <table className="actorPartnerProps">
+                <tbody>
+                    <tr>
+                        <td>{t('key')}:</td>
+                        <td>{intf[actorOrPartner + 'Key']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('state')}:</td>
+                        <td>{intf[actorOrPartner + 'State']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('portId')}:</td>
+                        <td>{intf[actorOrPartner + 'PortId']}</td>
+                    </tr>
+                    <tr>
+                        <td>{t('sysId')}:</td>
+                        <td>{intf[actorOrPartner + 'SysId']}</td>
+                    </tr>
+                </tbody>
+            </table>
+        );
     },
 
     render: function() {
         var lags,
-            infs;
+            infs,
+            initSel = this.state.sel !== null ? [this.state.sel] : null;
 
         lags = this.state.lags.map(function(i) {
             return (
@@ -76,64 +113,58 @@ module.exports = React.createClass({
             return (
                 <tr key={i.name}>
                     <td>{i.name}</td>
-                    <td>{i.mac}</td>
-                    <td>{i.macInUse}</td>
                     <td>{i.lacpCurrent}</td>
-                    <td>{i.actorKey}</td>
-                    <td>{i.actorState}</td>
-                    <td>{i.actorPortId}</td>
-                    <td>{i.actorSysId}</td>
-                    <td>{i.partnerKey}</td>
-                    <td>{i.partnerState}</td>
-                    <td>{i.partnerPortId}</td>
-                    <td>{i.partnerSysId}</td>
+                    <td title={t('actorPartnerTooltip')}>
+                        {this.mkActorPartnerPropTable('actor', i)}
+                    </td>
+                    <td title={t('actorPartnerTooltip')}>
+                        {this.mkActorPartnerPropTable('partner', i)}
+                    </td>
                 </tr>
             );
-        });
+        }.bind(this));
 
         return (
-            <div className="viewFill viewCol">
+            <div id='lagView' className="viewCol">
 
-                <div className="viewBox viewFlex1">
+                <div className="viewBox">
                     <ViewBoxHeader title={this.mkLinkAggrTitle()} />
-                    <GTable className="defaultTable"
-                        selectable={true}
-                        onSelect={this.selectLag}>
-                        <thead>
-                            <th>{t('lagName')}</th>
-                            <th>{t('mode')}</th>
-                            <th>{t('bondStatus')}</th>
-                            <th>{t('bondStatusReason')}</th>
-                            <th>{t('bondSpeed')}</th>
-                        </thead>
-                        <tbody>
-                            {lags}
-                        </tbody>
-                    </GTable>
+                    <div className="viewBoxContent">
+                        <GTable className="defaultTable"
+                            selectable={true}
+                            selection={initSel}
+                            onSelect={this.selectLag}>
+                            <thead>
+                                <th>{t('lagName')}</th>
+                                <th>{t('mode')}</th>
+                                <th>{t('bondStatus')}</th>
+                                <th>{t('bondStatusReason')}</th>
+                                <th>{t('bondSpeed')}</th>
+                            </thead>
+                            <tbody>
+                                {lags}
+                            </tbody>
+                        </GTable>
+                    </div>
                 </div>
 
-                <div className="viewBox viewFlex1">
+                <div className="viewBox">
                     <ViewBoxHeader title={this.mkInfsTitle()} />
-                    <GTable className="defaultTable">
-                        <thead>
-                            <th>{t('infName')}</th>
-                            <th>{t('mac')}</th>
-                            <th>{t('macInUse')}</th>
-                            <th>{t('lacpCurrent')}</th>
-                            <th>{t('actorKey')}</th>
-                            <th>{t('actorState')}</th>
-                            <th>{t('actorPortId')}</th>
-                            <th>{t('actorSysId')}</th>
-                            <th>{t('partnerKey')}</th>
-                            <th>{t('partnerState')}</th>
-                            <th>{t('partnerPortId')}</th>
-                            <th>{t('partnerSysId')}</th>
-                        </thead>
-                        <tbody>
-                            {infs}
-                        </tbody>
-                    </GTable>
+                    <div className="viewBoxContent">
+                        <GTable className="defaultTable">
+                            <thead>
+                                <th>{t('infName')}</th>
+                                <th>{t('lacpCurrent')}</th>
+                                <th>{t('actor')}</th>
+                                <th>{t('partner')}</th>
+                            </thead>
+                            <tbody>
+                                {infs}
+                            </tbody>
+                        </GTable>
+                    </div>
                 </div>
+
 
             </div>
         );

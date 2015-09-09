@@ -5,9 +5,21 @@
 
 $portCornerRadius: 3px;
 
+// Styles main box graphic container
+// dark gray color + general container props
 .boxContainer {
+
+    //small screen
+    @media #{$smallScreen} {
+        height: 350px;
+    }
+
+    //default - medim + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        height: 202px;
+    }
+
     width: 100%;
-    height: 190px;
     border-radius: 5px;
     background-color: #303030;
     padding-right: 15px;
@@ -21,15 +33,29 @@ $portCornerRadius: 3px;
     }
 }
 
+// innter table used for containing the
+// port elements
 .innerBoxTable {
     width: 100%;
     margin-top: 5px;
 }
 
+// Style the port table cell element
 .portBoxContainer {
-    padding: 3px;
+    cursor: pointer;
+
+    //small screen
+    @media #{$smallScreen} {
+        padding: 6px;
+    }
+
+    //defulat - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        padding: 3px;
+    }
 }
 
+// Style background + radius for top ports
 .boxPortBackgroundTop {
     background-color: gray;
 
@@ -42,6 +68,7 @@ $portCornerRadius: 3px;
     }
 }
 
+// Style background + radius for bottom ports
 .boxPortBackgroundBottom {
     background-color: gray;
 
@@ -54,137 +81,265 @@ $portCornerRadius: 3px;
     }
 }
 
+// Style background for middle components
 .boxPortBackgroundMiddle {
     background-color: gray;
 }
 
+// Style top and bottom port elements
 .boxPortTop, .boxPortBottom {
-    background-color: black; 
 
-    &.SFP_PLUS {
-        height: 30px;
-        width: 55px;
+    background-color: black;
+
+    // port styling for small screens
+    @media #{$smallScreen} {
+        height: 65px;
+
+        &.SFP_PLUS {
+            width: 125px;
+        }
+
+        &.QSFP_PLUS {
+            width: 140px;
+        }
     }
 
-    &.QSFP_PLUS {
+    // default port styling - medium and large screens
+    @media #{$mediumScreen, $largeScreen} {
         height: 30px;
-        width: 70px;
+
+        &.SFP_PLUS {
+            width: 55px;
+        }
+
+        &.QSFP_PLUS {
+            width: 70px;
+        }
     }
 }
 
+// Style rounder corners for top ports
 .boxPortTop {
     border-top-left-radius: $portCornerRadius;
     border-top-right-radius: $portCornerRadius;
 }
 
+// Style rounder corners for bottom ports
 .boxPortBottom {
     border-bottom-left-radius: $portCornerRadius;
     border-bottom-right-radius: $portCornerRadius;
 }
 
-.boxMiddle {
-    position: relative;
-    height: 30px;
-}
-
-.boxLabels {
-    position: relative;
-    height: 25px;
-}
-
+// Style the black boxes located at the top
+// and bottom of the middle component section
 .boxBlack {
     position: absolute;
     left: 0;
-    margin-left: 15px;
-    width: 30px;
-    height: 4px;
     background-color: black;
     border-radius: 2.0px;
+
+    //small screen
+    @media #{$smallScreen} {
+        width: 45px;
+        height: 8px;
+        margin-left: 40px;
+    }
+
+    //default - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        width: 30px;
+        height: 4px;
+        margin-left: 15px;
+    }
 }
 
+//position top black rectange in middle component
 .boxBlackTop {
     top: 0;
 }
 
+//position bottom black rectange in middle component
 .boxBlackBottom {
     bottom: 0;
 }
 
+// style the triangle arrows located in
+// the middle components
 .arrowBlack {
     width: 0;
     height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
     position: absolute;
     top: 0;
     left: 0;
-    margin-top: 10px;
+
+    //small screen
+    @media #{$smallScreen} {
+        margin-top: 20px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+    }
+
+    // default - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        margin-top: 10px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+    }
 }
 
+// general middle component styling
 .boxMiddle {
+    position: relative;
 
+    //small screen
+    @media #{$smallScreen} {
+        height: 55px;
+    }
+
+    //default - medium + largre screens
+    @media #{$mediumScreen, $largeScreen} {
+        height: 30px;
+    }
+
+    // Stlying up and down triangle arrows
     .boxArrowUp {
-        border-bottom: 10px solid black;
+        //small screen
+        @media #{$smallScreen} {
+            border-bottom: 15px solid black;
+        }
+
+        //default - medium + largre screens
+        @media #{$mediumScreen, $largeScreen} {
+            border-bottom: 10px solid black;
+        }
     }
 
     .boxArrowDown {
-        border-top: 10px solid black;
+        //small screen
+        @media #{$smallScreen} {
+            border-top: 15px solid black;
+        }
+
+        //default - medium + largre screens
+        @media #{$mediumScreen, $largeScreen} {
+            border-top: 10px solid black;
+        }
     }
 
     &.SFP_PLUS {
-        .boxArrowUp {
-            margin-left: 17px;
+
+        //small screen
+        @media #{$smallScreen} {
+            .boxArrowUp {
+                margin-left: 42px;
+            }
+
+            .boxArrowDown {
+                margin-left: 65px;
+            }
         }
 
-        .boxArrowDown {
-            margin-left: 32px;
+        //default - medium + largre screens
+        @media #{$mediumScreen, $largeScreen} {
+            .boxArrowUp {
+                margin-left: 17px;
+            }
+
+            .boxArrowDown {
+                margin-left: 32px;
+            }
         }
     }
 
     &.QSFP_PLUS {
-        .boxArrowUp {
-            margin-left: 10px;
-        }
-
-        .boxArrowDown {
-            margin-left: 55px;
-        }
 
         .circleBlack {
-
-            &.left {
-                margin-left: 25px;
-            }
-
-            &.right {
-                margin-left: 40px;
-            }
-
             position: absolute;
             top: 0;
             left: 0;
-            margin-top: 10px;
             background-color: black;
             border-radius: 50%;
-            width: 8px;
-            height: 8px;
         }
 
+        //small screen
+        @media #{$smallScreen} {
+            .boxArrowUp {
+                margin-left: 25px;
+            }
+
+            .boxArrowDown {
+                margin-left: 100px;
+            }
+
+            .circleBlack {
+                &.left {
+                    margin-left: 55px;
+                }
+
+                &.right {
+                    margin-left: 80px;
+                }
+
+                margin-top: 25px;
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        //default - medium + largre screens
+        @media #{$mediumScreen, $largeScreen} {
+            .boxArrowUp {
+                margin-left: 10px;
+            }
+
+            .boxArrowDown {
+                margin-left: 55px;
+            }
+
+            .circleBlack {
+                &.left {
+                    margin-left: 25px;
+                }
+
+                &.right {
+                    margin-left: 40px;
+                }
+
+                margin-top: 10px;
+                width: 8px;
+                height: 8px;
+            }
+        }
     }
 }
 
+// Style the label table cells
 .boxPortLabels {
     width: 100%;
 }
 
+// Style th number port labels
 .boxNumLabels {
     position: absolute;
     color: #D4D4D4;
-    font-size: 12px;
-    top: 5px;
+    top: 5;
+
+    //small screen
+    @media #{$smallScreen} {
+        font-size: 25px;
+    }
+
+    //default - medium and large screens
+    @media #{$mediumScreen, $largeScreen} {
+        font-size: 12px;
+    }
 }
 
+// Style table cells containing labels
 .boxLabels {
+    position: relative;
+    height: 25px;
+
     &.SFP_PLUS {
         .boxTopLabels {
             margin-left: 9px;
@@ -196,11 +351,28 @@ $portCornerRadius: 3px;
         }
 
         .boxArrowUpLabel {
-            margin-left: 24px;
+            //small screen
+            @media #{$smallScreen} {
+                margin-left: 45px;
+            }
+
+            //default - medium + large screen
+            @media #{$mediumScreen, $largeScreen} {
+                margin-left: 24px;
+            }
         }
 
         .boxArrowDownLabel {
-            margin-left: 32px;
+            //small screen
+            @media #{$smallScreen} {
+                margin-left: 75px;
+            }
+
+            //default - medium + large screen
+            @media #{$mediumScreen, $largeScreen} {
+                margin-left: 32px;
+            }
+
         }
     }
 
@@ -215,41 +387,94 @@ $portCornerRadius: 3px;
         }
 
         .boxArrowUpLabel {
-            margin-left: 30px;
+            //small screen
+            @media #{$smallScreen} {
+                margin-left: 55px;
+            }
+
+            //default - medium + large screen
+            @media #{$mediumScreen, $largeScreen} {
+                margin-left: 30px;
+            }
         }
 
         .boxArrowDownLabel {
-            margin-left: 42px;
+            //small screen
+            @media #{$smallScreen} {
+                margin-left: 85px;
+            }
+
+            //default - medium + large screen
+            @media #{$mediumScreen, $largeScreen} {
+                margin-left: 42px;
+            }
         }
     }
 }
+
+// Style the indicator arrow next to the port numbers
 .arrowWhite {
     width: 0;
     height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
     position: absolute;
     top: 0;
     left: 0;
-    margin-top: 10px;
+    margin-top: 5px;
+
+    //small screen
+    @media #{$smallScreen} {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+    }
+
+    //default - medium + large screen
+    @media #{$mediumScreen, $largeScreen} {
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+    }
 }
 
+// Style for specifically the top arrow
 .boxArrowUpLabel {
-    border-bottom: 8px solid white;
-    margin-left: 24px;
+
+    //small screen
+    @media #{$smallScreen} {
+        border-bottom: 12px solid white;
+        margin-left: 40px;
+    }
+
+    //default - medium + large screen
+    @media #{$mediumScreen, $largeScreen} {
+        border-bottom: 7px solid white;
+        margin-left: 24px;
+    }
 }
 
+
+// Style for specifically the down arrow
 .boxArrowDownLabel {
-    border-top: 8px solid white;
-    margin-left: 32px;
+
+    //small screen
+    @media #{$smallScreen} {
+        border-top: 12px solid white;
+        margin-left: 65px;
+    }
+
+    //default - medium + large screen
+    @media #{$mediumScreen, $largeScreen} {
+        border-top: 8px solid white;
+        margin-left: 32px;
+    }
 }
 
+// Style the container for the status indicators
 .portBadgeContainer {
     margin-top: 0px !important;
     border-collapse: separate;
     border-spacing: 3px;
 }
 
+// Style the generic status badge in the port
 .portBadge {
     height: 12px;
     width: 12px;
@@ -257,6 +482,7 @@ $portCornerRadius: 3px;
     padding-right: 2px;
 }
 
+// Style the specific status icon
 .portStatus {
     &.icon {
         .fa-check {
@@ -282,12 +508,24 @@ $portCornerRadius: 3px;
     }
 }
 
+// Style the general wrapper around te=he port table
 .portsWrapper {
     vertical-align: text-top;
 }
 
+// Style the extra port numbers not in the top or
+// bottom ports
 .portExtraNum {
     color: white;
-    font-size: 12px;
     text-align: center;
+
+    //small screens
+    @media #{$smallScreen} {
+        font-size: 25px;
+    }
+
+    //default - medium + large screens
+    @media #{$mediumScreen, $largeScreen} {
+        font-size: 12px;
+    }
 }

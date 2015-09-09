@@ -44,25 +44,33 @@
     background-color: $viewBoxBackgroundColor;
     border-radius: 5px;
     box-shadow: $viewBoxShadow;
-    margin-top: 24px;
-    margin-left: 24px;
-    margin-right: 24px;
+    margin-top: $viewPaneMargin;
+    margin-left: $viewPaneMargin;
+    margin-right: $viewPaneMargin;
     padding: 8px;
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+    overflow: auto;
+}
 
-    &.fillRow {
-        -flex-grow: 1;
-        -webkit-flex-grow: 1;
-    }
+// Style the contents to fill the flex container
+.fillRow, .fillColumn {
+    -flex-grow: 1;
+    -webkit-flex-grow: 1;
 }
 
 // Style the content portion of a viewBox. This is the area right below the
 // header (if there is one).
 .viewBoxContent {
-    overflow: scroll;
+    overflow: auto;
 
+    // center contents in viewBoxContent
+    &.center {
+        text-align: center;
+    }
+
+    // add margin to viewBox Contents
     &.margin {
         margin: 16px;
     }
@@ -72,31 +80,48 @@
 .viewFlex0 {
     flex: 0 0 auto;
     -webkit-flex: 0 0 auto;
+    -moz-flex: 0 0 auto;
 }
 .viewFlex1 {
     flex: 1 1 auto;
     -webkit-flex: 1 1 auto;
+    -moz-flex: 1 1 auto;
 }
 .viewFlex2 {
     flex: 2;
     -webkit-flex: 2;
+    -moz-flex: 2;
 }
 .viewFlex3 {
     flex: 3;
     -webkit-flex: 3;
+    -moz-flex: 3;
 }
 
 // Style the viewBoxHeader (used in the ViewBoxHeader component).
 .viewBoxHeader {
+
+    @media #{$smallScreen} {
+        font-size: $viewBoxHeaderFontSizeLarge;
+    }
+
+    @media #{$mediumScreen} {
+        font-size: $viewBoxHeaderFontSize;
+    }
+
+    @media #{$largeScreen} {
+        font-size: $viewBoxHeaderFontSize;
+    }
+
     box-sizing: border-box;
     border-bottom: $viewBoxHeaderBorderBottom;
     display: flex;
     display: -webkit-flex;
+    display: -ms-flexbox;
     justify-content: space-between;
     -webkit-justify-content: space-between;
     flex-wrap: wrap;
     -webkit-flex-wrap: wrap;
-    font-size: $viewBoxHeaderFontSize;
     line-height: $viewBoxHeaderFontSize;
     font-weight: $viewBoxHeaderFontWeight;
     margin-bottom: 10px;
@@ -105,7 +130,7 @@
     .flexIcons {
         flex-wrap: wrap;
         -webkit-flex-wrap: wrap;
-        display: -webkit-box;
+        display: flex;
         display: -ms-flexbox;
         display: -webkit-flex;
     }

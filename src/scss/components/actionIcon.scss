@@ -10,7 +10,8 @@
 
 // Style the font-awesome icons like grommet icons.
 .actionIcon.fa {
-    width: 48px;
+    padding-left: 10px;
+    padding-right: 10px;
     text-align: center;
     color: $iconNormalColor;
     cursor: pointer;
@@ -26,7 +27,7 @@
 
     // Style for smaller version of action icons
     &.smallIcon {
-        font-size: 16px;
+        font-size: 0.8em;
     }
 }
 

@@ -19,6 +19,7 @@ module.exports = {
         // Navigation groups.
         general: 'General',
         ports: 'Ports',
+        interfaces: 'Interfaces',
         vlans: 'VLANs',
         routing: 'Routing',
         partNum: 'Part #',
@@ -41,7 +42,7 @@ module.exports = {
             dashboard: {
                 name: 'Overview',
                 systemInfo: 'Information',
-                systemStatus: 'Status',
+                systemStatus: 'Other Status',
                 productName: 'Product',
                 baseMac: 'Base MAC',
                 version: 'Version',
@@ -65,8 +66,7 @@ module.exports = {
                 storageUnits: 'GB',
                 temp: 'Temperatures',
                 tempUnits: 'C',
-                portTopUtil: 'Top Port Utilization',
-                vlanTopUtil: 'Top VLAN Utilization',
+                portTopUtil: 'Top Interface Utilization',
                 port: 'Port',
                 vlan: 'VLAN',
                 tx: 'Tx',
@@ -86,7 +86,13 @@ module.exports = {
                 name: 'Monitor',
                 portUtil: 'Port Utilization - Port ',
                 noPorts: 'There are no active ports on this device. ' +
-                    'Please enabled a port to view utilization'
+                    'Please enable a port to view utilization',
+                details: {
+                    avg: 'Average',
+                    bytes: 'Total Bytes',
+                    low: 'Lowest Utilization',
+                    high: 'Highest Utilization'
+                }
             },
             portMgmt: {
                 name: 'Management',
@@ -133,27 +139,32 @@ module.exports = {
             lag: {
                 name: 'LAG',
                 linkAggrGroups: 'Link Aggregate Groups',
-                sysId: 'System ID',
-                sysPri: 'Priority',
                 lagName: 'Name',
                 mode: 'Mode',
                 bondStatus: 'Bond Status',
                 bondStatusReason: 'Bond Status Reason',
                 bondSpeed: 'Bond Speed',
-                actorKey: 'Actor Key',
-                actorState: 'Actor State',
-                actorPortId: 'Actor Port ID',
-                actorSysId: 'Actor System ID',
-                partnerKey: 'Partner Key',
-                partnerState: 'Partner State',
-                partnerPortId: 'Partner Port ID',
-                partnerSysId: 'Partner System ID',
+                actor: 'Actor',
+                partner: 'Partner',
                 infs: 'Interfaces',
                 infsNoneLoaded: '(no link aggregate group selected)',
                 infName: 'Name',
                 mac: 'MAC',
                 macInUse: 'MAC In Use',
                 lacpCurrent: 'LACP Current',
+                key: 'Key',
+                state: 'State',
+                portId: 'Port ID',
+                sysId: 'Sys ID',
+                actorPartnerTooltip:
+                    'Activ: LACP Activity (1-active, 0-passive)' +
+                    '\n\nTmOut: LACP Timeout (1-long, 0-short)' +
+                    '\n\nAggr: Aggregation (1-individual, 0-aggregatable)' +
+                    '\n\nSync: Synchronization (1-yes, 0-no)' +
+                    '\n\nCol: Collecting (1-enabled, 0-disabled)' +
+                    '\n\nDist: Distributing (1-enabled, 0-disabled)' +
+                    '\n\nDef: Defaulted Partner Info (1-true, 0-false)' +
+                    '\n\nExp: Expired (1-true, 0-false)'
             },
             mgmtIntf: {
                 name: 'Management Interface',

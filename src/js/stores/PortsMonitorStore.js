@@ -8,7 +8,6 @@ var Reflux = require('reflux'),
     _ = require('lodash'),
     Calcs = require('calculations'),
     Cnvs = require('conversions'),
-    I18n = require('i18n'),
     MAX_POINTS_ON_GRAPH = 25,
     INTERVAL = 5000;
 
@@ -177,21 +176,21 @@ module.exports = Reflux.createStore({
 
     },
 
-    onLoadPortStatsCompleted: function(portStats) {
-
-        var st = this.state;
+    onLoadPortStatsCompleted: function(res) {
+        var st = this.state,
+            portStats = res.body.status; // FIXME below some of these are arrays?
 
         // on the intial load - set the datasets variable
         // to have the correct data sets depending on
         // in the port is half or full duplex
         if (st.initialLoad) {
             st.initialLoad = 0;
-            this.loadGraphs(portStats.data.duplex);
+            this.loadGraphs(portStats.duplex);
         }
 
-        var linkSpeed = portStats.data.link_speed;
-        var stats = portStats.data.statistics;
-        var duplex = portStats.data.duplex;
+        var linkSpeed = portStats.link_speed;
+        var stats = res.body.statistics.statistics;
+        var duplex = portStats.duplex;
 
         //Update port counters and data points
         st.portStats.previous = _.cloneDeep(st.portStats.current);
@@ -229,38 +228,33 @@ module.exports = Reflux.createStore({
                 st.pointCount = st.pointCount + 1;
             }
 
-            this.state.labels.push(
-                new Date(portStats.date).toLocaleTimeString(I18n.locale, {
-                    hour12: false
-                })
-            );
-
+            this.state.labels.push(Date.parse(res.headers.date));
             this.trigger(this.state);
         }
     },
 
     //Callback for success of loading port list from server
-    onLoadPortsCompleted: function(ports) {
-
-        var st = this.state;
+    onLoadPortsCompleted: function(res) {
+        var st = this.state,
+            intfCfg, intfStatus, portNums = [];
 
         // loop through all interfaces and determine
         // if they are a port or not
-        var list = [];
-        for (var i in ports) {
-            if (ports.hasOwnProperty(i)) {
-                var port = ports[i].data;
-                //port type as empty string means it is a port
-                if (port.type === '') {
-                    if (port.link_state[0] === 'up' && port.link_speed[0] > 0) {
-                        list.push(Number(port.name));
-                    }
-                }
+        for (var i=0; i<res.length; i++) {
+            intfCfg = res[i].body.configuration;
+            intfStatus = res[i].body.status;
+            //port type as empty string means it is a port
+            if (intfCfg.type === '' &&
+                intfStatus.link_state[0] === 'up' &&
+                intfStatus.link_speed[0] > 0) {
+
+                portNums.push(Number(intfCfg.name));
             }
         }
 
         // sort port list by number
-        st.portList = list.sort(function(a, b) { return a-b; });
+        st.portList = portNums.sort(function(a, b) { return a-b; });
+
         if (!st.selectedPort) {
             st.selectedPort = st.portList[0];
         }

@@ -29,7 +29,15 @@ var NavGroup = React.createClass({
 
     mixins: [ Reflux.connect(RenderStore, 'render') ],
 
+    componentWillMount: function() {
+        this.updateNavPaneState();
+    },
+
     onClickLink: function() {
+        this.updateNavPaneState();
+    },
+
+    updateNavPaneState: function() {
         if (this.props.autoClose) {
             RenderActions.hideNavPane();
         }
@@ -42,7 +50,7 @@ var NavGroup = React.createClass({
             hd = heading ? <div className="heading">{heading}</div> : null;
 
         return (
-            <div className="group">
+            <div className="group headerFont">
                 {hd}
                 <ul>
                     { this.props.routes.map(function(route) {
@@ -85,7 +93,7 @@ module.exports = React.createClass({
                     ]}
                 />
                 <hr />
-                <NavGroup autoClose={ac} heading={t('ports')}
+                <NavGroup autoClose={ac} heading={t('interfaces')}
                     routes={[
                         { to: 'portMgmt' },
                         { to: 'portMonitor' },

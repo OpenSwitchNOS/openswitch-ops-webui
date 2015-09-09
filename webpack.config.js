@@ -10,7 +10,6 @@ module.exports = {
     // Last modules in the list is exported as specified in 'output'.
     entry: [
         './src/img/favicon.ico',        // file loader copies to the output path
-        './src/img/OpenHalonLogo.png',  // file loader copies to the output path
         './src/img/OpenSwitchLogo.png', // file loader copies to the output path
         './src/index.html',             // file loader copies to the output path
         './src/js/index.jsx'            // entry point
@@ -40,6 +39,12 @@ module.exports = {
                     Path.resolve(__dirname, 'node_modules/grommet/mixins')
                 ],
             },
+            // Match all .js|.jsx files -> .js
+            // Strips out any sourcemap comment lines.
+            {
+                test: /\.(js|jsx)$/,
+                loader: require.resolve('./tools/loader/strip-sourcemap-loader')
+            },
             // Match all .woff (web open font format) files.
             // Needed by Grommet & FontAwesome
             {
@@ -58,7 +63,9 @@ module.exports = {
             //  direcotry under 'node_modules'.
             {
                 test: /\.scss$/,
-                loader: 'style!css!sass?outputStyle=expanded&' +
+                loader: 'style!css' +
+                    '!' + require.resolve(__dirname + '/tools/loader/strip-ext-url-loader') +
+                    '!sass?outputStyle=expanded&' +
                     'includePaths[]=' +
                         (Path.resolve(__dirname, 'node_modules/grommet/node_modules')) + '&' +
                         (Path.resolve(__dirname, 'node_modules'))

@@ -16,6 +16,7 @@ module.exports = Reflux.createStore({
     // Data model VLAN data, colors, and graphic config
     state: {
         vlans: {},
+        allVlans: {},
         vlansGraphic: {},
         colors: [
                 { 'accent': '#FF6F3E', 'main': '#FF9E7D' },
@@ -41,39 +42,86 @@ module.exports = Reflux.createStore({
         return this.state;
     },
 
+    // parse the response into allVlans for the VLAN table
+    parseVlanResponse: function(res) {
+        var pcfg = res.body.configuration,
+            psts = res.body.status,
+            vlanData = {};
+
+        vlanData.id = pcfg.id;
+        vlanData.name = pcfg.name;
+        vlanData.operState = psts.oper_state;
+        vlanData.reason = psts.oper_state_reason;
+
+        return vlanData;
+    },
+
+    // because responses for both ports and vlans come
+    // back in one array - need to determine which
+    // responses are VLAN responses and which are
+    // port responses for parsing the data
+    //
+    // return true if a vlan request
+    isVlanRequest: function(res) {
+        var reqUrl = res.req.url;
+        if (reqUrl.indexOf('vlans') >= 0) {
+            return true;
+        }
+        return false;
+    },
+
+    // return true if a port request
+    isPortRequest: function(res) {
+        var reqUrl = res.req.url;
+        if (reqUrl.indexOf('ports') >= 0) {
+            return true;
+        }
+        return false;
+    },
+
     // Callback for success of loading vlan data
-    onLoadVlansCompleted: function(data) {
+    onLoadVlansCompleted: function(res) {
         var index,
             trunkVlans,
             vlans = {};
 
         // loop through returned vlans are create
         // entries in the object
-        for (var i=0; i<data.length; i++) {
-            var elem = data[i].data;
+        for (var i=0; i<res.length; i++) {
+            for (var idx=0; idx<res[i].length; idx++) {
+                var elem = res[i][idx];
+                var cfg = elem.body.configuration;
 
-            // id in elem - the data set is a vlan
-            // vlan_mode in elem - data set is a port
-            // confgured on a vlan
-            if ('id' in elem) {
-                vlans[elem.id] = data[i];
-                vlans[elem.id].ports = [];
-            } else if ('vlan_mode' in elem) {
-                if (elem.trunks !== []) {
-                    trunkVlans = elem.trunks;
-                    for (var j=0; j<trunkVlans.length; j++) {
-                        index = Number(trunkVlans[j]);
-                        if (vlans[index]) {
-                            vlans[index].ports = vlans[index].ports || [];
-                            vlans[index].ports.push(elem.name);
-                        }
-                    }
+                // handle data for the vlan response
+                if (this.isVlanRequest(elem)) {
+                    // parse the response for keys needed in view
+                    vlans[cfg.id] = this.parseVlanResponse(elem);
+                    vlans[cfg.id].ports = [];
                 }
 
-                index = Number(elem.tag);
-                if (vlans[index]) {
-                    vlans[index].ports = vlans[index].ports || [];
-                    vlans[index].ports.push(elem.name);
+                // handle data for the port response
+                if (this.isPortRequest(elem)) {
+                    // make sure the trunk array is not empty
+                    if (cfg.trunks !== []) {
+                        trunkVlans = cfg.trunks;
+
+                        // get the trunk vlans from trunk array
+                        for (var j=0; j<trunkVlans.length; j++) {
+                            index = Number(trunkVlans[j]);
+                            if (vlans[index]) {
+                                vlans[index].ports = vlans[index].ports || [];
+                                vlans[index].ports.push(cfg.name);
+                            }
+                        }
+                    }
+
+                    // if the port vlan is not a trunk then the
+                    // vlan id is in the tag key
+                    index = Number(cfg.tag);
+                    if (vlans[index]) {
+                        vlans[index].ports = vlans[index].ports || [];
+                        vlans[index].ports.push(cfg.name);
+                    }
                 }
             }
         }
@@ -81,8 +129,8 @@ module.exports = Reflux.createStore({
         // initialize the vlanDisplay data with the vlan data that is returned
         for (var key in vlans) {
             if (vlans.hasOwnProperty(key)) {
-                this.state.vlanDisplay[vlans[key].data.id] = {
-                    data: vlans[key].data,
+                this.state.vlanDisplay[vlans[key].id] = {
+                    data: vlans[key],
                     show: false,
                     colorIndex: null,
                     toolbar: <GEditIcon />,
@@ -126,10 +174,10 @@ module.exports = Reflux.createStore({
                     var port = data[i];
                     if (port in this.state.boxPortConfig.data) {
                         this.state.boxPortConfig.data[port].vlans
-                            .push(vlans[key].data.id);
+                            .push(vlans[key].id);
                     } else {
                         this.state.boxPortConfig.data[port] =
-                            { 'vlans': [vlans[key].data.id],
+                            { 'vlans': [vlans[key].id],
                                 'status': false };
                     }
                 }

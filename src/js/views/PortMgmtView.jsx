@@ -8,7 +8,6 @@ var React = require('react'),
     I18n = require('i18n'),
     PropTypes = React.PropTypes,
     Cnvs = require('conversions'),
-    PortsMgmtActions = require('PortsMgmtActions'),
     PortsMgmtStore = require('PortsMgmtStore'),
     BoxGraphic = require('BoxGraphic'),
     ViewBoxHeader = require('ViewBoxHeader'),
@@ -48,16 +47,16 @@ var PortList = React.createClass({
                 <tbody>
                     {this.props.ports.map(function(port) {
                         return (
-                            <tr key={port.data.name}>
-                                <td>{port.data.name}</td>
-                                <td>{port.data.admin_state}</td>
-                                <td>{port.data.link_state}</td>
-                                <td>{port.data.duplex}</td>
-                                <td>{Cnvs.bpsToGbps(port.data.link_speed)
+                            <tr key={port.name}>
+                                <td>{port.name}</td>
+                                <td>{port.adminState}</td>
+                                <td>{port.linkState}</td>
+                                <td>{port.duplex}</td>
+                                <td>{Cnvs.bpsToGbps(port.linkSpeed)
                                         + tUnits('gbps')}
                                 </td>
-                                <td>{port.data.pm_info.connector}</td>
-                                <td>{port.data.pm_info.vendor_name}</td>
+                                <td>{port.connector}</td>
+                                <td>{port.vendorName}</td>
                             </tr>
                         );
                     }, this)}
@@ -96,10 +95,6 @@ module.exports = React.createClass({
     displayName: 'PortsMgmtView',
 
     mixins: [ Reflux.connect(PortsMgmtStore, 'data') ],
-
-    componentDidMount: function() {
-        PortsMgmtActions.loadPorts();
-    },
 
     render: function() {
 

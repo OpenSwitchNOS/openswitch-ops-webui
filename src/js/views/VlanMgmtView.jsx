@@ -9,7 +9,7 @@ var React = require('react'),
     I18n = require('i18n'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GTable = require('grommet/components/Table'),
-    CheckBox = require('CheckBox'),
+    GCheckBox = require('grommet/components/CheckBox'),
     BoxGraphic = require('BoxGraphic'),
     StatusText = require('StatusText'),
     GLayer = require('grommet/components/Layer'),
@@ -62,40 +62,25 @@ var AllVlansTable = React.createClass({
 
             if (data.hasOwnProperty(key)) {
                 var vlan = data[key];
-                var ports = { 'native-tagged': [],
-                    'native-untagged': [],
-                    'access': [],
-                    'trunk': []
-                };
                 var status = false;
-
-                // generate ports list by vlan mode for VLAN table rows
-                for (var i in vlan.ports) {
-                    if (vlan.ports.hasOwnProperty(i)) {
-                        var port = vlan.ports[i];
-                        if (port.vlan_mode in ports) {
-                            ports[port.vlan_mode].push(port.name);
-                        }
-                    }
-                }
 
                 // disable remaining check boxes if max vlans
                 // displayed in graphic
                 if (this.props.selectedVlans === MAX_VLANS_TO_DISPLAY &&
-                    !this.props.vlanStatus[vlan.data.id].show) {
+                    !this.props.vlanStatus[vlan.id].show) {
                     status = true;
                 }
 
                 //push the table row to be rendered below
                 tableRows.push(
-                    <tr key={vlan.data.id}>
-                        <td>{vlan.data.name}</td>
-                        <td>{vlan.data.id}</td>
-                        <td>{vlan.data.oper_state}</td>
-                        <td>{vlan.data.oper_state_reason}</td>
+                    <tr key={vlan.id}>
+                        <td>{vlan.name}</td>
+                        <td>{vlan.id}</td>
+                        <td>{vlan.operState}</td>
+                        <td>{vlan.reason}</td>
                         <td>{formatPorts(vlan.ports)}</td>
                         <td>
-                            <CheckBox id={vlan.data.id}
+                            <GCheckBox id={vlan.id}
                                 onChange={this.toggleVlanDisplay}
                                 disabled={status}/>
                         </td>
@@ -216,9 +201,9 @@ var MembershipTable = React.createClass({
                     var index = this.getPortIndex(vlan.ports, this.props.port);
                     if (index !== -1) {
                         tableRows.push(
-                            <tr key={vlan.data.id}>
-                                <td>{vlan.data.name}</td>
-                                <td>{vlan.data.oper_state}</td>
+                            <tr key={vlan.id}>
+                                <td>{vlan.name}</td>
+                                <td>{vlan.operState}</td>
                             </tr>
                         );
                     }
