@@ -130,8 +130,14 @@
     .flexIcons {
         flex-wrap: wrap;
         -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
         display: flex;
         display: -ms-flexbox;
         display: -webkit-flex;
+
+        // IE 10 support
+        > span {
+            display: -ms-flexbox;
+        }
     }
 }

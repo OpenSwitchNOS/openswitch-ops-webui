@@ -248,7 +248,6 @@ module.exports = React.createClass({
             <div key={item.name} className="tempRow">
                 <GMeter
                     value={Math.round(item.val * 10) / 10}
-                    small={true}
                     min={{
                         value: item.min,
                         label: item.min.toFixed(1) + ' ' + u

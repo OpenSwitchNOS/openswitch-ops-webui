@@ -91,6 +91,10 @@ html, body, {
     }
 
     #mastDeviceInfo, #mastUserInfo {
+        // IE 10 support
+        display: -ms-flexbox;
+        -ms-flex-pack: center;
+
         //small screen
         @media #{$smallScreen} {
             display: none;

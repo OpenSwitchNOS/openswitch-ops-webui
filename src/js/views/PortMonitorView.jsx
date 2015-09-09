@@ -14,6 +14,7 @@ var React = require('react'),
     ActionIcon = require('ActionIcon'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GMenu = require('grommet/components/Menu'),
+    GTable = require('grommet/components/Table'),
     GDropCaret = require('grommet/components/icons/DropCaret'),
     I18n = require('i18n'),
     PortsMonitorActions = require('PortsMonitorActions'),
@@ -89,50 +90,52 @@ var PortDetails = React.createClass({
 
         return (
             <div className="innerContainer">
-                <table className="portDetails defaultTable">
-                    <tr>
-                        <td className="average">
-                            <div className="main">{t('details.avg')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.average + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.bytes')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {Cnvs.round1D(
-                                    Cnvs.bytesToMbytes(data.stats.total)
-                                ) + tUnits('mb')}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.high')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.high + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.low')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.low + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                <GTable className="portDetails defaultTable">
+                    <tbody>
+                        <tr>
+                            <td className="average">
+                                <div className="main">{t('details.avg')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.average + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.bytes')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {Cnvs.round1D(
+                                        Cnvs.bytesToMbytes(data.stats.total)
+                                    ) + tUnits('mb')}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.high')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.high + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.low')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.low + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </GTable>
             </div>
         );
     }
@@ -149,12 +152,6 @@ module.exports = React.createClass({
         Reflux.listenerMixin,
         Navigation
     ],
-
-    /*componentWillMount: function() {
-        if (this.getParams().port) {
-            PortsMonitorActions.setPortSelected(this.getParams().port);
-        }
-    },*/
 
     componentDidMount: function() {
         //load the list of ports to populate the port list
