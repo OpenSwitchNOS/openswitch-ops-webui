@@ -7,7 +7,7 @@ var React = require('react'),
     I18n = require('i18n'),
     Reflux = require('reflux'),
     ReactChart = require('react-chartjs'),
-    BarChart = ReactChart.Bar,
+    LineChart = ReactChart.Line,
     Router = require('react-router'),
     SystemMonitorStore = require('SystemMonitorStore'),
     SystemStatsActions = require('SystemStatsActions'),
@@ -74,7 +74,7 @@ module.exports = React.createClass({
                     label: s.temps[i].name,
                     data: s.temps[i].data,
                     fillColor: ChartUtils.colors[ci].fill,
-                    pointColor: ChartUtils.colors[ci].paint,
+                    pointColor: ChartUtils.colors[ci].stroke,
                     strokeColor: ChartUtils.colors[ci].stroke
                 });
             }
@@ -82,7 +82,7 @@ module.exports = React.createClass({
             datasets.push({
                 data: s[type].data,
                 fillColor: ChartUtils.colors[0].fill,
-                pointColor: ChartUtils.colors[0].paint,
+                pointColor: ChartUtils.colors[0].stroke,
                 strokeColor: ChartUtils.colors[0].stroke
             });
         }
@@ -102,13 +102,12 @@ module.exports = React.createClass({
                 responsive: true,
                 scaleBeginAtZero: true,
                 maintainAspectRatio: false,
-                scaleLabel: function(v) { return scaleLabel(v.value, type); },
-                multiTooltipTemplate: '<%= datasetLabel %> - <%= value %>'
+                scaleLabel: function(v) { return scaleLabel(v.value, type); }
             };
 
         return (
             <div id="systemMonitorViewCanvas">
-                <BarChart
+                <LineChart
                     data={this.mkChartData(type)}
                     options={chartOptions}
                     redraw
