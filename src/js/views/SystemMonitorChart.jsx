@@ -77,6 +77,10 @@ module.exports = React.createClass({
                     pointColor: ChartUtils.colors[ci].stroke,
                     strokeColor: ChartUtils.colors[ci].stroke
                 });
+                datasets.sort(function(d1, d2) {
+                    return (d1.label > d2.label) ?
+                        1 : ((d2.name > d1.name) ? -1 : 0);
+                });
             }
         } else {
             datasets.push({
@@ -102,7 +106,8 @@ module.exports = React.createClass({
                 responsive: true,
                 scaleBeginAtZero: true,
                 maintainAspectRatio: false,
-                scaleLabel: function(v) { return scaleLabel(v.value, type); }
+                scaleLabel: function(v) { return scaleLabel(v.value, type); },
+                multiTooltipTemplate: '<%= datasetLabel %> - <%= value %>'
             };
 
         return (
