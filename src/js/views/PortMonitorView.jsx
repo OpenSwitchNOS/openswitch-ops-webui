@@ -10,6 +10,7 @@ var React = require('react'),
     PropTypes = React.PropTypes,
     Link = Router.Link,
     Cnvs = require('conversions'),
+    ChartUtils = require('chartUtils'),
     DateParse = require('dateParse'),
     ActionIcon = require('ActionIcon'),
     ViewBoxHeader = require('ViewBoxHeader'),
@@ -287,7 +288,7 @@ module.exports = React.createClass({
             if (st.data.dataSets.hasOwnProperty(i)) {
                 var dt = st.data,
                     data = dt.dataSets[i],
-                    color = dt.colors[data.options.colorIndex].stroke,
+                    color = ChartUtils.colors[data.options.colorIndex].stroke,
                     onclick = this.toggleGraph.bind(this, i),
                     icon;
 
@@ -300,7 +301,7 @@ module.exports = React.createClass({
                 //tile toolbar
                 toggleToolbar[i] = (<GraphToggleButton
                     cls = {data.title}
-                    color = {dt.colors[data.options.colorIndex].stroke}
+                    color = {ChartUtils.colors[data.options.colorIndex].stroke}
                     text = {data.desc}
                     click = {onclick}
                     index = {data.options.colorIndex}

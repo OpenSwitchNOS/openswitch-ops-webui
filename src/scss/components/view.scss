@@ -56,7 +56,7 @@
 
 // Style the contents to fill the flex container
 .fillRow, .fillColumn {
-    -flex-grow: 1;
+    flex-grow: 1;
     -webkit-flex-grow: 1;
 }
 
@@ -117,7 +117,6 @@
     border-bottom: $viewBoxHeaderBorderBottom;
     display: flex;
     display: -webkit-flex;
-    display: -ms-flexbox;
     justify-content: space-between;
     -webkit-justify-content: space-between;
     flex-wrap: wrap;

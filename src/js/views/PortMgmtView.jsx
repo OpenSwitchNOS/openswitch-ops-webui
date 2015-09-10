@@ -120,7 +120,7 @@ module.exports = React.createClass({
                 </div>
                 <div className="viewBox viewFlex0">
                     <ViewBoxHeader title={t('allInterfaces')}/>
-                    <div className="viewBoxContent">
+                    <div className="viewBoxContent scrollbar">
                         <PortList ports={this.state.data.allPorts}/>
                     </div>
                 </div>

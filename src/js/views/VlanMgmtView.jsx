@@ -334,7 +334,7 @@ module.exports = React.createClass({
                     </div>
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('allVlans')}/>
-                        <div className="viewBoxContent">
+                        <div className="viewBoxContent scrollbar">
                             {Object.keys(data.vlans).length !== 0 ?
                                 <AllVlansTable
                                     data={data.vlans}

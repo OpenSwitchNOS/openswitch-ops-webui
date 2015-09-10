@@ -7,6 +7,7 @@ var Reflux = require('reflux'),
     PortsMonitorActions = require('PortsMonitorActions'),
     _ = require('lodash'),
     Calcs = require('calculations'),
+    ChartUtils = require('chartUtils'),
     Cnvs = require('conversions'),
     MAX_POINTS_ON_GRAPH = 25,
     INTERVAL = 5000;
@@ -86,7 +87,7 @@ module.exports = Reflux.createStore({
         //graph colors - stroke: line stroke
         //fill: fill under graph
         //light: to make transprent when showing details
-        colors: [
+        /*colors: [
                 { 'stroke': 'rgba(255,111,62,1)',
                     'fill': 'rgba(255,111,62,0.3)',
                     'light': 'rgba(255,111,62,0.1)' },
@@ -99,7 +100,7 @@ module.exports = Reflux.createStore({
                 { 'stroke': 'rgba(101,57,164,1)',
                     'fill': 'rgba(101,57,164,0.3)',
                     'light': 'rgba(101,57,164,0.1)' }
-            ],
+            ],*/
 
         //datasets for the utilization chart
         //each data set is a line on the graph
@@ -150,7 +151,7 @@ module.exports = Reflux.createStore({
         // create data sets and add to dataSets store variable
         for (var i=0; i<graphTypes.length; i++) {
             var initialStats = new Stats(),
-                colors = this.state.colors[i];
+                colors = ChartUtils.colors[i];
 
             var data = new DataSet(
                 graphTypes[i].name, i, { 'show': 1, 'colorIndex': i }, [],
@@ -421,7 +422,7 @@ module.exports = Reflux.createStore({
     // the bar chart color
     setBarColors: function() {
         var graph = this.state.dataSets[this.state.activeDetails];
-        var colors = this.state.colors[graph.index];
+        var colors = ChartUtils.colors[graph.index];
         graph.graphData.fillColor = colors.stroke;
         graph.graphData.strokeColor = colors.stroke;
         this.trigger(this.state);
@@ -444,7 +445,7 @@ module.exports = Reflux.createStore({
         for (var key in this.state.dataSets) {
             if (this.state.dataSets.hasOwnProperty(key)) {
                 var graph = this.state.dataSets[key];
-                var colorIndex = this.state.colors[graph.index];
+                var colorIndex = ChartUtils.colors[graph.index];
                 graph.graphData.fillColor = colorIndex.fill;
                 graph.graphData.strokeColor = colorIndex.stroke;
             }
