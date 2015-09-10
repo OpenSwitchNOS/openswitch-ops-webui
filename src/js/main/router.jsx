@@ -16,12 +16,7 @@ var React = require('react'),
     DashboardView = require('DashboardView'),
     PortMonitorView = require('PortMonitorView'),
     PortMgmtView = require('PortMgmtView'),
-    TestView1 = require('TestView1'),
-    TestView2 = require('TestView2'),
-    TestView3 = require('TestView3'),
     VlanMgmtView = require('VlanMgmtView'),
-    VlanMonitorView = require('VlanMonitorView'),
-    VlanPortConfigView = require('VlanPortConfigView'),
     MgmtIntfView = require('MgmtIntfView'),
 
     App = require('App');
@@ -38,12 +33,7 @@ var routes = (
         <Route name="systemMonitor" handler={SystemMonitorView}>
             <Route path=":type" handler={SystemMonitorChart}/>
         </Route>
-        <Route name="test1" handler={TestView1}/>
-        <Route name="test2" handler={TestView2}/>
-        <Route name="test3" handler={TestView3}/>
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
-        <Route name="vlanMonitor" handler={VlanMonitorView}/>
-        <Route name="vlanPortConfig" handler={VlanPortConfigView}/>
         <Route name="mgmtIntf" handler={MgmtIntfView}/>
         <DefaultRoute handler={Login}/>
     </Route>
