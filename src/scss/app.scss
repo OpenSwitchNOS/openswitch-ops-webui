@@ -88,6 +88,11 @@ html, body, {
 
     i {
         box-sizing: border-box;
+
+        @media #{$smallScreen} {
+            font-size: $mastToggleIconFontSizeSmallScreen;
+            line-height: $mastToggleIconLineHeightSmallScreen
+        }
     }
 
     #mastDeviceInfo, #mastUserInfo {

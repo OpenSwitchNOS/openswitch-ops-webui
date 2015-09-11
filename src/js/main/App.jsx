@@ -18,7 +18,7 @@ var React = require('react/addons'),
     QueryString = require('query-string'),
     RestUtils = require('restUtils');
 
-var MAX_AUTO_CLOSE_NAV_WIDTH = 640;
+var MAX_AUTO_CLOSE_NAV_WIDTH = 1000;
 
 module.exports = React.createClass({
 
