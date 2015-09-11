@@ -24,6 +24,11 @@ function toLocaleTimeStringSupported() {
 // if locale conversion is supported. Otherwise convert
 // it in relative format
 function convert(date) {
+
+    if (!date) {
+        return '';
+    }
+
     if (toLocaleTimeStringSupported()) {
         return new Date(date).toLocaleTimeString(I18n.locale, {
             hour12: false

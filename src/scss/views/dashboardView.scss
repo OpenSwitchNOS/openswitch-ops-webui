@@ -13,6 +13,9 @@
 
     .viewBox.box1 {
         min-height: 300px;
+
+        // for IE 11 until grommet meter styling is fixed
+        max-height: 400px;
     }
 
     td {

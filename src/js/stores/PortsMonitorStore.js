@@ -180,6 +180,7 @@ module.exports = Reflux.createStore({
     onLoadPortStatsCompleted: function(res) {
         var st = this.state,
             portStats = res.body.status; // FIXME below some of these are arrays?
+        var date;
 
         // on the intial load - set the datasets variable
         // to have the correct data sets depending on
@@ -229,7 +230,8 @@ module.exports = Reflux.createStore({
                 st.pointCount = st.pointCount + 1;
             }
 
-            this.state.labels.push(Date.parse(res.headers.date));
+            date = res.headers.date ? Date.parse(res.headers.date) : null;
+            this.state.labels.push(date);
             this.trigger(this.state);
         }
     },
