@@ -195,6 +195,7 @@ module.exports = React.createClass({
     //handler for selected a port in the dropdown menu
     portSelected: function(port) {
         PortsMonitorActions.setPortSelected(port);
+        this.getPortData(port);
         this.startInterval(port);
     },
 
