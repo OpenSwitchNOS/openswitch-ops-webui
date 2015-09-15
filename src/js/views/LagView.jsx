@@ -9,7 +9,8 @@ var React = require('react'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GTable = require('grommet/components/Table'),
     LagActions = require('LagActions'),
-    LagStore = require('LagStore');
+    LagStore = require('LagStore'),
+    ViewInitMixin = require('ViewInitMixin');
 
 function t(key) {
     return I18n.text('views.lag.' + key);
@@ -19,7 +20,10 @@ module.exports = React.createClass({
 
     displayName: 'LagView',
 
-    mixins: [ Reflux.connect(LagStore) ],
+    mixins: [
+        Reflux.connect(LagStore),
+        ViewInitMixin
+    ],
 
     getInitialState: function() {
         return { sel: null };

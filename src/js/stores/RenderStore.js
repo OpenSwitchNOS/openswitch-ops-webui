@@ -18,7 +18,6 @@ module.exports = Reflux.createStore({
     // Data model.
     state: {
         showNavPane: true,
-        isAuth: false,
         requestErr: null,
         restApiRedirect: null
     },
@@ -43,11 +42,6 @@ module.exports = Reflux.createStore({
     // Callback for RenderActions.toggleNavPane.
     onToggleNavPane: function() {
         this.state.showNavPane = !this.state.showNavPane;
-        this.trigger(this.state);
-    },
-
-    onLogin: function() {
-        this.state.isAuth = true;
         this.trigger(this.state);
     },
 

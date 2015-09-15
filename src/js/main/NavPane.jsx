@@ -22,8 +22,9 @@ var NavGroup = React.createClass({
         autoClose: PropTypes.bool,
         heading: PropTypes.string,
         routes: PropTypes.arrayOf(PropTypes.shape({
-            to: PropTypes.string.isRequired,
-            name: PropTypes.string
+            to: PropTypes.string,
+            nameKey: PropTypes.string,
+            href: PropTypes.string
         })).isRequired
     },
 
@@ -47,8 +48,19 @@ var NavGroup = React.createClass({
                 <ul>
                     { this.props.routes.map(function(route) {
                         var to = route.to,
-                            nameKey = route.viewName || to,
-                            name = t('views.' + nameKey + '.name');
+                            href = route.href,
+                            name = route.nameKey ?
+                                t(route.nameKey) :
+                                t('views.' + to + '.name');
+                        if (href) {
+                            return (
+                                <li key={name}>
+                                    <a href={href} target="_blank">
+                                        {name}
+                                    </a>
+                                </li>
+                            );
+                        }
                         return (
                             <li key={name}>
                                 <Link onClick={clickFn} to={to}>{name}</Link>
@@ -81,7 +93,7 @@ module.exports = React.createClass({
                     routes={[
                         { to: 'dashboard' },
                         { to: 'systemMonitor' },
-                        { to: 'mgmtIntf' },
+                        { to: 'mgmtIntf' }
                     ]}
                 />
                 <hr />
@@ -96,6 +108,19 @@ module.exports = React.createClass({
                 <NavGroup autoClose={ac} heading={t('vlans')}
                     routes={[
                         { to: 'vlanMgmt' }
+                    ]}
+                />
+                <hr />
+                <NavGroup autoClose={ac} heading={t('links')}
+                    routes={[
+                        {
+                            href: 'http://api.openswitch.net/rest/dist/index.html',
+                            nameKey: 'swaggerLink'
+                        },
+                        {
+                            href: 'http://openswitch.net',
+                            nameKey: 'openSwitchLink'
+                        }
                     ]}
                 />
 

@@ -19,6 +19,7 @@ var React = require('react'),
     ColorBlock = require('ColorBlock'),
     VlanMgmtActions = require('VlanMgmtActions'),
     VlanMgmtStore = require('VlanMgmtStore'),
+    ViewInitMixin = require('ViewInitMixin'),
     MAX_VLANS_TO_DISPLAY = 4;
 
 /*********** Helper functions **************/
@@ -45,6 +46,10 @@ var AllVlansTable = React.createClass({
         selectedVlans: PropTypes.number,
         vlanStatus: PropTypes.object
     },
+
+    mixins: [
+        ViewInitMixin
+    ],
 
     // handler when a VLAN display checkbox is selected
     // toggle the display based on the state of the checkbox

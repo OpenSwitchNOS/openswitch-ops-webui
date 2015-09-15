@@ -9,7 +9,8 @@ var React = require('react'),
     GMenu = require('grommet/components/Menu'),
     Router = require('react-router'),
     RouteHandler = Router.RouteHandler,
-    Link = Router.Link;
+    Link = Router.Link,
+    ViewInitMixin = require('ViewInitMixin');
 
 function t(key) {
     return I18n.text('views.systemMonitor.' + key);
@@ -21,7 +22,8 @@ module.exports = React.createClass({
 
     mixins: [
         Router.Navigation,
-        Router.State
+        Router.State,
+        ViewInitMixin
     ],
 
     componentWillMount: function() {

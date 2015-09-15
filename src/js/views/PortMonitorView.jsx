@@ -23,6 +23,7 @@ var React = require('react'),
     StatusText = require('StatusText'),
     LineChart = require('react-chartjs').Line,
     BarChart = require('react-chartjs').Bar,
+    ViewInitMixin = require('ViewInitMixin'),
     INTERVAL = 5000;
 
 // internationalization for this view
@@ -49,6 +50,10 @@ var GraphToggleButton = React.createClass({
         show: PropTypes.number,
         cls: PropTypes.string
     },
+
+    mixins: [
+        ViewInitMixin
+    ],
 
     render: function() {
 
