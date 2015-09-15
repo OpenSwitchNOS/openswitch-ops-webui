@@ -84,24 +84,6 @@ module.exports = Reflux.createStore({
         //of the graphs
         showStatusText: 0,
 
-        //graph colors - stroke: line stroke
-        //fill: fill under graph
-        //light: to make transprent when showing details
-        /*colors: [
-                { 'stroke': 'rgba(255,111,62,1)',
-                    'fill': 'rgba(255,111,62,0.3)',
-                    'light': 'rgba(255,111,62,0.1)' },
-                { 'stroke': 'rgba(61,141,155,1)',
-                    'fill': 'rgba(61,141,155,0.3)',
-                    'light': 'rgba(61,141,155,0.1)' },
-                { 'stroke': 'rgba(211,154,66,1)',
-                    'fill': 'rgba(211,154,66,0.3)',
-                    'light': 'rgba(211,154,66,0.1)' },
-                { 'stroke': 'rgba(101,57,164,1)',
-                    'fill': 'rgba(101,57,164,0.3)',
-                    'light': 'rgba(101,57,164,0.1)' }
-            ],*/
-
         //datasets for the utilization chart
         //each data set is a line on the graph
         dataSets: {},
@@ -247,9 +229,9 @@ module.exports = Reflux.createStore({
             intfCfg = res[i].body.configuration;
             intfStatus = res[i].body.status;
             //port type as empty string means it is a port
-            if (intfCfg.type === '' &&
-                intfStatus.link_state[0] === 'up' &&
-                intfStatus.link_speed[0] > 0) {
+            if (intfCfg.type === 'system' &&
+                intfStatus.link_state === 'up' &&
+                intfStatus.link_speed > 0) {
 
                 portNums.push(Number(intfCfg.name));
             }

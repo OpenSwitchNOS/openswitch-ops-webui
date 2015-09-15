@@ -24,7 +24,8 @@ module.exports = Reflux.createStore({
             base: []
         },
         hwData: {},
-        loadCompleted: 0
+        loadCompleted: 0,
+        showGraphic: 0
     },
 
     // Can be used to initialize users of this store.
@@ -45,6 +46,11 @@ module.exports = Reflux.createStore({
             name = port.configuration.name;
             this.state.hwData[name] =
                 { 'portType': port.status.hw_intf_info.connector };
+        }
+
+        // set the show graphic param to true
+        if (ports.length > 0) {
+            this.state.showGraphic = 1;
         }
 
         this.state.loadCompleted = 1;

@@ -77,8 +77,8 @@ module.exports = Reflux.createStore({
                 psts = ports[i].status;
 
             portStatus[pcfg.name] = {};
-            portStatus[pcfg.name].adminState = psts.admin_state[0];
-            portStatus[pcfg.name].linkState = psts.link_state[0];
+            portStatus[pcfg.name].adminState = psts.admin_state;
+            portStatus[pcfg.name].linkState = psts.link_state;
 
             // create port data obejct from the response with
             // the data keys needed for the view

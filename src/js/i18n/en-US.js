@@ -215,7 +215,12 @@ module.exports = {
                 c2r2: 'C2 R2',
                 c2r3hdr: 'C2 R3'
             }
-        }
+        },
 
+        components: {
+            boxGraphic: {
+                noPorts: 'Interface status is currently unavailable',
+            }
+        }
     }
 };

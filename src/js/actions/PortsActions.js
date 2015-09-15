@@ -23,8 +23,8 @@ PortsActions.loadPorts.listen(function() {
                 } else {
                     for (var i=0; i<r2.length; i++) {
                         port = r2[i].body;
-                        // empty string as type means it is a port
-                        if (port.configuration.type === '') {
+                        // system as type means it is a port
+                        if (port.configuration.type === 'system') {
                             ports.push(port);
                         }
                     }
