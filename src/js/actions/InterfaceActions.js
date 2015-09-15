@@ -14,18 +14,22 @@ var InterfaceActions = Reflux.createActions({
 });
 
 function processResponse(res) {
-    return res.map(function(r) {
-        var sts = r.body.status,
-            stats = r.body.statistics.statistics;
-        return {
-            link: sts.link_state[0],
-            duplex: sts.duplex[0],
-            speed: Number(sts.link_speed[0]),
-            name: r.body.configuration.name,
-            rxBytes: Number(stats.rx_bytes),
-            txBytes: Number(stats.tx_bytes)
-        };
-    });
+    var intfs = [], intf, stats;
+    for (var i=0; i<res.length; i++) {
+        intf = res[i].body;
+        stats = intf.statistics.statistics;
+        if (intf.configuration.type === 'system') {
+            intfs.push({
+                link: intf.status.link_state,
+                duplex: intf.status.duplex,
+                speed: Number(intf.status.link_speed),
+                name: intf.configuration.name,
+                rxBytes: Number(stats.rx_bytes),
+                txBytes: Number(stats.tx_bytes)
+            });
+        }
+    }
+    return intfs;
 }
 
 InterfaceActions.load.listen(function() {
