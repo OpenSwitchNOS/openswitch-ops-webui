@@ -13,21 +13,23 @@ var URL_PREFIX = 'http://',
     REST_HOST = URL_PREFIX + window.location.hostname + PORT_POSTFIX,
     redirect;
 
-// Wraps the superagent GET request in a form that can be used as an Async
-// callback (i.e. callback(err, res)).
-function requestGet(url, callback) {
-    var reqUrl = url;
-
+function mkUrl(url) {
     // If we are running the unit tests don't modify the URL at all!
     if (!window.jasmine) {
         if (redirect) {
-            reqUrl = URL_PREFIX + redirect + PORT_POSTFIX + url;
-        } else {
-            reqUrl = REST_HOST + url;
+            return URL_PREFIX + redirect + PORT_POSTFIX + url;
         }
+        return REST_HOST + url;
     }
+    return url;
+}
 
-    Request.get(reqUrl).end(function(err, res) {
+// Wraps the superagent GET request in a form that can be used as an Async
+// callback (i.e. callback(err, res)).
+function requestGet(url, callback) {
+    var reqUrl = mkUrl(url);
+
+    Request.get(reqUrl).withCredentials().end(function(err, res) {
         if (err) {
             err.reqUrl = reqUrl;
             callback(err, null);
@@ -83,9 +85,40 @@ function get(req, cb) {
     }
 }
 
+function encodeValues(obj) {
+    var encodedObj = {};
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            encodedObj[key] = encodeURIComponent(obj[key]);
+        }
+    }
+    return encodedObj;
+}
+
+// Wraps the superagent POST request (contentType is optional).
+function post(url, body, callback, contentType) {
+    var reqUrl = mkUrl(url),
+        encodedBody = encodeValues(body);
+
+    if (contentType === 'application/x-www-form-urlencoded') {
+        Request.post(reqUrl)
+            .type('form')
+            .withCredentials()
+            .send(encodedBody)
+            .end(callback);
+    } else {
+        Request.post(reqUrl)
+            .withCredentials()
+            .send(encodedBody) // default is JSON
+            .end(callback);
+    }
+}
+
 module.exports = {
 
     get: get,
+
+    post: post,
 
     setRestApiRedirect: function(host) {
         redirect = host;

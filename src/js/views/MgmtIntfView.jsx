@@ -10,7 +10,8 @@ var React = require('react'),
     ViewBoxHeader = require('ViewBoxHeader'),
     MgmtIntfActions = require('MgmtIntfActions'),
     MgmtIntfStore = require('MgmtIntfStore'),
-    PropTable = require('PropTable');
+    PropTable = require('PropTable'),
+    ViewInitMixin = require('ViewInitMixin');
 
 function t(key) {
     return I18n.text('views.mgmtIntf.' + key);
@@ -20,7 +21,10 @@ module.exports = React.createClass({
 
     displayName: 'MgmtIntfView',
 
-    mixins: [ Reflux.connect(MgmtIntfStore) ],
+    mixins: [
+        Reflux.connect(MgmtIntfStore),
+        ViewInitMixin,
+    ],
 
     componentDidMount: function() {
         MgmtIntfActions.load();

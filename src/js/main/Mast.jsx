@@ -11,17 +11,24 @@ var React = require('react'),
     RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore'),
     SystemInfoActions = require('SystemInfoActions'),
-    UserStore = require('UserStore'),
-    ActionIcon = require('ActionIcon');
+    AuthStore = require('AuthStore'),
+    ActionIcon = require('ActionIcon'),
+    GMenu = require('grommet/components/Menu'),
+    GEditIcon = require('grommet/components/icons/Edit'),
+    Router = require('react-router'),
+    Link = Router.Link;
+
+function t(key) {
+    return I18n.text(key);
+}
 
 module.exports = React.createClass({
 
     displayName: 'Mast',
 
     mixins: [
-        Reflux.connect(RenderStore, 'render'),
-        Reflux.connect(UserStore, 'user'),
-        // FIXME: create a MastStore I think.
+        Reflux.connect(RenderStore),
+        Reflux.connect(AuthStore),
         Reflux.listenTo(SystemInfoActions.load.completed, 'onSysInfoLoaded')
     ],
 
@@ -39,12 +46,11 @@ module.exports = React.createClass({
 
     render: function() {
         // FIXME: bogus data, clean up this.state below
-        var t = I18n.text,
-            partNum = this.state.sysInfo && this.state.sysInfo.partNum,
+        var partNum = this.state.sysInfo && this.state.sysInfo.partNum,
             serialNum = this.state.sysInfo && this.state.sysInfo.serialNum,
             hostName = this.state.sysInfo && this.state.sysInfo.hostName,
-            user = 'John Powell',
-            showToggleIcon = this.state.render.showNavPane,
+            user = this.state.user,
+            showToggleIcon = this.state.showNavPane,
             chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
             toggleIcon = (
                 <ActionIcon
@@ -56,7 +62,6 @@ module.exports = React.createClass({
 
         return (
             <div id="mast">
-
                 <span>
                     {toggleIcon}
                     <img src="OpenSwitchLogo.png" />
@@ -71,7 +76,15 @@ module.exports = React.createClass({
                 </span>
 
                 <span id='mastUserInfo'>
-                    <b>{t('user')}:</b>&nbsp;{user}
+                    { user ?
+                        <span>
+                            <b>{t('user')}:</b>&nbsp;
+                            {user}&nbsp;&nbsp;&nbsp;
+                        </span>
+                        : null }
+                    <GMenu icon={<GEditIcon />}>
+                        <Link to={'/login'}>{t('logout')}</Link>
+                    </GMenu>
                 </span>
 
             </div>

@@ -23,7 +23,8 @@ var React = require('react/addons'),
     SystemInfoActions = require('SystemInfoActions'),
     SystemStatsActions = require('SystemStatsActions'),
     InterfaceActions = require('InterfaceActions'),
-    Lodash = require('lodash');
+    Lodash = require('lodash'),
+    ViewInitMixin = require('ViewInitMixin');
 
 var AUTO_REFRESH_MILLIS = 10000,
     NUM_UTL_VIEW_SLOTS = 5,
@@ -76,7 +77,8 @@ module.exports = React.createClass({
 
     mixins: [
         Reflux.connect(DashboardStore),
-        Navigation
+        Navigation,
+        ViewInitMixin
     ],
 
     componentDidMount: function() {

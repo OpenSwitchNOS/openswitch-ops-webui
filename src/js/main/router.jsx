@@ -35,11 +35,11 @@ var routes = (
         </Route>
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
         <Route name="mgmtIntf" handler={MgmtIntfView}/>
-        <DefaultRoute handler={Login}/>
+        <DefaultRoute handler={DashboardView}/>
     </Route>
 );
 
 // Attach the routes to the document.body
 Router.run(routes, function(Handler) {
-    React.render(<Handler />, document.body);
+    React.render(<Handler />, document.getElementById('appContent'));
 });

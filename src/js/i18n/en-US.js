@@ -15,17 +15,23 @@ module.exports = {
         user: 'User',
         errReqUrl: 'Request',
         errMsg: 'Error',
+        partNum: 'Part #',
+        serialNum: 'Serial #',
+        hostName: 'Hostname',
+        test: 'Test',
+        logout: 'Logout',
+        invalidUserPwd: 'Invalid user or password.',
 
         // Navigation groups.
         general: 'General',
         ports: 'Ports',
         interfaces: 'Interfaces',
         vlans: 'VLANs',
-        routing: 'Routing',
-        partNum: 'Part #',
-        serialNum: 'Serial #',
-        hostName: 'Hostname',
-        test: 'Test',
+        links: 'Links',
+
+        // Links.
+        swaggerLink: 'Swagger UI',
+        openSwitchLink: 'OpenSwitch.net',
 
         // Errors.
         err: {

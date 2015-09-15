@@ -265,6 +265,14 @@ html, body, {
 .appLoginLayer {
     z-index: 200; // must be larger than mast and navPane
 
+    &.progress {
+        cursor: progress;
+    }
+
+    &.progress * {
+        cursor: progress;
+    }
+
     .layer__container {
         background: none;
         border: none;
