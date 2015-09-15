@@ -27,13 +27,13 @@ function processConfig(res) {
 }
 
 function lacpPortVal(portCfg) {
-    var lacpVal;
-    if (portCfg.lacp && portCfg.lacp.length > 0) {
-        lacpVal = portCfg.lacp[0];
-        if (lacpVal === 'off' || lacpVal === 'active' ||
-                lacpVal === 'passive') {
-            return lacpVal;
-        }
+    var lacpVal = portCfg.lacp;
+    if (lacpVal &&
+        lacpVal === 'off' ||
+        lacpVal === 'active' ||
+        lacpVal === 'passive') {
+
+        return lacpVal;
     }
     return null;
 }
