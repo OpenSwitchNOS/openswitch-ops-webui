@@ -40,6 +40,9 @@ The GUI design is based on the following technologies:
  * Controller-view framework
 * [RefluxJS](https://github.com/reflux/refluxjs)
  * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation with a unidirectional data flow pattern
+* [React-Router] (https://github.com/rackt/react-router)
+ * URL routing (i.e View) framework
+ * Browser history support
 
 
     +---------+     +--------+     +-----------------+
@@ -66,6 +69,63 @@ This approach is taken one step further to isolate all back-end service interact
             +----+-------------+   |          |          | A Backend Service |  
             | A RefluxJS Store +<--+          +----------+ (REST)            |  
             +------------------+               Callback  +-------------------+  
+
+The major Web UI components
+
+    *
+                                +---------------------------------+
+                       +------->+ src/index.html                  |
+                       |        | (index.jsx content loaded here) |
+                       |        +---------------------------------+
+    +------------------+---+
+    |                      |    +---------------------------------+
+    |  webpack.config.js   +--->+ src/js/index.jsx                |
+    |  entry: [            |    +-----------------+---------------+
+    |    src/index.html,   |                      |
+    |    src/js/index.jsx  |                      v
+    |  ]                   |    +-----------------+---------------+
+    |                      |    | src/js/main/router.js           |
+    +----------------------+    | (react-router routes)           |
+                                | "app" -> App.jsx                |
+                                | "dashboard" -> Dashboard.jsx    |                   
+                                | ...etc...                       |
+                                +-----+---------------------------+
+                                      |
+                                      v
+    +---------------------------------+----------------------+
+    |                                                        |
+    | App                                                    |
+    |                                                        |
+    | +----------------------------------------------------+ |
+    | |                                                    | |
+    | | Mast                                               | |
+    | |                                                    | |
+    | +----------------------------------------------------+ |
+    |                                                        |
+    | +---------+  +---------------------------------------+ |
+    | |         |  |                                       | |
+    | | NavPane |  | RouteHandler                          | |
+    | |         |  |                                       | |
+    | |         |  |   +-------------------------------+   | |
+    | |         |  |   |                               |   | |
+    | |         |  |   |  View                         |   | |
+    | |         |  |   |                               |   | |
+    | |         |  |   +-----------+-------------------+   | |
+    | |         |  |               ^                       | |
+    | |         |  |               |                       | |
+    | +---------+  +---------------------------------------+ |
+    |                              |                         |
+    +--------------------------------------------------------+
+                                   |
+           +----------------+------+---------+------------+
+           |                |                |            |
+    +------+------+   +-----+------+   +-----+------+   +-+-+
+    |DashboardView|   |MgmtIntfView|   |PortMgmtView|   |...|
+    +-------------+   +------------+   +------------+   +---+
+
+The main entry points for the web compilation are configured in the webpack.config.js file.  The index.html contains a root element "div" with an ID. The router.js file contains a list of all the available routes (or considered "views" in our case).  Each view is denoted by its own ID ("app" -> App component).  Based on the current browser window.location (or URL), the appropriate view is loaded in the RouteHandler.  The NavPane "Link" items are automatically activated based on the current URL.
+
+(TODO)
 
 Development Environment
 -----------------------
@@ -109,12 +169,28 @@ The directory structure (described below) includes:
 
 The development stack is based on the following technologies:
 * [NodeJS / npm](https://nodejs.org/en)
- * Used to load 3rd party modules
- * Used to issue build and test commands
+ * used to load 3rd party modules
+ * used to issue build and test commands
  * package.json file is used to store:
    * versioned list of run-time dependencies
    * versioned list of development dependencies
    * npm build commands (see below)
+* [Webpack](https://webpack.github.io) module builder
+   * used to transpile files
+     * JSX -> JavaScript
+     * SCSS -> CSS
+   * used to load modules via the CommonJS pattern (i.e. require('moduleName'))
+   * used to build bundle.js
+   * used to minimize bundle.js for production builds
+* [Karma](http://karma-runner.github.io/0.13/index.html) test runner
+ * uses [Jasmine](http://jasmine.github.io/) test framework (also see [jasmine introduction](http://jasmine.github.io/2.0/introduction.html))
+ * tests are located in \__tests__ directories within
+   * src/utils/
+   * src/stores/
+   * src/actions/
+
+User Guide
+----------
 
 Once NodeJS/npm is installed, the npm build commands (defined in package.json) can be run from the ops-webui root directory.  For example:
 
