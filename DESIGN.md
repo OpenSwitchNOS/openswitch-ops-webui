@@ -1,7 +1,148 @@
-﻿High level design of OPS-FOO
-============================
+﻿High level design of OPS-WEBUI
+==============================
 
-High level description of OPS-FOO design. 
+System Design
+-------------
+
+    +------------------------------------------------------------+
+    |     Client Browser (feature/webui)                         |
+    +------------------------+-------------------+---------------+
+                             |                   |
+      HTTPS GET/POST/...     |                   |
+      (token authentication) |                   |
+                             |                   |
+    +------------------------------------------------------------+
+    |  OpenSwitch Platform   |                   |               |
+    |                        v                   v               |
+    |  +---------------------+--+   +------------+------------+  |
+    |  | Tornado Web Server     |   | Lighttpd (static files) |  |
+    |  +-----------+------------+   +------------+------------+  |
+    |              |                             |               |
+    |              |                             |               |
+    |              v                             |               |
+    |  +-----------+------------+                |               |
+    |  |REST (auto generated)   |                v               |
+    |  +-----------+------------+    +-----------+------------+  |
+    |              |                 | built artifacts        |  |
+    |              |                 |     index.html         |  |
+    |              v                 |     bundle.js          |  |
+    |  +-----------+------------+    |     images             |  |
+    |  | OVSDB                  |    |     ...etc             |  |
+    |  +------------------------+    +------------------------+  |
+    |                                                            |
+    +------------------------------------------------------------+
+
+GUI Design
+----------
+
+The GUI design is based on the following technologies:
+* [ReactJS](https://github.com/facebook/react)
+ * Controller-view framework
+* [RefluxJS](https://github.com/reflux/refluxjs)
+ * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation with a unidirectional data flow pattern
+
+
+    +---------+     +--------+     +-----------------+
+    | Actions +---->+ Stores +---->+ View Components |
+    +----+----+     +--------+     +-------+---------+
+         ^                                 |
+         |                                 |
+         +---------------------------------+
+
+This approach is taken one step further to isolate all back-end service interaction within actions.
+
+    +---------------------+      Calls   Calls   +---------------------------+
+    | A ReactJS Component +--------+       +-----| Another ReactJS Component |
+    +----+----------------+        |       |     +---------------------------+
+                 ^                 |       |
+                 |                 v       v
+                 |               +-+-------+-------+    Calls
+                 |               | A Reflux Action +------------+
+                 |               +-+----------+----+            |
+                 |                 |          ^                 |
+    Publishes to |    Publishes to |          |                 |
+                 |                 |          |                 v
+                 |                 |          |          +------+------------+  
+            +----+-------------+   |          |          | A Backend Service |  
+            | A RefluxJS Store +<--+          +----------+ (REST)            |  
+            +------------------+               Callback  +-------------------+  
+
+Development Environment
+-----------------------
+
+The directory structure (described below) includes:
+
+    ../ops-webui
+        .eslintrc - javascript/JSX ESLint rule definitions
+        aliases.sh - can be sourced by bash, aliases of "npm run ..." commands
+        package.json - nodeJS/npm dependences and npm command definitions
+        webpack.config.js - webpack module bundler configuration
+        /build - all built artifacts go here (empty until a build is performed)
+            index.html
+            bundle.js - all compiled javascript and styles
+            (images, icons. fonts)
+        /node_modules - all 3rd party npm modules are install here
+            /react
+            /grommet
+            (...etc...)
+        /src - all javascript and styles
+            /font - all font files
+            /img - all image files
+            /js - all javascript/JSX files
+                /actions - action modules
+                /components - ReactJS components that are building blocks (not views)
+                /i18n - internationalization text (i.e. en-US.js)
+                /main - framework modules/components (i.e. mast, navpane, ...)
+                /stores - store modules
+                /utils - general javascript utility modules
+                /views - ReactJS components that are views (associated with a navigation route)
+            /scss - all style files
+                /components - styles associated with building block components
+                /views - styles associated with views
+                app.scss - main framework styles (i.e. mast, navpane, ...)
+                index.scss - main style entry point (sets globals and loads all style files)
+            index.html - bare bones single page that contains single content div
+        /tools - development tools (build and test)
+            /loader - custom webpack loaders needed for building
+            /reference - backup directory for legacy code (not used)
+            /test - test configuration and helper files
+
+The development stack is based on the following technologies:
+* [NodeJS / npm](https://nodejs.org/en)
+ * Used to load 3rd party modules
+ * Used to issue build and test commands
+ * package.json file is used to store:
+   * versioned list of run-time dependencies
+   * versioned list of development dependencies
+   * npm build commands (see below)
+
+Once NodeJS/npm is installed, the npm build commands (defined in package.json) can be run from the ops-webui root directory.  For example:
+
+    ops-webui$ npm run build
+
+    > webapp@0.0.0 build /home/fjw/openswitch/ops-webui
+    > webpack --progress
+
+There is an aliases.sh file in the ops-webui root directory that can be sourced that provide aliases for each command.
+
+    alias wb='npm run build'
+    alias wbw='npm run buildwatch'
+    alias wbd='npm run builddebug'
+    alias wbp='npm run buildprod'
+    alias wtw='npm run testwatch'
+    alias wt='npm run test'
+    alias wds='./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot --inline'
+
+There commands are described below:
+* wb - single-run build creates index.html, bundle.js and other assets in ./build
+* wbw - continuous build, same as build but reruns when files change
+* wbd - single-run build with more verbose output
+* wbp - single-run build with the addition minimizing bundle.js
+* wt - single-run unit tests (karma/jasmine tests are located in __test__ directories)
+* wtw - continuous testing, same as test but reruns when files change
+* wds - runs the webpack development server with hot change support
+
+
 
 Reponsibilities
 ---------------
@@ -26,7 +167,7 @@ Discuss which tables/columns this module is interested in. Where it gets the con
 
 Internal structure
 ------------------
-Put diagrams and text explaining major modules, threads, data structures, timers etc. 
+Put diagrams and text explaining major modules, threads, data structures, timers etc.
 
 Any other sections that are relevant for the module
 ---------------------------------------------------
