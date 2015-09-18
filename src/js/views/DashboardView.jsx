@@ -248,6 +248,7 @@ module.exports = React.createClass({
             max = (item.max * 1.5); // FIXME: temp val always max?
         return (
             <div key={item.name} className="tempRow">
+                <div><b>{item.name + ': '}</b>{item.loc}</div>
                 <GMeter
                     value={Math.round(item.val * 10) / 10}
                     min={{

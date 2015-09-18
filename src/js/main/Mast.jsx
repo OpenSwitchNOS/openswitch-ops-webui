@@ -11,7 +11,7 @@ var React = require('react'),
     RenderActions = require('RenderActions'),
     RenderStore = require('RenderStore'),
     SystemInfoActions = require('SystemInfoActions'),
-    AuthStore = require('AuthStore'),
+    SessionStore = require('SessionStore'),
     ActionIcon = require('ActionIcon'),
     GMenu = require('grommet/components/Menu'),
     GEditIcon = require('grommet/components/icons/Edit'),
@@ -28,7 +28,7 @@ module.exports = React.createClass({
 
     mixins: [
         Reflux.connect(RenderStore),
-        Reflux.connect(AuthStore),
+        Reflux.connect(SessionStore),
         Reflux.listenTo(SystemInfoActions.load.completed, 'onSysInfoLoaded')
     ],
 
@@ -49,7 +49,7 @@ module.exports = React.createClass({
         var partNum = this.state.sysInfo && this.state.sysInfo.partNum,
             serialNum = this.state.sysInfo && this.state.sysInfo.serialNum,
             hostName = this.state.sysInfo && this.state.sysInfo.hostName,
-            user = this.state.user,
+            user = this.state.userId,
             showToggleIcon = this.state.showNavPane,
             chevron = showToggleIcon ? 'chevron-left' : 'chevron-right',
             toggleIcon = (

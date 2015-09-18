@@ -21,6 +21,7 @@ module.exports = {
         test: 'Test',
         logout: 'Logout',
         invalidUserPwd: 'Invalid user or password.',
+        noAuthUserId: 'None (no authorization)',
 
         // Navigation groups.
         general: 'General',

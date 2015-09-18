@@ -7,14 +7,12 @@
 var React = require('react/addons'),
     Reflux = require('reflux'),
     Router = require('react-router'),
-    AuthStore = require('AuthStore'),
-    ServerConfigStore = require('ServerConfigStore'),
+    SessionStore = require('SessionStore'),
+    SessionActions = require('SessionActions'),
     History = Router.History,
     Navigation = Router.Navigation,
     GLayer = require('grommet/components/Layer'),
     GLoginForm = require('grommet/components/LoginForm'),
-    AuthActions = require('AuthActions'),
-    ServerConfigActions = require('ServerConfigActions'),
     I18n = require('i18n'),
     ViewInitMixin = require('ViewInitMixin'),
     ClassNames = require('classnames');
@@ -26,8 +24,7 @@ module.exports = React.createClass({
     mixins: [
         History,
         Navigation,
-        Reflux.listenTo(AuthStore, 'onAuthChange'),
-        Reflux.listenTo(ServerConfigStore, 'onServerConfigChange'),
+        Reflux.listenTo(SessionStore, 'onSessionChange'),
         ViewInitMixin
     ],
 
@@ -35,42 +32,27 @@ module.exports = React.createClass({
         return { inProgress: false, errors: [ ] };
     },
 
-    onAuthChange: function(data) {
-        if (data.error) {
+    onSessionChange: function(data) {
+        if (this.state.inProgress) {
             this.setState({
                 inProgress: false,
-                errors: [ I18n.text('invalidUserPwd') ]
+                errors: data.userId ? [ ] : [ I18n.text('invalidUserPwd') ]
             });
-        } else {
-            this.setState({
-                inProgress: false,
-                errors: [ ]
-            });
-        }
-
-        if (data.user) {
-            ServerConfigActions.init();
-        }
-    },
-
-    onServerConfigChange: function(data) {
-        var ctxRtr = this.context.router,
-            cq = ctxRtr && ctxRtr.getCurrentQuery();
-        if (data.isInitialized) {
-            if (cq && cq.nextPath) {
-                ctxRtr.replaceWith(cq.nextPath);
-            } else {
-                ctxRtr.replaceWith('/dashboard');
+            if (data.userId) {
+                this.context.router.replaceWith('/dashboard');
             }
         }
     },
 
     onSubmitLogin: function(data) {
-        AuthActions.login({
+        SessionActions.open({
             user: data.username,
             pwd: data.password
         });
-        this.setState(({ inProgress: true, errors: [ ] }));
+        this.setState(({
+            inProgress: true,
+            errors: [ ]
+        }));
     },
 
     render: function() {

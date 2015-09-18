@@ -4,10 +4,8 @@
  * @author Frank Wood
  */
 
-var AuthStore = require('AuthStore'),
-    AuthActions = require('AuthActions'),
-    ServerConfigActions = require('ServerConfigActions'),
-    ServerConfigStore = require('ServerConfigStore');
+var SessionStore = require('SessionStore'),
+    SessionActions = require('SessionActions');
 
 module.exports = {
     statics: {
@@ -16,18 +14,13 @@ module.exports = {
 
             console.log('*** ViewInitMixin ***');
             console.log(transition);
-            console.log('isLoggedIn: ' + AuthStore.isLoggedIn());
-            console.log('isInitialized: ' + ServerConfigStore.isInitialized());
+            console.log('SessionStore.userId: ' + SessionStore.userId());
 
             if (transition.path === '/login') {
 
-                if (AuthStore.isLoggedIn()) {
-                    console.log('Performing logout & server reset');
-                    AuthActions.logout();
-                    ServerConfigActions.reset();
-                }
+                SessionActions.close();
 
-            } else if (!AuthStore.isLoggedIn()) {
+            } else if (!SessionStore.userId()) {
 
                 transition.redirect('/login', {}, {});
             }

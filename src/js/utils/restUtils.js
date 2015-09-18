@@ -86,10 +86,15 @@ function get(req, cb) {
 }
 
 function encodeValues(obj) {
-    var encodedObj = {};
+    var encodedObj = {}, val;
     for (var key in obj) {
         if (obj.hasOwnProperty(key)) {
-            encodedObj[key] = encodeURIComponent(obj[key]);
+            val = obj[key];
+            if (typeof val === 'object') {
+                encodedObj[key] = encodeValues(val);
+            } else {
+                encodedObj[key] = encodeURIComponent(obj[key]);
+            }
         }
     }
     return encodedObj;
@@ -97,19 +102,36 @@ function encodeValues(obj) {
 
 // Wraps the superagent POST request (contentType is optional).
 function post(url, body, callback, contentType) {
-    var reqUrl = mkUrl(url),
-        encodedBody = encodeValues(body);
+    var reqUrl = mkUrl(url);
 
     if (contentType === 'application/x-www-form-urlencoded') {
         Request.post(reqUrl)
             .type('form')
             .withCredentials()
-            .send(encodedBody)
+            .send(encodeValues(body))
             .end(callback);
     } else {
         Request.post(reqUrl)
             .withCredentials()
-            .send(encodedBody) // default is JSON
+            .send(body) // default is JSON
+            .end(callback);
+    }
+}
+
+// Wraps the superagent PUT request (contentType is optional).
+function put(url, body, callback, contentType) {
+    var reqUrl = mkUrl(url);
+
+    if (contentType === 'application/x-www-form-urlencoded') {
+        Request.put(reqUrl)
+            .type('form')
+            .withCredentials()
+            .send(encodeValues(body))
+            .end(callback);
+    } else {
+        Request.put(reqUrl)
+            .withCredentials()
+            .send(body) // default is JSON
             .end(callback);
     }
 }
@@ -119,6 +141,8 @@ module.exports = {
     get: get,
 
     post: post,
+
+    put: put,
 
     setRestApiRedirect: function(host) {
         redirect = host;
