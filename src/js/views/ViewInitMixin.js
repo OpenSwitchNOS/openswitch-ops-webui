@@ -12,10 +12,6 @@ module.exports = {
 
         willTransitionTo: function(transition) {
 
-            console.log('*** ViewInitMixin ***');
-            console.log(transition);
-            console.log('SessionStore.userId: ' + SessionStore.userId());
-
             if (transition.path === '/login') {
 
                 SessionActions.close();

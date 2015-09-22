@@ -29,20 +29,20 @@ MgmtIntfActions.load.listen(function() {
                     if ( mgmtIntf.ip ) {
                         result.ip = mgmtIntf.ip;
                     }
-                    if ( mgmtIntf['subnet-mask'] ) {
-                        result.subnetMask = mgmtIntf['subnet-mask'];
+                    if ( mgmtIntf.subnet_mask ) {
+                        result.subnetMask = mgmtIntf.subnet_mask;
                     }
-                    if ( mgmtIntf['default-gateway'] ) {
-                        result.defaultGateway = mgmtIntf['default-gateway'];
+                    if ( mgmtIntf.default_gateway ) {
+                        result.defaultGateway = mgmtIntf.default_gateway;
                     }
                     if ( mgmtIntf.ipv6 ) {
                         result.ipv6 = mgmtIntf.ipv6;
                     }
-                    if ( mgmtIntf['dns-server1'] ) {
-                        result.dnsServer1 = mgmtIntf['dns-server1'];
+                    if ( mgmtIntf.dns_server1 ) {
+                        result.dnsServer1 = mgmtIntf.dns_server1;
                     }
-                    if ( mgmtIntf['dns-server2'] ) {
-                        result.dnsServer2 = mgmtIntf['dns-server2'];
+                    if ( mgmtIntf.dns_server2 ) {
+                        result.dnsServer2 = mgmtIntf.dns_server2;
                     }
                 } else {
                     result.mode = 'dhcp';
