@@ -6,22 +6,29 @@
 describe('Test Suite For InterfaceActions', function() {
 
     var infs = {
-            testUrl: '/system/Interface',
-            data: [
-                '/system/Interface/INF-0',
-                '/system/Interface/INF-1'
+            testUrl: '/rest/v1/system/interfaces',
+            body: [
+                '/rest/v1/system/interface/INF-0',
+                '/rest/v1/system/interface/INF-1'
             ]
         },
         inf0 = {
-            testUrl: '/system/Interface/INF-0',
-            data: {
-                'link_state': [ 'up' ],
-                duplex: [ 'full' ],
-                'link_speed': [ '1000000000' ],
-                name: 'inf0',
+            testUrl: '/rest/v1/system/interface/INF-0',
+            body: {
+                configuration: {
+                    type:  'system'
+                },
                 statistics: {
-                    'rx_bytes': '111',
-                    'tx_bytes': '222'
+                    statistics: {
+                        'rx_bytes': '111',
+                        'tx_bytes': '222'
+                    }
+                },
+                status: {
+                    'link_state': 'up',
+                    duplex: 'full',
+                    'link_speed': '1000000000',
+                    name: 'inf0',
                 }
             },
             processed: {
@@ -34,15 +41,22 @@ describe('Test Suite For InterfaceActions', function() {
             }
         },
         inf1 = {
-            testUrl: '/system/Interface/INF-1',
-            data: {
-                'link_state': [ 'down' ],
-                duplex: [ 'half' ],
-                'link_speed': [ '100000000' ],
-                name: 'inf1',
+            testUrl: '/rest/v1/system/interface/INF-1',
+            body: {
+                configuration: {
+                    type:  'system'
+                },
                 statistics: {
-                    'rx_bytes': '333',
-                    'tx_bytes': '444'
+                    statistics: {
+                        'rx_bytes': '333',
+                        'tx_bytes': '444'
+                    }
+                },
+                status: {
+                    'link_state': 'down',
+                    duplex: 'half',
+                    'link_speed': '100000000',
+                    name: 'inf1',
                 }
             },
             processed: {
@@ -63,9 +77,9 @@ describe('Test Suite For InterfaceActions', function() {
     });
 
     it('completes correctly', function() {
-        AjaxStubRequest(infs.testUrl, infs);
-        AjaxStubRequest(inf0.testUrl, inf0);
-        AjaxStubRequest(inf1.testUrl, inf1);
+        AjaxStubRequest(infs.testUrl, infs.body);
+        AjaxStubRequest(inf0.testUrl, inf0.body);
+        AjaxStubRequest(inf1.testUrl, inf1.body);
 
         spyOn(InterfaceActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');

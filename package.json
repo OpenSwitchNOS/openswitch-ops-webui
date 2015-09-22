@@ -35,7 +35,8 @@
     "grommet": "0.3.6",
     "react-shuffle": "0.1.0",
     "react-chartjs": "0.6.0",
-    "query-string": "2.4.0"
+    "query-string": "2.4.0",
+    "ip-subnet-calculator": "1.0.2"
   },
   "devDependencies": {
     "webpack": "1.11.0",

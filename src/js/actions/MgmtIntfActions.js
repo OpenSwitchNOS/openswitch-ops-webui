@@ -5,7 +5,8 @@
 
 var Reflux = require('reflux'),
     RestUtils = require('restUtils'),
-    RenderActions = require('RenderActions');
+    RenderActions = require('RenderActions'),
+    IpSubnetCalc = require('ip-subnet-calculator');
 
 var MgmtIntfActions = Reflux.createActions({
     load: { asyncResult: true },
@@ -28,9 +29,17 @@ MgmtIntfActions.load.listen(function() {
                     result.mode = 'static';
                     if ( mgmtIntf.ip ) {
                         result.ip = mgmtIntf.ip;
-                    }
-                    if ( mgmtIntf.subnet_mask ) {
-                        result.subnetMask = mgmtIntf.subnet_mask;
+                        if ( mgmtIntf.subnet_mask ) {
+                            if (mgmtIntf.subnet_mask.length <= 2) {
+                                result.subnetMask =
+                                    IpSubnetCalc.calculateSubnetMask(
+                                        mgmtIntf.ip,
+                                        Number(mgmtIntf.subnet_mask)
+                                    ).prefixMaskStr;
+                            } else {
+                                result.subnetMask = mgmtIntf.subnet_mask;
+                            }
+                        }
                     }
                     if ( mgmtIntf.default_gateway ) {
                         result.defaultGateway = mgmtIntf.default_gateway;
