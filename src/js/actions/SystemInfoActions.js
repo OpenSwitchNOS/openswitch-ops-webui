@@ -29,8 +29,8 @@ SystemInfoActions.load.listen(function() {
                 serialNum: otherInfo.serial_number,
                 vendor: otherInfo.vendor,
                 productName: otherInfo['Product Name'],
-                version: otherInfo.diag_version,
                 partNum: otherInfo.part_number,
+                version: res[1].body.status.switch_version,
                 hostName: res[1].body.configuration.hostname
             });
         }

@@ -74,8 +74,8 @@ module.exports = {
                 temp: 'Temperatures',
                 tempUnits: 'C',
                 portTopUtil: 'Top Interface Utilization',
-                port: 'Port',
-                vlan: 'VLAN',
+                loadingInfData: 'Loading Interfaces...',
+                port: 'Interface',
                 tx: 'Tx',
                 rx: 'Rx',
                 txRx: ''

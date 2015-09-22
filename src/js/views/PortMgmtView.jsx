@@ -12,7 +12,8 @@ var React = require('react'),
     BoxGraphic = require('BoxGraphic'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GTable = require('grommet/components/Table'),
-    ViewInitMixin = require('ViewInitMixin');
+    ViewInitMixin = require('ViewInitMixin'),
+    PortsActions = require('PortsActions');
 
 // internationalization for the view
 function t(key) {
@@ -35,6 +36,10 @@ var PortList = React.createClass({
     mixins: [
         ViewInitMixin
     ],
+
+    componentDidMount: function() {
+        PortsActions.loadPorts();
+    },
 
     render: function() {
 

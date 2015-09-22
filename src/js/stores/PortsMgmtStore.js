@@ -30,7 +30,7 @@ function splitPort(elem, index) {
 module.exports = Reflux.createStore({
 
     init: function() {
-        PortsActions.loadPorts();
+        // FIXME: can't do this before login - PortsActions.loadPorts();
         this.listenTo(PortsActions.loadPorts.completed, 'setPorts');
     },
 
