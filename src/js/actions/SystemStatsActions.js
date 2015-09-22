@@ -83,6 +83,16 @@ function processPass2(res) {
             val: Number(r.body.status.temperature) / 1000
         };
     });
+    // FIXME: where should we put this?
+    result.temps.sort(function(t1, t2) {
+        if (t1.name < t2.name) {
+            return -1;
+        }
+        if (t1.name > t2.name) {
+            return 1;
+        }
+        return 0;
+    });
 
     result.fans = res[2].map(function(r) {
         var textStatus = processFanStatus(r.body.status.status);

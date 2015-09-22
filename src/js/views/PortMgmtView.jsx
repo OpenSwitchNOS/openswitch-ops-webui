@@ -36,6 +36,10 @@ var PortList = React.createClass({
         ViewInitMixin
     ],
 
+    componentDidMount: function() {
+        PortsActions.loadPorts();
+    },
+
     render: function() {
 
         return (

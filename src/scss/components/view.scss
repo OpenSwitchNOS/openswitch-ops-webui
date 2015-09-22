@@ -25,6 +25,10 @@
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+
+    &.spaceBetween {
+        justify-content: space-between;
+    }
 }
 
 // Style a view element to flex in the top-to-bottom direction
@@ -36,6 +40,10 @@
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+
+    &.spaceBetween {
+        justify-content: space-between;
+    }
 }
 
 // Style a view element as a 'viewBox'

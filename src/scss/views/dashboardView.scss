@@ -8,9 +8,14 @@
 
     .utilizationRow {
         border-bottom: $viewBoxHeaderBorderBottom;
-        margin-bottom: 24px;
+        margin-bottom: 32px;
     }
 
+    .tempRow {
+        margin-bottom: 12px;
+    }
+
+    // FIXME: not used after readjustment of the dashboard cause temp panel
     .viewBox.box1 {
         min-height: 300px;
 
@@ -22,7 +27,4 @@
         max-width: 220px;
     }
 
-    .tempRow {
-        margin-bottom: 24px;
-    }
 }

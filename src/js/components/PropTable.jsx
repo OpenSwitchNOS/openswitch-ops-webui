@@ -27,9 +27,11 @@ module.exports = React.createClass({
                 <tbody>
                     {this.props.data.map(function(row) {
                         var name = row[0];
+                        name = typeof name === 'string' && name.length > 0 ?
+                                name + ':' : '';
                         return (
                             <tr key={name}>
-                                <td>{name}:</td><td>{row[1]}</td>
+                                <td>{name}</td><td>{row[1]}</td>
                             </tr>
                         );
                     })}

@@ -6,7 +6,8 @@
 var Reflux = require('reflux'),
     InterfaceActions = require('InterfaceActions'),
     Lodash = require('lodash'),
-    Calc = require('calculations');
+    Calc = require('calculations'),
+    TOP_COUNT = 6; // FIXME: this is related to DashboardView shuffle count
 
 module.exports = Reflux.createStore({
 
@@ -77,7 +78,7 @@ module.exports = Reflux.createStore({
         });
 
         this.state.timestampMillis = currTsMillis;
-        this.state.topUtilization = topUtls.slice(0, 5);
+        this.state.topUtilization = topUtls.slice(0, TOP_COUNT);
         this.state.interfaces = ciMap;
     },
 
