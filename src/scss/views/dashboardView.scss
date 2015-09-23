@@ -15,12 +15,9 @@
         margin-bottom: 12px;
     }
 
-    // FIXME: not used after readjustment of the dashboard cause temp panel
-    .viewBox.box1 {
-        min-height: 300px;
-
-        // for IE 11 until grommet meter styling is fixed
-        max-height: 400px;
+    // FIXME: for IE 11 until grommet meter styling is fixed
+    .meter--bar .meter__graphic {
+        max-height: 32px;
     }
 
     td {
