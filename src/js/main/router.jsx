@@ -1,7 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Create and run the router.
- * @author Kelsey Dedoshka
- * @author Frank Wood
  */
 
 var React = require('react'),
@@ -16,12 +30,7 @@ var React = require('react'),
     DashboardView = require('DashboardView'),
     PortMonitorView = require('PortMonitorView'),
     PortMgmtView = require('PortMgmtView'),
-    TestView1 = require('TestView1'),
-    TestView2 = require('TestView2'),
-    TestView3 = require('TestView3'),
     VlanMgmtView = require('VlanMgmtView'),
-    VlanMonitorView = require('VlanMonitorView'),
-    VlanPortConfigView = require('VlanPortConfigView'),
     MgmtIntfView = require('MgmtIntfView'),
 
     App = require('App');
@@ -38,18 +47,13 @@ var routes = (
         <Route name="systemMonitor" handler={SystemMonitorView}>
             <Route path=":type" handler={SystemMonitorChart}/>
         </Route>
-        <Route name="test1" handler={TestView1}/>
-        <Route name="test2" handler={TestView2}/>
-        <Route name="test3" handler={TestView3}/>
         <Route name="vlanMgmt" handler={VlanMgmtView}/>
-        <Route name="vlanMonitor" handler={VlanMonitorView}/>
-        <Route name="vlanPortConfig" handler={VlanPortConfigView}/>
         <Route name="mgmtIntf" handler={MgmtIntfView}/>
-        <DefaultRoute handler={Login}/>
+        <DefaultRoute handler={DashboardView}/>
     </Route>
 );
 
 // Attach the routes to the document.body
 Router.run(routes, function(Handler) {
-    React.render(<Handler />, document.body);
+    React.render(<Handler />, document.getElementById('appContent'));
 });

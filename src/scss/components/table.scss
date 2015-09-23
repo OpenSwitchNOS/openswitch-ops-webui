@@ -23,21 +23,6 @@ tbody, thead {
 
 .defaultTable {
 
-    //@media #{$smallScreen} {
-   //     font-size: $tableFontSizeLarge;
-   // }
-
-   // @media #{$mediumScreen} {
-   //     font-size: $tableFontSize;
-   // }
-
-   // @media #{$largeScreen} {
-   //     font-size: $tableFontSize;
-    //}
-
-   // line-height: 1em;
-   // font-weight: normal;
-
     // style even rows - alternate table
     // row colors
     > table > tbody > tr:nth-child(even) {

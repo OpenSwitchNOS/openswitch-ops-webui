@@ -1,7 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Dashboard view.
- * @author Frank Wood
- * @author Al Harrington
  */
 
 // TODO: stagger load times so we don't wait 10 seconds.
@@ -23,10 +37,11 @@ var React = require('react/addons'),
     SystemInfoActions = require('SystemInfoActions'),
     SystemStatsActions = require('SystemStatsActions'),
     InterfaceActions = require('InterfaceActions'),
-    Lodash = require('lodash');
+    Lodash = require('lodash'),
+    ViewInitMixin = require('ViewInitMixin');
 
 var AUTO_REFRESH_MILLIS = 10000,
-    NUM_UTL_VIEW_SLOTS = 5,
+    NUM_UTL_VIEW_SLOTS = 6,
     NUM_UTL_SLOTS = NUM_UTL_VIEW_SLOTS * 2,
     METER_MAX_VAL_ADJ = 0.1,
     autoRefreshCount = 0,
@@ -76,7 +91,8 @@ module.exports = React.createClass({
 
     mixins: [
         Reflux.connect(DashboardStore),
-        Navigation
+        Navigation,
+        ViewInitMixin
     ],
 
     componentDidMount: function() {
@@ -129,8 +145,8 @@ module.exports = React.createClass({
             newInfSlots,
             newTopUtilInfs = this.state.interfaceStats.topUtilization;
 
-        if (!newTopUtilInfs) {
-            return;
+        if (!newTopUtilInfs || newTopUtilInfs.length === 0) {
+            return false;
         }
 
         newInfSlots = Lodash.cloneDeep(infSlots);
@@ -166,23 +182,14 @@ module.exports = React.createClass({
         }
 
         infSlots = newInfSlots;
+        return true;
     },
 
     mkSysInfoPropData: function() {
-        var si = this.state.sysInfo;
-        return [
-            [ t('productName'), si.productName ],
-            [ t('vendor'), si.vendor ],
-            [ t('version'), si.version ],
-            [ t('onieVersion'), si.onieVersion ],
-            [ t('baseMac'), si.baseMac ]
-        ];
-    },
-
-    mkSysStatusPropData: function() {
-        var si = this.state.sysStats,
-            fans = si.fans,
-            pwrs = si.powerSupplies,
+        var si = this.state.sysInfo,
+            ss = this.state.sysStats,
+            fans = ss.fans,
+            pwrs = ss.powerSupplies,
             fanPropVal,
             status,
             fanCount,
@@ -217,6 +224,12 @@ module.exports = React.createClass({
         }
 
         return [
+            [ t('productName'), si.productName ],
+            [ t('vendor'), si.vendor ],
+            [ t('version'), si.version ],
+            [ t('onieVersion'), si.onieVersion ],
+            [ t('baseMac'), si.baseMac ],
+            [ '', '' ],
             [ t('fanStatus'), fanPropVal ],
             [ t('powerSupplyLabel') + ' 1', pwrPropVal1 ],
             [ t('powerSupplyLabel') + ' 2', pwrPropVal2 ]
@@ -228,7 +241,10 @@ module.exports = React.createClass({
             m = Math.round((maxVal || 0) * 10) / 10,
             u = units || '';
         return (
-            <GMeter className="viewBoxContent margin" type="arc" value={ v }
+            <GMeter className="viewBoxContent margin"
+                small={true}
+                type="arc"
+                value={ v }
                 min={{
                     value: 0,
                     label: '0 ' + u
@@ -246,9 +262,9 @@ module.exports = React.createClass({
             max = (item.max * 1.5); // FIXME: temp val always max?
         return (
             <div key={item.name} className="tempRow">
+                <div><b>{item.name + ': '}</b>{item.loc}</div>
                 <GMeter
                     value={Math.round(item.val * 10) / 10}
-                    small={true}
                     min={{
                         value: item.min,
                         label: item.min.toFixed(1) + ' ' + u
@@ -334,72 +350,62 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var si = this.state.sysStats;
-
-        this.updateInfSlots();
+        var si = this.state.sysStats,
+            haveInfData = this.updateInfSlots();
 
         return (
-            <div id="dashboardView" className="viewRow">
+            <div id="dashboardView" className="viewCol">
 
-                <div className="viewCol fillRow">
-                    <div className="viewBox box1 fillColumn">
-                        <ViewBoxHeader title={t('systemInfo')} />
-                        <PropTable
-                            className="viewBoxContent margin"
-                            data={this.mkSysInfoPropData()} />
-                    </div>
-
-                    <div className="viewBox box1 fillColumn">
-                        <ViewBoxHeader title={t('systemStatus')} />
-                        <PropTable
-                            className="viewBoxContent margin"
-                            data={this.mkSysStatusPropData()} />
-                    </div>
-                </div>
-
-                <div className="viewCol fillRow">
-                    <div className="viewBox box1 fillColumn">
-                        <ViewBoxHeader
-                            title={t('cpu')}
-                            toolbar={this.mkSysTb('cpu')} />
-                            <div className="viewBoxContent margin center">
-                                {this.mkMeter(si.cpuVal, si.cpuMax, '')}
-                            </div>
-                    </div>
-                    <div className="viewBox box1 fillColumn">
-                        <ViewBoxHeader title={t('storage')} />
-                        <div className="viewBoxContent margin center">
-                            {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
+                <div className="viewRow">
+                    <div className="viewCol">
+                        <div className="viewBox">
+                            <ViewBoxHeader title={t('systemInfo')} />
+                            <PropTable
+                                className="viewBoxContent margin"
+                                data={this.mkSysInfoPropData()} />
+                        </div>
+                        <div className="viewBox">
+                            <ViewBoxHeader
+                                title={t('temp')}
+                                toolbar={this.mkSysTb('temperature')} />
+                            {this.mkTempMeters()}
                         </div>
                     </div>
-                </div>
-
-                <div className="viewCol fillRow">
-                    <div className="viewBox box1 fillColumn">
-                        <ViewBoxHeader
-                            title={t('memory')}
-                            toolbar={this.mkSysTb('memory')} />
+                    <div className="viewCol spaceBetween">
+                        <div className="viewBox">
+                            <ViewBoxHeader
+                                title={t('cpu')}
+                                toolbar={this.mkSysTb('cpu')} />
+                                <div className="viewBoxContent margin center">
+                                    {this.mkMeter(si.cpuVal, si.cpuMax, '')}
+                                </div>
+                        </div>
+                        <div className="viewBox">
+                            <ViewBoxHeader
+                                title={t('memory')}
+                                toolbar={this.mkSysTb('memory')} />
+                                <div className="viewBoxContent margin center">
+                                    {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                                </div>
+                        </div>
+                        <div className="viewBox">
+                            <ViewBoxHeader title={t('storage')} />
                             <div className="viewBoxContent margin center">
-                                {this.mkMeter(si.memVal, si.memMax, t('memoryUnits'))}
+                                {this.mkMeter(si.storVal, si.storMax, t('storageUnits'))}
                             </div>
+                        </div>
                     </div>
-
-                    <div className="viewBox box1 fillColumn">
+                    <div className="viewBox">
                         <ViewBoxHeader
-                            title={t('temp')}
-                            toolbar={this.mkSysTb('temperature')} />
-                        {this.mkTempMeters()}
-                    </div>
-                </div>
-
-                <div className="viewBox fillColumn">
-                    <ViewBoxHeader
-                        title={t('portTopUtil')}
-                        toolbar={this.mkUtlTb()} />
-                    <div className="viewBoxContent margin">
-                        <ReactShuffle duration={1500} scale={false} fade={true}>
-                            {this.mkUtlMeters()}
-                        </ReactShuffle>
+                            title={t('portTopUtil')}
+                            toolbar={this.mkUtlTb()} />
+                        <div className="viewBoxContent margin">
+                            { haveInfData ?
+                                <ReactShuffle duration={1500} scale={false} fade={true}>
+                                    {this.mkUtlMeters()}
+                                </ReactShuffle> :
+                                t('loadingInfData') }
+                        </div>
                     </div>
                 </div>
 

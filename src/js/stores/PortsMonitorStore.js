@@ -1,12 +1,28 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Data Store for the ports monitor view
- * @author Kelsey Dedoshka
  */
 
 var Reflux = require('reflux'),
     PortsMonitorActions = require('PortsMonitorActions'),
     _ = require('lodash'),
     Calcs = require('calculations'),
+    ChartUtils = require('chartUtils'),
     Cnvs = require('conversions'),
     MAX_POINTS_ON_GRAPH = 25,
     INTERVAL = 5000;
@@ -83,24 +99,6 @@ module.exports = Reflux.createStore({
         //of the graphs
         showStatusText: 0,
 
-        //graph colors - stroke: line stroke
-        //fill: fill under graph
-        //light: to make transprent when showing details
-        colors: [
-                { 'stroke': 'rgba(255,111,62,1)',
-                    'fill': 'rgba(255,111,62,0.3)',
-                    'light': 'rgba(255,111,62,0.1)' },
-                { 'stroke': 'rgba(61,141,155,1)',
-                    'fill': 'rgba(61,141,155,0.3)',
-                    'light': 'rgba(61,141,155,0.1)' },
-                { 'stroke': 'rgba(211,154,66,1)',
-                    'fill': 'rgba(211,154,66,0.3)',
-                    'light': 'rgba(211,154,66,0.1)' },
-                { 'stroke': 'rgba(101,57,164,1)',
-                    'fill': 'rgba(101,57,164,0.3)',
-                    'light': 'rgba(101,57,164,0.1)' }
-            ],
-
         //datasets for the utilization chart
         //each data set is a line on the graph
         dataSets: {},
@@ -150,7 +148,7 @@ module.exports = Reflux.createStore({
         // create data sets and add to dataSets store variable
         for (var i=0; i<graphTypes.length; i++) {
             var initialStats = new Stats(),
-                colors = this.state.colors[i];
+                colors = ChartUtils.colors[i];
 
             var data = new DataSet(
                 graphTypes[i].name, i, { 'show': 1, 'colorIndex': i }, [],
@@ -179,6 +177,7 @@ module.exports = Reflux.createStore({
     onLoadPortStatsCompleted: function(res) {
         var st = this.state,
             portStats = res.body.status; // FIXME below some of these are arrays?
+        var date;
 
         // on the intial load - set the datasets variable
         // to have the correct data sets depending on
@@ -228,7 +227,8 @@ module.exports = Reflux.createStore({
                 st.pointCount = st.pointCount + 1;
             }
 
-            this.state.labels.push(Date.parse(res.headers.date));
+            date = res.headers.date ? Date.parse(res.headers.date) : null;
+            this.state.labels.push(date);
             this.trigger(this.state);
         }
     },
@@ -244,9 +244,9 @@ module.exports = Reflux.createStore({
             intfCfg = res[i].body.configuration;
             intfStatus = res[i].body.status;
             //port type as empty string means it is a port
-            if (intfCfg.type === '' &&
-                intfStatus.link_state[0] === 'up' &&
-                intfStatus.link_speed[0] > 0) {
+            if (intfCfg.type === 'system' &&
+                intfStatus.link_state === 'up' &&
+                intfStatus.link_speed > 0) {
 
                 portNums.push(Number(intfCfg.name));
             }
@@ -421,7 +421,7 @@ module.exports = Reflux.createStore({
     // the bar chart color
     setBarColors: function() {
         var graph = this.state.dataSets[this.state.activeDetails];
-        var colors = this.state.colors[graph.index];
+        var colors = ChartUtils.colors[graph.index];
         graph.graphData.fillColor = colors.stroke;
         graph.graphData.strokeColor = colors.stroke;
         this.trigger(this.state);
@@ -444,7 +444,7 @@ module.exports = Reflux.createStore({
         for (var key in this.state.dataSets) {
             if (this.state.dataSets.hasOwnProperty(key)) {
                 var graph = this.state.dataSets[key];
-                var colorIndex = this.state.colors[graph.index];
+                var colorIndex = ChartUtils.colors[graph.index];
                 graph.graphData.fillColor = colorIndex.fill;
                 graph.graphData.strokeColor = colorIndex.stroke;
             }

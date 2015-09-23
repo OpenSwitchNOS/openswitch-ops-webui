@@ -6,23 +6,29 @@
 describe('Test Suite For SystemInfoActions', function() {
 
     var ssbase = {
-            testUrl: '/system/subsystems/base',
-            data: {
-                'other_info': {
-                    'onie_version': '1.2.3',
-                    'base_mac_address': '0a:0b:0c:0d:0e:0f',
-                    'serial_number': '321',
-                    vendor: 'hp',
-                    'Product Name': 'halon',
-                    'diag_version': 'v123',
-                    'part_number': 'p#1',
+            testUrl: '/rest/v1/system/subsystems/base',
+            body: {
+                status: {
+                    'other_info': {
+                        'onie_version': '1.2.3',
+                        'base_mac_address': '0a:0b:0c:0d:0e:0f',
+                        'serial_number': '321',
+                        vendor: 'hp',
+                        'Product Name': 'halon',
+                        'part_number': 'p#1',
+                    }
                 }
             }
         },
         sys = {
-            testUrl: '/system',
-            data: {
-                hostname: 'alswitch.rose.hp.com'
+            testUrl: '/rest/v1/system',
+            body: {
+                configuration: {
+                    hostname: 'alswitch.rose.hp.com'
+                },
+                status: {
+                    'switch_version': 'v123'
+                }
             }
         },
         processed = {
@@ -44,8 +50,8 @@ describe('Test Suite For SystemInfoActions', function() {
     });
 
     it('completes correctly', function() {
-        AjaxStubRequest(sys.testUrl, sys);
-        AjaxStubRequest(ssbase.testUrl, ssbase);
+        AjaxStubRequest(sys.testUrl, sys.body);
+        AjaxStubRequest(ssbase.testUrl, ssbase.body);
 
         spyOn(SystemInfoActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');
@@ -61,8 +67,8 @@ describe('Test Suite For SystemInfoActions', function() {
     });
 
     it('fails correctly', function() {
-        AjaxStubRequest(sys.testUrl, sys);
-        AjaxStubRequest(ssbase.testUrl, ssbase, 500);
+        AjaxStubRequest(sys.testUrl, sys.body);
+        AjaxStubRequest(ssbase.testUrl, ssbase.body, 500);
 
         spyOn(SystemInfoActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');

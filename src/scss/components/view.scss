@@ -25,6 +25,10 @@
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+
+    &.spaceBetween {
+        justify-content: space-between;
+    }
 }
 
 // Style a view element to flex in the top-to-bottom direction
@@ -36,6 +40,10 @@
     box-sizing: border-box;
     min-height: 100px;
     min-width: 100px;
+
+    &.spaceBetween {
+        justify-content: space-between;
+    }
 }
 
 // Style a view element as a 'viewBox'
@@ -56,7 +64,7 @@
 
 // Style the contents to fill the flex container
 .fillRow, .fillColumn {
-    -flex-grow: 1;
+    flex-grow: 1;
     -webkit-flex-grow: 1;
 }
 
@@ -117,7 +125,6 @@
     border-bottom: $viewBoxHeaderBorderBottom;
     display: flex;
     display: -webkit-flex;
-    display: -ms-flexbox;
     justify-content: space-between;
     -webkit-justify-content: space-between;
     flex-wrap: wrap;
@@ -130,8 +137,14 @@
     .flexIcons {
         flex-wrap: wrap;
         -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
         display: flex;
         display: -ms-flexbox;
         display: -webkit-flex;
+
+        // IE 10 support
+        > span {
+            display: -ms-flexbox;
+        }
     }
 }

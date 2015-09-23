@@ -8,18 +8,24 @@
 
     .utilizationRow {
         border-bottom: $viewBoxHeaderBorderBottom;
-        margin-bottom: 24px;
+        margin-bottom: 32px;
     }
 
-    .viewBox.box1 {
-        min-height: 300px;
+    .tempRow {
+        margin-bottom: 12px;
+    }
+
+    // FIXME: for IE 11 until grommet meter styling is fixed
+    .meter--bar .meter__graphic {
+        max-height: 32px;
     }
 
     td {
         max-width: 220px;
     }
 
-    .tempRow {
-        margin-bottom: 24px;
+    .viewBox {
+        margin-right: 4px;
+        // margin-left: 16px;
     }
 }

@@ -1,6 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Actions for interfaces (frequently changes).
- * @author Frank Wood
  */
 
 // TODO: make action file names consistent with stores (Port vs Ports).
@@ -14,18 +29,22 @@ var InterfaceActions = Reflux.createActions({
 });
 
 function processResponse(res) {
-    return res.map(function(r) {
-        var sts = r.body.status,
-            stats = r.body.statistics.statistics;
-        return {
-            link: sts.link_state[0],
-            duplex: sts.duplex[0],
-            speed: Number(sts.link_speed[0]),
-            name: r.body.configuration.name,
-            rxBytes: Number(stats.rx_bytes),
-            txBytes: Number(stats.tx_bytes)
-        };
-    });
+    var intfs = [], intf, stats;
+    for (var i=0; i<res.length; i++) {
+        intf = res[i].body;
+        if (intf.configuration.type === 'system') {
+            stats = intf.statistics.statistics;
+            intfs.push({
+                link: intf.status.link_state,
+                duplex: intf.status.duplex,
+                speed: Number(intf.status.link_speed),
+                name: intf.configuration.name,
+                rxBytes: Number(stats.rx_bytes),
+                txBytes: Number(stats.tx_bytes)
+            });
+        }
+    }
+    return intfs;
 }
 
 InterfaceActions.load.listen(function() {

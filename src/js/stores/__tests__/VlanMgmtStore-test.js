@@ -105,7 +105,7 @@ describe('Test Suite For VlanMgmtStore', function() {
 
         jasmine.clock().tick(); // allow action
         expect(err).toBeNull();
-        expect(result).toEqual(vlans.test1.data);
+        expect(result.body).toEqual(vlans.test1.data);
 
     });
 

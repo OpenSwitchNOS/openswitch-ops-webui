@@ -15,26 +15,40 @@
 */
 
 /*
- * Management Interface store.
+ * Session store.
  */
 
 var Reflux = require('reflux'),
-    MgmtIntfActions = require('MgmtIntfActions');
+    SessionActions = require('SessionActions'),
+    CookieUtils = require('cookieUtils');
 
 module.exports = Reflux.createStore({
 
-    listenables: [ MgmtIntfActions ],
-
-    state: {
-    },
+    listenables: [ SessionActions ],
 
     getInitialState: function() {
-        return this.state;
+        return { userId: sessionStorage.userId };
     },
 
-    onLoadCompleted: function(data) {
-        this.state = data;
-        this.trigger(this.state);
+    userId: function() {
+        return sessionStorage.userId;
     },
+
+    onClose: function() {
+        delete sessionStorage.userId;
+        CookieUtils.delete('user');
+        this.trigger({ userId: null });
+    },
+
+    onOpenCompleted: function(userId) {
+        sessionStorage.userId = userId;
+        this.trigger({ userId: sessionStorage.userId });
+    },
+
+    onOpenFailed: function() {
+        delete sessionStorage.userId;
+        CookieUtils.delete('user');
+        this.trigger({ userId: null });
+    }
 
 });

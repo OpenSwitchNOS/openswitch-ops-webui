@@ -1,13 +1,35 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Draws the Box Graphic
- * @author Kelsey Dedoshka
  */
 
 var React = require('react'),
     PropTypes = React.PropTypes,
     Reflux = require('reflux'),
+    I18n = require('i18n'),
+    StatusText = require('StatusText'),
     BoxGraphicActions = require('BoxGraphicActions'),
     BoxGraphicStore = require('BoxGraphicStore');
+
+// internationalization for this view
+function t(key) {
+    return I18n.text('components.boxGraphic.' + key);
+}
 
 /************* HELPER FUNCTIONS ******************/
 function generatePortArray(type, data) {
@@ -487,6 +509,65 @@ var BoxPortExtras = React.createClass({
     }
 });
 
+var BoxGraphicLayout = React.createClass({
+
+    displayName: 'BoxGraphicLayout',
+
+    propTypes: {
+        portConfig: PropTypes.object,
+        colors: PropTypes.array,
+        vlanStatus: PropTypes.object,
+        selectedVlan: PropTypes.number,
+        portSelected: PropTypes.func,
+        loadCompleted: PropTypes.number,
+        base: PropTypes.object,
+        hwData: PropTypes.object
+    },
+
+    render: function() {
+        var key = 0;
+        return (
+            <div className="boxContainer">
+                {this.props.loadCompleted ?
+                <table className="innerBoxTable">
+                    <tr>
+                        {this.props.base.map(function(group) {
+                            return (
+                                <td key={key++} className="portsWrapper">
+                                    <table>
+                                        <BoxPorts type={"Top"}
+                                            ports={group}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}
+                                            hwData={this.props.hwData}/>
+                                        <BoxMiddle ports={group}
+                                            hwData={this.props.hwData}/>
+                                        <BoxPorts type={"Bottom"}
+                                            ports={group}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}
+                                            hwData={this.props.hwData}/>
+                                        <BoxPortLabels ports={group}
+                                            hwData={this.props.hwData}/>
+                                        <BoxPortExtras ports={group.extra}
+                                            hwData={this.props.hwData}
+                                            portConfig={this.props.portConfig}
+                                            portSelected={this.props.portSelected}
+                                            vlanStatus={this.props.vlanStatus}/>
+                                    </table>
+                                </td>
+                            );
+                        }, this)}
+                    </tr>
+                </table>
+                : null}
+            </div>
+        );
+    }
+});
+
 //Main box graphic component
 module.exports = React.createClass({
 
@@ -511,44 +592,19 @@ module.exports = React.createClass({
     // row to represent middle graphic,
     // row of bottom ports and a row of port nums
     render: function() {
-        var key = 0;
         return (
-            <div className="boxContainer">
-                {this.state.ports.loadCompleted ?
-                <table className="innerBoxTable">
-                    <tr>
-                        {this.state.ports.data.base.map(function(group) {
-                            return (
-                                <td key={key++} className="portsWrapper">
-                                    <table>
-                                        <BoxPorts type={"Top"}
-                                            ports={group}
-                                            portConfig={this.props.portConfig}
-                                            portSelected={this.props.portSelected}
-                                            vlanStatus={this.props.vlanStatus}
-                                            hwData={this.state.ports.hwData}/>
-                                        <BoxMiddle ports={group}
-                                            hwData={this.state.ports.hwData}/>
-                                        <BoxPorts type={"Bottom"}
-                                            ports={group}
-                                            portConfig={this.props.portConfig}
-                                            portSelected={this.props.portSelected}
-                                            vlanStatus={this.props.vlanStatus}
-                                            hwData={this.state.ports.hwData}/>
-                                        <BoxPortLabels ports={group}
-                                            hwData={this.state.ports.hwData}/>
-                                        <BoxPortExtras ports={group.extra}
-                                            hwData={this.state.ports.hwData}
-                                            portConfig={this.props.portConfig}
-                                            portSelected={this.props.portSelected}
-                                            vlanStatus={this.props.vlanStatus}/>
-                                    </table>
-                                </td>
-                            );
-                        }, this)}
-                    </tr>
-                </table>
-                : null}
+            <div>
+                {this.state.ports.showGraphic ?
+                    <BoxGraphicLayout
+                        portConfig={this.props.portConfig}
+                        portSelected={this.props.portSelected}
+                        vlanStatus={this.props.vlanStatus}
+                        hwData={this.state.ports.hwData}
+                        base={this.state.ports.data.base}
+                        loadCompleted={this.state.ports.loadCompleted}
+                    />
+                    : <StatusText value='disabled' text={t('noPorts')} />
+                }
             </div>
         );
     }

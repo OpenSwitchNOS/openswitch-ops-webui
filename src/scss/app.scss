@@ -24,7 +24,7 @@ html, body, {
 
     // remove the scrollbar styling from the page
     ::-webkit-scrollbar {
-        display: none;
+        width: 0px;
     }
 
     //remove scrollbars (IE)
@@ -88,9 +88,18 @@ html, body, {
 
     i {
         box-sizing: border-box;
+
+        @media #{$smallScreen} {
+            font-size: $mastToggleIconFontSizeSmallScreen;
+            line-height: $mastToggleIconLineHeightSmallScreen
+        }
     }
 
     #mastDeviceInfo, #mastUserInfo {
+        // IE 10 support
+        display: -ms-flexbox;
+        -ms-flex-pack: center;
+
         //small screen
         @media #{$smallScreen} {
             display: none;
@@ -256,6 +265,14 @@ html, body, {
 .appLoginLayer {
     z-index: 200; // must be larger than mast and navPane
 
+    &.progress {
+        cursor: progress;
+    }
+
+    &.progress * {
+        cursor: progress;
+    }
+
     .layer__container {
         background: none;
         border: none;
@@ -280,6 +297,27 @@ html, body, {
         border: 0;
         height: 1px;
         background-color: $appNotificationDivderBackgroundColor;
+    }
+}
+
+/*
+ * Style scrollbars - add scrollbar class to get scrollbar
+ */
+.scrollbar {
+    ::-webkit-scrollbar {
+        width: 15px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: lightgray;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 4px;
+        border-style: solid;
     }
 }
 

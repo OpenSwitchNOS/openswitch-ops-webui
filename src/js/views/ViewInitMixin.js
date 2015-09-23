@@ -15,18 +15,26 @@
 */
 
 /*
- * Actions for switching the render configuration.
+ * Mixin that provides a hook before a routing transition is performed.
+ * This will likely be changed after we upgrade to react-router v1.0.
  */
 
-var Reflux = require('reflux');
+var SessionStore = require('SessionStore'),
+    SessionActions = require('SessionActions');
 
-// TODO: change the name of this to "global settings" or something.
+module.exports = {
+    statics: {
 
-module.exports = Reflux.createActions([
-    'showNavPane',
-    'hideNavPane',
-    'toggleNavPane',
-    'postRequestErr',
-    'clearRequestErr',
-    'restApiRedirect'
-]);
+        willTransitionTo: function(transition) {
+
+            if (transition.path === '/login') {
+
+                SessionActions.close();
+
+            } else if (!SessionStore.userId()) {
+
+                transition.redirect('/login', {}, {});
+            }
+        }
+    }
+};

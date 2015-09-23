@@ -6,14 +6,16 @@
 describe('Test Suite For SystemStatsActions', function() {
 
     var temp1 = {
-            testUrl: '/system/subsystems/base/temp_sensors/base-1',
-            data: {
-                location: 'U1',
-                max: '31500',
-                min: '27500',
-                name: 'base-1',
-                status: 'normal',
-                temperature: '31000'
+            testUrl: '/rest/v1/system/subsystems/base/temp_sensors/base-1',
+            body: {
+                status: {
+                    location: 'U1',
+                    max: '31500',
+                    min: '27500',
+                    name: 'base-1',
+                    status: 'normal',
+                    temperature: '31000'
+                }
             },
             processed: {
                 name: 'base-1',
@@ -24,14 +26,16 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         temp2 = {
-            testUrl: '/system/subsystems/base/temp_sensors/base-2',
-            data: {
-                location: 'U2',
-                max: '32500',
-                min: '27440',
-                name: 'base-2',
-                status: 'normal',
-                temperature: '31590'
+            testUrl: '/rest/v1/system/subsystems/base/temp_sensors/base-2',
+            body: {
+                status: {
+                    location: 'U2',
+                    max: '32500',
+                    min: '27440',
+                    name: 'base-2',
+                    status: 'normal',
+                    temperature: '31590'
+                }
             },
             processed: {
                 name: 'base-2',
@@ -42,10 +46,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         fan1 = {
-            testUrl: '/system/subsystems/base/fans/f1',
-            data: {
-                name: 'f1',
-                status: 'ok'
+            testUrl: '/rest/v1/system/subsystems/base/fans/f1',
+            body: {
+                status: {
+                    name: 'f1',
+                    status: 'ok'
+                }
             },
             processed: {
                 name: 'f1',
@@ -54,10 +60,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         fan2 = {
-            testUrl: '/system/subsystems/base/fans/f2',
-            data: {
-                name: 'f2',
-                status: 'fault'
+            testUrl: '/rest/v1/system/subsystems/base/fans/f2',
+            body: {
+                status: {
+                    name: 'f2',
+                    status: 'fault'
+                }
             },
             processed: {
                 name: 'f2',
@@ -66,10 +74,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         fan3 = {
-            testUrl: '/system/subsystems/base/fans/f3',
-            data: {
-                name: 'f3',
-                status: 'uninitialized'
+            testUrl: '/rest/v1/system/subsystems/base/fans/f3',
+            body: {
+                status: {
+                    name: 'f3',
+                    status: 'uninitialized'
+                }
             },
             processed: {
                 name: 'f3',
@@ -78,10 +88,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         pwr1 = {
-            testUrl: '/system/subsystems/base/power_supplies/base-1',
-            data: {
-                name: 'base-1',
-                status: 'ok'
+            testUrl: '/rest/v1/system/subsystems/base/power_supplies/base-1',
+            body: {
+                status: {
+                    name: 'base-1',
+                    status: 'ok'
+                }
             },
             processed: {
                 name: 'base-1',
@@ -90,10 +102,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         pwr2 = {
-            testUrl: '/system/subsystems/base/power_supplies/base-2',
-            data: {
-                name: 'base-2',
-                status: 'fault_input'
+            testUrl: '/rest/v1/system/subsystems/base/power_supplies/base-2',
+            body: {
+                status: {
+                    name: 'base-2',
+                    status: 'fault_input'
+                }
             },
             processed: {
                 name: 'base-2',
@@ -102,10 +116,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         pwr3 = {
-            testUrl: '/system/subsystems/base/power_supplies/base-3',
-            data: {
-                name: 'base-3',
-                status: 'fault_output'
+            testUrl: '/rest/v1/system/subsystems/base/power_supplies/base-3',
+            body: {
+                status: {
+                    name: 'base-3',
+                    status: 'fault_output'
+                }
             },
             processed: {
                 name: 'base-3',
@@ -114,10 +130,12 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         pwr4 = {
-            testUrl: '/system/subsystems/base/power_supplies/base-4',
-            data: {
-                name: 'base-4',
-                status: 'absent'
+            testUrl: '/rest/v1/system/subsystems/base/power_supplies/base-4',
+            body: {
+                status: {
+                    name: 'base-4',
+                    status: 'absent'
+                }
             },
             processed: {
                 name: 'base-4',
@@ -126,24 +144,26 @@ describe('Test Suite For SystemStatsActions', function() {
             }
         },
         pass1temps = {
-            testUrl: '/system/subsystems/base/temp_sensors',
-            data: [ temp1.testUrl, temp2.testUrl ]
+            testUrl: '/rest/v1/system/subsystems/base/temp_sensors',
+            body: [ temp1.testUrl, temp2.testUrl ]
         },
         pass1fans = {
-            testUrl: '/system/subsystems/base/fans',
-            data: [ fan1.testUrl, fan2.testUrl, fan3.testUrl ]
+            testUrl: '/rest/v1/system/subsystems/base/fans',
+            body: [ fan1.testUrl, fan2.testUrl, fan3.testUrl ]
         },
         pass1pwrs = {
-            testUrl: '/system/subsystems/base/power_supplies',
-            data: [ pwr1.testUrl, pwr2.testUrl, pwr3.testUrl, pwr4.testUrl ]
+            testUrl: '/rest/v1/system/subsystems/base/power_supplies',
+            body: [ pwr1.testUrl, pwr2.testUrl, pwr3.testUrl, pwr4.testUrl ]
         },
         sys = {
-            testUrl: '/system',
-            data: {
+            testUrl: '/rest/v1/system',
+            body: {
                 statistics: {
-                    'load_average': '1.95,1.88,1.43',
-                    memory: '8167696,2097440,618016,0,0',
-                    'file_systems': '/,1998672,289484'
+                    statistics: {
+                        'load_average': '1.95,1.88,1.43',
+                        memory: '8167696,2097440,618016,0,0',
+                        'file_systems': '/,1998672,289484'
+                    }
                 }
             }
         },
@@ -177,19 +197,19 @@ describe('Test Suite For SystemStatsActions', function() {
     });
 
     it('completes correctly', function() {
-        AjaxStubRequest(pass1temps.testUrl, pass1temps);
-        AjaxStubRequest(pass1fans.testUrl, pass1fans);
-        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs);
-        AjaxStubRequest(temp1.testUrl, temp1);
-        AjaxStubRequest(temp2.testUrl, temp2);
-        AjaxStubRequest(fan1.testUrl, fan1);
-        AjaxStubRequest(fan2.testUrl, fan2);
-        AjaxStubRequest(fan3.testUrl, fan3);
-        AjaxStubRequest(pwr1.testUrl, pwr1);
-        AjaxStubRequest(pwr2.testUrl, pwr2);
-        AjaxStubRequest(pwr3.testUrl, pwr3);
-        AjaxStubRequest(pwr4.testUrl, pwr4);
-        AjaxStubRequest(sys.testUrl, sys);
+        AjaxStubRequest(pass1temps.testUrl, pass1temps.body);
+        AjaxStubRequest(pass1fans.testUrl, pass1fans.body);
+        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs.body);
+        AjaxStubRequest(temp1.testUrl, temp1.body);
+        AjaxStubRequest(temp2.testUrl, temp2.body);
+        AjaxStubRequest(fan1.testUrl, fan1.body);
+        AjaxStubRequest(fan2.testUrl, fan2.body);
+        AjaxStubRequest(fan3.testUrl, fan3.body);
+        AjaxStubRequest(pwr1.testUrl, pwr1.body);
+        AjaxStubRequest(pwr2.testUrl, pwr2.body);
+        AjaxStubRequest(pwr4.testUrl, pwr4.body);
+        AjaxStubRequest(pwr3.testUrl, pwr3.body);
+        AjaxStubRequest(sys.testUrl, sys.body);
 
         spyOn(SystemStatsActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');
@@ -205,9 +225,9 @@ describe('Test Suite For SystemStatsActions', function() {
     });
 
     it('fails the first pass correctly', function() {
-        AjaxStubRequest(pass1temps.testUrl, pass1temps);
-        AjaxStubRequest(pass1fans.testUrl, pass1fans, 500);
-        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs);
+        AjaxStubRequest(pass1temps.testUrl, pass1temps.body);
+        AjaxStubRequest(pass1fans.testUrl, pass1fans.body, 500);
+        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs.body);
 
         spyOn(SystemStatsActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');
@@ -220,19 +240,19 @@ describe('Test Suite For SystemStatsActions', function() {
     });
 
     it('fails the second pass correctly', function() {
-        AjaxStubRequest(pass1temps.testUrl, pass1temps);
-        AjaxStubRequest(pass1fans.testUrl, pass1fans);
-        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs);
-        AjaxStubRequest(temp1.testUrl, temp1);
-        AjaxStubRequest(temp2.testUrl, temp2);
-        AjaxStubRequest(fan1.testUrl, fan1);
-        AjaxStubRequest(fan2.testUrl, fan2);
-        AjaxStubRequest(fan3.testUrl, fan3);
-        AjaxStubRequest(pwr1.testUrl, pwr1);
+        AjaxStubRequest(pass1temps.testUrl, pass1temps.body);
+        AjaxStubRequest(pass1fans.testUrl, pass1fans.body);
+        AjaxStubRequest(pass1pwrs.testUrl, pass1pwrs.body);
+        AjaxStubRequest(temp1.testUrl, temp1.body);
+        AjaxStubRequest(temp2.testUrl, temp2.body);
+        AjaxStubRequest(fan1.testUrl, fan1.body);
+        AjaxStubRequest(fan2.testUrl, fan2.body);
+        AjaxStubRequest(fan3.testUrl, fan3.body);
+        AjaxStubRequest(pwr1.testUrl, pwr1.body);
         AjaxStubRequest(pwr2.testUrl, {}, 500);
-        AjaxStubRequest(pwr3.testUrl, pwr3);
-        AjaxStubRequest(pwr4.testUrl, pwr4);
-        AjaxStubRequest(sys.testUrl, sys);
+        AjaxStubRequest(pwr3.testUrl, pwr3.body);
+        AjaxStubRequest(pwr4.testUrl, pwr4.body);
+        AjaxStubRequest(sys.testUrl, sys.body);
 
         spyOn(SystemStatsActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');

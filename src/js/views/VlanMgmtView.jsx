@@ -1,6 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * VLAN management view.
- * @author Kelsey Dedoshka
  */
 
 var React = require('react'),
@@ -19,6 +34,8 @@ var React = require('react'),
     ColorBlock = require('ColorBlock'),
     VlanMgmtActions = require('VlanMgmtActions'),
     VlanMgmtStore = require('VlanMgmtStore'),
+    ViewInitMixin = require('ViewInitMixin'),
+    PortsActions = require('PortsActions'),
     MAX_VLANS_TO_DISPLAY = 4;
 
 /*********** Helper functions **************/
@@ -279,10 +296,14 @@ module.exports = React.createClass({
 
     displayName: 'VlanMgmtView',
 
-    mixins: [ Reflux.connect(VlanMgmtStore, 'data') ],
+    mixins: [
+        Reflux.connect(VlanMgmtStore, 'data'),
+        ViewInitMixin
+    ],
 
     componentDidMount: function() {
         //load the vlans on component mount
+        PortsActions.loadPorts();
         VlanMgmtActions.loadVlans();
     },
 
@@ -334,7 +355,7 @@ module.exports = React.createClass({
                     </div>
                     <div className="viewBox viewFlex0">
                         <ViewBoxHeader title={t('allVlans')}/>
-                        <div className="viewBoxContent">
+                        <div className="viewBoxContent scrollbar">
                             {Object.keys(data.vlans).length !== 0 ?
                                 <AllVlansTable
                                     data={data.vlans}

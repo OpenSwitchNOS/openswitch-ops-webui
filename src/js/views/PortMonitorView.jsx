@@ -1,6 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Port monitor view.
- * @author Kelsey Dedoshka
  */
 
 var React = require('react'),
@@ -10,10 +25,12 @@ var React = require('react'),
     PropTypes = React.PropTypes,
     Link = Router.Link,
     Cnvs = require('conversions'),
+    ChartUtils = require('chartUtils'),
     DateParse = require('dateParse'),
     ActionIcon = require('ActionIcon'),
     ViewBoxHeader = require('ViewBoxHeader'),
     GMenu = require('grommet/components/Menu'),
+    GTable = require('grommet/components/Table'),
     GDropCaret = require('grommet/components/icons/DropCaret'),
     I18n = require('i18n'),
     PortsMonitorActions = require('PortsMonitorActions'),
@@ -21,6 +38,7 @@ var React = require('react'),
     StatusText = require('StatusText'),
     LineChart = require('react-chartjs').Line,
     BarChart = require('react-chartjs').Bar,
+    ViewInitMixin = require('ViewInitMixin'),
     INTERVAL = 5000;
 
 // internationalization for this view
@@ -47,6 +65,10 @@ var GraphToggleButton = React.createClass({
         show: PropTypes.number,
         cls: PropTypes.string
     },
+
+    mixins: [
+        ViewInitMixin
+    ],
 
     render: function() {
 
@@ -89,50 +111,52 @@ var PortDetails = React.createClass({
 
         return (
             <div className="innerContainer">
-                <table className="portDetails defaultTable">
-                    <tr>
-                        <td className="average">
-                            <div className="main">{t('details.avg')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.average + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.bytes')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {Cnvs.round1D(
-                                    Cnvs.bytesToMbytes(data.stats.total)
-                                ) + tUnits('mb')}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.high')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.high + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div className="main">{t('details.low')}</div>
-                        </td>
-                        <td>
-                            <div className="details" style={color}>
-                                {data.stats.low + ' %'}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                <GTable className="portDetails defaultTable">
+                    <tbody>
+                        <tr>
+                            <td className="average">
+                                <div className="main">{t('details.avg')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.average + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.bytes')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {Cnvs.round1D(
+                                        Cnvs.bytesToMbytes(data.stats.total)
+                                    ) + tUnits('mb')}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.high')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.high + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div className="main">{t('details.low')}</div>
+                            </td>
+                            <td>
+                                <div className="details" style={color}>
+                                    {data.stats.low + ' %'}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </GTable>
             </div>
         );
     }
@@ -149,12 +173,6 @@ module.exports = React.createClass({
         Reflux.listenerMixin,
         Navigation
     ],
-
-    /*componentWillMount: function() {
-        if (this.getParams().port) {
-            PortsMonitorActions.setPortSelected(this.getParams().port);
-        }
-    },*/
 
     componentDidMount: function() {
         //load the list of ports to populate the port list
@@ -197,6 +215,7 @@ module.exports = React.createClass({
     //handler for selected a port in the dropdown menu
     portSelected: function(port) {
         PortsMonitorActions.setPortSelected(port);
+        this.getPortData(port);
         this.startInterval(port);
     },
 
@@ -290,7 +309,7 @@ module.exports = React.createClass({
             if (st.data.dataSets.hasOwnProperty(i)) {
                 var dt = st.data,
                     data = dt.dataSets[i],
-                    color = dt.colors[data.options.colorIndex].stroke,
+                    color = ChartUtils.colors[data.options.colorIndex].stroke,
                     onclick = this.toggleGraph.bind(this, i),
                     icon;
 
@@ -303,7 +322,7 @@ module.exports = React.createClass({
                 //tile toolbar
                 toggleToolbar[i] = (<GraphToggleButton
                     cls = {data.title}
-                    color = {dt.colors[data.options.colorIndex].stroke}
+                    color = {ChartUtils.colors[data.options.colorIndex].stroke}
                     text = {data.desc}
                     click = {onclick}
                     index = {data.options.colorIndex}

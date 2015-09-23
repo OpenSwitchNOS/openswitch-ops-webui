@@ -1,6 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Data Store for the ports mgmt view
- * @author Kelsey Dedoshka
  */
 
 //FIXME - do not truncate and do toFixed in any store - always in the view
@@ -30,7 +45,7 @@ function splitPort(elem, index) {
 module.exports = Reflux.createStore({
 
     init: function() {
-        PortsActions.loadPorts();
+        // FIXME: can't do this before login - PortsActions.loadPorts();
         this.listenTo(PortsActions.loadPorts.completed, 'setPorts');
     },
 
@@ -77,8 +92,8 @@ module.exports = Reflux.createStore({
                 psts = ports[i].status;
 
             portStatus[pcfg.name] = {};
-            portStatus[pcfg.name].adminState = psts.admin_state[0];
-            portStatus[pcfg.name].linkState = psts.link_state[0];
+            portStatus[pcfg.name].adminState = psts.admin_state;
+            portStatus[pcfg.name].linkState = psts.link_state;
 
             // create port data obejct from the response with
             // the data keys needed for the view

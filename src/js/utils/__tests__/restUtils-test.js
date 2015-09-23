@@ -83,7 +83,7 @@ describe('Test Suite For restUtils', function() {
         });
 
         expect(err).toBeNull();
-        expect(result).toEqual(bridges);
+        expect(result.body).toEqual(bridges);
     });
 
     it('get single URL with error', function() {
@@ -113,7 +113,8 @@ describe('Test Suite For restUtils', function() {
         });
 
         expect(err).toBeNull();
-        expect(result).toEqual([ vlan0, vlan1, vlan2 ]);
+        expect([ result[0].body, result[1].body, result[2].body ])
+            .toEqual([ vlan0, vlan1, vlan2 ]);
     });
 
     it('get URL array in parallel with error', function() {
@@ -127,12 +128,13 @@ describe('Test Suite For restUtils', function() {
             result = r;
         });
 
-        expect(result).toEqual([ vlan0, null, vlan2 ]);
+        expect([ result[0].body, result[1], result[2].body ])
+            .toEqual([ vlan0, null, vlan2 ]);
         expect(err.response.body).toEqual('E1');
     });
 
     it('3 passes - single, parallel, parallel', function() {
-        var result;
+        var result, rVlans, rPorts;
 
         AjaxStubRequest(bridges.testUrl, bridges);
         AjaxStubRequest(vlans.testUrl, vlans);
@@ -144,12 +146,12 @@ describe('Test Suite For restUtils', function() {
         AjaxStubRequest(port1.testUrl, port1);
 
         RestUtils.get(bridges.testUrl, function(e1, r1) {
-            var baseUrl = r1.data[0];
+            var baseUrl = r1.body.data[0];
             expect(e1).toBeNull();
             RestUtils.get([ baseUrl + '/vlans', baseUrl + '/ports' ],
                 function(e2, r2) {
                     expect(e2).toBeNull();
-                    RestUtils.get([ r2[0].data, r2[1].data ],
+                    RestUtils.get([ r2[0].body.data, r2[1].body.data ],
                         function(e3, r3) {
                             expect(e3).toBeNull();
                             result = r3;
@@ -159,14 +161,20 @@ describe('Test Suite For restUtils', function() {
             );
         });
 
-        expect(result).toEqual([
-            [ vlan0, vlan1, vlan2 ],
-            [ port0, port1 ]
-        ]);
+        rVlans = result[0];
+        rPorts = result[1];
+
+        expect([
+                [ rVlans[0].body, rVlans[1].body, rVlans[2].body ],
+                [ rPorts[0].body, rPorts[1].body]
+            ]).toEqual([
+                [ vlan0, vlan1, vlan2 ],
+                [ port0, port1 ]
+            ]);
     });
 
     it('3 passes - single, parallel, parallel with error', function() {
-        var result;
+        var result, rVlans, rPorts;
 
         AjaxStubRequest(bridges.testUrl, bridges);
         AjaxStubRequest(vlans.testUrl, vlans);
@@ -178,12 +186,12 @@ describe('Test Suite For restUtils', function() {
         AjaxStubRequest(port1.testUrl, 'E1', 500);
 
         RestUtils.get(bridges.testUrl, function(e1, r1) {
-            var baseUrl = r1.data[0];
+            var baseUrl = r1.body.data[0];
             expect(e1).toBeNull();
             RestUtils.get([ baseUrl + '/vlans', baseUrl + '/ports' ],
                 function(e2, r2) {
                     expect(e2).toBeNull();
-                    RestUtils.get([ r2[0].data, r2[1].data ],
+                    RestUtils.get([ r2[0].body.data, r2[1].body.data ],
                         function(e3, r3) {
                             expect(e3).toBeTruthy();
                             result = r3;
@@ -193,14 +201,21 @@ describe('Test Suite For restUtils', function() {
             );
         });
 
-        expect(result).toEqual([
-            [ null, vlan1, vlan2 ],
-            [ port0, null ]
-        ]);
+        rVlans = result[0];
+        rPorts = result[1];
+
+        expect([
+                [ rVlans[0], rVlans[1].body, rVlans[2].body ],
+                [ rPorts[0].body, rPorts[1] ]
+            ])
+            .toEqual([
+                [ null, vlan1, vlan2 ],
+                [ port0, null ]
+            ]);
     });
 
     it('differnt base URL array in parallel', function() {
-        var result;
+        var result, rPorts, rInfs;
 
         AjaxStubRequest(ports.testUrl, ports);
         AjaxStubRequest(port0.testUrl, port0);
@@ -212,16 +227,26 @@ describe('Test Suite For restUtils', function() {
 
         RestUtils.get([ ports.testUrl, infs.testUrl ], function(e1, r1) {
             expect(e1).toBeNull();
-            RestUtils.get([ r1[0].data, r1[1].data ], function(e2, r2) {
-                expect(e2).toBeNull();
-                result = r2;
-            });
+            RestUtils.get(
+                [ r1[0].body.data, r1[1].body.data ],
+                function(e2, r2) {
+                    expect(e2).toBeNull();
+                    result = r2;
+                }
+            );
         });
 
-        expect(result).toEqual([
-            [ port0, port1 ],
-            [ inf0, inf1, inf2 ]
-        ]);
+        rPorts = result[0];
+        rInfs = result[1];
+
+        expect([
+                [ rPorts[0].body, rPorts[1].body ],
+                [ rInfs[0].body, rInfs[1].body, rInfs[2].body ]
+            ])
+            .toEqual([
+                [ port0, port1 ],
+                [ inf0, inf1, inf2 ]
+            ]);
     });
 
 });

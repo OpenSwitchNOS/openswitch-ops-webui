@@ -1,6 +1,21 @@
 /*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+/*
  * Ports Mgmt view.
- * @author Kelsey Dedoshka
  */
 
 var React = require('react'),
@@ -11,7 +26,9 @@ var React = require('react'),
     PortsMgmtStore = require('PortsMgmtStore'),
     BoxGraphic = require('BoxGraphic'),
     ViewBoxHeader = require('ViewBoxHeader'),
-    GTable = require('grommet/components/Table');
+    GTable = require('grommet/components/Table'),
+    ViewInitMixin = require('ViewInitMixin'),
+    PortsActions = require('PortsActions');
 
 // internationalization for the view
 function t(key) {
@@ -29,6 +46,14 @@ var PortList = React.createClass({
 
     propTypes: {
         ports: PropTypes.array
+    },
+
+    mixins: [
+        ViewInitMixin
+    ],
+
+    componentDidMount: function() {
+        PortsActions.loadPorts();
     },
 
     render: function() {
@@ -120,7 +145,7 @@ module.exports = React.createClass({
                 </div>
                 <div className="viewBox viewFlex0">
                     <ViewBoxHeader title={t('allInterfaces')}/>
-                    <div className="viewBoxContent">
+                    <div className="viewBoxContent scrollbar">
                         <PortList ports={this.state.data.allPorts}/>
                     </div>
                 </div>
