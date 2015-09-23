@@ -261,7 +261,7 @@ describe('Test Suite For InterfaceStatsStore', function() {
 
         expect(issState.timestampMillis).toBeGreaterThan(0);
         expect(Object.keys(issState.interfaces).length).toEqual(4);
-        expect(issState.topUtilization.length).toEqual(5);
+        expect(issState.topUtilization.length).toEqual(6);
 
         infCopy0 = Lodash.cloneDeep(DATA5[0]);
         infCopy0.rxUtl = 2;

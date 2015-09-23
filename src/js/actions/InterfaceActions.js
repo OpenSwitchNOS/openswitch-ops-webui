@@ -32,8 +32,8 @@ function processResponse(res) {
     var intfs = [], intf, stats;
     for (var i=0; i<res.length; i++) {
         intf = res[i].body;
-        stats = intf.statistics.statistics;
         if (intf.configuration.type === 'system') {
+            stats = intf.statistics.statistics;
             intfs.push({
                 link: intf.status.link_state,
                 duplex: intf.status.duplex,

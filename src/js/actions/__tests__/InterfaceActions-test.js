@@ -9,14 +9,16 @@ describe('Test Suite For InterfaceActions', function() {
             testUrl: '/rest/v1/system/interfaces',
             body: [
                 '/rest/v1/system/interface/INF-0',
-                '/rest/v1/system/interface/INF-1'
+                '/rest/v1/system/interface/INF-1',
+                '/rest/v1/system/interface/INF-2'
             ]
         },
         inf0 = {
             testUrl: '/rest/v1/system/interface/INF-0',
             body: {
                 configuration: {
-                    type:  'system'
+                    name: 'inf0',
+                    type: 'system'
                 },
                 statistics: {
                     statistics: {
@@ -27,8 +29,7 @@ describe('Test Suite For InterfaceActions', function() {
                 status: {
                     'link_state': 'up',
                     duplex: 'full',
-                    'link_speed': '1000000000',
-                    name: 'inf0',
+                    'link_speed': '1000000000'
                 }
             },
             processed: {
@@ -44,7 +45,8 @@ describe('Test Suite For InterfaceActions', function() {
             testUrl: '/rest/v1/system/interface/INF-1',
             body: {
                 configuration: {
-                    type:  'system'
+                    name: 'inf1',
+                    type: 'system'
                 },
                 statistics: {
                     statistics: {
@@ -55,8 +57,7 @@ describe('Test Suite For InterfaceActions', function() {
                 status: {
                     'link_state': 'down',
                     duplex: 'half',
-                    'link_speed': '100000000',
-                    name: 'inf1',
+                    'link_speed': '100000000'
                 }
             },
             processed: {
@@ -68,6 +69,15 @@ describe('Test Suite For InterfaceActions', function() {
                 txBytes: 444
             }
         },
+        inf2 = {
+            testUrl: '/rest/v1/system/interface/INF-2',
+            body: {
+                configuration: {
+                    name: 'inf2',
+                    type: 'bogus'
+                }
+            }
+        },
         InterfaceActions,
         RenderActions; // FIXME: rename this
 
@@ -76,10 +86,11 @@ describe('Test Suite For InterfaceActions', function() {
         RenderActions = require('RenderActions');
     });
 
-    it('completes correctly', function() {
+    it('completes correctly ignoring non system interfaces', function() {
         AjaxStubRequest(infs.testUrl, infs.body);
         AjaxStubRequest(inf0.testUrl, inf0.body);
         AjaxStubRequest(inf1.testUrl, inf1.body);
+        AjaxStubRequest(inf2.testUrl, inf2.body);
 
         spyOn(InterfaceActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');
@@ -108,9 +119,10 @@ describe('Test Suite For InterfaceActions', function() {
     });
 
     it('fails the second pass correctly', function() {
-        AjaxStubRequest(infs.testUrl, infs);
-        AjaxStubRequest(inf0.testUrl, inf0);
+        AjaxStubRequest(infs.testUrl, infs.body);
+        AjaxStubRequest(inf0.testUrl, inf0.body);
         AjaxStubRequest(inf1.testUrl, {}, 500);
+        AjaxStubRequest(inf2.testUrl, inf2.body);
 
         spyOn(InterfaceActions.load, 'completed');
         spyOn(RenderActions, 'postRequestErr');

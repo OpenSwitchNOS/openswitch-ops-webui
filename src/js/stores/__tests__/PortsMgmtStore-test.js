@@ -68,7 +68,7 @@ describe('Test Suite For PortsMgmtStore', function() {
 
         jasmine.clock().tick(); // allow action
         expect(err).toBeNull();
-        expect(result).toEqual(1);
+        expect(result.body).toEqual(1);
 
 
         // TEST 2
@@ -81,7 +81,7 @@ describe('Test Suite For PortsMgmtStore', function() {
 
         jasmine.clock().tick(); // allow action
         expect(err).toBeNull();
-        expect(result).toEqual(34);
+        expect(result.body).toEqual(34);
 
     });
 
@@ -111,7 +111,9 @@ describe('Test Suite For PortsMgmtStore', function() {
 
         jasmine.clock().tick();
         expect(err).toBeNull();
-        expect(result).toEqual([2, 4, 10, 17, 24, 37, 52]);
+        expect(result.map(function(item) {
+            return item.body;
+        })).toEqual([2, 4, 10, 17, 24, 37, 52]);
 
     });
 
@@ -123,16 +125,20 @@ describe('Test Suite For PortsMgmtStore', function() {
         AjaxStubRequest(ports.test3.urls.url2, ports.test3.status.status2);
         AjaxStubRequest(ports.test3.urls.url3, ports.test3.status.status3);
 
-        RestUtils.get([ports.test3.urls.url1,
-            ports.test3.urls.url2,
-            ports.test3.urls.url3], function(e, r) {
+        RestUtils.get([
+                ports.test3.urls.url1,
+                ports.test3.urls.url2,
+                ports.test3.urls.url3
+            ], function(e, r) {
                 err = e;
                 result = r;
             });
 
         jasmine.clock().tick();
         expect(err).toBeNull();
-        expect(result).toEqual([{ 2: 'up' }, { 4: 'up' }, { 10: 'down' }]);
+        expect(result.map(function(item) {
+            return item.body;
+        })).toEqual([{ 2: 'up' }, { 4: 'up' }, { 10: 'down' }]);
     });
 
 });

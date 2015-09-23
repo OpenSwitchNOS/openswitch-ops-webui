@@ -55,7 +55,7 @@ describe('Test suite for conversions', function() {
                     result: 3266.5
                 },
                 t3: {
-                    data:12.67,
+                    data: 12.67,
                     result: 12.7
                 },
                 t4: {
