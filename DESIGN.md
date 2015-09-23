@@ -88,8 +88,6 @@ The major Web UI components
 
 The main entry points for the web compilation are configured in the webpack.config.js file.  The index.html contains a root element "div" with an ID. The router.js file contains a list of all the available routes (or considered "views" in our case).  Each view is denoted by its own ID ("app" -> App component).  Based on the current browser window.location (or URL), the appropriate view is loaded in the RouteHandler.  The NavPane "Link" items are automatically activated based on the current URL.
 
-(TODO)
-
 Development Environment
 -----------------------
 
