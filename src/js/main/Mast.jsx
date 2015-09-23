@@ -39,16 +39,25 @@ module.exports = React.createClass({
 
     displayName: 'Mast',
 
+    // FIXME: create a MastStore I think.
     mixins: [
         Reflux.connect(RenderStore),
+        Reflux.listenTo(SessionStore, 'onSessionChanged'),
         Reflux.connect(SessionStore),
         Reflux.listenTo(SystemInfoActions.load.completed, 'onSysInfoLoaded')
     ],
 
     componentDidMount: function() {
-        // FIXME: create a MastStore I think.
-        SystemInfoActions.load();
+        if (SessionStore.userId()) {
+            SystemInfoActions.load();
+        }
+    },
 
+    onSessionChanged: function(data) {
+        if (data.userId) {
+            SystemInfoActions.load();
+        }
+        this.setState(data);
     },
 
     onSysInfoLoaded: function(data) {
