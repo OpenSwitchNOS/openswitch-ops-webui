@@ -1,6 +1,6 @@
 Developer Guide for OPS-WEBUI
 =============================
-In addition to this document it is highly recommended to become familar with the following technologies:
+In addition to this document it is highly recommended to become familiar with the following technologies:
 
 Run-time modules:
 * [ReactJS](https://github.com/facebook/react) - component bases view/control framework
@@ -16,11 +16,6 @@ Development modules:
 * [Webpack Module Bundler](https://webpack.github.io/) - module builder
 * [Karma](http://karma-runner.github.io/0.13/index.html) - unit test runner
 * [Jasmine](http://jasmine.github.io/) - unit test framework (see also [jasmine introduction](http://jasmine.github.io/2.0/introduction.html))
-
-Repository
-----------
-* TBD - info for the ops-webui repo.
-* TBD - Should the DESIGN docs directory structure be located here?
 
 NodeJS
 ------
@@ -316,5 +311,172 @@ Finally, put a breakpoint at **
 
 whenever the **MyTestStore** invokes its **tigger** method, it will automatically update the state of **MyTestStore** which (because of ReactJS) will result in a re-render of the component. The component's internal state has already been updated by with the new data behind the scene.
 
-Testing
-=======
+Testing Example
+===============
+
+Automated JavaScript Unit Tests
+-------------------------------
+
+Testing uses the following NodeJS modules:
+* [NodeJS / npm](https://nodejs.org/en) - used to run the JavaScript development tools
+* [Webpack Module Bundler](https://webpack.github.io/) - module builder
+* [Karma](http://karma-runner.github.io/0.13/index.html) - unit test runner
+* [Jasmine](http://jasmine.github.io/) - unit test framework (see also [jasmine introduction](http://jasmine.github.io/2.0/introduction.html))
+
+Additionally, there are test support files located in **tools/test**
+* karma.config.js - Karma configuration file (resues webpack configuration)
+* mock-ajax.js - 3rd party library that provides mocking of ajax requests
+* tests.webpack.js - used by Karma to find and run all the test files
+
+Shell Test Commands
+-------------------
+* wt - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
+* wtw - continuous testing, same as test but reruns when files change
+
+Create A Unit Test Suite
+------------------------
+Let's create a unit test for the previous **MyTestActions.js** we created previously.  Create a new file withing the **src/js/actions/__tests__** directory.  There are **__tests__** directories located in:
+* src/js/actions
+* src/js/stores
+* src/js/utils
+
+    MyTestActions-test.js
+
+    describe('Test Suite For MyTestActions', function() {
+
+        var MyTestActions,
+            RenderActions;
+
+        beforeEach(function() {
+            MyTestActions = require('MyTestActions');
+            RenderActions = require('RenderActions');
+        });
+
+        it('completes correctly', function() {
+            expect(true).toBe(false);
+        });
+
+    });
+
+This is the style of **Jasmine** tests suites. The **describe** function is the test suite and each **it** function is an individual unit test.  Now, run **wtw** from the shell, you should get something like the following:
+
+    SUMMARY:
+    ✔ 47 tests completed
+    ✖ 1 test failed
+
+    FAILED TESTS:
+      Test Suite For MyTestActions
+        ✖ completes correctly
+          PhantomJS 1.9.8 (Linux 0.0.0)
+        Expected true to be false.
+            at /home/fjw/openswitch/ops-webui/tools/test/tests.webpack.js:68827
+
+Our goal is the create a unit test for the asynchronous **completed** and **failed** cases of **MyTestActions**. First we create some variables to store the mock URLs and data that we will use.  Add the following to variables section.
+
+    sys = {
+        testUrl: '/rest/v1/system',
+        body: {
+            configuration: {
+                hostname: 'alswitch.rose.hp.com'
+            }
+        },
+        processed: {
+            hostname: 'alswitch.rose.hp.com'
+        }
+    };
+
+Now we are going to mock the ajax requests but using the helper function **AjaxStubRequest**.  This will intercept the requests and return whatever data we wish.  Also, we are going to **spy** on the **loadCompleted** action to make sure it was called with the correct data.  Change the contents of the unit test function **it('completes correctly', ...** with:
+
+    AjaxStubRequest(sys.testUrl, sys.body);
+
+    spyOn(MyTestActions.load, 'completed');
+
+    expect(MyTestActions.load.completed).toHaveBeenCalledWith(
+        sys.processed
+    );
+
+
+_Remember that the Karam test running will rerun everytime to you save the test file.  It is good practice to monitor the output as you add test code._
+
+You should get something like the following:
+
+    SUMMARY:
+    ✔ 47 tests completed
+    ✖ 1 test failed
+
+    FAILED TESTS:
+      Test Suite For MyTestActions
+        ✖ completes correctly
+          PhantomJS 1.9.8 (Linux 0.0.0)
+        Expected spy completed to have been called with [ Object({ hostname: 'alswitch.rose.hp.com' }) ] but it was never called.
+            at /home/fjw/openswitch/ops-webui/tools/test/tests.webpack.js:68843
+
+There are actually two reasons that the test failed:
+* We didn't actually invoke the **loadCompleted** action
+* We didn't wait for the asynchronous action to be handled
+
+Add the following right after the **spyOn** line:
+
+    MyTestActions.load();
+    jasmine.clock().tick(); // allow action to be handled
+
+After saving the file you should get:
+
+    Test Suite For MyTestActions
+      ✔ completes correctly
+
+To enhance our test lets make sure that the failed case was not called:
+
+    AjaxStubRequest(sys.testUrl, sys.body);
+
+    spyOn(MyTestActions.load, 'completed');
+    spyOn(RenderActions, 'postRequestErr');
+
+    MyTestActions.load();
+    jasmine.clock().tick(); // allow action to be handled
+
+    expect(MyTestActions.load.completed).toHaveBeenCalledWith(
+        sys.processed
+    );
+
+    expect(RenderActions.postRequestErr.calls.count()).toEqual(1);
+
+After saving this file, the test should fail because **postRequestErr** should not have been called.
+
+    SUMMARY:
+    ✔ 47 tests completed
+    ✖ 1 test failed
+
+    FAILED TESTS:
+      Test Suite For MyTestActions
+        ✖ completes correctly
+          PhantomJS 1.9.8 (Linux 0.0.0)
+        Expected 0 to equal 1.
+            at /home/fjw/openswitch/ops-webui/tools/test/tests.webpack.js:68849
+
+Change the 1 in **toEqual** to 0 and your test should pass now.
+
+For the **failed** unit test add the following:
+
+    it('fails correctly', function() {
+        AjaxStubRequest(sys.testUrl, sys.body, 500);
+
+        spyOn(MyTestActions.load, 'completed');
+        spyOn(RenderActions, 'postRequestErr');
+
+        MyTestActions.load();
+        jasmine.clock().tick(); // allow action to be handled
+
+        expect(MyTestActions.load.completed.calls.count()).toEqual(0);
+        expect(RenderActions.postRequestErr.calls.count()).toEqual(1);
+    });
+
+Notice that we are using a version of the **AjaxStubRequest** function that access an response error code (i.e. 500).  Now, save the file.
+
+    Test Suite For MyTestActions
+      ✔ completes correctly
+      ✔ fails correctly
+
+Congradulations! You've just unit tested you new Actions!
+
+Keep in mind that all Actions, Stores and utility modules should have full unit tests.
