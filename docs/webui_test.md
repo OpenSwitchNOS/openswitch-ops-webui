@@ -1,11 +1,11 @@
 Testing for OPS-WEBUI
 =====================
 
-The current Web UI testing consists of
-* Automated JavaScript unit tests
-* Manual GUI tests
+The current Web UI testing consists of:
+* automated JavaScript unit tests
+* manual GUI tests
 
-This document only describes the developer automated JavaScript units.
+This document only describes the automated JavaScript unit tests.
 
 Automated JavaScript Unit Tests
 ===============================
@@ -21,18 +21,20 @@ Additionally, there are test support files located in **tools/test**
 * mock-ajax.js - 3rd party library that provides mocking of ajax requests
 * tests.webpack.js - used by Karma to find and run all the test files
 
+All **Karma/Jasmine** tests are located in \__tests__ directories.
+
 Shell Test Commands
 -------------------
-The npm build commands (defined in package.json) can be run from the **ops-webui** root directory.  For example:
+The NodeJs/npm build commands (defined in package.json) can be run from the **ops-webui** root directory.  For example:
 
     ops-webui$ npm run test
 
-There is an aliases.sh file in the ops-webui root directory that can be sourced that provide aliases for each command.  For example:
+There is an **aliases.sh** file in the ops-webui root directory that can be sourced to provide aliases for each command.  For example:
 
-    alias wb='npm run build'
+    alias wt='npm run test'
 
-* wt - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
-* wtw - continuous testing, same as test but reruns when files change
+* **wt** - run the unit tests a single time (karma/jasmine tests are located in \__test__ directories)
+* **wtw** - continuous testing, same as test but reruns when files change
 
 Tests
 -----

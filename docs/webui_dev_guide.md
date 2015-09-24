@@ -1,13 +1,13 @@
-Developer Guide for OPS-WEBUI
-=============================
-In addition to this document it is highly recommended to become familiar with the following technologies:
+Developer "How-To" Guide for OPS-WEBUI
+======================================
+In addition to this document developers should be familiar with the following technologies:
 
 Run-time modules:
 * [ReactJS](https://github.com/facebook/react) - component bases view/control framework
 * [RefluxJS](https://github.com/reflux/refluxjs) -  [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation module
 * [React-Router](https://github.com/rackt/react-router) - URL route module
 * [Grommet](http://grommet.io/docs/hpe/) - open source enterprise UX framework
-* [SuperAgent](https://visionmedia.github.io/superagent/) - AJAX request module
+* [SuperAgent](https://visionmedia.github.io/superagent/) - ajax request module
 
 Development modules:
 * [NodeJS / npm](https://nodejs.org/en) - used to run the JavaScript development tools
@@ -27,7 +27,7 @@ _On Ubuntu, there is already an unrelated application called "node" that must be
 
 After installation verify you have a version of node compatible with the current source base you are working on.
 
-    $ node -v
+    ops-webui$ node -v
     v0.10.25
     $ npm -v
     1.3.24
@@ -41,57 +41,62 @@ Once NodeJS/npm is installed, the npm build commands (defined in package.json) c
     > webapp@0.0.0 build /home/fjw/openswitch/ops-webui
     > webpack --progress
 
-There is an aliases.sh file in the ops-webui root directory that can be sourced that provide aliases for each command.  For example:
- on development ReactJS components
+There is an **aliases.sh** file in the **ops-webui** root directory that can be sourced that provide aliases for each command.  For example:
 
     alias wb='npm run build'
 
 Th commands include:
-* wb - single-run build creates index.html, bundle.js and other assets in ./build
-* wbw - continuous build, same as build but reruns when files change
-* wbd - single-run build with more verbose output
-* wbp - single-run build with the addition minimizing bundle.js
-* wt - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
-* wtw - continuous testing, same as test but reruns when files change
-* wds - runs the webpack development server with hot change support
+* **wb** - single-run build creates index.html, bundle.js and other assets in ./build
+* **wbw** - continuous build, same as build but reruns when files change
+* **wbd** - single-run build with more verbose output
+* **wbp** - single-run build with the additional minimizing of bundle.js
+* **wt** - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
+* **wtw** - continuous testing, same as test but reruns when files change
+* **wds** - runs the webpack development server with file change support
 
 Editor (optional)
 -----------------
-[Atom](https://atom.io) is a  really nice editor that supports syntax highlighting of JSX.  However, you need to install the **language-babel** package.
+[Atom](https://atom.io) is a really nice editor that supports syntax highlighting of JSX.  However, you need to install the **language-babel** package.
 
 Development Modes
 =================
-There are multiple development modes, for example:
+There are multiple development modes:
 
-* Build and copy to switch
- * For this mode, run the **wb** command to perform a build and **scp** the required build files to the switch. This will require you to first perform an OpenSwitch install to the switch. Normally, you will only need to copy over the **build/bundle.js** file as it will be the only file changed after a build.
- * Use this mode when you need to run on real hardware
-* Continuous unit test
- * For this mode, run the **wtw** command and the unit tests will run once and every time you save a file.
- * Use this mode when you are working on action, store and/or utility modules
- * You can debug in this mode by connecting you browser to _localhost:9876_
-* Developer Server
- * For this mode, run the **wds** command to run the Webpack development server which uses the same build configuration as **wb**. Each time a file is changed a new build will be performed.
- * Connect your browser to _localhost:8080/index.html?restapi=SWITCH_IP_, where SWITCH_IP is the IP address of your physical switch that is serving up the REST API.
- * Use this mode when you want rapid feedback on any static file changes (JavaScript & styles), all your static resources are loaded locally but all ajax calls are redirected to SWITCH_IP
- * Developers will spend most of the time using this mode.
+Build and copy to switch
+* use this mode when you need to run on real hardware
+* you must first perform an install of the current OpenSwitch software to your switch
+* run the **wb** command to perform a build
+* use **scp** to copy the required build files to the switch (i.e. bundle.js)
+
+Continuous unit test
+* use this mode when you are working on action, store or utility modules
+* run the **wtw** command and the unit tests will run every time you save a file
+* debug in this mode by connecting you browser to **localhost:9876**
+
+Local development server (most time will be spent in this mode)
+* use this mode when you want rapid feedback on any static file changes (JavaScript & styles), all your static resources are loaded locally but all ajax calls are redirected to SWITCH_IP
+* you must first perform an install of the current OpenSwitch software to your switch
+* run the **wds** command to run the Webpack development server which uses the same build configuration as **wb**
+* each time a file is changed a new build will be performed
+* debug in this mode by connecting your browser to **localhost:8080/index.html?restapi=SWITCH_IP**, where SWITCH_IP is the IP address of your switch
 
 Implementation Example
 ======================
 
 Creating a View (with associated Store & Actions)
 -------------------------------------------------
-As described in the design documentation, the Web UI is composed of navigable Views (or routes) associated with a URL (or Link).  A View is simply a ReactJS component.
+As described in the design documentation, the Web UI is composed of navigable Views (or routes) associated with a URL (or link).  A View is simply a ReactJS component.
 
-First, run the development server
+First, run the local development server (as described above):
 
     {feature/webui} ~/openswitch/ops-webui$ wds
     ...etc...
     webpack: bundle is now VALID.
 
-Create a new View within **src/js/views**.  The test view will simply display the view's route ID and the switch's hostname.
+All Views are created within the **src/js/views** directory.  The View we create will simply display the View's route ID and the switch's hostname.
 
     MyTestView.jsx
+    --------------
 
     var React = require('react'),
         Reflux = require('reflux'),
@@ -128,19 +133,19 @@ Create a new View within **src/js/views**.  The test view will simply display th
 
     });
 
-_ReactJS components use the .jsx extension because they contain JSX code that needs to be transpiled to JavaScript._
+**Note:** _ReactJS components use the .jsx extension because they contain JSX code that needs to be transpiled to JavaScript._
 
 See [ReactJS](https://github.com/facebook/react) for more information on developing components.
 
-Add the View as route within **src/js/main/router.jsx**. At the top require the new View
+Within **src/js/main/router.jsx** we need to add the new View as a route. At the top of the file, require the new View:
 
     MyTestView = require('MyTestView')
 
-Add a route as a child of the App route
+In the same file, add a route as a child of the **App** route
 
     <Route name="mytest" handler={MyTestView}/>
 
-Once you save the **router.jsx** you should get some errors in the webpack developer server console
+Once you save the **router.jsx** you should get some errors in the Webpack developer server output:
 
     ERROR in ./src/js/views/MyTestView.jsx
     Module not found: Error: Cannot resolve module 'MyTestActions' in /home/fjw/openswitch/ops-webui/src/js/views
@@ -151,9 +156,10 @@ Once you save the **router.jsx** you should get some errors in the webpack devel
     @ ./src/js/views/MyTestView.jsx 8:18-40
     webpack: bundle is now VALID.
 
-Create a new Store within **src/js/stores**
+Next, create a new Store within **src/js/stores**
 
     MyTestStore.js
+    --------------
 
     var Reflux = require('reflux'),
         MyTestActions = require('MyTestActions');
@@ -177,11 +183,12 @@ Create a new Store within **src/js/stores**
 
     });
 
-Once you save the Store you should only see errors related to resolving module **MyTestActions**.
+Once you save the Store, you should now only see errors related to resolving module **MyTestActions**.
 
 Create a new Actions module within **src/js/actions**
 
     MyTestActions.js
+    ----------------
 
     var Reflux = require('reflux'),
         RestUtils = require('restUtils'),
@@ -210,7 +217,7 @@ Create a new Actions module within **src/js/actions**
 
     module.exports = MyTestActions;
 
-Once you save the Actions you should not see any errors.
+Once you save the new Actions file, you should not see any errors.
 
 See [RefluxJS](https://github.com/reflux/refluxjs) for more information on developing Stores and Actions.
 
@@ -222,9 +229,9 @@ First, make sure your browser is open to
 
     http://localhost:8080/index.html?restapi=SWITCH_IP#/
 
-_If authentication is enabled, you will need to login to display the NavPane._
+_If authentication is enabled, you will need to login._
 
-Now, in **src/js/main/NavPane.jsx** add the 'mytest' route to one of the NavGroups:
+Now, in **src/js/main/NavPane.jsx** add the new 'mytest' route to one of the **NavGroup** elements:
 
     routes={[
         { to: 'dashboard' },
@@ -237,7 +244,7 @@ Once you save the file, you should see a new navigation link in the NavPane. The
 
     ~views.mytest.name~
 
-In **src/js/i18n/en-US.js** (under _messages/views_) create a new **mytest** object:
+All text displayed in the Web UI is localized by files in the **src/js/i18n** directory. If a key cannot be found in the localization file, the key will be displayed _as is_ surrounded by tildas.  To fix this, we need to edit **src/js/i18n/en-US.js** and under _messages/views_ create a new **mytest** object:
 
     mytest: {
         name: 'MyTest'
@@ -248,16 +255,16 @@ Once you save the file, you should see the link text change to "MyTest" in the b
     View: MyTest
     Host: myswitch
 
-Congradulations! You've just added a new View to the Web UI!
+Congratulations! You've just added a new View to the Web UI!
 
 Debugging Example
 =================
 
-In the previous example, we created a new View, Store and Actions.  Now, we are going to walk through how the pieces work together. Enter the debug mode for the browser.  Select the **bundle.js** in source, and search until to find
+In the previous example, we created a new View, Store and Actions.  Now, we are going to walk through how the pieces work together. Enter the debug mode for the browser.  Select the **bundle.js** in source, and search until to find:
 
     MyTestActions.load()
 
-This is the line called from **MyTestView.jsx** when the component mounts
+This is the line called from **MyTestView.jsx** when the component mounts:
 
     componentDidMount: function componentDidMount() {
         MyTestActions.load();
@@ -265,11 +272,11 @@ This is the line called from **MyTestView.jsx** when the component mounts
 
 _Notice that the code in the browser is not exactly the same as the original file, this is because we are looking the file post-processed by Webpack._
 
-Put a breakpoint on the **MyTestActions.load()** and refresh the browser.  You should hit the break point when the View loads (called mounting).
+Put a breakpoint on the **MyTestActions.load()** and refresh the browser.  You should hit the break point when the View loads (called component mounting in ReactJS).
 
-_If you don't hit the break point, make sure you are loading the new 'mytest' route._
+_If you don't hit the break point, make sure you are loading the new 'mytest' route (i.e. 'MyTest' is selected in the NavPane)._
 
-Now use the same technique to find
+Now use the same technique to find:
 
     MyTestActions.load.listen(function () {
 
@@ -281,7 +288,7 @@ and
 
     if (err) {
 
-Now proceed past the first breakpoint.  When **MyTestActions.load()** is invoked, it is intercepted by **MyTestActions.load.listen** and a call is made using the switch at the specified URL.  When the response arrives the callback is invoked (and now error occurs), the **completed** action in invoked.
+Now proceed past the first breakpoint.  When **MyTestActions.load()** is invoked, it is intercepted by **MyTestActions.load.listen** and a REST call is made to the switch with the specified URL.  When the response arrives, the callback is invoked. Assuming no network/switch error occurs, the **completed** action will be invoked by calling:
 
     this.completed({
         hostname: res.body.configuration.hostname
@@ -292,24 +299,18 @@ In **MyTestActions** we created 3 actions
 * loadCompleted
 * loadFailed
 
-Calling **this.completed** is really shorthand for calling the action **loadCompleted**.  Finally, notice that we are passing in data to the completed function.  This is the data that will given to any listeners of the action (see [RefluxJS](https://github.com/reflux/refluxjs)).
+Calling **completed** is really shorthand for calling the action **loadCompleted**. Note that we pass in the data (i.e. the hostname) as an argument to the action. This is the data that will given to any listeners of the action (see [RefluxJS](https://github.com/reflux/refluxjs)).
 
 
-Now, put a breakpoint at **onLoadCompleted** within the **MyTestStore** module. Search for
+Now, put a breakpoint in **onLoadCompleted** within the **MyTestStore** module. Search for:
 
     listenables: [MyTestActions]
 
 to find the **MyTestStore** within the **bundle.js**
 
-Now proceed past the current breakpoint. You should see the **onLoadCompleted** get called in the **MyTestStore** module.  The Store will now update its internal state and call is own **this.tigger** method. The trigger will call any components that are _connected_ this this Store.
+When you hit this breakpoint, you will see the Store update its internal state and call its **tigger** method. When a Store calls trigger, any components that are _connected_ this this Store will get notified.  There are different ways to connect to a Store (see [RefluxJS](https://github.com/reflux/refluxjs))). In this case, we are using the **Reflux.connect** mixin to connect **MyTestView** to **MyTestStore**.  Therefore, the **MyTestView** component's state will _automatically_ get updated for us behind the scenes. In the ReactJS framework, whenever a component's state gets updated, the component's **render** method will be invoked. Since our state has already been updated, we will now be able to display the correct _hostname_ value in the GUI.
 
-Since **MyTestView** is connected to the **MyTestStore** via the mixin:
-
-Finally, put a breakpoint at **
-
-    mixins: [Reflux.connect(MyTestStore), ViewInitMixin],
-
-whenever the **MyTestStore** invokes its **tigger** method, it will automatically update the state of **MyTestStore** which (because of ReactJS) will result in a re-render of the component. The component's internal state has already been updated by with the new data behind the scene.
+You can put a breakpoint in the **render** method of **MyTestView** to monitor render function before and after the server responds with data.
 
 Testing Example
 ===============
@@ -330,17 +331,15 @@ Additionally, there are test support files located in **tools/test**
 
 Shell Test Commands
 -------------------
-* wt - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
-* wtw - continuous testing, same as test but reruns when files change
+* **wt** - single-run unit tests (karma/jasmine tests are located in \__test__ directories)
+* **wtw** - continuous testing, same as test but reruns when files change
 
 Create A Unit Test Suite
 ------------------------
-Let's create a unit test for the previous **MyTestActions.js** we created previously.  Create a new file withing the **src/js/actions/__tests__** directory.  There are **__tests__** directories located in:
-* src/js/actions
-* src/js/stores
-* src/js/utils
+Let's make a unit test for the previously created **MyTestActions.js**. Add the following test file under the **src/js/actions/__tests__** directory:
 
     MyTestActions-test.js
+    ---------------------
 
     describe('Test Suite For MyTestActions', function() {
 
@@ -358,6 +357,11 @@ Let's create a unit test for the previous **MyTestActions.js** we created previo
 
     });
 
+There are **__tests__** directories located in:
+  * src/js/actions
+  * src/js/stores
+  * src/js/utils
+
 This is the style of **Jasmine** tests suites. The **describe** function is the test suite and each **it** function is an individual unit test.  Now, run **wtw** from the shell, you should get something like the following:
 
     SUMMARY:
@@ -371,7 +375,7 @@ This is the style of **Jasmine** tests suites. The **describe** function is the 
         Expected true to be false.
             at /home/fjw/openswitch/ops-webui/tools/test/tests.webpack.js:68827
 
-Our goal is the create a unit test for the asynchronous **completed** and **failed** cases of **MyTestActions**. First we create some variables to store the mock URLs and data that we will use.  Add the following to variables section.
+Our goal is the create a unit test for the asynchronous **completed** and **failed** cases of **MyTestActions**. First we create some variables to store the mock URLs and data.  Add the following to variables section:
 
     sys = {
         testUrl: '/rest/v1/system',
@@ -385,7 +389,7 @@ Our goal is the create a unit test for the asynchronous **completed** and **fail
         }
     };
 
-Now we are going to mock the ajax requests but using the helper function **AjaxStubRequest**.  This will intercept the requests and return whatever data we wish.  Also, we are going to **spy** on the **loadCompleted** action to make sure it was called with the correct data.  Change the contents of the unit test function **it('completes correctly', ...** with:
+First, we are going to mock the ajax request by using the helper function **AjaxStubRequest**.  This will intercept the request and return whatever data we wish.  Second, we are going to **spy** on the **loadCompleted** action to make sure it was called with the correct data.  Change the contents of the unit test function **it('completes correctly', ...** with:
 
     AjaxStubRequest(sys.testUrl, sys.body);
 
@@ -396,7 +400,7 @@ Now we are going to mock the ajax requests but using the helper function **AjaxS
     );
 
 
-_Remember that the Karam test running will rerun everytime to you save the test file.  It is good practice to monitor the output as you add test code._
+_Remember that the Karma test runner will rerun every time to you save the test file.  It is good practice to monitor the output as you add test code._
 
 You should get something like the following:
 
@@ -412,8 +416,8 @@ You should get something like the following:
             at /home/fjw/openswitch/ops-webui/tools/test/tests.webpack.js:68843
 
 There are actually two reasons that the test failed:
-* We didn't actually invoke the **loadCompleted** action
-* We didn't wait for the asynchronous action to be handled
+* we didn't actually invoke the **loadCompleted** action
+* we didn't wait for the asynchronous action to be handled
 
 Add the following right after the **spyOn** line:
 
@@ -425,7 +429,7 @@ After saving the file you should get:
     Test Suite For MyTestActions
       ✔ completes correctly
 
-To enhance our test lets make sure that the failed case was not called:
+To enhance our test lets make sure that the failed case was _not_ called:
 
     AjaxStubRequest(sys.testUrl, sys.body);
 
@@ -471,12 +475,14 @@ For the **failed** unit test add the following:
         expect(RenderActions.postRequestErr.calls.count()).toEqual(1);
     });
 
-Notice that we are using a version of the **AjaxStubRequest** function that access an response error code (i.e. 500).  Now, save the file.
+Notice that in this case we are calling **AjaxStubRequest** with a response error code (i.e. 500).
+
+Now, save the file:
 
     Test Suite For MyTestActions
       ✔ completes correctly
       ✔ fails correctly
 
-Congradulations! You've just unit tested you new Actions!
+Congratulations! You've just unit tested you new Actions!
 
 Keep in mind that all Actions, Stores and utility modules should have full unit tests.
