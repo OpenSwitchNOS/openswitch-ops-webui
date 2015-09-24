@@ -1,5 +1,5 @@
-High level design of OPS-WEBUI
-==============================
+High level design of the OpenSwitch Web UI (ops-webui)
+======================================================
 
 The GUI design is based on the following technologies:
 * [ReactJS](https://github.com/facebook/react)
