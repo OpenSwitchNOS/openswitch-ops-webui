@@ -88,7 +88,7 @@ module.exports = {
                 temp: 'Temperatures',
                 tempUnits: 'C',
                 portTopUtil: 'Top Interface Utilization',
-                loadingInfData: 'Loading Interfaces...',
+                loadingInfData: 'Waiting for active interfaces...',
                 port: 'Interface',
                 tx: 'Tx',
                 rx: 'Rx',
