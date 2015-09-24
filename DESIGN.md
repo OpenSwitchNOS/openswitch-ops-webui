@@ -1,4 +1,4 @@
-﻿High level design of OPS-WEBUI
+High level design of OPS-WEBUI
 ==============================
 
 The GUI design is based on the following technologies:
@@ -6,7 +6,7 @@ The GUI design is based on the following technologies:
  * Controller-view framework
 * [RefluxJS](https://github.com/reflux/refluxjs)
  * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation with a unidirectional data flow pattern
-* [React-Router] (https://github.com/rackt/react-router)
+* [React-Router](https://github.com/rackt/react-router)
  * URL routing (i.e View) framework
  * Browser history support
 
@@ -160,13 +160,13 @@ Design choices
 --------------
 A major motivation for the following design decisions is time-to-market.  The GUI development was proposed relatively late in the project life cycle.
 
-It was decided early on to use [Grommet](http://grommet.io/docs/hpe/), which is an open source UX framework for enterprise applications lead by HP.  This framework is based on [ReactJS](https://github.com/facebook/react).
+It was decided early on to use [Grommet](http://grommet.io/docs/), which is an open source UX framework for enterprise applications lead by HP.  This framework is based on [ReactJS](https://github.com/facebook/react).
 
 The **ops-webui** development environment uses a subset of the Grommet _modular development environment_ stack.  To this end, Grommet can be viewed
 as just another NodeJS module.  This reduces the coupling but still allows full access to the entire set of Grommet components and assets.
 The only build tools needed are NodeJS and Webpack ([Gulp](http://gulpjs.com/) and [Bower](http://bower.io/) are not needed).
 
-Grommet doesn't necessary specify which [Flux](https://facebook.github.io/react/docs/flux-overview.html) implementation to use. However, as Grommet is leveraging [RefluxJS](https://github.com/reflux/refluxjs) (and after investigating alternatives) it was decided to use the same package.
+Grommet doesn't necessarily specify which [Flux](https://facebook.github.io/react/docs/flux-overview.html) implementation to use. However, as Grommet is leveraging [RefluxJS](https://github.com/reflux/refluxjs) (and after investigating alternatives) it was decided to use the same package.
 
 Based on several meetings and discussions with OpenSwitch architects it was decided to simply use the current _auto generated_ REST API to obtain the data to be displayed by the GUI. Because this requires the GUI to perform a large number of REST requests, a shim layer was created to allow the browser to make these requests in parallel.  However, most browsers only allow a small number of socket requests (~5) to be open at the same time.
 
@@ -338,7 +338,7 @@ Source dependencies:
 * [RefluxJS](https://github.com/reflux/refluxjs)
 * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html)
 * [React-Router](https://github.com/rackt/react-router)
-* [Grommet](http://grommet.io/docs/hpe/)
+* [Grommet](http://grommet.io/docs/)
 * [SuperAgent](https://visionmedia.github.io/superagent/)
 
 Development dependencies:
