@@ -33,10 +33,10 @@ This approach is taken one step further to isolate all back-end service interact
              |                 |          ^                 |
 Publishes to |    Publishes to |          |                 |
              |                 |          |                 v
-             |                 |          |          +------+------------+  
-        +----+-------------+   |          |          | A Backend Service |  
-        | A RefluxJS Store +<--+          +----------+ (REST)            |  
-        +------------------+               Callback  +-------------------+  
+             |                 |          |          +------+------------+
+        +----+-------------+   |          |          | A Backend Service |
+        | A RefluxJS Store +<--+          +----------+ (REST)            |
+        +------------------+               Callback  +-------------------+
 ```
 
 The major Web UI components
@@ -343,7 +343,7 @@ Source dependencies:
 
 Development dependencies:
 * [ESLint](http://eslint.org/)
-* [Sassy CSS](http://sass-lang.com/guide)  
+* [Sassy CSS](http://sass-lang.com/guide)
 * [Webpack Module Bundler](https://webpack.github.io/)
 * [NodeJS / npm](https://nodejs.org/en)
 * [Karma](http://karma-runner.github.io/0.13/index.html)
