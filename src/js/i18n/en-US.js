@@ -45,7 +45,7 @@ module.exports = {
         links: 'Links',
 
         // Links.
-        swaggerLink: 'Swagger UI',
+        swaggerLink: 'REST API',
         openSwitchLink: 'OpenSwitch.net',
 
         // Errors.
