@@ -95,7 +95,7 @@ $portCornerRadius: 3px;
     @media #{$smallScreen} {
         height: 65px;
 
-        &.SFP_PLUS {
+        &.SFP_PLUS, &.RJ45 {
             width: 125px;
         }
 
@@ -108,7 +108,7 @@ $portCornerRadius: 3px;
     @media #{$mediumScreen, $largeScreen} {
         height: 30px;
 
-        &.SFP_PLUS {
+        &.SFP_PLUS, &.RJ45 {
             width: 55px;
         }
 
@@ -226,7 +226,7 @@ $portCornerRadius: 3px;
         }
     }
 
-    &.SFP_PLUS {
+    &.SFP_PLUS, &.RJ45 {
 
         //small screen
         @media #{$smallScreen} {
@@ -340,7 +340,7 @@ $portCornerRadius: 3px;
     position: relative;
     height: 25px;
 
-    &.SFP_PLUS {
+    &.SFP_PLUS, &.RJ45 {
         .boxTopLabels {
             margin-left: 9px;
         }

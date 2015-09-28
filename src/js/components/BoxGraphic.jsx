@@ -322,7 +322,7 @@ var BoxMiddle = React.createClass({
                 {middleArray.map(function(index) {
                     if (this.props.hwData[index]) {
                         var hwPort = this.props.hwData[index].portType;
-                        if (hwPort === 'SFP_PLUS') {
+                        if (hwPort === 'SFP_PLUS' || hwPort === 'RJ45') {
                             return (
                                 <MiddleSfpPlus key={index} index={index}/>
                             );
