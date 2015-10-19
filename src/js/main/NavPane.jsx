@@ -86,7 +86,8 @@ var NavGroup = React.createClass({
     }
 });
 
-// FIXME: not highlighting when systemMonitor/memory (ActiveStore or query params)
+
+var API_LINK = 'http://' + window.location.hostname + ':8091/api/index.html';
 
 module.exports = React.createClass({
 
@@ -127,7 +128,7 @@ module.exports = React.createClass({
                 <NavGroup autoClose={ac} heading={t('links')}
                     routes={[
                         {
-                            href: 'http://api.openswitch.net/rest/dist/index.html',
+                            href: API_LINK,
                             nameKey: 'swaggerLink'
                         },
                         {
