@@ -27,5 +27,8 @@ do
     tar -zcf ../node-module-tars/$f.tgz $f
 done
 
+# Need the .bin folder for webpack to run
+tar -zcf ../node-modules-tars/dot-bin.tgz .bin
+
 cd ..
 echo "Done!"
