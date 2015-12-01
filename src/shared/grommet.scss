@@ -1,0 +1,306 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+// Encapsulates all grommet styles.
+
+@import "~_themeSettings.scss";
+
+// grommet vanilla
+
+$brand-color: $themeBrandColor;
+$brand-neutral-colors: $themeNeutralColors;
+$brand-accent-colors: $themeAccentColors;
+$brand-link-color: $themeLinkColors;
+$brand-status-colors: $themeStatusColors;
+$brand-grey-colors: $themeGreyColors;
+
+@if not variable-exists(brand-graph-colors) {
+  $brand-graph-colors: ();
+  $brand-graph-colors: join($brand-graph-colors, $brand-accent-colors);
+  $brand-graph-colors: join($brand-graph-colors, $brand-neutral-colors);
+};
+
+// override grommet-core/_base.color.scss
+
+$text-color: #000;
+$secondary-text-color: #000;
+$hover-text-color: $brand-color;
+
+// various "adjustments"
+
+.check-box--disabled {
+  .check-box__label {
+    @extend .disabled;
+  }
+}
+
+.radio-button--disabled {
+  .radio-button__label {
+    @extend .disabled;
+  }
+}
+
+.toolbar {
+  .search-input__input {
+    width: 150px;
+    height: $themeToolHeight - 4;
+  }
+  .search-input__control {
+    line-height: $themeToolHeight - 8;
+    .control-icon-search {
+      height: $themeToolHeight - 4;
+      width: $themeToolWidth - 4;
+    }
+  }
+  button {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .check-box__control {
+    overflow: visible;
+  }
+}
+
+.drop {
+  z-index: $themeMaxPageZIndex + 150 !important; // bewteen nav bar and pane
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.menu__drop {
+  .menu__control {
+    font-size: 19px;
+    line-height: 40px;
+  }
+}
+
+.menu {
+  font-size: 19px !important;
+  line-height: 40px !important;
+}
+
+// grommet-core/index.scss
+
+@import "~grommet/node_modules/inuit-defaults/settings.defaults";
+@import "~grommet/scss/grommet-core/settings.defaults";
+@import "~grommet/scss/grommet-core/settings.color";
+
+// grommet-core/settings.font
+
+@font-face {
+  font-family: 'Exo';
+  src: url('#{$fontsPath}/exo-regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('#{$fontsPath}/exo-bold.woff') format('woff');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('#{$fontsPath}/exo-semibold.woff') format('woff');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('#{$fontsPath}/exo-light.woff') format('woff');
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('#{$fontsPath}/exo-regular.woff') format('woff');
+}
+
+$brand-font-family: 'Source Sans Pro', Arial, sans-serif !default;
+$brand-large-number-font-family: 'Source Sans Pro', Arial, sans-serif !default;
+
+$label-font-size: 14px !default;
+$content-font-size: 16px !default;
+$control-font-size: 19px !default;
+$control-large-font-size: 24px !default;
+$menu-font-size: 19px !default;
+$header-font-size: 24px !default;
+$number-font-size: 24px !default;
+$number-units-font-size: 20px !default;
+$large-number-font-size: 48px !default;
+$large-number-units-font-size: 24px !default;
+$small-large-number-font-size: 20px !default;
+$small-large-number-units-font-size: 16px !default;
+$large-large-number-font-size: 64px !default;
+$large-large-number-units-font-size: 48px !default;
+$paragraph-small-font-size: 14px !default;
+$paragraph-large-font-size: 24px !default;
+
+// ...continue after settings.font
+
+@import "~grommet/node_modules/inuit-responsive-settings/settings.responsive";
+
+@import "~grommet/node_modules/inuit-functions/tools.functions";
+@import "~grommet/node_modules/inuit-mixins/tools.mixins";
+@import "~grommet/node_modules/inuit-responsive-tools/tools.responsive";
+
+@import "~grommet/scss/grommet-core/tools.page";
+@import "~grommet/scss/grommet-core/tools.flexible";
+@import "~grommet/scss/grommet-core/tools.color-index";
+@import "~grommet/scss/grommet-core/tools.pad";
+
+@import "~grommet/node_modules/inuit-normalize/generic.normalize";
+@import "~grommet/node_modules/inuit-reset/generic.reset";
+@import "~grommet/node_modules/inuit-box-sizing/generic.box-sizing";
+@import "~grommet/node_modules/inuit-shared/generic.shared";
+@import "~grommet/node_modules/inuit-page/base.page";
+@import "~grommet/node_modules/inuit-headings/base.headings";
+@import "~grommet/node_modules/inuit-lists/base.lists";
+@import "~grommet/node_modules/inuit-images/base.images";
+
+@import "~grommet/scss/grommet-core/base.color";
+@import "~grommet/scss/grommet-core/base.font";
+@import "~grommet/scss/grommet-core/base.text";
+@import "~grommet/scss/grommet-core/base.animation";
+@import "~grommet/scss/grommet-core/base.input";
+@import "~grommet/scss/grommet-core/base.page";
+
+@import "~grommet/node_modules/inuit-list-bare/objects.list-bare";
+
+@import "~grommet/scss/grommet-core/objects.anchor";
+@import "~grommet/scss/grommet-core/objects.app";
+@import "~grommet/scss/grommet-core/objects.article";
+@import "~grommet/scss/grommet-core/objects.attribute";
+@import "~grommet/scss/grommet-core/objects.box";
+@import "~grommet/scss/grommet-core/objects.button";
+@import "~grommet/scss/grommet-core/objects.calendar";
+@import "~grommet/scss/grommet-core/objects.carousel";
+@import "~grommet/scss/grommet-core/objects.chart";
+@import "~grommet/scss/grommet-core/objects.check-box";
+@import "~grommet/scss/grommet-core/objects.color-index";
+@import "~grommet/scss/grommet-core/objects.column";
+@import "~grommet/scss/grommet-core/objects.dashboard";
+@import "~grommet/scss/grommet-core/objects.distribution";
+@import "~grommet/scss/grommet-core/objects.donut";
+@import "~grommet/scss/grommet-core/objects.drop";
+@import "~grommet/scss/grommet-core/objects.footer";
+@import "~grommet/scss/grommet-core/objects.form";
+@import "~grommet/scss/grommet-core/objects.form-field";
+@import "~grommet/scss/grommet-core/objects.header";
+@import "~grommet/scss/grommet-core/objects.headline";
+@import "~grommet/scss/grommet-core/objects.icon";
+@import "~grommet/scss/grommet-core/objects.index";
+@import "~grommet/scss/grommet-core/objects.label";
+@import "~grommet/scss/grommet-core/objects.layer";
+@import "~grommet/scss/grommet-core/objects.list";
+@import "~grommet/scss/grommet-core/objects.legend";
+@import "~grommet/scss/grommet-core/objects.login";
+@import "~grommet/scss/grommet-core/objects.login-form";
+@import "~grommet/scss/grommet-core/objects.map";
+@import "~grommet/scss/grommet-core/objects.menu";
+@import "~grommet/scss/grommet-core/objects.meter";
+@import "~grommet/scss/grommet-core/objects.notification";
+@import "~grommet/scss/grommet-core/objects.notifications";
+@import "~grommet/scss/grommet-core/objects.object";
+@import "~grommet/scss/grommet-core/objects.paragraph";
+@import "~grommet/scss/grommet-core/objects.radio-button";
+@import "~grommet/scss/grommet-core/objects.search";
+@import "~grommet/scss/grommet-core/objects.search-input";
+@import "~grommet/scss/grommet-core/objects.section";
+@import "~grommet/scss/grommet-core/objects.session";
+@import "~grommet/scss/grommet-core/objects.settings";
+@import "~grommet/scss/grommet-core/objects.sidebar";
+@import "~grommet/scss/grommet-core/objects.split";
+@import "~grommet/scss/grommet-core/objects.skip-link";
+@import "~grommet/scss/grommet-core/objects.tab";
+@import "~grommet/scss/grommet-core/objects.tabs";
+@import "~grommet/scss/grommet-core/objects.table";
+@import "~grommet/scss/grommet-core/objects.tbd";
+@import "~grommet/scss/grommet-core/objects.tile";
+@import "~grommet/scss/grommet-core/objects.title";
+@import "~grommet/scss/grommet-core/objects.topology";
+
+@import "~grommet/node_modules/inuit-clearfix/trumps.clearfix";
+
+// grommet objects.button-vanilla.scss
+
+$button-accent-color: nth($brand-accent-colors, 1);
+$hover-darken: 15%;
+$active-darken: 20%;
+
+.button {
+
+  &:hover:not(.button--disabled) {
+    border-color: darken($brand-color, $hover-darken);
+  }
+
+  &:active:not(.button--disabled) {
+    border-color: darken($brand-color, $active-darken);
+  }
+
+  &--primary {
+
+    &:hover:not(.button--disabled) {
+      border-color: darken($brand-color, $hover-darken);
+      background-color: darken($brand-color, $hover-darken);
+    }
+
+    &:active:not(.button--disabled) {
+      border-color: darken($brand-color, $active-darken);
+      background-color: darken($brand-color, $active-darken);
+    }
+  }
+
+  &--secondary {
+
+    &:hover:not(.button--disabled) {
+      border-color: darken($button-secondary-color, $hover-darken);
+    }
+
+    &:active:not(.button--disabled) {
+      border-color: darken($button-secondary-color, $active-darken);
+    }
+  }
+
+  &--accent {
+
+    &:hover:not(.button--disabled) {
+      border-color: darken($button-accent-color, $hover-darken);
+    }
+
+    &:active:not(.button--disabled) {
+      border-color: darken($button-accent-color, $active-darken);
+    }
+  }
+
+  [class*="background-color-index-"] & {
+
+    &:hover {
+      border-color: darken($colored-border-color, $hover-darken);
+    }
+
+    &.button--primary {
+      &:hover {
+        border-color: darken($brand-color, $hover-darken);
+        background-color: darken($brand-color, $hover-darken);
+      }
+    }
+
+    &.button--accent {
+      &:hover {
+        border-color: darken($button-accent-color, $hover-darken);
+      }
+    }
+  }
+}
