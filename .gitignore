@@ -2,7 +2,6 @@
 
 build
 
-
 # Ignore 3rd party dependencies
 
 node_modules
@@ -17,4 +16,3 @@ logs
 # Ignore any coverage directories (tools like istanbul)
 
 coverage
-

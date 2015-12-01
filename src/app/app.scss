@@ -1,0 +1,123 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+@import "~_themeSettings.scss";
+@import "~globalStyles.scss";
+
+$fontsPath: '../shared/assets';
+@import "~grommet.scss";
+
+$navBarHeight: 46px;
+$navBarMinWidth: 600px;
+$navBarBottomBorder: $themeBorder;
+$navBarBgColor: $themeBrandInverseColor;
+
+$navPaneWidth: 200px;
+$navPaneBorderRight: $themeBorder;
+$navPaneBgColor: $themeBrandInverseColor;
+$navPaneSepratorColor: $themeBorder;
+$navPaneGroupColor: darken($themeBorderColor, 15%);
+$navPaneActiveBgColor: $themeBrandColor;
+$navPaneActiveColor: $themeBrandInverseColor;
+$navPaneHoverBgColor: $themeRowHoverBgColor;
+
+$pageBgColor: $themePageBgColor;
+
+$maxPageZIndex: $themeMaxPageZIndex;
+
+#app {
+
+  #appNavBar {
+    z-index: $maxPageZIndex + 200;
+    background-color: $navBarBgColor;
+    border-bottom: $navBarBottomBorder;
+    position: fixed;
+    height: $navBarHeight;
+    right: 0px;
+    left: 0px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  #appPage {
+    @include transitionAll();
+    background-color: $pageBgColor;
+    position: fixed;
+    top: $navBarHeight;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow-y: auto;
+  }
+
+  #appNavPane {
+    z-index: $maxPageZIndex + 100;
+    @include transitionAll();
+    padding: 16px 8px;
+    border-right: $navPaneBorderRight;
+    background-color: $navPaneBgColor;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    top: $navBarHeight;
+    width: $navPaneWidth;
+    margin-left: -$navPaneWidth;
+    a {
+      display: inline-block;
+      width: 100%;
+      text-decoration: none;
+      margin: 0;
+      padding: 8px;
+      &.active {
+        background-color: $navPaneActiveBgColor;
+        color: $navPaneActiveColor;
+      }
+      &:hover:not(.active) {
+        background-color: $navPaneHoverBgColor;
+      }
+    }
+    .group {
+      color: $navPaneGroupColor;
+    }
+    hr {
+      border-top: $navPaneSepratorColor;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+    &.navPaneOpen {
+      margin-left: 0;
+    }
+  }
+
+  @media #{$themeMdScreen} {
+    #appPage.navPaneOpen {
+      left: $navPaneWidth;
+    }
+    #appNavBar .mdOnly {
+      display: inline-block;
+    }
+  }
+
+  @media #{$themeLgScreen} {
+    #appNavBar .lgOnly {
+      display: inline-block;
+    }
+  }
+
+}
