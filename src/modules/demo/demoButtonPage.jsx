@@ -14,38 +14,43 @@
     under the License.
 */
 
-import './toolbar.scss';
-
 import React, { PropTypes, Component } from 'react';
-import Header from 'grommet/components/Header';
+import { connect } from 'react-redux';
 
-// This value id dependent on the .header { height: ... } value defined in in
-// the styles because that is the only way we can override the "<Header>..."
-// height.
-const HEIGHT = 48;
+import Button from 'grommet/components/Button';
 
-export default class Toolbar extends Component {
+class DemoButtonPage extends Component {
 
   static propTypes = {
-    children: PropTypes.node,
-    width: PropTypes.number,
+    actions: PropTypes.object.isRequired,
+    demo: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
+    this.state = {};
   }
 
-  static height() { return HEIGHT; }
+  _onClick = () => {
+    alert('Clicked me!');
+  }
 
   render() {
-    const style = {height: HEIGHT, width: this.props.width};
     return (
-      <div className="toolbar" style={style}>
-        <Header {...this.props} tag="h4" justify="between">
-          {this.props.children}
-        </Header>
+      <div>
+        <Button onClick={this._onClick} label="Default-Active"/>
+        <p/>
+        <Button label="Default-Disabled"/>
+        <p/>
+        <Button primary onClick={this._onClick} label="Primary"/>
+        <p/>
+        <Button primary label="Primary-Disabled"/>
       </div>
     );
   }
 
 }
+
+const select = (state) => ({ demo: state.demo });
+
+export default connect(select)(DemoButtonPage);

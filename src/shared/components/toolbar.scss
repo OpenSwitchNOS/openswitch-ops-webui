@@ -14,17 +14,26 @@
     under the License.
 */
 
-@import "~_themeSettings.scss";
+@import "~_settings.scss";
 
-$toolbarHeight: $themeToolHeight + 4;
-$toolbarBorder: $themeBorder;
+$toolbarHeight: 48px; // Keep identical with constant in Toolbar class
 
 .toolbar {
-  box-sizing: border-box;
-  line-height: $toolbarHeight;
-  height: $toolbarHeight;
-  vertical-align: middle;
-  &.borderBottom {
-    border-bottom: $toolbarBorder;
+
+  .header {
+    height: $toolbarHeight;
+
+    input.search-input__input {
+      padding-top: 4px;
+      padding-bottom: 4px;
+      width: 10rem;
+    }
+    .search-input__control {
+      .control-icon {
+        width: 36px;
+        height: 36px;
+      }
+    }
   }
+
 }

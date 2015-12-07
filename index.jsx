@@ -23,5 +23,5 @@ mainInit(BuildConfig);
 
 ReactDOM.render(
   <Main/>,
-  document.getElementById('app')
+  document.getElementById('main')
 );

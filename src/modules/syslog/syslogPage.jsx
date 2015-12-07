@@ -17,12 +17,13 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-import Button from 'button.jsx';
+import Box from 'grommet/components/Box';
+import Button from 'grommet/components/Button';
+import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import BoxContainer from 'boxContainer.jsx';
 import FetchInfo from 'fetchInfo.jsx';
 
-class SyslogRouteContainer extends Component {
+class SyslogPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -31,6 +32,10 @@ class SyslogRouteContainer extends Component {
 
   constructor(props) {
     super(props);
+    this.cols = [
+      { columnKey: 'id', header: t('id'), width: 100 },
+      { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
+    ];
     this.state = {};
   }
 
@@ -38,27 +43,28 @@ class SyslogRouteContainer extends Component {
     this.props.actions.syslog.fetchIfNeeded();
   }
 
+  _onClick = () => {
+    this.props.actions.syslog.readAll();
+  }
+
   render() {
     const syslogProps = this.props.syslog;
     const syslogActions = this.props.actions.syslog;
-    const cols = [
-      { columnKey: 'id', header: t('id'), width: 100 },
-      { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
-    ];
 
     return (
-      <BoxContainer page col pad2x>
-        <BoxContainer panel marginBottom2x pad>
-          <FetchInfo {...syslogProps}/>
-          <Button label={t('readAll')} onClick={syslogActions.readAll}/>
-        </BoxContainer>
-        <BoxContainer panel pad computeSize flex={1}>
+      <Box className="flex1">
+        <FetchInfo {...syslogProps}/>
+        <p/>
+        <Button primary label={t('readAll')} onClick={this._onClick} />
+        <p/>
+        <ResponsiveBox>
           <DataGrid title={t('syslog')} width={500} height={400}
               data={syslogProps.entities}
-              columns={cols}
+              columns={this.cols}
+              noSelect
           />
-        </BoxContainer>
-      </BoxContainer>
+        </ResponsiveBox>
+      </Box>
     );
   }
 
@@ -70,4 +76,4 @@ function select(state) {
   };
 }
 
-export default connect(select)(SyslogRouteContainer);
+export default connect(select)(SyslogPage);

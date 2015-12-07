@@ -18,7 +18,6 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
-import BoxContainer from 'boxContainer.jsx';
 import FetchInfo from 'fetchInfo.jsx';
 
 class InterfaceRouteContainer extends Component {
@@ -56,19 +55,20 @@ class InterfaceRouteContainer extends Component {
       },
     ];
 
-    return (
-      <BoxContainer page col pad2x>
-        <BoxContainer panel pad marginBottom2x>
-          <FetchInfo {...infProps}/>
-        </BoxContainer>
-        <BoxContainer panel pad computeSize flex={1}>
-          <DataGrid title={t('interfaces')} width={500} height={400}
-              data={infProps.entities}
-              columns={cols}
-          />
-        </BoxContainer>
-      </BoxContainer>
-    );
+    return null;
+    // return (
+    //   <BoxContainer page col pad2x>
+    //     <BoxContainer panel pad marginBottom2x>
+    //       <FetchInfo {...infProps}/>
+    //     </BoxContainer>
+    //     <BoxContainer panel pad computeSize flex={1}>
+    //       <DataGrid title={t('interfaces')} width={500} height={400}
+    //           data={infProps.entities}
+    //           columns={cols}
+    //       />
+    //     </BoxContainer>
+    //   </BoxContainer>
+    // );
   }
 
 }

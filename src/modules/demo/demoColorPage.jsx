@@ -14,38 +14,48 @@
     under the License.
 */
 
-import './toolbar.scss';
-
 import React, { PropTypes, Component } from 'react';
-import Header from 'grommet/components/Header';
+import { connect } from 'react-redux';
 
-// This value id dependent on the .header { height: ... } value defined in in
-// the styles because that is the only way we can override the "<Header>..."
-// height.
-const HEIGHT = 48;
+import Box from 'grommet/components/Box';
+import BrandLogo from 'brandLogo.jsx';
 
-export default class Toolbar extends Component {
+class DemoColorPage extends Component {
 
   static propTypes = {
-    children: PropTypes.node,
-    width: PropTypes.number,
+    actions: PropTypes.object.isRequired,
+    demo: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
+    this.state = {};
   }
 
-  static height() { return HEIGHT; }
+  _mkBox(color) {
+    return (
+      <Box direction="row" align="center" colorIndex={color}>
+        <BrandLogo/>colorIndex="{color}"
+      </Box>
+    );
+  }
 
   render() {
-    const style = {height: HEIGHT, width: this.props.width};
     return (
-      <div className="toolbar" style={style}>
-        <Header {...this.props} tag="h4" justify="between">
-          {this.props.children}
-        </Header>
+      <div>
+        {this._mkBox('neutral-1')}
+        {this._mkBox('neutral-2')}
+        {this._mkBox('neutral-3')}
+        {this._mkBox('neutral-4')}
+        {this._mkBox('accent-1')}
+        {this._mkBox('accent-2')}
+        {this._mkBox('accent-3')}
       </div>
     );
   }
 
 }
+
+const select = (state) => ({ demo: state.demo });
+
+export default connect(select)(DemoColorPage);

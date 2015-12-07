@@ -27,7 +27,7 @@ export const ACTIONS = {
 };
 
 const INITIAL_STATE = {
-  showPane: false
+  paneActive: false
 };
 
 // Optional 'reducer' function
@@ -35,10 +35,10 @@ export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
 
     case NAV_SHOW_PANE:
-      return { ...moduleState, showPane: true };
+      return { ...moduleState, paneActive: true };
 
     case NAV_HIDE_PANE:
-      return { ...moduleState, showPane: false };
+      return { ...moduleState, paneActive: false };
 
     default:
       return moduleState;

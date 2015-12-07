@@ -14,24 +14,24 @@
     under the License.
 */
 
-@import "~_themeSettings.scss";
+@import "~_settings.scss";
 @import "~fixed-data-table/dist/fixed-data-table.css";
-
-$headerBgColor: $themeHeaderBgColor;
-$headerHoverColor: $themeHeaderHoverColor;
-
-$rowOddBgColor: $themeRowOddBgColor;
-$rowHoverBgColor: $themeRowHoverBgColor;
-$rowActiveBgColor: $themeRowActiveBgColor;
-$rowActiveHoverBgColor: $themeRowActiveHoverBgColor;
-
-$toolbarBorder: $themeBorder;
 
 .dataGrid {
 
-  .toolbar {
-    .left {
-      min-width: 255px; // based on the filter input box width & icons
+  overflow: hidden;
+
+  .header {
+    height: 48px;
+    input.search-input__input {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+    .search-input__control {
+      .control-icon {
+        width: 36px;
+        height: 36px;
+      }
     }
   }
 
@@ -43,8 +43,18 @@ $toolbarBorder: $themeBorder;
     background-color: $headerBgColor;
     background-image: none; // git rid of the gradient (you're welcome Kelsey)
     cursor: pointer;
+    transition: all 0.2s;
     &:hover {
       color: $headerHoverColor;
+      .control-icon.tiny:not(.noColor) {
+        fill: $headerHoverColor;
+        stroke: $headerHoverColor;
+      }
+    }
+    .control-icon.tiny {
+      margin-top: 0px;
+      margin-bottom: 0px;
+      margin-left: -8px;
     }
   }
 
@@ -55,14 +65,19 @@ $toolbarBorder: $themeBorder;
   }
 
   .public_fixedDataTableRow_main {
+    transition: background-color 0.2s;
+    cursor: pointer;
+
     &.public_fixedDataTableRow_odd {
       background-color: $rowOddBgColor;
     }
     &:hover {
       background-color: $rowHoverBgColor;
+      color: $rowHoverColor;
     }
     &.active {
       background-color: $rowActiveBgColor;
+      color: $rowActiveColor;
       &:hover {
         background-color: $rowActiveHoverBgColor;
       }

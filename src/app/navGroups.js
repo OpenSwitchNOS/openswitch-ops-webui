@@ -14,12 +14,17 @@
     under the License.
 */
 
+// Modules don't specify group order.  The groups are created automatically
+// when they are detected as a new parent of a link in the build config.
+// Therefore, we need a way to specify an order for each group. The idea is
+// that groups are few (or not used at all).
+
 const GROUP_ORDER = {
-  general: 100,
-  links: 200,
+  general: 1000,
+  links: 2000,
 };
 
-const DEFAULT_ORDER = 999;
+const DEFAULT_ORDER = 9999;
 
 export function orderForGroup(groupKey) {
   return GROUP_ORDER[groupKey] || DEFAULT_ORDER;

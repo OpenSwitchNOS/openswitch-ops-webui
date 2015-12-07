@@ -16,18 +16,28 @@
 
 import './dataGrid.scss';
 
-import { t } from 'i18n/lookup.js';
 import React, { PropTypes, Component } from 'react';
+import { t } from 'i18n/lookup.js';
+import _ from 'lodash';
 import { Table, Column, Cell } from 'fixed-data-table';
+import SearchInput from 'grommet/components/SearchInput';
+import DownIcon from 'grommet/components/icons/base/CaretDown';
+import UpIcon from 'grommet/components/icons/base/CaretUp';
+import CheckBox from 'grommet/components/CheckBox';
+import EditIcon from 'grommet/components/icons/base/Edit';
+import Title from 'grommet/components/Title';
+import Menu from 'grommet/components/Menu';
 import Toolbar from 'toolbar.jsx';
-import BoxIcon from 'boxIcon.jsx';
-import SearchInput from 'searchInput.jsx';
 
 const ASC = 'asc';
 const DESC = 'desc';
 
+// Export a reference to the Cell component so that users can create custom cell
+// renderers.
+
 export const CustomCell = Cell;
 
+// Encapsulates the header cells that handle sorting of a column.
 
 class SortHeaderCell extends Component {
 
@@ -42,40 +52,38 @@ class SortHeaderCell extends Component {
     sortDirection: null,
   };
 
-  static SORT_DOWN = 'fa fa-long-arrow-down';
-  static SORT_UP = 'fa fa-long-arrow-up';
-  static SORT_NONE = 'fa fa-long-arrow-up noColor';
+  static UP = <UpIcon className="tiny" />;
+  static DOWN = <DownIcon className="tiny" />;
+  static NONE = <UpIcon className="tiny noColor"/>;
+
+  static toggleSortDir(ds) { return ds === DESC ? ASC : DESC; }
+
+  static renderSortInd(sd) {
+    return (sd === ASC)
+        ? SortHeaderCell.UP : (sd === DESC)
+            ? SortHeaderCell.DOWN : SortHeaderCell.NONE;
+  }
 
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  static toggleSortDir(ds) { return ds === DESC ? ASC : DESC; }
-
-  onClickHeader = e => {
+  _onClickHeader = e => {
     e.preventDefault();
     const sd = SortHeaderCell.toggleSortDir(this.props.sortDirection);
     this.props.onSortChange(this.props.columnKey, sd);
   };
 
-  static renderSortInd(sd) {
-    const cls = (sd === ASC)
-        ? SortHeaderCell.SORT_UP : (sd === DESC)
-            ? SortHeaderCell.SORT_DOWN : SortHeaderCell.SORT_NONE;
-    return <span className={cls}/>;
-  }
-
   render() {
     const si = SortHeaderCell.renderSortInd(this.props.sortDirection);
     return (
-      <Cell {...this.props} className="sortHeader" onClick={this.onClickHeader}>
+      <Cell {...this.props} onClick={this._onClickHeader}>
         {this.props.children} {si}
       </Cell>
     );
   }
 }
-
 
 class DataMap {
 
@@ -113,112 +121,16 @@ export default class DataGrid extends Component {
     noFilter: PropTypes.bool,
     noSelect: PropTypes.bool,
     onEdit: PropTypes.func,
-    onRowSelected: PropTypes.func,
+    onSelectChange: PropTypes.func,
     rowHeight: PropTypes.number,
     singleSelect: PropTypes.bool,
     title: PropTypes.string,
-    toolbarHeight: PropTypes.number,
     width: PropTypes.number.isRequired,
   };
 
   static defaultProps = {
     headerHeight: 40,
-    onRowsSelectoned: null,
     rowHeight: 40,
-    toolbarHeight: 46,
-  }
-
-  constructor(props) {
-    super(props);
-
-    const defaultDataMap = new DataMap(props.data);
-
-    this.state = {
-      activeDataKeys: [],
-      filterText: null,
-      sortingSpecs: [],
-      defaultDataMap,
-      dataMap: new DataMap(props.data, defaultDataMap.cloneDataKeyArray()),
-    };
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.data !== this.props.data) {
-      const defaultDataMap = new DataMap(newProps.data);
-
-      let dataKeyArray = defaultDataMap.cloneDataKeyArray();
-
-      const ft = this.state.filterText;
-      dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
-
-      DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
-
-      const dataMap = new DataMap(newProps.data, dataKeyArray);
-      this.setState({ defaultDataMap, dataMap });
-    }
-  }
-
-  onRowClick = (e, rowIdx) => {
-    if (!this.props.noSelect) {
-      let activeDataKeys = this.state.activeDataKeys.slice();
-      const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
-      const pos = activeDataKeys.indexOf(dataKey);
-
-      if (this.props.singleSelect) {
-        activeDataKeys = (pos >= 0) ? [] : [ dataKey ];
-      } else if (pos >= 0) {
-        activeDataKeys.splice(pos, 1);
-      } else {
-        activeDataKeys.push(dataKey);
-      }
-
-      this.setState({ activeDataKeys });
-    }
-  }
-
-  rowClassName = (rowIdx) => {
-    const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
-    return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
-  }
-
-  onSelectAll = () => {
-    this.setState({ activeDataKeys: this.state.dataMap.cloneDataKeyArray() });
-  }
-
-  onUnselectAll = () => {
-    this.setState({ activeDataKeys: [] });
-  }
-
-  onHeaderSortChange = (columnKey, sortDirection) => {
-    const sortingSpecs = [ {columnKey, sortDirection} ];
-    const defaultDataMap = this.state.defaultDataMap;
-
-    let dataKeyArray = defaultDataMap.cloneDataKeyArray();
-    const ft = this.state.filterText;
-    dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
-    DataGrid.sort(defaultDataMap, dataKeyArray, sortingSpecs);
-
-    const dataMap = new DataMap(this.props.data, dataKeyArray);
-    this.setState({ sortingSpecs, dataMap });
-  }
-
-  onFilterChange = (text) => {
-    const filterText = text.toLowerCase();
-    const defaultDataMap = this.state.defaultDataMap;
-
-    let dataKeyArray = defaultDataMap.cloneDataKeyArray();
-    dataKeyArray = DataGrid.mkFiltered(
-      defaultDataMap, dataKeyArray, filterText
-    );
-
-    DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
-
-    const dataMap = new DataMap(this.props.data, dataKeyArray);
-    this.setState({ filterText, dataMap });
-  }
-
-  onEditClicked = () => {
-    this.props.onEdit(this.state.activeDataKeys.slice());
   }
 
   static mkFiltered(defaultDataMap, dataKeyArray, filterText) {
@@ -283,7 +195,109 @@ export default class DataGrid extends Component {
     };
   }
 
-  mkCell(cellProps, colProps) {
+  constructor(props) {
+    super(props);
+
+    const defaultDataMap = new DataMap(props.data);
+
+    this.selectCbId = _.uniqueId('dataGridSelCb_');
+
+    this.state = {
+      activeDataKeys: [],
+      filterText: null,
+      sortingSpecs: [],
+      defaultDataMap,
+      dataMap: new DataMap(props.data, defaultDataMap.cloneDataKeyArray()),
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.data !== this.props.data) {
+      const defaultDataMap = new DataMap(newProps.data);
+
+      let dataKeyArray = defaultDataMap.cloneDataKeyArray();
+
+      const ft = this.state.filterText;
+      dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+
+      DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
+
+      const dataMap = new DataMap(newProps.data, dataKeyArray);
+      this.setState({ defaultDataMap, dataMap });
+    }
+  }
+
+  _onRowClick = (e, rowIdx) => {
+    if (!this.props.noSelect) {
+      let activeDataKeys = this.state.activeDataKeys.slice();
+      const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
+      const pos = activeDataKeys.indexOf(dataKey);
+
+      if (this.props.singleSelect) {
+        activeDataKeys = (pos >= 0) ? [] : [ dataKey ];
+      } else if (pos >= 0) {
+        activeDataKeys.splice(pos, 1);
+      } else {
+        activeDataKeys.push(dataKey);
+      }
+
+      this.setState({ activeDataKeys });
+
+      if (this.props.onSelectChange) {
+        this.props.onSelectChange(activeDataKeys.slice());
+      }
+    }
+  }
+
+  _rowClassName = (rowIdx) => {
+    const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
+    return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
+  }
+
+  _onSelectToggle = (e) => {
+    const activeDataKeys = e.target.checked ?
+      this.state.dataMap.cloneDataKeyArray() : [];
+
+    this.setState({ activeDataKeys });
+
+    if (this.props.onSelectChange) {
+      this.props.onSelectChange(activeDataKeys.slice());
+    }
+  }
+
+  _onHeaderSortChange = (columnKey, sortDirection) => {
+    const sortingSpecs = [ {columnKey, sortDirection} ];
+    const defaultDataMap = this.state.defaultDataMap;
+
+    let dataKeyArray = defaultDataMap.cloneDataKeyArray();
+    const ft = this.state.filterText;
+    dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+    DataGrid.sort(defaultDataMap, dataKeyArray, sortingSpecs);
+
+    const dataMap = new DataMap(this.props.data, dataKeyArray);
+    this.setState({ sortingSpecs, dataMap });
+  }
+
+  _onFilterChange = (text) => {
+    const filterText = text.toLowerCase();
+    const defaultDataMap = this.state.defaultDataMap;
+
+    let dataKeyArray = defaultDataMap.cloneDataKeyArray();
+    dataKeyArray = DataGrid.mkFiltered(
+      defaultDataMap, dataKeyArray, filterText
+    );
+
+    DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
+
+    const dataMap = new DataMap(this.props.data, dataKeyArray);
+    this.setState({ filterText, dataMap });
+  }
+
+  _onEditClicked = () => {
+    this.props.onEdit(this.state.activeDataKeys.slice());
+  }
+
+  _mkCell = (cellProps, colProps) => {
     const rowData = this.state.dataMap.getDataAt(cellProps.rowIndex);
     const cellData = rowData && rowData[cellProps.columnKey];
     if (!colProps.cell) {
@@ -292,96 +306,89 @@ export default class DataGrid extends Component {
     return colProps.cell(cellData, cellProps, colProps);
   }
 
-  mkColumn(colProps, sortDirection) {
+  _mkColumn = (colProps, sortDirection) => {
     return (
       <Column {...colProps}
           header={
             <SortHeaderCell
                 columnKey={colProps.columnKey}
-                onSortChange={this.onHeaderSortChange}
+                onSortChange={this._onHeaderSortChange}
                 sortDirection={sortDirection}>
               {colProps.header}
             </SortHeaderCell>
           }
           key={colProps.columnKey}
-          cell={cellProps => this.mkCell(cellProps, colProps)}
+          cell={cellProps => this._mkCell(cellProps, colProps)}
       />
     );
   }
 
   render() {
+    // Determine the current sort key and direction
     const ss0 = this.state.sortingSpecs && this.state.sortingSpecs[0];
     const sortColumnKey = ss0 && ss0.columnKey;
     const sortDirection = ss0 && ss0.sortDirection;
 
+    // Create the columns that will be props to the backing data grid.
     const columns = this.props.columns.map(colProps => {
       const sd = sortColumnKey === colProps.columnKey ? sortDirection : null;
-      return this.mkColumn(colProps, sd);
+      return this._mkColumn(colProps, sd);
     });
 
     const rowCount = this.state.dataMap.size();
-    const toolbarHeight = this.props.toolbarHeight;
 
+    // Compute the grid dimensions. If are parent in a responsive box then
+    // we will be passed the computed dimensions.
     const gridWidth = this.props.computedAvailableWidth || this.props.width;
     const height = this.props.computedAvailableHeight || this.props.height;
-    const gridHeight = height - toolbarHeight;
+    const gridHeight = height - Toolbar.height();
 
-    const selectTools = this.props.singleSelect || this.props.noSelect ? null :
-      <span>
-        &nbsp;
-        <BoxIcon fa="bars" onClick={this.onSelectAll}/>
-        &nbsp;
-        <BoxIcon fa="remove" onClick={this.onUnselectAll}/>
-      </span>;
+    // Determine which tools are avialable.
 
-    const filterTool = this.props.noFilter ? null :
-      <span>
-        &nbsp;
-        <SearchInput
-            value={this.state.filterText}
-            onChange={this.onFilterChange}
-            placeHolder={t('filter')}
-        />
-      </span>;
+    const selectTool = this.props.singleSelect || this.props.noSelect ? null :
+      <CheckBox id={this.selectCbId} label="" onChange={this._onSelectToggle}/>;
 
-    const editCb = this.props.onEdit ? this.onEditClicked : null;
-    const editEbl = this.state.activeDataKeys.length > 0;
-    const editTool = (
-      <BoxIcon fa="gear"
-          noColor={!editCb}
-          disabled={!editEbl}
-          onClick={editEbl ? editCb : null}
-      />
+    let editTool = null;
+    const editCb = this.props.onEdit ? this._onEditClicked : null;
+    if (editCb) {
+      editTool = this.state.activeDataKeys.length > 0 ?
+        <a onClick={editCb}><EditIcon/></a> :
+        <EditIcon className="disabled"/>;
+    }
+
+    const searchTool = this.props.noFilter ? null :
+      <SearchInput
+          value={this.state.filterText}
+          onChange={this._onFilterChange}
+          placeHolder={t('search')} />;
+
+    // Create the toolbar based on the current props/state.
+
+    const tb = (
+      <Toolbar width={gridWidth}>
+        <Menu direction="row" align="center" responsive={false}>
+          {selectTool}
+          {searchTool}
+          <Title>{this.props.title}</Title>
+        </Menu>
+        {editTool}
+      </Toolbar>
     );
 
     return (
       <div className="dataGrid" style={{height}}>
-
-        <Toolbar height={toolbarHeight} spaceBetween>
-          <span className="left flexItem1">
-            {selectTools}
-            {filterTool}
-          </span>
-          <span className="title textAlignCenter flexItem2">
-            {this.props.title}
-          </span>
-          <span className="flexItem1 textAlignRight">
-            {editTool}
-          </span>
-        </Toolbar>
-
+        {tb}
         <Table
             height={gridHeight}
             width={gridWidth}
             rowHeight={this.props.rowHeight}
             rowsCount={rowCount}
             headerHeight={this.props.headerHeight}
-            onRowClick={this.onRowClick}
-            rowClassNameGetter={this.rowClassName}
+            onRowClick={this._onRowClick}
+            rowClassNameGetter={this._rowClassName}
         >
           {columns}
         </Table>
-
       </div>
     );
   }

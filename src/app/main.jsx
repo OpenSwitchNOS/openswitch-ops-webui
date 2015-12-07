@@ -14,6 +14,8 @@
     under the License.
 */
 
+// The main component that is rendered by 'index.jsx'.
+
 import React, { Component } from 'react';
 import Router from 'react-router';
 import {
@@ -25,23 +27,35 @@ import {
 import thunkMiddleware from 'redux-thunk';
 import createLogger from 'redux-logger';
 import { Provider } from 'react-redux';
-import App from './app.jsx';
-import { createNavModel, createRouteElements } from './navModel.jsx';
 
+import { createNavModel, createRouteElements } from './navModel.jsx';
 import { setLocale } from 'i18n/lookup.js';
-import * as navDescriptor from 'framework/navDux.jsx';
-import * as screenDescriptor from 'framework/screenDux.jsx';
+
+import * as navDux from 'framework/navDux.jsx';
+
+import MainApp from './mainApp.jsx';
 
 let store;
 let actions;
 let routes;
 
+// Based on the modules loaded by the BuildConfig, we look for the well known
+// 'MODULE' string and 'reducer' function, and create a combined object of
+// reducers that is later given to the Redux framework.
+
 function createReducers(BuildConfig) {
   const modules = BuildConfig.modules;
-  const reducers = { links: (state = {}) => { return state; } };
+  const reducers = {
+    links: (state = {}) => { return state; },
+    routeToLink: (state = {}) => { return state; },
+  };
   modules.forEach(i => reducers[i.MODULE] = i.reducer);
   return combineReducers(reducers);
 }
+
+// Based on the modules loaded by the BuildConfig, we look for the well known
+// 'MODULE' string and 'ACTIONS' object, and create a combinded object that we
+// later inject into each route component.
 
 function createActions(BuildConfig, s) {
   const modules = BuildConfig.modules;
@@ -53,6 +67,10 @@ function createActions(BuildConfig, s) {
   });
   return result;
 }
+
+// Boilerplate code to create the combined reducers (Redux) and the store
+// with all necessary middleware (middleware is a fancy term for plugging in
+// to the Redux handling of actions and store updates).
 
 function createReducersAndStore(BuildConfig, initStore) {
   const reducers = createReducers(BuildConfig);
@@ -66,19 +84,29 @@ function createReducersAndStore(BuildConfig, initStore) {
   return createStore(reducers, initStore);
 }
 
+// Entry point called by index.jsx. The BuildConfig is passed as a parameter
+// so that we can configure the app based on settings and the provided
+// links from each module.
+
 export function mainInit(BuildConfig) {
   setLocale(BuildConfig.settings.i18nLocale);
 
-  BuildConfig.modules.splice(0, 0, screenDescriptor);
-  BuildConfig.modules.splice(0, 0, navDescriptor);
+  BuildConfig.modules.splice(0, 0, navDux);
 
-  const navModel = createNavModel(BuildConfig, App);
-  const initStore = { links: navModel.links };
+  const navModel = createNavModel(BuildConfig, MainApp);
+  const initStore = {
+    links: navModel.links,
+    routeToLink: navModel.routeToLink,
+  };
 
   store = createReducersAndStore(BuildConfig, initStore);
   actions = createActions(BuildConfig, store);
   routes = createRouteElements(navModel);
 }
+
+// The Main component that connectes the Redux store to all the routes. We also
+// provide a createElement handler so that we can inject all action functions.
+// Any route component will have 'this.props.actions.<module>.<fn>' available.
 
 function createElement(RouteComponent, props) {
   return <RouteComponent {...props} actions={actions} />;
@@ -88,9 +116,7 @@ export default class Main extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router createElement={createElement}>
-          {routes}
-        </Router>
+        <Router routes={routes} createElement={createElement}/>
       </Provider>
     );
   }

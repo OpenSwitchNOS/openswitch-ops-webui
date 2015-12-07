@@ -14,6 +14,10 @@
     under the License.
 */
 
+// Encapsulates the creation of the navigation model tree from the provided
+// build configuration. The actual navigation items (groups and Links) are not
+// created here.
+
 import React from 'react';
 import { Route } from 'react-router';
 
@@ -61,7 +65,8 @@ function processLinkDesc(navModelLinks, navDesc) {
 export function createNavModel(BuildConfig, rootComponent) {
   const navModel = {
     routes: mkRouteDescNode(rootComponent),
-    links: mkLinkGroupDescNode()
+    links: mkLinkGroupDescNode(),
+    routeToLink: {},
   };
 
   BuildConfig.modules.forEach(m => {
@@ -69,6 +74,7 @@ export function createNavModel(BuildConfig, rootComponent) {
       m.NAVS.forEach(i => {
         processRouteDesc(navModel.routes, i.route);
         processLinkDesc(navModel.links, i);
+        navModel.routeToLink[i.route.path] = i.link.path;
       });
     }
   });

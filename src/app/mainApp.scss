@@ -1,0 +1,91 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+@import "~_settings.scss";
+
+// Override the default font for bit text.
+h1, h2, h3, .headline, .title {
+  font-family:'Exo', Arial, sans-serif;
+}
+
+.control-icon {
+  &.tiny {
+    width: 32px;
+    height: 32px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  &.noColor {
+    stroke: none;
+    fill: none;
+  }
+  &.disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+}
+
+@mixin flex($g, $s: 0, $b: 0) {
+  flex: $g $s $b;
+  -webkit-flex: $g $s $b;
+  -moz-flex: $g $s $b;
+}
+
+.flex0 {
+  @include flex(0);
+}
+
+.flex1 {
+  @include flex(1);
+}
+
+.flex2 {
+  @include flex(2);
+}
+
+.flex3 {
+  @include flex(3);
+}
+
+// Override the sidebar-width for the navigation pane.
+$sidebar-width: 320px;
+
+// Include all the Grommet styles.
+$fontsPath: '../shared/assets';
+@import "grommet.scss";
+
+// The original rule throws off vertical centering of the anchors in headers.
+.menu a:not(.button) {
+    margin-bottom: 0px;
+}
+
+// Addes animation to the sidebar's
+.sidebar {
+  @include media-query(lap-and-up) {
+    @include animation('slide-sidebar 0.5s');
+  }
+  nav header {
+    opacity: 0.2;
+  }
+}
+@include keyframes(slide-sidebar) {
+  0% {
+    width: 0px;
+  }
+  100% {
+    width: $sidebar-width;
+  }
+}

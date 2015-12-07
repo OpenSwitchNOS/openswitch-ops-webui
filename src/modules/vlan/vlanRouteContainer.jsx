@@ -18,7 +18,6 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
-import BoxContainer from 'boxContainer.jsx';
 import FetchInfo from 'fetchInfo.jsx';
 
 class VlanRouteContainer extends Component {
@@ -56,19 +55,20 @@ class VlanRouteContainer extends Component {
       },
     ];
 
-    return (
-      <BoxContainer page col pad2x>
-        <BoxContainer panel pad marginBottom2x>
-          <FetchInfo {...vlanProps}/>
-        </BoxContainer>
-        <BoxContainer panel pad computeSize flex={1}>
-          <DataGrid title={t('vlans')} width={500} height={400}
-              data={vlanProps.entities}
-              columns={cols}
-          />
-        </BoxContainer>
-      </BoxContainer>
-    );
+    return null;
+    // return (
+    //   <BoxContainer page col pad2x>
+    //     <BoxContainer panel pad marginBottom2x>
+    //       <FetchInfo {...vlanProps}/>
+    //     </BoxContainer>
+    //     <BoxContainer panel pad computeSize flex={1}>
+    //       <DataGrid title={t('vlans')} width={500} height={400}
+    //           data={vlanProps.entities}
+    //           columns={cols}
+    //       />
+    //     </BoxContainer>
+    //   </BoxContainer>
+    // );
   }
 
 }

@@ -14,7 +14,7 @@
     under the License.
 */
 
-import SyslogRouteContainer from './syslogRouteContainer.jsx';
+import SyslogPage from './syslogPage.jsx';
 
 // Required 'MODULE' name
 export const MODULE = 'syslog';
@@ -22,8 +22,8 @@ export const MODULE = 'syslog';
 // Optional 'NAVS' object
 export const NAVS = [
   {
-    route: { path: '/syslog', component: SyslogRouteContainer },
-    link: { path: '/syslog', order: 5 }
+    route: { path: '/syslog', component: SyslogPage },
+    link: { path: '/syslog', order: 10 }
   },
 ];
 
@@ -77,6 +77,7 @@ const INITIAL_STATE = {
   lastError: null,
   entities: {},
   lastRead: 0,
+  numUnread: 0,
 };
 
 // Optional 'reducer' function
@@ -100,10 +101,11 @@ export function reducer(moduleState = INITIAL_STATE, action) {
         isFetching: false,
         lastUpdate: Date.now(),
         entities,
+        numUnread: 3,
       };
 
     case SYSLOG_READ_ALL:
-      return { ...moduleState, lastRead: Date.now() };
+      return { ...moduleState, lastRead: Date.now(), numUnread: 0 };
 
     default:
       return moduleState;
