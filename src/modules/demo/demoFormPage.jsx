@@ -17,6 +17,8 @@
 import React, { PropTypes, Component } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
+import _ from 'lodash';
+
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
@@ -38,6 +40,8 @@ import RadioButton from 'grommet/components/RadioButton';
 import CheckBox from 'grommet/components/CheckBox';
 import Calendar from 'grommet/components/Calendar';
 import SearchInput from 'grommet/components/SearchInput';
+import Validator from 'grommet/utils/Validator';
+
 
 class DemoFormPage extends Component {
 
@@ -48,105 +52,159 @@ class DemoFormPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { inputText: '' };
+    this.fid = _.uniqueId('demoForm_');
+    this.state = {
+      user: {
+        login: '',
+        name: '',
+        password: '',
+        role: 'specialized',
+        backupAdmin: false,
+        networkAdmin: false,
+        serverAdmin: false,
+        storageAdmin: false,
+        email: '',
+        officePhone: '',
+        mobilePhone: '',
+      },
+      validation: {errors: {}},
+    };
   }
 
   _onSubmit = () => {
     alert('Submit!');
   }
 
-  _onChange = (inputText) => {
-    this.setState({ inputText });
+  _validate = () => {
+    const user = this.state.user;
+    const rules = [
+      {
+        field: 'login',
+        test: !user.login,
+        message: 'required'
+      },
+      {
+        field: 'password',
+        tests: [
+          {
+            test: !user.password,
+            message: 'required'
+          },
+          {
+            test: user.password.length < 8,
+            message: 'must be at least 8 characters'
+          },
+        ]
+      }
+    ];
+    return Validator.validate(rules);
   }
 
+  _onChange = (e) => {
+    const fn = e.target.getAttribute('name');
+    const user = { ...this.state.user, [fn]: e.target.value };
+    this.setState({ user, validation: this._validate() });
+  }
+
+  _onChangeCheckBox = (e) => {
+    const fn = e.target.getAttribute('name');
+    const user = {...this.state.user, [fn]: e.target.checked };
+    this.setState({ user, validation: this._validate() });
+  }
+
+  _id = s => `${this.fid}_${s}`;
+
   render() {
-    const p = 'pre';
+    const validation = this.state.validation;
+    const errors = validation.errors;
+    const user = this.state.user;
+    const f = this.fid;
+    const pwdId = `${f}pwd`;
     return (
-      <Form onSubmit={this._onSubmit} compact>
+      <Form onSubmit={this._onSubmit} compact={this.props.compact}>
         <Header>
-          <h1>Edit</h1>
+          <h1>Add User</h1>
         </Header>
         <FormFields>
+
           <fieldset>
-            <legend>First section</legend>
-            <FormField label="Item 1" htmlFor={p + "item1"} help="something helpful">
-              <input id={p + "item1"} name="item-1" type="text" onChange={this._onChange} />
+            <FormField label="Login name" htmlFor={this._id('login')}
+                error={errors.login}>
+              <input id={this._id('login')} name="login" type="text"
+                  value={user.login} onChange={this._onChange} />
             </FormField>
-            <FormField>
-              <CheckBox id={p + "item2"} name="item-2" label="Item 2"
-                  onChange={this._onChange} />
-            </FormField>
-            <FormField>
-              <CheckBox id={p + "item3"} name="item-3" label="Item 3" toggle={true}
-                  onChange={this._onChange} />
-            </FormField>
-            <FormField label="Item 4">
-              <RadioButton id={p + "item4-1"} name="item-4" label="first"
-                  onChange={this._onChange} />
-              <RadioButton id={p + "item4-2"} name="item-4" label="second"
-                  onChange={this._onChange} />
-            </FormField>
-            <FormField label="Item 5" htmlFor={p + "item5"}
-                error="something's wrong">
-              <textarea id={p + "item5"} name="item-5"></textarea>
-            </FormField>
-            <FormField label="Item 6" htmlFor={p + "item6"}>
-              <SearchInput id={p + "item6"} name="item-6"
-                  value={this.state.inputText}
-                  onChange={this._onChange} />
-            </FormField>
-            <FormField label="Item 7" htmlFor={p + "item7"}
-                help={<a>learn more ...</a>}>
-              <select id={p + "item7"} name="item-7">
-                <option>first</option>
-                <option>second</option>
-                <option>third</option>
-              </select>
-            </FormField>
-            <FormField label="Item 8" htmlFor={p + "item8"}>
-              <Calendar id={p + "item8"} name="item-8"
-                  value={this.state.calendarDate}
-                  onChange={this._onCalendarChange} />
+            <FormField label="Password" htmlFor={this._id('pwd')}
+                error={errors.password}>
+              <input id={this._id('pwd')} name="password" type="password"
+                  value={user.password} onChange={this._onChange} />
             </FormField>
           </fieldset>
+
           <fieldset>
-            <legend>Another section</legend>
-            <p>Some informational text.</p>
-            <FormField label="Item 9">
-              <Table selectable={true} defaultSelection={0}>
-                <tbody>
-                  <tr>
-                    <td>first</td>
-                    <td>123</td>
-                  </tr>
-                  <tr>
-                    <td>second</td>
-                    <td>456</td>
-                  </tr>
-                  <tr>
-                    <td>third</td>
-                    <td>789</td>
-                  </tr>
-                </tbody>
-              </Table>
+            <legend>Role</legend>
+            <FormField>
+              <RadioButton id={this._id('roleSp')} name="role"
+                  label="Specialized" value="specialized"
+                  checked={user.role === 'specialized'}
+                  onChange={this._onChange} />
+              <FormField hidden={user.role !== 'specialized'}>
+                <CheckBox id={this._id('subRoleBu')} name="backupAdmin"
+                    label="Backup administrator"
+                    checked={user.backupAdmin}
+                    onChange={this._onChangeCheckBox} />
+                <CheckBox id={this._id('subRoleNet')} name="networkAdmin"
+                    label="Network administrator"
+                    checked={user.networkAdmin}
+                    onChange={this._onChangeCheckBox} />
+                <CheckBox id={this._id('subRoleSvr')} name="serverAdmin"
+                    label="Server administrator"
+                    checked={user.serverAdmin}
+                    onChange={this._onChangeCheckBox} />
+                <CheckBox id={this._id('subRoleStor')} name="storageAdmin"
+                    label="Storage administrator"
+                    checked={user.storageAdmin}
+                    onChange={this._onChangeCheckBox} />
+              </FormField>
             </FormField>
-            <FormField label="Item 10" htmlFor={p + "item10"}>
-              <input id={p + "item10"} name="item-10" type="number"
-                  min="1" max="20" step="1" defaultValue="10" />
+            <FormField>
+              <RadioButton id={this._id('roleFull')} name="role" label="Full"
+                  value="full" checked={user.role === 'full'}
+                  onChange={this._onChange} />
             </FormField>
-            <FormField label="Item 11" htmlFor={p + "item11"} help={this.state.rangeValue}>
-              <input id={p + "item11"} name="item-11" type="range"
-                  min="1" max="20" defaultValue="10"
-                  onChange={this._onChangeRange}/>
+            <FormField>
+              <RadioButton id={this._id('roleRdOnly')} name="role"
+                  label="Read only" value="read-only"
+                  checked={user.role === 'read-only'}
+                  onChange={this._onChange} />
+            </FormField>
+          </fieldset>
+
+          <fieldset>
+            <legend>Contact</legend>
+            <FormField label="Email" htmlFor={this._id('email')}>
+              <input id={this._id('email')} name="email" type="text"
+                value={user.email} onChange={this._onChange} />
             </FormField>
           </fieldset>
         </FormFields>
         <Footer pad={{vertical: 'medium'}}>
-          <Menu direction="row">
-            <Button label="OK" primary={true} strong={true} onClick={this._onClose} />
-            <Button label="OK" strong={true} onClick={this._onClose} />
+          <Menu>
+            <Button label="Add" primary
+                onClick={validation.valid && this._onSubmit} />
           </Menu>
         </Footer>
+        <p>
+          {`login: ${this.state.user.login}`}<br/>
+          {`password: ${this.state.user.password}`}<br/>
+          {`role: ${this.state.user.role}`}<br/>
+          {`backupAdmin: ${this.state.user.backupAdmin}`}<br/>
+          {`networkAdmin: ${this.state.user.networkAdmin}`}<br/>
+          {`serverAdmin: ${this.state.user.serverAdmin}`}<br/>
+          {`storageAdmin: ${this.state.user.storageAdmin}`}<br/>
+          {`email: ${this.state.user.email}`}<br/>
+          {`validation.valid: ${validation.valid}`}<br/>
+          {`validation.firstError: ${validation.firstError}`}<br/>
+        </p>
       </Form>
     );
   }

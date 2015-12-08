@@ -31,11 +31,11 @@ export default class Toolbar extends Component {
     width: PropTypes.number,
   };
 
+  static height() { return HEIGHT; }
+
   constructor(props) {
     super(props);
   }
-
-  static height() { return HEIGHT; }
 
   render() {
     const style = {height: HEIGHT, width: this.props.width};

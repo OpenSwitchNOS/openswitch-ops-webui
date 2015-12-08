@@ -15,24 +15,20 @@
 */
 
 import React, { PropTypes, Component } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
-import Sidebar from 'grommet/components/Sidebar';
+import { t } from 'i18n/lookup.js';
+
 import Header from 'grommet/components/Header';
-import Footer from 'grommet/components/Footer';
-import Title from 'grommet/components/Title';
-// import Logo from './Logo'; // './HPELogo';
-import Menu from 'grommet/components/Menu';
-import Anchor from 'grommet/components/Anchor';
-import CloseIcon from 'grommet/components/icons/base/Close';
-import Section from 'grommet/components/Section';
+import CheckBox from 'grommet/components/CheckBox';
 import Layer from 'grommet/components/Layer';
 import Form from 'grommet/components/Form';
 import FormField from 'grommet/components/FormField';
 import FormFields from 'grommet/components/FormFields';
 import Button from 'grommet/components/Button';
+import Menu from 'grommet/components/Menu';
+import Footer from 'grommet/components/Footer';
 
-import { t } from 'i18n/lookup.js';
+import Confirm from 'confirm.jsx';
 
 
 class DemoLayerPage extends Component {
@@ -47,8 +43,12 @@ class DemoLayerPage extends Component {
     this.state = {};
   }
 
-  _onOpenDialog = () => {
-    this.setState({ dialog: true });
+  _onOpenDialog1 = () => {
+    this.setState({ dialog1: true });
+  }
+
+  _onOpenDialog2 = () => {
+    this.setState({ dialog2: true });
   }
 
   _onOpenEdit = () => {
@@ -56,27 +56,36 @@ class DemoLayerPage extends Component {
   }
 
   _onClose = () => {
-    this.setState({ dialog: false });
+    this.setState({ dialog1: false });
+    this.setState({ dialog2: false });
     this.setState({ edit: false });
+  }
+
+  _onSubmit = () => {
+    alert('Make it so!');
+    this._onClose();
   }
 
   render() {
     return (
       <div>
         <p>
-          <Button label="Modal" onClick={this._onOpenDialog}/>
+          <Button label="Confirm-Defaults" onClick={this._onOpenDialog1}/>
         </p>
-        {this.state.dialog ?
-          <Layer onClose={this._onClose} closer={true} flush={true}
-              align="top">
-            <Form>
-              <Header>
-                <h2>Dialog Title</h2>
-              </Header>
-              <FormFields>
-                <p>This is a simple dialog.</p>
-              </FormFields>
-            </Form>
+        {this.state.dialog1 ?
+          <Layer onClose={this._onClose} closer flush align="top">
+            <Confirm onSubmit={this._onSubmit}/>
+          </Layer> : null
+        }
+
+        <p>
+          <Button label="Confirm-Configured" onClick={this._onOpenDialog2}/>
+        </p>
+        {this.state.dialog2 ?
+          <Layer onClose={this._onClose} closer flush align="top">
+            <Confirm message="Captain, course has been set for the Neutral Zone at Warp factor 10..."
+                title="Awaiting Confirmation" submitLabel="Engage"
+                onSubmit={this._onSubmit}/>
           </Layer> : null
         }
 
@@ -84,13 +93,50 @@ class DemoLayerPage extends Component {
           <Button label="Edit" onClick={this._onOpenEdit}/>
         </p>
         {
-          this.state.active2 ?
-          <Layer onClose={this._onClose} closer={true} flush={true}
-              align="right">
-            <p>Edit Here</p>
+          this.state.edit ?
+          <Layer onClose={this._onClose} closer flush align="right">
+            <Form onSubmit={this._onSubmit}>
+              <Header>
+                <h2>Edit Some Things</h2>
+              </Header>
+              <FormFields>
+                <fieldset>
+                  <legend>First section</legend>
+                  <FormField label="Item 1" htmlFor="ffItem1"
+                      help="Some helpful text">
+                    <input id="ffItem1" name="ffItem1" type="text"/>
+                  </FormField>
+                  <FormField>
+                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
+                  </FormField>
+                  <FormField>
+                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
+                        toggle />
+                  </FormField>
+                </fieldset>
+                <fieldset>
+                  <legend>Second section</legend>
+                  <FormField label="Item 1" htmlFor="ffItem1"
+                      help="Some helpful text">
+                    <input id="ffItem1" name="ffItem1" type="text"/>
+                  </FormField>
+                  <FormField>
+                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
+                  </FormField>
+                  <FormField>
+                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
+                        toggle />
+                  </FormField>
+                </fieldset>
+              </FormFields>
+              <Footer pad={{vertical: 'medium'}}>
+                <Menu>
+                  <Button label={t('deploy')} primary onClick={this._onSubmit}/>
+                </Menu>
+              </Footer>
+            </Form>
           </Layer> : null
         }
-
       </div>
     );
   }

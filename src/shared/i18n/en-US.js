@@ -24,6 +24,7 @@ export const MESSAGES = {
   dataGrid: 'DataGrid',
   dataGridSmall: 'DataGrid (small)',
   demo: 'Demo',
+  form: 'Form & Validator',
   general: 'General',
   header: 'Header & Toolbar',
   icon: 'Logo & Icons',
@@ -32,6 +33,9 @@ export const MESSAGES = {
   table: 'Table',
 
   // messages
+  areYouSure: 'Are you sure?',
+  confirmation: 'Confirmation',
+  deploy: 'Deploy',
   id: 'ID',
   isFetching: 'Is Fetching',
   lastError: 'Last Error',
@@ -40,4 +44,5 @@ export const MESSAGES = {
   readAll: 'Read All',
   search: 'Search',
   text: 'Text',
+  yes: 'Yes',
 };

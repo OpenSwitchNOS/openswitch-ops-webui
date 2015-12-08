@@ -200,7 +200,7 @@ export default class DataGrid extends Component {
 
     const defaultDataMap = new DataMap(props.data);
 
-    this.selectCbId = _.uniqueId('dataGridSelCb_');
+    this.selectCbId = _.uniqueId('dataGridSelCkBx_');
 
     this.state = {
       activeDataKeys: [],

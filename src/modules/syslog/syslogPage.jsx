@@ -49,7 +49,6 @@ class SyslogPage extends Component {
 
   render() {
     const syslogProps = this.props.syslog;
-    const syslogActions = this.props.actions.syslog;
 
     return (
       <Box className="flex1">

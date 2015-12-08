@@ -21,7 +21,6 @@ import './mainApp.scss';
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-import _ from 'lodash';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -40,6 +39,7 @@ class MainApp extends Component {
     location: PropTypes.object,
     nav: PropTypes.object,
     routeToLink: PropTypes.object,
+    syslog: PropTypes.object,
   };
 
   constructor(props) {
@@ -93,7 +93,7 @@ class MainApp extends Component {
           justify="between">
         <Menu direction="row" align="center" responsive={false}>
           {!this.props.nav.paneActive ?
-            <Title onClick={this._onPageNavClicked}>Nav</Title>
+            <Title onClick={this._onPageNavClicked}>{'>>>'}</Title>
             : null
           }
           <Title>{this._linkPathName()}</Title>
