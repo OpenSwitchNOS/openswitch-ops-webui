@@ -15,31 +15,18 @@
 */
 
 import React, { PropTypes, Component } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
-import Title from 'grommet/components/Title';
-// import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
-import Anchor from 'grommet/components/Anchor';
-import CloseIcon from 'grommet/components/icons/base/Close';
-import { t } from 'i18n/lookup.js';
-import LogoutIcon from 'grommet/components/icons/base/Logout';
-import App from 'grommet/components/App';
-import Box from 'grommet/components/Box';
 import Form from 'grommet/components/Form';
 import FormField from 'grommet/components/FormField';
 import FormFields from 'grommet/components/FormFields';
 import Button from 'grommet/components/Button';
-import Table from 'grommet/components/Table';
 import RadioButton from 'grommet/components/RadioButton';
 import CheckBox from 'grommet/components/CheckBox';
-import Calendar from 'grommet/components/Calendar';
-import SearchInput from 'grommet/components/SearchInput';
 import Validator from 'grommet/utils/Validator';
 
 
@@ -118,10 +105,8 @@ class DemoFormPage extends Component {
     const validation = this.state.validation;
     const errors = validation.errors;
     const user = this.state.user;
-    const f = this.fid;
-    const pwdId = `${f}pwd`;
     return (
-      <Form onSubmit={this._onSubmit} compact={this.props.compact}>
+      <Form onSubmit={this._onSubmit}>
         <Header>
           <h1>Add User</h1>
         </Header>
@@ -183,7 +168,7 @@ class DemoFormPage extends Component {
             <legend>Contact</legend>
             <FormField label="Email" htmlFor={this._id('email')}>
               <input id={this._id('email')} name="email" type="text"
-                value={user.email} onChange={this._onChange} />
+                  value={user.email} onChange={this._onChange} />
             </FormField>
           </fieldset>
         </FormFields>

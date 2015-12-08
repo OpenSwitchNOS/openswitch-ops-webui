@@ -14,7 +14,7 @@
     under the License.
 */
 
-import InterfaceRouteContainer from './interfaceRouteContainer.jsx';
+import InterfacePage from './interfacePage.jsx';
 import Agent from 'superagent';
 
 // Required 'MODULE' name
@@ -23,8 +23,8 @@ export const MODULE = 'interface';
 // Optional 'NAVS' object
 export const NAVS = [
   {
-    route: { path: '/interface', component: InterfaceRouteContainer },
-    link: { path: '/interface', order: 6 }
+    route: { path: '/interface', component: InterfacePage },
+    link: { path: '/interface', order: 20 }
   },
 ];
 

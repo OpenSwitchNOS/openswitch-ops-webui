@@ -23,6 +23,7 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import FetchInfo from 'fetchInfo.jsx';
 
+
 class SyslogPage extends Component {
 
   static propTypes = {

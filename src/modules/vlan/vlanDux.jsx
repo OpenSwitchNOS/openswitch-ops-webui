@@ -14,7 +14,7 @@
     under the License.
 */
 
-import VlanRouteContainer from './vlanRouteContainer.jsx';
+import VlanPage from './vlanPage.jsx';
 import Agent from 'superagent';
 
 // Required 'MODULE' name
@@ -23,8 +23,8 @@ export const MODULE = 'vlan';
 // Optional 'NAVS' object
 export const NAVS = [
   {
-    route: { path: '/vlan', component: VlanRouteContainer },
-    link: { path: '/vlan', order: 7 }
+    route: { path: '/vlan', component: VlanPage },
+    link: { path: '/vlan', order: 30 }
   },
 ];
 

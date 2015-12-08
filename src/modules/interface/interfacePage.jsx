@@ -17,18 +17,35 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
+import Box from 'grommet/components/Box';
+import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import FetchInfo from 'fetchInfo.jsx';
 
-class InterfaceRouteContainer extends Component {
+
+class InterfacePage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    interface: PropTypes.object,
+    interface: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
+    this.cols = [
+      {
+        columnKey: 'name',
+        header: t('name'),
+        flexGrow: 2,
+        width: 100,
+        align: 'left',
+      },
+      {
+        columnKey: 'adminState',
+        header: t('state'),
+        width: 100,
+      },
+    ];
     this.state = {};
   }
 
@@ -38,37 +55,19 @@ class InterfaceRouteContainer extends Component {
 
   render() {
     const infProps = this.props.interface;
-    const cols = [
-      {
-        columnKey: 'name',
-        header: t('name'),
-        flexGrow: 2,
-        width: 300,
-        align: 'left'
-      },
-      {
-        columnKey: 'adminState',
-        header: t('state'),
-        flexGrow: 1,
-        width: 200,
-        align: 'right'
-      },
-    ];
-
-    return null;
-    // return (
-    //   <BoxContainer page col pad2x>
-    //     <BoxContainer panel pad marginBottom2x>
-    //       <FetchInfo {...infProps}/>
-    //     </BoxContainer>
-    //     <BoxContainer panel pad computeSize flex={1}>
-    //       <DataGrid title={t('interfaces')} width={500} height={400}
-    //           data={infProps.entities}
-    //           columns={cols}
-    //       />
-    //     </BoxContainer>
-    //   </BoxContainer>
-    // );
+    return (
+      <Box className="flex1">
+        <FetchInfo {...infProps}/>
+        <p/>
+        <ResponsiveBox>
+          <DataGrid title={t('interfaces')} width={300} height={400}
+              data={infProps.entities}
+              columns={this.cols}
+              noSelect
+          />
+        </ResponsiveBox>
+      </Box>
+    );
   }
 
 }
@@ -79,4 +78,4 @@ function select(state) {
   };
 }
 
-export default connect(select)(InterfaceRouteContainer);
+export default connect(select)(InterfacePage);
