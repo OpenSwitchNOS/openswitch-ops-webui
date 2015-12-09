@@ -60,7 +60,7 @@ class InterfacePage extends Component {
         <FetchInfo {...infProps}/>
         <p/>
         <ResponsiveBox>
-          <DataGrid title={t('interfaces')} width={300} height={400}
+          <DataGrid width={300} height={400}
               data={infProps.entities}
               columns={this.cols}
               noSelect

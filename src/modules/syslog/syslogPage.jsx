@@ -58,7 +58,7 @@ class SyslogPage extends Component {
         <Button primary label={t('readAll')} onClick={this._onClick} />
         <p/>
         <ResponsiveBox>
-          <DataGrid title={t('syslog')} width={500} height={400}
+          <DataGrid width={500} height={400}
               data={syslogProps.entities}
               columns={this.cols}
               noSelect

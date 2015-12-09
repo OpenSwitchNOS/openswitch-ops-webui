@@ -15,7 +15,7 @@
 */
 
 import VlanPage from './vlanPage.jsx';
-import Agent from 'superagent';
+import Agent from 'agent.js';
 
 // Required 'MODULE' name
 export const MODULE = 'vlan';
@@ -34,8 +34,7 @@ const VLANS_FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
 const VLANS_FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
 const VLANS_FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
 
-// FIXME const URL
-const URL = 'http://15.108.30.248:8091/rest-poc/v1/system/bridges/bridge_normal/vlans';
+const URL = '/rest-poc/v1/system/bridges/bridge_normal/vlans';
 
 // Optional 'ACTIONS' object
 export const ACTIONS = {

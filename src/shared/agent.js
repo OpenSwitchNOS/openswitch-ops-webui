@@ -14,14 +14,25 @@
     under the License.
 */
 
-let locale = null;
-let msgs = null;
+/*eslint no-console:0*/
 
-export function setLocale(l) {
-  locale = l;
-  msgs = locale && locale.MESSAGES;
+import defaults from 'superagent-defaults';
+
+const Agent = defaults();
+
+export function agentInit(settings) {
+  const prefix = settings && (settings.prefix || '');
+  if (prefix) {
+    console.log(`Agent request prefix: ${prefix}`);
+  }
+  Agent
+    // .auth(..., ...) <- user, pwd
+    // .set(..., ...) <- headers
+    .on('request', (req) => {
+      if (req.url[0] === '/') {
+        req.url = prefix + req.url;
+      }
+    });
 }
 
-export function getLocale() { return locale; }
-
-export function t(k) { return (msgs && msgs[k]) || `~${k}~`; }
+export default Agent;

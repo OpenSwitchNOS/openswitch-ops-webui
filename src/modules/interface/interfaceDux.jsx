@@ -15,7 +15,7 @@
 */
 
 import InterfacePage from './interfacePage.jsx';
-import Agent from 'superagent';
+import Agent from 'agent.js';
 
 // Required 'MODULE' name
 export const MODULE = 'interface';
@@ -32,8 +32,7 @@ const INTERFACES_FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
 const INTERFACES_FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
 const INTERFACES_FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
 
-// FIXME const URL
-const URL = 'http://15.108.30.248:8091/rest-poc/v1/system/interfaces?admin_state=up;link_state=up';
+const URL = '/rest-poc/v1/system/interfaces?admin_state=up;link_state=up';
 
 // Optional 'ACTIONS' object
 export const ACTIONS = {

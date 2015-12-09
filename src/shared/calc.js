@@ -14,14 +14,18 @@
     under the License.
 */
 
-let locale = null;
-let msgs = null;
+export function utilization(prevBytes, currBytes, speed, intervalMillis) {
 
-export function setLocale(l) {
-  locale = l;
-  msgs = locale && locale.MESSAGES;
+  if (isNaN(prevBytes) || isNaN(currBytes) || isNaN(speed) ||
+      isNaN(intervalMillis) || speed <= 0 || currBytes < prevBytes ||
+      intervalMillis <= 0) {
+
+    return 0;
+  }
+
+  const maxBytesPerSec = speed / 8;
+  const bytesPerSec = (currBytes - prevBytes) / (intervalMillis / 1000);
+  const result = 100 * (bytesPerSec / maxBytesPerSec);
+
+  return (result > 100) ? 100 : result;
 }
-
-export function getLocale() { return locale; }
-
-export function t(k) { return (msgs && msgs[k]) || `~${k}~`; }

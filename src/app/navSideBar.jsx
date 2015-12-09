@@ -24,10 +24,13 @@ import { t } from 'i18n/lookup.js';
 
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
+import Footer from 'grommet/components/Footer';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
+import Box from 'grommet/components/Box';
 import CloseIcon from 'grommet/components/icons/base/Close';
+import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
 
 import BrandLogo from 'brandLogo.jsx';
 
@@ -109,7 +112,7 @@ class NavSideBar extends Component {
 
   render() {
     return (
-      <Sidebar colorIndex="neutral-1">
+      <Sidebar colorIndex="neutral-3" fixed separator="right">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
             <BrandLogo />
@@ -121,9 +124,25 @@ class NavSideBar extends Component {
             </Anchor>
           </Menu>
         </Header>
-        <Menu primary>
-          {this.items}
-        </Menu>
+        <Box>
+          <Box pad={{horizontal: 'medium', vertical: 'small'}}>
+            <div><b>{t('hostname')}</b></div>
+            <div>alswitch.rose.hp.com</div>
+            <br/>
+            <div><b>{t('model')}</b></div>
+            <div>#X-10-power-armor</div>
+          </Box>
+          <br/>
+          <Menu primary>
+            {this.items}
+          </Menu>
+        </Box>
+        <Footer pad="medium" align="center">
+          <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
+            <a href="#/demoColor">{t('logout')}</a>
+          </Menu>
+          <span>jpowell</span>
+        </Footer>
       </Sidebar>
     );
   }

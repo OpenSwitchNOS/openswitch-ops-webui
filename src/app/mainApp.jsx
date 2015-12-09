@@ -28,6 +28,7 @@ import Title from 'grommet/components/Title';
 import Split from 'grommet/components/Split';
 import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
+import NotificationIcon from 'grommet/components/icons/base/Notification';
 
 import NavSideBar from './navSideBar.jsx';
 
@@ -99,7 +100,9 @@ class MainApp extends Component {
           <Title>{this._linkPathName()}</Title>
         </Menu>
         <Menu direction="row" align="center" responsive={false}>
-          <a href="#/syslog">{`${t('syslog')} ${numSyslog}`}</a>
+          <a href="#/syslog">
+            <NotificationIcon/><small>{numSyslog}</small>
+          </a>
         </Menu>
       </Header>
     );

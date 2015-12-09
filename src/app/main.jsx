@@ -30,6 +30,7 @@ import { Provider } from 'react-redux';
 
 import { createNavModel, createRouteElements } from './navModel.jsx';
 import { setLocale } from 'i18n/lookup.js';
+import { agentInit } from 'agent.js';
 
 import * as navDux from 'framework/navDux.jsx';
 
@@ -90,6 +91,7 @@ function createReducersAndStore(BuildConfig, initStore) {
 
 export function mainInit(BuildConfig) {
   setLocale(BuildConfig.settings.i18nLocale);
+  agentInit(BuildConfig.settings.agent);
 
   BuildConfig.modules.splice(0, 0, navDux);
 

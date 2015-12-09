@@ -62,7 +62,7 @@ class VlanPage extends Component {
         <FetchInfo {...vlanProps}/>
         <p/>
         <ResponsiveBox>
-          <DataGrid title={t('vlans')} width={500} height={400}
+          <DataGrid width={500} height={400}
               data={vlanProps.entities}
               columns={this.cols}
               noSelect
