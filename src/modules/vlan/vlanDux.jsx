@@ -15,7 +15,7 @@
 */
 
 import VlanPage from './vlanPage.jsx';
-import Agent from 'agent.js';
+import Agent, { parseError } from 'agent.js';
 
 // Required 'MODULE' name
 export const MODULE = 'vlan';
@@ -30,9 +30,9 @@ export const NAVS = [
 
 // export optional action names and "ACTIONS" function object
 
-const VLANS_FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const VLANS_FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const VLANS_FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
+const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
+const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
+const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
 
 const URL = '/rest-poc/v1/system/bridges/bridge_normal/vlans';
 
@@ -40,15 +40,15 @@ const URL = '/rest-poc/v1/system/bridges/bridge_normal/vlans';
 export const ACTIONS = {
 
   fetchRequest() {
-    return { type: VLANS_FETCH_REQUEST };
+    return { type: FETCH_REQUEST };
   },
 
-  fetchFailure(url, error) {
-    return { type: VLANS_FETCH_FAILURE, url, error };
+  fetchFailure(error) {
+    return { type: FETCH_FAILURE, error };
   },
 
   fetchSuccess(resp) {
-    return { type: VLANS_FETCH_SUCCESS, resp };
+    return { type: FETCH_SUCCESS, resp };
   },
 
   fetchIfNeeded() {
@@ -68,7 +68,7 @@ export const ACTIONS = {
       dispatch(ACTIONS.fetchRequest());
       return Agent.get(URL).end((error, resp) => {
         if (error) {
-          dispatch(ACTIONS.fetchFailure(URL, error));
+          dispatch(ACTIONS.fetchFailure(parseError(URL, error)));
         } else {
           dispatch(ACTIONS.fetchSuccess(resp));
         }
@@ -89,13 +89,13 @@ const INITIAL_STATE = {
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
 
-    case VLANS_FETCH_REQUEST:
+    case FETCH_REQUEST:
       return { ...moduleState, isFetching: true };
 
-    case VLANS_FETCH_FAILURE:
+    case FETCH_FAILURE:
       return { ...moduleState, isFetching: false, lastError: action.error };
 
-    case VLANS_FETCH_SUCCESS:
+    case FETCH_SUCCESS:
       const entities = {};
       const len = action.resp.body.length;
       for (let i=0; i<len; i++) {

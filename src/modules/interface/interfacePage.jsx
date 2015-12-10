@@ -20,7 +20,7 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import FetchInfo from 'fetchInfo.jsx';
+import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class InterfacePage extends Component {
@@ -53,11 +53,30 @@ class InterfacePage extends Component {
     this.props.actions.interface.fetchIfNeeded();
   }
 
+  _onRefresh = () => {
+    this.props.actions.interface.fetchIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const inf = nextProps.interface;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={inf.isFetching}
+          error={inf.lastError}
+          date={inf.lastUpdate}
+          onRefresh={this._onRefresh}/>
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
+  }
+
   render() {
     const infProps = this.props.interface;
     return (
       <Box className="flex1">
-        <FetchInfo {...infProps}/>
+        Keep for BoxGraphic.
         <p/>
         <ResponsiveBox>
           <DataGrid width={300} height={400}

@@ -28,8 +28,8 @@ import Button from 'grommet/components/Button';
 import Menu from 'grommet/components/Menu';
 import Footer from 'grommet/components/Footer';
 
-import Confirm from 'confirm.jsx';
-
+import ConfirmLayer from 'confirmLayer.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 class DemoLayerPage extends Component {
 
@@ -41,6 +41,18 @@ class DemoLayerPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+
+  _onOpenInfo = () => {
+    this.setState({ info: true });
+  }
+
+  _onOpenError = () => {
+    this.setState({ error: true });
+  }
+
+  _onOpenWarning = () => {
+    this.setState({ warning: true });
   }
 
   _onOpenDialog1 = () => {
@@ -56,6 +68,9 @@ class DemoLayerPage extends Component {
   }
 
   _onClose = () => {
+    this.setState({ info: false });
+    this.setState({ error: false });
+    this.setState({ warning: false });
     this.setState({ dialog1: false });
     this.setState({ dialog2: false });
     this.setState({ edit: false });
@@ -69,24 +84,54 @@ class DemoLayerPage extends Component {
   render() {
     return (
       <div>
+
+        <p>
+          <Button label="Info" onClick={this._onOpenInfo}/>
+        </p>
+        {this.state.info ?
+          <StatusLayer onClose={this._onClose}>
+            The text.
+          </StatusLayer> : null
+        }
+
+        <p>
+          <Button label="Error" onClick={this._onOpenError}/>
+        </p>
+        {this.state.error ?
+          <StatusLayer value="error" onClose={this._onClose}>
+            The text.
+          </StatusLayer> : null
+        }
+
+        <p>
+          <Button label="Warning-Configured" onClick={this._onOpenWarning}/>
+        </p>
+        {this.state.warning ?
+          <StatusLayer title="This is a warning" value="warning"
+              onClose={this._onClose}>
+            The text.
+          </StatusLayer> : null
+        }
+
         <p>
           <Button label="Confirm-Defaults" onClick={this._onOpenDialog1}/>
         </p>
         {this.state.dialog1 ?
-          <Layer onClose={this._onClose} closer flush align="top">
-            <Confirm onSubmit={this._onSubmit}/>
-          </Layer> : null
+          <ConfirmLayer onClose={this._onClose} onSubmit={this._onSubmit}>
+            The text.
+          </ConfirmLayer> : null
         }
 
         <p>
           <Button label="Confirm-Configured" onClick={this._onOpenDialog2}/>
         </p>
         {this.state.dialog2 ?
-          <Layer onClose={this._onClose} closer flush align="top">
-            <Confirm message="Captain, course has been set for the Neutral Zone at Warp factor 10..."
-                title="Awaiting Confirmation" submitLabel="Engage"
-                onSubmit={this._onSubmit}/>
-          </Layer> : null
+          <ConfirmLayer onClose={this._onClose}
+              title="Awaiting Confirmation"
+              submitLabel="Engage"
+              onSubmit={this._onSubmit}>
+            Captain, course has been set for the Neutral Zone at Warp factor 10
+          </ConfirmLayer> : null
         }
 
         <p>

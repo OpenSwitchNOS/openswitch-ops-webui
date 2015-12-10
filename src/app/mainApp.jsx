@@ -40,7 +40,9 @@ class MainApp extends Component {
     location: PropTypes.object,
     nav: PropTypes.object,
     routeToLink: PropTypes.object,
+    status: PropTypes.object,
     syslog: PropTypes.object,
+    toolbar: PropTypes.object,
   };
 
   constructor(props) {
@@ -100,6 +102,7 @@ class MainApp extends Component {
           <Title>{this._linkPathName()}</Title>
         </Menu>
         <Menu direction="row" align="center" responsive={false}>
+          {this.props.toolbar.component}
           <a href="#/syslog">
             <NotificationIcon/><small>{numSyslog}</small>
           </a>
@@ -132,6 +135,7 @@ class MainApp extends Component {
 const select = (state) => ({
   nav: state.nav,
   routeToLink: state.routeToLink,
+  toolbar: state.toolbar,
   syslog: state.syslog,
 });
 

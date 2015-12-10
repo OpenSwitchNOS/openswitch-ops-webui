@@ -20,8 +20,7 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import FetchInfo from 'fetchInfo.jsx';
-
+import FetchToolbar from 'fetchToolbar.jsx';
 
 class VlanPage extends Component {
 
@@ -54,15 +53,33 @@ class VlanPage extends Component {
     this.props.actions.vlan.fetchIfNeeded();
   }
 
+  _onRefresh = () => {
+    this.props.actions.vlan.fetchIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const vlan = nextProps.vlan;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={vlan.isFetching}
+          error={vlan.lastError}
+          date={vlan.lastUpdate}
+          onRefresh={this._onRefresh}/>
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
+  }
+
   render() {
     const vlanProps = this.props.vlan;
-
     return (
       <Box className="flex1">
-        <FetchInfo {...vlanProps}/>
+        Keep for BoxGraphic.
         <p/>
         <ResponsiveBox>
-          <DataGrid width={500} height={400}
+          <DataGrid width={300} height={400}
               data={vlanProps.entities}
               columns={this.cols}
               noSelect

@@ -14,28 +14,33 @@
     under the License.
 */
 
-import React, { Component } from 'react';
-import { t } from 'i18n/lookup.js';
+// Required 'MODULE' name
+export const MODULE = 'toolbar';
 
-export default class FetchInfo extends Component {
+const CLEAR = `${MODULE}/CLEAR`;
+const SET = `${MODULE}/SET`;
 
-  constructor(props) {
-    super(props);
-    this.state = {};
+// Optional 'ACTIONS' object
+export const ACTIONS = {
+  clear() { return { type: CLEAR }; },
+  set(component) { return { type: SET, component }; },
+};
+
+const INITIAL_STATE = {
+  component: null,
+};
+
+// Optional 'reducer' function
+export function reducer(moduleState = INITIAL_STATE, action) {
+  switch (action.type) {
+
+    case CLEAR:
+      return { ...INITIAL_STATE };
+
+    case SET:
+      return { component: action.component };
+
+    default:
+      return moduleState;
   }
-
-  render() {
-    const p = this.props;
-    return (
-      <div>
-        <b>{t('isFetching')}</b>
-        {`: ${p.isFetching}`}<br/>
-        <b>{t('lastError')}</b>
-        {`: ${p.lastError}`}<br/>
-        <b>{t('lastUpdate')}</b>
-        {`: ${new Date(p.lastUpdate)}`}
-      </div>
-    );
-  }
-
 }

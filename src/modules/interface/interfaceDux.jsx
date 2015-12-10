@@ -28,9 +28,9 @@ export const NAVS = [
   },
 ];
 
-const INTERFACES_FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const INTERFACES_FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const INTERFACES_FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
+const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
+const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
+const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
 
 const URL = '/rest-poc/v1/system/interfaces?admin_state=up;link_state=up';
 
@@ -38,15 +38,15 @@ const URL = '/rest-poc/v1/system/interfaces?admin_state=up;link_state=up';
 export const ACTIONS = {
 
   fetchRequest() {
-    return { type: INTERFACES_FETCH_REQUEST };
+    return { type: FETCH_REQUEST };
   },
 
   fetchFailure(url, error) {
-    return { type: INTERFACES_FETCH_FAILURE, url, error };
+    return { type: FETCH_FAILURE, url, error };
   },
 
   fetchSuccess(resp) {
-    return { type: INTERFACES_FETCH_SUCCESS, resp };
+    return { type: FETCH_SUCCESS, resp };
   },
 
   fetchIfNeeded() {
@@ -87,13 +87,13 @@ const INITIAL_STATE = {
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
 
-    case INTERFACES_FETCH_REQUEST:
+    case FETCH_REQUEST:
       return { ...moduleState, isFetching: true };
 
-    case INTERFACES_FETCH_FAILURE:
+    case FETCH_FAILURE:
       return { ...moduleState, isFetching: false, lastError: action.error };
 
-    case INTERFACES_FETCH_SUCCESS:
+    case FETCH_SUCCESS:
       const entities = {};
       const len = action.resp.body.length;
       for (let i=0; i<len; i++) {

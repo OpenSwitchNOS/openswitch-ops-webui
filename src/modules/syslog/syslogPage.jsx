@@ -21,7 +21,7 @@ import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import FetchInfo from 'fetchInfo.jsx';
+import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class SyslogPage extends Component {
@@ -44,17 +44,33 @@ class SyslogPage extends Component {
     this.props.actions.syslog.fetchIfNeeded();
   }
 
+  _onRefresh = () => {
+    this.props.actions.syslog.fetchIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const syslog = nextProps.syslog;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={syslog.isFetching}
+          error={syslog.lastError}
+          date={syslog.lastUpdate}
+          onRefresh={syslog._onRefresh}/>
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
+  }
+
   _onClick = () => {
     this.props.actions.syslog.readAll();
   }
 
   render() {
     const syslogProps = this.props.syslog;
-
     return (
       <Box className="flex1">
-        <FetchInfo {...syslogProps}/>
-        <p/>
         <Button primary label={t('readAll')} onClick={this._onClick} />
         <p/>
         <ResponsiveBox>

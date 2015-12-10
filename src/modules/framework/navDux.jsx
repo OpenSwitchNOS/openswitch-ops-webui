@@ -17,13 +17,13 @@
 // Required 'MODULE' name
 export const MODULE = 'nav';
 
-const NAV_SHOW_PANE = `${MODULE}/SHOW_PANE`;
-const NAV_HIDE_PANE = `${MODULE}/HIDE_PANE`;
+const SHOW_PANE = `${MODULE}/SHOW_PANE`;
+const HIDE_PANE = `${MODULE}/HIDE_PANE`;
 
 // Optional 'ACTIONS' object
 export const ACTIONS = {
-  showPane() { return { type: NAV_SHOW_PANE }; },
-  hidePane() { return { type: NAV_HIDE_PANE }; },
+  showPane() { return { type: SHOW_PANE }; },
+  hidePane() { return { type: HIDE_PANE }; },
 };
 
 const INITIAL_STATE = {
@@ -34,10 +34,10 @@ const INITIAL_STATE = {
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
 
-    case NAV_SHOW_PANE:
+    case SHOW_PANE:
       return { ...moduleState, paneActive: true };
 
-    case NAV_HIDE_PANE:
+    case HIDE_PANE:
       return { ...moduleState, paneActive: false };
 
     default:

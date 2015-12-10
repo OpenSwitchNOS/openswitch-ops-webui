@@ -21,6 +21,8 @@ import Box from 'grommet/components/Box';
 import BrandLogo from 'brandLogo.jsx';
 import Section from 'grommet/components/Section';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import SpanStatus from 'spanStatus.jsx';
+import TimeAgo from 'react-timeago';
 
 class DemoIconPage extends Component {
 
@@ -50,6 +52,17 @@ class DemoIconPage extends Component {
         </Section>
         <Section colorIndex="neutral-1">
           <EditIcon className="tiny" />
+        </Section>
+        <Section>
+          <SpanStatus value="ok">This is text gg yy ABC</SpanStatus>
+          <br/>
+          <SpanStatus value="error">This is text gg yy ABC</SpanStatus>
+          <br/>
+          <SpanStatus disabled value="error">Disabled</SpanStatus>
+          <br/>
+          <SpanStatus value="ok">
+            Loaded the page&nbsp;<TimeAgo date={new Date()}/>
+          </SpanStatus>
         </Section>
       </Box>
     );

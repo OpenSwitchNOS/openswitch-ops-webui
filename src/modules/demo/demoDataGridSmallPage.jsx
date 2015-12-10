@@ -17,9 +17,8 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-
 import DataGrid from 'dataGrid.jsx';
-import FetchInfo from 'fetchInfo.jsx';
+import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
 
 class DemoDataGridSmallPage extends Component {
@@ -49,6 +48,25 @@ class DemoDataGridSmallPage extends Component {
     this.props.actions.demo.fetchIfNeeded();
   }
 
+  _onRefresh = () => {
+    this.props.actions.demo.fetchIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const demo = nextProps.demo;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={demo.isFetching}
+          error={demo.lastError}
+          date={demo.lastUpdate}
+          onRefresh={this._onRefresh}/>
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
+  }
+
   _onEdit = (selection) => {
     alert(selection);
   }
@@ -61,7 +79,6 @@ class DemoDataGridSmallPage extends Component {
     const demoProps = this.props.demo;
     return (
       <div>
-        <FetchInfo {...demoProps}/>
         <Section>
           <DataGrid title="Full Toolbar" width={500} height={200}
               data={demoProps.entities}

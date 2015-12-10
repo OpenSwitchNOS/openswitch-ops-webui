@@ -35,4 +35,14 @@ export function agentInit(settings) {
     });
 }
 
+export function parseError(url, error) {
+  const resp = error.response;
+  return {
+    url,
+    status: error.status,
+    title: error.message,
+    msg: resp && resp.error && resp.error.message,
+  };
+}
+
 export default Agent;

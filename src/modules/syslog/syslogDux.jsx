@@ -27,24 +27,24 @@ export const NAVS = [
   },
 ];
 
-const SYSLOG_FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const SYSLOG_FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const SYSLOG_FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
-const SYSLOG_READ_ALL = `${MODULE}/READ_ALL`;
+const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
+const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
+const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
+const READ_ALL = `${MODULE}/READ_ALL`;
 
 // Optional 'ACTIONS' object
 export const ACTIONS = {
 
   fetchRequest() {
-    return { type: SYSLOG_FETCH_REQUEST };
+    return { type: FETCH_REQUEST };
   },
 
   fetchFailure(url, error) {
-    return { type: SYSLOG_FETCH_FAILURE, url, error };
+    return { type: FETCH_FAILURE, url, error };
   },
 
   fetchSuccess(resp) {
-    return { type: SYSLOG_FETCH_SUCCESS, resp };
+    return { type: FETCH_SUCCESS, resp };
   },
 
   fetchIfNeeded() {
@@ -67,7 +67,7 @@ export const ACTIONS = {
   },
 
   readAll() {
-    return { type: SYSLOG_READ_ALL };
+    return { type: READ_ALL };
   }
 };
 
@@ -84,13 +84,13 @@ const INITIAL_STATE = {
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
 
-    case SYSLOG_FETCH_REQUEST:
+    case FETCH_REQUEST:
       return { ...moduleState, isFetching: true };
 
-    case SYSLOG_FETCH_FAILURE:
+    case FETCH_FAILURE:
       return { ...moduleState, isFetching: false, lastError: action.error };
 
-    case SYSLOG_FETCH_SUCCESS:
+    case FETCH_SUCCESS:
       const entities = {
         '1': { id: 1, text: 'This is syslog with ID: 1' },
         '2': { id: 2, text: 'This is syslog with ID: 2' },
@@ -104,7 +104,7 @@ export function reducer(moduleState = INITIAL_STATE, action) {
         numUnread: 3,
       };
 
-    case SYSLOG_READ_ALL:
+    case READ_ALL:
       return { ...moduleState, lastRead: Date.now(), numUnread: 0 };
 
     default:

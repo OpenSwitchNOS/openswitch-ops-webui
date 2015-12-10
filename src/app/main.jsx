@@ -33,6 +33,7 @@ import { setLocale } from 'i18n/lookup.js';
 import { agentInit } from 'agent.js';
 
 import * as navDux from 'framework/navDux.jsx';
+import * as toolbarDux from 'framework/toolbarDux.jsx';
 
 import MainApp from './mainApp.jsx';
 
@@ -94,6 +95,7 @@ export function mainInit(BuildConfig) {
   agentInit(BuildConfig.settings.agent);
 
   BuildConfig.modules.splice(0, 0, navDux);
+  BuildConfig.modules.splice(0, 0, toolbarDux);
 
   const navModel = createNavModel(BuildConfig, MainApp);
   const initStore = {

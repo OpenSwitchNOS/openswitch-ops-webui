@@ -17,9 +17,8 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
-import FetchInfo from 'fetchInfo.jsx';
+import FetchToolbar from 'fetchToolbar.jsx';
 import ResponsiveBox from 'responsiveBox.jsx';
 import Box from 'grommet/components/Box';
 
@@ -54,6 +53,25 @@ class DemoDataGridPage extends Component {
     this.props.actions.demo.fetchIfNeeded();
   }
 
+  _onRefresh = () => {
+    this.props.actions.demo.fetchIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const demo = nextProps.demo;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={demo.isFetching}
+          error={demo.lastError}
+          date={demo.lastUpdate}
+          onRefresh={this._onRefresh}/>
+    );
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
+  }
+
   _onCustomCell = (cellData, cellProps, colProps) => {
     return (
       <CustomCell {...cellProps}>
@@ -73,12 +91,13 @@ class DemoDataGridPage extends Component {
     const demoProps = this.props.demo;
     return (
       <Box className="flex1">
-        <FetchInfo {...demoProps}/>
+        Stuff can go here.
+        <p/>
         <ResponsiveBox>
-          <DataGrid title={t('openSwitch')} width={500} height={400}
+          <DataGrid width={300} height={400}
               data={demoProps.entities}
               columns={this.cols}
-              onEdit={this._onEdit}
+              noSelect
           />
         </ResponsiveBox>
       </Box>

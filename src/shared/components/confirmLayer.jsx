@@ -20,20 +20,20 @@ import Form from 'grommet/components/Form';
 import Menu from 'grommet/components/Menu';
 import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
+import Layer from 'grommet/components/Layer';
+import Title from 'grommet/components/Title';
+import SpanStatus from 'spanStatus.jsx';
 
 import { t } from 'i18n/lookup.js';
 
-export default class Confirm extends Component {
+export default class ConfirmLayer extends Component {
 
   static propTypes = {
-    message: PropTypes.string,
+    children: PropTypes.node,
+    onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     submitLabel: PropTypes.string,
     title: PropTypes.string,
-  }
-
-  static defaultProps = {
-    prefix: 'confirmForm',
   }
 
   constructor(props) {
@@ -43,27 +43,29 @@ export default class Confirm extends Component {
 
   _onSubmit = (event) => {
     event.preventDefault();
-    if (this.state.acknowledged) {
-      this.props.onSubmit();
-    } else {
-      this.setState({error: t('required')});
-    }
+    this.props.onSubmit();
   }
 
   render() {
     return (
-      <Form onSubmit={this._onSubmit}>
-        <Header>
-          <h2>{this.props.title || t('confirmation')}</h2>
-        </Header>
-        <p>{this.props.message || t('areYouSure')}</p>
-        <Footer pad={{vertical: 'medium'}}>
-          <Menu>
-            <Button label={this.props.submitLabel || t('yes')}
-                primary onClick={this.props.onSubmit} />
-          </Menu>
-        </Footer>
-      </Form>
+      <Layer onClose={this.props.onClose} closer flush align="top">
+        <Form onSubmit={this._onSubmit}>
+          <Header>
+            <Title>
+              <SpanStatus size="large" space={false} value="unknown">
+                {this.props.title || t('confirmation')}
+              </SpanStatus>
+            </Title>
+          </Header>
+          <p>{this.props.children || t('areYouSure')}</p>
+          <Footer pad={{vertical: 'medium'}}>
+            <Menu>
+              <Button label={this.props.submitLabel || t('yes')}
+                  primary onClick={this.props.onSubmit} />
+            </Menu>
+          </Footer>
+        </Form>
+      </Layer>
     );
   }
 
