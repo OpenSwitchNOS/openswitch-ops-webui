@@ -23,8 +23,6 @@
     "classnames": "2.2.1",
     "element-resize-event": "2.0.3",
     "fixed-data-table": "0.6.0",
-    "font-awesome": "4.5.0",
-    "font-awesome-webpack": "0.0.4",
     "grommet": "0.4.1",
     "history": "1.13.1",
     "lodash": "3.10.1",

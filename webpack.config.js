@@ -28,7 +28,6 @@ module.exports = {
   },
   resolve: {
     root: [
-      __dirname + '/src/components',
       __dirname + '/src/modules',
       __dirname + '/src/shared',
       __dirname + '/src/shared/assets',
@@ -54,8 +53,7 @@ module.exports = {
       {
         test: /\.scss$/,
         loader: 'style!css!sass' +
-          '?includePaths[]=' + __dirname + '/node_modules' +
-          '&includePaths[]=' + __dirname + '/assets'
+          '?includePaths[]=' + __dirname + '/node_modules'
       },
       {
         test: /\.(woff|woff2|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,

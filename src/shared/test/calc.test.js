@@ -18,7 +18,7 @@
 
 import * as Calc from '../calc.js';
 
-describe('i18n/lookup', () => {
+describe('calc', () => {
 
   const SPECS = [
     {
