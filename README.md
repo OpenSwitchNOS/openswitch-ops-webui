@@ -49,6 +49,6 @@ ops-webui is using the Apache 2.0 license. For more details refer to [COPYING](C
 Other documents
 -----------------------------------
 For the high level design of ops-webui, refer to [DESIGN.md](DESIGN.md)
-For the current list of contributors and maintainers, refer to [AUTHORS.md](AUTHORS.md)
+For the current list of contributors and maintainers, refer to [AUTHORS](AUTHORS)
 
 For general information about OpenSwitch project refer to http://www.openswitch.net
