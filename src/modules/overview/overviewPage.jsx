@@ -18,7 +18,8 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
-import Button from 'grommet/components/Button';
+import Header from 'grommet/components/Header';
+import Title from 'grommet/components/Title';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
@@ -70,11 +71,30 @@ class OverviewPage extends Component {
   render() {
     const overviewProps = this.props.overview;
     return (
-      <Box className="flex1">
-        <Button primary label={t('readAll')} onClick={this._onClick} />
-        <p/>
-        <ResponsiveBox>
-          <DataGrid width={500} height={400}
+      <Box className="flex1auto">
+        <Box className="flexWrap" direction="row" responsive={false}>
+          <Box className="flex1 pageBox">
+            <Header size="small">
+              <Title>Information</Title>
+            </Header>
+            <p>Stuff</p>
+            <p>Stuff</p>
+            <p>Stuff</p>
+            <p>Stuff</p>
+          </Box>
+          <Box className="flex1 pageBox">
+            <Header size="small">
+              <Title>System</Title>
+            </Header>
+          </Box>
+          <Box className="flex1 pageBox">
+            <Header size="small">
+              <Title>Network</Title>
+            </Header>
+          </Box>
+        </Box>
+        <ResponsiveBox className="flex1 minBox">
+          <DataGrid width={500} height={425}
               data={overviewProps.entities}
               columns={this.cols}
               noSelect

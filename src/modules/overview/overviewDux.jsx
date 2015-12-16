@@ -75,6 +75,8 @@ const INITIAL_STATE = {
   entities: {},
 };
 
+function mkEntity(i) { return { id: i, text: `This is item ${i}` }; }
+
 // Optional 'reducer' function
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
@@ -86,11 +88,8 @@ export function reducer(moduleState = INITIAL_STATE, action) {
       return { ...moduleState, isFetching: false, lastError: action.error };
 
     case FETCH_SUCCESS:
-      const entities = {
-        '1': { id: 1, text: 'This is syslog with ID: 1' },
-        '2': { id: 2, text: 'This is syslog with ID: 2' },
-        '3': { id: 3, text: 'This is syslog with ID: 3' },
-      };
+      const entities = {};
+      for (let i=1; i<=15; i++) { entities[i] = mkEntity(i); }
       return {
         ...moduleState,
         isFetching: false,

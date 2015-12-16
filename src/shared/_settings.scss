@@ -46,6 +46,8 @@ $border-radius: 8px;
 
 // Brand specific settings
 
+$pageBgColor: #F5F5F5;
+
 $headerBgColor: #eee;
 $headerHoverColor: $brand-color;
 
@@ -59,3 +61,5 @@ $rowActiveColor: #333;
 $rowActiveHoverBgColor: darken($rowActiveBgColor, 5%);
 
 $border: 1px solid grey;
+
+$space: 16px;

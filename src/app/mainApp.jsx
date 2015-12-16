@@ -111,7 +111,7 @@ class MainApp extends Component {
     );
 
     const page = (
-      <Box className="flex1" pad="small">
+      <Box id="pageContent" className="flex1 pLeft pRight pBottom">
         {this.props.children}
       </Box>
     );
@@ -121,7 +121,7 @@ class MainApp extends Component {
         <Split flex="right" onResponsive={this._onNavSplitResponsive}
             priority="left">
           {nav}
-          <Box>
+          <Box id="page">
             {pageHdr}
             {page}
           </Box>

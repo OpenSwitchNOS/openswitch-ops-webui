@@ -68,7 +68,7 @@ export default class ResponsiveBox extends Component {
     });
 
     return (
-      <Box className="flex1" {...this.props}>
+      <Box className="minBox flex1" {...this.props}>
         {children}
       </Box>
     );

@@ -42,27 +42,63 @@ h1, h2, h3, .headline, .title {
   }
 }
 
-@mixin flex($g, $s: 0, $b: 0) {
+@mixin flex($g, $s, $b) {
   flex: $g $s $b;
   -webkit-flex: $g $s $b;
   -moz-flex: $g $s $b;
 }
 
-.flex0 {
-  @include flex(0);
+.flex0auto { @include flex(0, 0, auto); }
+.flex1auto { @include flex(1, 0, auto); }
+.flex2auto { @include flex(2, 0, auto); }
+
+.flex0 { @include flex(0, 0, 0); }
+.flex1 { @include flex(1, 0, 0); }
+.flex2 { @include flex(2, 0, 0); }
+
+.flexWrap {
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
 }
 
-.flex1 {
-  @include flex(1);
+.minBox {
+  min-height: 200px;
+  min-width: 200px;
 }
 
-.flex2 {
-  @include flex(2);
+#page {
+  background-color: $pageBgColor;
+  height: 100vh;
+
+  .mTop { margin-top: $space; }
+  .mRight { margin-right: $space; }
+  .mBottom { margin-bottom: $space; }
+  .mLeft { margin-left: $space; }
+
+  .pTop { padding-top: $space; }
+  .pRight { padding-right: $space; }
+  .pBottom { padding-bottom: $space; }
+  .pLeft { padding-left: $space; }
+
+  #pageContent {
+    overflow: auto;
+  }
+
+  .pageBox {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px lightgrey;
+    padding: 8px;
+    box-sizing: border-box;
+    @extend .minBox;
+    margin-bottom: $space;
+  }
+
+  .pageBox + .pageBox {
+    margin-left: $space;
+  }
 }
 
-.flex3 {
-  @include flex(3);
-}
 
 // Adds a continuous spin to an element (i.e. refresh icon).
 .spin {
@@ -115,4 +151,24 @@ $fontsPath: '../shared/assets';
   100% {
     width: $sidebar-width;
   }
+}
+
+// Nice for debugging
+.redBorder {
+  border: 3px solid red;
+}
+.greenBorder {
+  border: 3px solid green;
+}
+.blueBorder {
+  border: 3px solid blue;
+}
+.redBg {
+  background-color: red;
+}
+.greenBg {
+  background-color: green;
+}
+.blueBg {
+  background-color: blue;
 }

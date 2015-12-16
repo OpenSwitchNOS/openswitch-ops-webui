@@ -18,12 +18,14 @@ import * as vlanDux from 'vlan/vlanDux.jsx';
 import * as interfaceDux from 'interface/interfaceDux.jsx';
 import * as syslogDux from 'syslog/syslogDux.jsx';
 import * as demoDux from 'demo/demoDux.jsx';
+import * as overviewDux from 'overview/overviewDux.jsx';
 
 const modules = [
-  vlanDux,
-  interfaceDux,
-  syslogDux,
   demoDux,
+  interfaceDux,
+  overviewDux,
+  syslogDux,
+  vlanDux,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
