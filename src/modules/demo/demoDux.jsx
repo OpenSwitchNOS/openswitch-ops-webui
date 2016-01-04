@@ -23,6 +23,7 @@ import DemoDataGridSmallPage from './demoDataGridSmallPage.jsx';
 import DemoButtonPage from './demoButtonPage.jsx';
 import DemoFormPage from './demoFormPage.jsx';
 import DemoLayerPage from './demoLayerPage.jsx';
+import DemoMetricPage from './demoMetricPage.jsx';
 
 // Required 'MODULE' name
 export const MODULE = 'demo';
@@ -64,6 +65,10 @@ export const NAVS = [
   {
     route: { path: '/demoLayer', component: DemoLayerPage },
     link: { path: '/demo/layer', order: 90 }
+  },
+  {
+    route: { path: '/demoMetric', component: DemoMetricPage },
+    link: { path: '/demo/metric', order: 100 }
   },
 ];
 

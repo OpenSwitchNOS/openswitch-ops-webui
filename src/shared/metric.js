@@ -39,6 +39,25 @@ export default class Metric {
 
   getValue(i) { return this._values[i]; }
 
+  latestValue() { return this._values[this._values.length - 1]; }
+
+  latestValueAsText() {
+    return this.size() > 0 ? `${this.latestValue()} ${this.units()}` : '';
+  }
+
+  latestValueColorIndex() {
+    if (this.size() > 0) {
+      const v = this.latestValue();
+      if (v >= this._critical) {
+        return 'critical';
+      }
+      if (v >= this._warning) {
+        return 'warning';
+      }
+    }
+    return 'ok';
+  }
+
   size() { return this._values.length; }
 
   getValues() {return this._values.slice(); }

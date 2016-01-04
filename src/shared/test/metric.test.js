@@ -42,6 +42,15 @@ describe('Metric', () => {
     verify(m, 5, 'name', 'units', [1, 2, 3], 10, 100, 75, 90);
   });
 
+  it('can get threshold color', () => {
+    const m = new Metric('name', 'units', [], 10, 100, 75, 90, 5);
+    expect(m.latestValueColorIndex()).toEqual('ok');
+    m.addValue(75);
+    expect(m.latestValueColorIndex()).toEqual('warning');
+    m.addValue(90);
+    expect(m.latestValueColorIndex()).toEqual('critical');
+  });
+
   it('constructs with bad thresholds', () => {
     let m = new Metric('name', 'units', [], 10, 1, 1, 1, 5);
     verify(m, 5, 'name', 'units', [], 10, 10, 10, 10);
@@ -63,9 +72,15 @@ describe('Metric', () => {
   });
 
   it('can get value', () => {
+    expect(new Metric().latestValueAsText()).toEqual('');
+
     const m = new Metric('name', 'units', [1, 2, 3]);
+
     expect(m.getValue(0)).toEqual(1);
     expect(m.getValue(2)).toEqual(3);
+
+    expect(m.latestValue()).toEqual(3);
+    expect(m.latestValueAsText()).toEqual('3 units');
   });
 
   it('can set values', () => {

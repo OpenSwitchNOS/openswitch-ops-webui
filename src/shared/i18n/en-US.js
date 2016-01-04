@@ -30,6 +30,7 @@ export const MESSAGES = {
   icon: 'Logo & Icons',
   interface: 'Interfaces',
   layer: 'Layer',
+  metric: 'Metrics',
   overview: 'Overview',
   syslog: 'Syslog',
   table: 'Table',
