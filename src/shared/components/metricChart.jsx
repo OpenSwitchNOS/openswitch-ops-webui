@@ -16,24 +16,19 @@
 
 import './metricChart.scss';
 
-import React, { Component } from 'react';
-
+import React, { Component, PropTypes } from 'react';
 import Chart from 'grommet/components/Chart';
-import Metric from 'metric.js';
 
 
 export default class MetricChart extends Component {
 
+  static propTypes = {
+    metric: PropTypes.object.isRequired,
+    onSelect: PropTypes.func,
+  }
+
   constructor(props) {
     super(props);
-    // FIXME: hack for now
-    this.metric = new Metric('n', '%', [100, 2, 30], 10, 100, 75, 90);
-    this.syslog = [
-      '3 Syslog - blah blah blah',
-      'no Syslog',
-      '2 Syslog - blah blah',
-    ];
-
     this.state = {
       selection: {}
     };
@@ -51,51 +46,58 @@ export default class MetricChart extends Component {
     const loc = marker.substr(marker.indexOf('_x_band_') + 8);
     const s = loc.split('.');
     const x = s[0];
+    const dp = this.props.metric.getDataPoint(x);
 
-    this.setState({
-      selection: { el, marker, x }
-    });
+    const selection = { dp, el, x };
+
+    this.setState({ selection });
+
+    if (this.props.onSelect) {
+      this.props.onSelect(dp);
+    }
   }
 
   render() {
-    const x = this.state.selection.x;
+    const len = this.props.metric.size();
     let chart = null;
-    let selData = null;
-    if (this.metric.size() > 0) {
-      const values = this.metric.getValues().map((item, idx) => {
-        return [ idx + 1, item ];
-      });
-      const dates = this.metric.getValues().map((item, idx) => {
-        return { label: idx, value: idx+1 };
-      });
-      if (x != null) {
-        selData = `${this.metric.getValue(x)} syslog: ${this.syslog[x]}`;
+
+    if (len > 0) {
+      const series0 = [];
+      const xAxisData = [];
+      for (let i=0; i<len; i++) {
+        const x = i + 1;
+        const dp = this.props.metric.getDataPoint(i);
+        series0.push( [x, dp.value()] );
+        xAxisData.push({
+          value: x,
+          label: new Date(dp.ts()).toLocaleTimeString(),
+        });
       }
       chart = (
         <Chart
-            series={[
-              {
-                values,
-                label: this.metric.name(),
-              },
-            ]}
+            series={[ {values: series0} ]}
             type="area"
             smooth
             legend={{position: 'after'}}
-            units={this.metric.units()}
-            max={this.metric.max() * 1.25}
+            units={this.props.metric.getUnits()}
+            max={this.props.metric.max() * 1.25}
             xAxis={{
-              data: dates,
+              data: xAxisData,
               placement: 'bottom',
             }}
         />
       );
     }
 
+    // Note: using the 'key' property below forces a redraw of the chart if
+    // you change the metric property. Without this, changing the metric
+    // property does not completely redraw the chart.
     return (
-      <div className="metricChart" onClick={this._onSelect}>
+      <div
+          key={this.props.metric.getName()}
+          className="metricChart"
+          onClick={this._onSelect}>
         {chart}
-        <div>Selected X: {this.state.selection.x}, data: {selData}</div>
       </div>
     );
   }

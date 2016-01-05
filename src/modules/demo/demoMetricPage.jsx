@@ -19,6 +19,8 @@ import { connect } from 'react-redux';
 
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
+import Metric from 'metric.js';
+import DataPoint from 'dataPoint.js';
 import MetricChart from 'metricChart.jsx';
 import MetricTable from 'metricTable.jsx';
 
@@ -31,20 +33,86 @@ class DemoMetricPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    const ts = Date.now();
+    this.state = {
+      selectedMetric: 0,
+      selectedDataPoint: null,
+      metrics: [
+        new Metric()
+          .setName('Metric #1').setUnits('%')
+          .setDataPoints([
+            new DataPoint(1, ts, ['msg1 msg2']),
+            new DataPoint(91, ts+1000, ['msg3']),
+            new DataPoint(3, ts+2000, [])
+          ]),
+        new Metric()
+          .setName('Metric #2').setUnits('GB').setThresholds(0, 500)
+          .setDataPoints([
+            new DataPoint(100, ts, ['msg1', 'msg2']),
+            new DataPoint(50, ts+1000),
+            new DataPoint(200, ts+2000)
+          ]),
+        new Metric()
+          .setName('Metric #3').setThresholds(0, 3)
+          .setDataPoints([
+            new DataPoint(2.3, ts, ['msg1 msg2']),
+            new DataPoint(1.1, ts+1000, ['msg3']),
+            new DataPoint(0.8, ts+2000, [])
+          ]),
+      ]
+    };
+  }
+
+  _onSelectMetric = (metric, idx) => {
+    this.setState({
+      selectedMetric: idx,
+      selectedDataPoint: null,
+    });
+  }
+
+  _onSelectDataPoint = (dp) => {
+    this.setState({ selectedDataPoint: dp });
   }
 
   render() {
+    const chartMetric = this.state.metrics[this.state.selectedMetric];
+    const dp = this.state.selectedDataPoint;
     return (
       <div className="pageBox">
         <Header>
-          <Title>MetricTable</Title>
+          <Title>MetricTables</Title>
         </Header>
-        <MetricTable name="system"/>
+        <MetricTable
+            onSelect={this._onSelectMetric}
+            widths={{label: '130px', value: '70px'}}
+            metrics={[
+              { label: 'Metric title #1', metric: this.state.metrics[0] },
+              { label: 'Metric title #2', metric: this.state.metrics[1] },
+              { label: 'Metric title #3', metric: this.state.metrics[2] },
+            ]}
+        />
+        <MetricTable
+            onSelect={this._onSelectMetric}
+            widths={{table: '500px', label: '130px', value: '70px'}}
+            metrics={[
+              { label: 'Metric title #1', metric: this.state.metrics[0] },
+              { label: 'Metric title #2', metric: this.state.metrics[1] },
+              { label: 'Metric title #3', metric: this.state.metrics[2] },
+            ]}
+        />
         <Header>
           <Title>MetricChart</Title>
         </Header>
-        <MetricChart />
+        <MetricChart metric={chartMetric} onSelect={this._onSelectDataPoint}/>
+        <div>
+          Selected datapoint value: {dp && dp.value()}
+        </div>
+        <div>
+          Selected datapoint date: {dp && new Date(dp.ts()).toString()}
+        </div>
+        <div>
+          Selected datapoint userdata: {dp && dp.userData()}
+        </div>
       </div>
     );
   }

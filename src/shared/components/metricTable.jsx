@@ -20,75 +20,74 @@ import React, { PropTypes, Component } from 'react';
 
 import Table from 'grommet/components/Table';
 import Chart from 'grommet/components/Chart';
-import RadioButton from 'grommet/components/RadioButton';
-import Metric from 'metric.js';
 import _ from 'lodash';
 
 
 export default class MetricTable extends Component {
 
   static propTypes = {
-    name: PropTypes.string.isRequired,
+    metrics: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string,
+      metric: PropTypes.object.isRequired,
+    })).isRequired,
+    onSelect: PropTypes.func,
+    widths: PropTypes.shape({
+      table: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      label: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      chart: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    }),
   }
 
   constructor(props) {
     super(props);
-    this.state = {
-      selection: {}
-    };
+    this.state = {};
   }
 
-  _mkRow = (label, metric) => {
-    const name = this.props.name;
-    const uid = _.uniqueId('mt_');
-
-    const rb = (
-      <RadioButton id={uid} name={name} label="" onChange={this._onSelect}/>
-    );
-
+  _mkRow = (widths, metric, label) => {
     let chart = null;
     if (metric.size() > 0) {
-      const values = metric.getValues().map((item, idx) => {
-        return [ idx + 1, item ];
+      const values = metric.getDataPoints().map((dp, idx) => {
+        return [ idx + 1, dp.value() ];
       });
       chart = (
-        <Chart
-            series={[
-              {
-                values,
-                colorIndex: metric.latestValueColorIndex(),
-              }
-            ]}
-            type="area"
-            smooth
-        />
+        <Chart type="area" smooth series={[
+          { values }
+        ]}/>
       );
     }
 
+    const rowUid = _.uniqueId('mt_');
+    const txt = label || metric.name();
     return (
-      <tr key={uid}>
-        <td className="selectCol">{rb}</td>
-        <td className="chartCol">{chart}</td>
-        <td style={{width: '100px'}}><b>{label}</b></td>
-        <td className="valueCol">{metric.latestValueAsText()}</td>
+      <tr key={rowUid}>
+        <td className="labelCol" style={{width: widths.label}}><b>{txt}</b></td>
+        <td className="valueCol" style={{width: widths.value}}>
+          {metric.latestValueUnits()}
+        </td>
+        <td className="chartCol" style={{width: widths.chart}}>{chart}</td>
       </tr>
     );
   }
 
+  _onSelect = (idx) => {
+    const fn = this.props.onSelect;
+    if (fn) { fn(this.props.metrics[idx].metric, idx); }
+  }
+
   render() {
-
-    const tableBody = (
-      <tbody>
-        {this._mkRow('Row #1:', new Metric('n', '%', [1, 91, 3], 10, 100, 75, 90))}
-        {this._mkRow('Row #2:', new Metric('n', '%', [1, 2, 75], 10, 100, 75, 90))}
-        {this._mkRow('Row #3:', new Metric('n', '%', [100, 2, 30], 10, 100, 75, 90))}
-      </tbody>
+    const widths = this.props.widths;
+    const rows = this.props.metrics.map(
+      i => this._mkRow(widths, i.metric, i.label)
     );
-
     return (
-      <Table className="metricTable">
-        {tableBody}
-      </Table>
+      <div className="metricTable" style={{width: widths.table}}>
+        <Table onSelect={this._onSelect} selectable>
+          <tbody>
+            {rows}
+          </tbody>
+        </Table>
+      </div>
     );
   }
 

@@ -14,20 +14,18 @@
     under the License.
 */
 
-@import "~_settings.scss";
+export default class DataPoint {
 
+  constructor(value, ts, userData) {
+    this._value = value;
+    this._ts = ts;
+    this._userData = userData;
+  }
 
-.metricTable {
-  .labelCol {
-    padding-left: 0px;
-    padding-right: 0px;
-  }
-  .valueCol {
-    padding-right: 0px;
-  }
-  .chartCol {
-    .chart__graphic {
-      height: 30px;
-    }
-  }
+  value() { return this._value; }
+
+  ts() { return this._ts; }
+
+  userData() { return this._userData; }
+
 }

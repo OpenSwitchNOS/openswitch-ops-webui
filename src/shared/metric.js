@@ -18,76 +18,88 @@ export default class Metric {
 
   static CACHE_SIZE = 60;
 
-  constructor(name, units, values, min, max, warning, critical, cacheSize) {
+  constructor(cacheSize) {
     this._cacheSize = cacheSize || Metric.CACHE_SIZE;
-    this._name = name || '';
-    this._units = units || '';
-    this.setValues(values);
-    this._min = min || 0;
-    this._max = (max > this._min) ? max : this._min;
-    this._critical = (critical < this._max && critical > this._min)
-      ? critical : this._max;
-    this._warning = (warning < this._critical && warning > this._min)
-      ? warning : this._critical;
+    this._name = '';
+    this._units = '';
+    this._dataPoints = [];
+    this._min = 0;
+    this._warning = 75;
+    this._critical = 90;
+    this._max = 100;
   }
 
   cacheSize() { return this._cacheSize; }
 
-  name() { return this._name; }
+  setName(name) { this._name = name; return this; }
+  getName() { return this._name; }
 
-  units() { return this._units; }
+  setUnits(units) { this._units = units; return this; }
+  getUnits() { return this._units; }
 
-  getValue(i) { return this._values[i]; }
+  getDataPoints() {return this._dataPoints.slice(); }
 
-  latestValue() { return this._values[this._values.length - 1]; }
+  setDataPoints(dataPoints) {
+    if (!dataPoints) {
+      this._dataPoints = [];
+    } else {
+      const len = dataPoints.length;
+      if (len > this._cacheSize) {
+        this._dataPoints = dataPoints.slice(len - this._cacheSize, len);
+      } else {
+        this._dataPoints = dataPoints.slice();
+      }
+    }
+    return this;
+  }
 
-  latestValueAsText() {
-    return this.size() > 0 ? `${this.latestValue()} ${this.units()}` : '';
+  addDataPoint(dataPoint) {
+    if (this._dataPoints.length >= this._cacheSize) {
+      this._dataPoints.shift();
+    }
+    this._dataPoints.push(dataPoint);
+    return this;
+  }
+
+  getDataPoint(i) { return this._dataPoints[i]; }
+
+  latestDataPoint() { return this._dataPoints[this._dataPoints.length - 1]; }
+
+  latestValueUnits() {
+    const dp = this.latestDataPoint();
+    return dp ? `${dp.value()} ${this.getUnits()}` : '';
   }
 
   latestValueColorIndex() {
-    if (this.size() > 0) {
-      const v = this.latestValue();
-      if (v >= this._critical) {
+    const dp = this.latestDataPoint();
+    if (dp) {
+      if (dp.value() >= this._critical) {
         return 'critical';
       }
-      if (v >= this._warning) {
+      if (dp.value() >= this._warning) {
         return 'warning';
       }
     }
     return 'ok';
   }
 
-  size() { return this._values.length; }
+  size() { return this._dataPoints.length; }
 
-  getValues() {return this._values.slice(); }
+  min() { return this._min; }
+  max() { return this._max; }
+  warning() { return this._warning; }
+  critical() { return this._critical; }
 
-  setValues(values) {
-    if (!values) {
-      this._values = [];
-    } else {
-      const len = values.length;
-      if (len > this._cacheSize) {
-        this._values = values.slice(len - this._cacheSize, len);
-      } else {
-        this._values = values.slice();
-      }
+  setThresholds(min, max, warning, critical) {
+    const w = warning || max * 0.75;
+    const c = critical || max * 0.9;
+    if (min < w && w < c && c < max) {
+      this._min = min;
+      this._max = max;
+      this._warning = w;
+      this._critical = c;
     }
-  }
-
-  addValue(value) {
-    if (this._values.length >= this._cacheSize) {
-      this._values.shift();
-    }
-    this._values.push(value);
     return this;
   }
 
-  min() { return this._min; }
-
-  max() { return this._max; }
-
-  warning() { return this._warning; }
-
-  critical() { return this._critical; }
 }
