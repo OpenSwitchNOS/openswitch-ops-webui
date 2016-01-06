@@ -18,6 +18,8 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
 import Table from 'grommet/components/Table';
+import Box from 'grommet/components/Box';
+
 
 class DemoTablePage extends Component {
 
@@ -63,10 +65,12 @@ class DemoTablePage extends Component {
     );
 
     return (
-      <Table selectable="multiple" onSelect={this._onMultipleSelect}>
-        {tableHeader}
-        {tableBody}
-      </Table>
+      <Box className="pageBox">
+        <Table selectable="multiple" onSelect={this._onMultipleSelect}>
+          {tableHeader}
+          {tableBody}
+        </Table>
+      </Box>
     );
   }
 

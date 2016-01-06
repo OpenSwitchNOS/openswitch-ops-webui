@@ -19,10 +19,13 @@ import { connect } from 'react-redux';
 
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
+import Box from 'grommet/components/Box';
 import Metric from 'metric.js';
 import DataPoint from 'dataPoint.js';
 import MetricChart from 'metricChart.jsx';
 import MetricTable from 'metricTable.jsx';
+import MetricTableChart from 'metricTableChart.jsx';
+
 
 class DemoMetricPage extends Component {
 
@@ -78,41 +81,60 @@ class DemoMetricPage extends Component {
     const chartMetric = this.state.metrics[this.state.selectedMetric];
     const dp = this.state.selectedDataPoint;
     return (
-      <div className="pageBox">
-        <Header>
-          <Title>MetricTables</Title>
-        </Header>
-        <MetricTable
-            onSelect={this._onSelectMetric}
-            widths={{label: '130px', value: '70px'}}
-            metrics={[
-              { label: 'Metric title #1', metric: this.state.metrics[0] },
-              { label: 'Metric title #2', metric: this.state.metrics[1] },
-              { label: 'Metric title #3', metric: this.state.metrics[2] },
-            ]}
-        />
-        <MetricTable
-            onSelect={this._onSelectMetric}
-            widths={{table: '500px', label: '130px', value: '70px'}}
-            metrics={[
-              { label: 'Metric title #1', metric: this.state.metrics[0] },
-              { label: 'Metric title #2', metric: this.state.metrics[1] },
-              { label: 'Metric title #3', metric: this.state.metrics[2] },
-            ]}
-        />
-        <Header>
-          <Title>MetricChart</Title>
-        </Header>
-        <MetricChart metric={chartMetric} onSelect={this._onSelectDataPoint}/>
-        <div>
-          Selected datapoint value: {dp && dp.value()}
-        </div>
-        <div>
-          Selected datapoint date: {dp && new Date(dp.ts()).toString()}
-        </div>
-        <div>
-          Selected datapoint userdata: {dp && dp.userData()}
-        </div>
+      <div>
+        <Box className="pageBox">
+          <Header>
+            <Title>MetricTables</Title>
+          </Header>
+          <MetricTable
+              onSelect={this._onSelectMetric}
+              widths={{label: '130px', value: '70px'}}
+              metrics={[
+                { label: 'Metric title #1', metric: this.state.metrics[0] },
+                { label: 'Metric title #2', metric: this.state.metrics[1] },
+                { label: 'Metric title #3', metric: this.state.metrics[2] },
+              ]}
+          />
+          <MetricTable
+              onSelect={this._onSelectMetric}
+              widths={{table: '500px', label: '130px', value: '70px'}}
+              metrics={[
+                { label: 'Metric title #1', metric: this.state.metrics[0] },
+                { label: 'Metric title #2', metric: this.state.metrics[1] },
+                { label: 'Metric title #3', metric: this.state.metrics[2] },
+              ]}
+          />
+        </Box>
+        <Box className="pageBox">
+          <Header>
+            <Title>MetricChart</Title>
+          </Header>
+          <MetricChart metric={chartMetric} onSelect={this._onSelectDataPoint}/>
+          <div>
+            Selected datapoint value: {dp && dp.value()}
+          </div>
+          <div>
+            Selected datapoint date: {dp && new Date(dp.ts()).toString()}
+          </div>
+          <div>
+            Selected datapoint userdata: {dp && dp.userData()}
+          </div>
+        </Box>
+        <Box className="pageBox">
+          <Header>
+            <Title>MetricTableChart</Title>
+          </Header>
+          <MetricTableChart
+              widths={{label: '130px', value: '70px'}}
+              metrics={[
+                { label: 'Metric title #1', metric: this.state.metrics[0] },
+                { label: 'Metric title #2', metric: this.state.metrics[1] },
+                { label: 'Metric title #3', metric: this.state.metrics[2] },
+              ]}
+              onSelectMetric={this._onSelectMetric}
+              onSelectDataPoint={this._onSelectDataPoint}
+          />
+        </Box>
       </div>
     );
   }
