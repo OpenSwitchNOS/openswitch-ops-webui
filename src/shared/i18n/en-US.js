@@ -37,8 +37,10 @@ export const MESSAGES = {
   // messages
   areYouSure: 'Are you sure?',
   confirmation: 'Confirmation',
+  date: 'Date',
   deploy: 'Deploy',
   error: 'Error',
+  facility: 'Facility',
   hostname: 'Hostname',
   id: 'ID',
   information: 'Information',
@@ -51,11 +53,12 @@ export const MESSAGES = {
   openSwitch: 'OpenSwitch',
   readAll: 'Read All',
   search: 'Search',
+  severity: 'Severity',
   state: 'State',
   status: 'Status',
   text: 'Text',
   url: 'URL',
   user: 'User',
   warning: 'Warning',
-  yes: 'Yes',
+  yes: 'Yes'
 };
