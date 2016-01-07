@@ -92,9 +92,24 @@ export function reducer(moduleState = INITIAL_STATE, action) {
 
     case FETCH_SUCCESS:
       const entities = {
-        '1': { id: 1, text: 'This is syslog with ID: 1' },
-        '2': { id: 2, text: 'This is syslog with ID: 2' },
-        '3': { id: 3, text: 'This is syslog with ID: 3' },
+        '1': {
+          severity: 1,
+          date: '2015-12-17 01:01:01',
+          facility: 'Auth',
+          text: 'This is syslog with Severity: 1'
+        },
+        '2': {
+          severity: 2,
+          date: '2015-12-17 02:02:02',
+          facility: 'System',
+          text: 'This is syslog with Severity: 2'
+        },
+        '3': {
+          severity: 3,
+          date: '2015-12-17 03:03:03',
+          facility: 'LAG',
+          text: 'This is syslog with Severity: 3'
+        }
       };
       return {
         ...moduleState,
