@@ -58,4 +58,8 @@ export const MESSAGES = {
   user: 'User',
   warning: 'Warning',
   yes: 'Yes',
+  severity: 'Severity',
+  date: 'Date',
+  facility: 'Facility',
+
 };

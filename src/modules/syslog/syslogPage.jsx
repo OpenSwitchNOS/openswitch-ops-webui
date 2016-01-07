@@ -34,7 +34,9 @@ class SyslogPage extends Component {
   constructor(props) {
     super(props);
     this.cols = [
-      { columnKey: 'id', header: t('id'), width: 100 },
+      { columnKey: 'severity', header: t('severity'), width: 20, flexGrow: 1 },
+      { columnKey: 'date', header: t('date'), width: 100, flexGrow: 1 },
+      { columnKey: 'facility', header: t('facility'), width: 20, flexGrow: 1 },
       { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
     ];
     this.state = {};
