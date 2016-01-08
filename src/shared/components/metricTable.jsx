@@ -37,7 +37,7 @@ export default class MetricTable extends Component {
       chart: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     }),
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -52,7 +52,7 @@ export default class MetricTable extends Component {
       });
       chart = (
         <Chart type="area" smooth series={[
-          { values }
+          { values, colorIndex: metric.getColorIndex() }
         ]}/>
       );
     }
@@ -68,12 +68,12 @@ export default class MetricTable extends Component {
         <td className="chartCol" style={{width: widths.chart}}>{chart}</td>
       </tr>
     );
-  }
+  };
 
   _onSelect = (idx) => {
     const fn = this.props.onSelect;
     if (fn) { fn(this.props.metrics[idx].metric, idx); }
-  }
+  };
 
   render() {
     const widths = this.props.widths;

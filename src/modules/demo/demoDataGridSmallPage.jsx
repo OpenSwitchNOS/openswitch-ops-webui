@@ -50,7 +50,7 @@ class DemoDataGridSmallPage extends Component {
 
   _onRefresh = () => {
     this.props.actions.demo.fetchIfNeeded();
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const demo = nextProps.demo;
@@ -69,11 +69,11 @@ class DemoDataGridSmallPage extends Component {
 
   _onEdit = (selection) => {
     alert(selection);
-  }
+  };
 
   _onSelectChange = (selection) => {
     alert(selection);
-  }
+  };
 
   render() {
     const demoProps = this.props.demo;

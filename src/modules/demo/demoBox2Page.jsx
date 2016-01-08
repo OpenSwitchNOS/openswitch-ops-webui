@@ -17,9 +17,9 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
-import Button from 'grommet/components/Button';
+import Box from 'grommet/components/Box';
 
-class DemoButtonPage extends Component {
+class DemoBoxPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -31,21 +31,11 @@ class DemoButtonPage extends Component {
     this.state = {};
   }
 
-  _onClick = () => {
-    alert('Clicked me!');
-  };
-
   render() {
     return (
-      <div>
-        <Button onClick={this._onClick} label="Default-Active"/>
-        <p/>
-        <Button label="Default-Disabled"/>
-        <p/>
-        <Button primary onClick={this._onClick} label="Primary"/>
-        <p/>
-        <Button primary label="Primary-Disabled"/>
-      </div>
+      <Box>
+        Hello
+      </Box>
     );
   }
 
@@ -53,4 +43,4 @@ class DemoButtonPage extends Component {
 
 const select = (state) => ({ demo: state.demo });
 
-export default connect(select)(DemoButtonPage);
+export default connect(select)(DemoBoxPage);

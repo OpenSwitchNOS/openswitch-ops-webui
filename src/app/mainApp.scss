@@ -82,26 +82,33 @@ h1, h2, h3, .headline, .title {
 
   #pageContent {
     overflow: auto;
-  }
+    // The following margin top/left (along with the .pageBox space, provides
+    // spacing between pageBox items if the items are on the same row only,
+    // when pageBox items wrap, the margin is not added.
+    margin-top: -$space;
+    margin-left: -$space;
 
-  .pageBox {
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0px 0px 3px lightgrey;
-    padding-left: $space;
-    padding-right: $space;
-    padding-top: $space/2;
-    padding-bottom: $space/2;
-    box-sizing: border-box;
-    @extend .minBox;
-    margin-bottom: $space;
-  }
+    .pageBox {
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0px 0px 3px lightgrey;
+      padding-left: $space;
+      padding-right: $space;
+      padding-top: $space/2;
+      padding-bottom: $space/2;
+      box-sizing: border-box;
+      @extend .minBox;
+      margin-top: $space;
+      margin-left: $space;
+      overflow: auto;
+    }
 
-  .pageBox + .pageBox {
-    margin-left: $space;
+    .table th {
+      font-size: 1em;
+      font-weight: bold;
+    }
   }
 }
-
 
 // Adds a continuous spin to an element (i.e. refresh icon).
 .spin {

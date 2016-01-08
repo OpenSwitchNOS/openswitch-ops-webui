@@ -131,7 +131,7 @@ export default class DataGrid extends Component {
   static defaultProps = {
     headerHeight: 40,
     rowHeight: 40,
-  }
+  };
 
   static mkFiltered(defaultDataMap, dataKeyArray, filterText) {
     if (!filterText) {
@@ -247,12 +247,12 @@ export default class DataGrid extends Component {
         this.props.onSelectChange(activeDataKeys.slice());
       }
     }
-  }
+  };
 
   _rowClassName = (rowIdx) => {
     const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
     return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
-  }
+  };
 
   _onSelectToggle = (e) => {
     const activeDataKeys = e.target.checked ?
@@ -263,7 +263,7 @@ export default class DataGrid extends Component {
     if (this.props.onSelectChange) {
       this.props.onSelectChange(activeDataKeys.slice());
     }
-  }
+  };
 
   _onHeaderSortChange = (columnKey, sortDirection) => {
     const sortingSpecs = [ {columnKey, sortDirection} ];
@@ -276,7 +276,7 @@ export default class DataGrid extends Component {
 
     const dataMap = new DataMap(this.props.data, dataKeyArray);
     this.setState({ sortingSpecs, dataMap });
-  }
+  };
 
   _onFilterChange = (text) => {
     const filterText = text.toLowerCase();
@@ -291,11 +291,11 @@ export default class DataGrid extends Component {
 
     const dataMap = new DataMap(this.props.data, dataKeyArray);
     this.setState({ filterText, dataMap });
-  }
+  };
 
   _onEditClicked = () => {
     this.props.onEdit(this.state.activeDataKeys.slice());
-  }
+  };
 
   _mkCell = (cellProps, colProps) => {
     const rowData = this.state.dataMap.getDataAt(cellProps.rowIndex);
@@ -304,7 +304,7 @@ export default class DataGrid extends Component {
       return ( <Cell {...cellProps}>{cellData}</Cell> );
     }
     return colProps.cell(cellData, cellProps, colProps);
-  }
+  };
 
   _mkColumn = (colProps, sortDirection) => {
     return (
@@ -321,7 +321,7 @@ export default class DataGrid extends Component {
           cell={cellProps => this._mkCell(cellProps, colProps)}
       />
     );
-  }
+  };
 
   render() {
     // Determine the current sort key and direction

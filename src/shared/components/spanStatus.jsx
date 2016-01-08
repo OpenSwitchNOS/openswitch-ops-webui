@@ -26,11 +26,11 @@ export default class SpanStatus extends Component {
     size: PropTypes.string,
     space: PropTypes.bool,
     value: PropTypes.string.isRequired,
-  }
+  };
 
   static defaultProps = {
     space: true,
-  }
+  };
 
   constructor(props) {
     super(props);

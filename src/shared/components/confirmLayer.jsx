@@ -34,7 +34,7 @@ export default class ConfirmLayer extends Component {
     onSubmit: PropTypes.func.isRequired,
     submitLabel: PropTypes.string,
     title: PropTypes.string,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -44,7 +44,7 @@ export default class ConfirmLayer extends Component {
   _onSubmit = (event) => {
     event.preventDefault();
     this.props.onSubmit();
-  }
+  };
 
   render() {
     return (

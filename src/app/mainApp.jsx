@@ -59,13 +59,13 @@ class MainApp extends Component {
     } else if (!act && mode === 'multiple') {
       this.props.actions.nav.showPane();
     }
-  }
+  };
 
   _onPageNavClicked = () => {
     this.props.actions.nav.showPane();
-  }
+  };
 
-  _linkPathName() {
+  _linkPathName = () => {
     const loc = this.props.location.pathname;
     const linkPath = this.props.routeToLink[loc];
     if (linkPath) {
@@ -79,7 +79,7 @@ class MainApp extends Component {
       return name.join('/');
     }
     return '/';
-  }
+  };
 
   render() {
     // The only reason we pass in the location to the NavSideBar is so that

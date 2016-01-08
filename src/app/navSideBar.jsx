@@ -108,7 +108,7 @@ class NavSideBar extends Component {
 
   _onClose = () => {
     this.props.actions.nav.hidePane();
-  }
+  };
 
   render() {
     return (

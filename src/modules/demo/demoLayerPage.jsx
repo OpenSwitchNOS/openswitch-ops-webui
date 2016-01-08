@@ -45,27 +45,27 @@ class DemoLayerPage extends Component {
 
   _onOpenInfo = () => {
     this.setState({ info: true });
-  }
+  };
 
   _onOpenError = () => {
     this.setState({ error: true });
-  }
+  };
 
   _onOpenWarning = () => {
     this.setState({ warning: true });
-  }
+  };
 
   _onOpenDialog1 = () => {
     this.setState({ dialog1: true });
-  }
+  };
 
   _onOpenDialog2 = () => {
     this.setState({ dialog2: true });
-  }
+  };
 
   _onOpenEdit = () => {
     this.setState({ edit: true });
-  }
+  };
 
   _onClose = () => {
     this.setState({ info: false });
@@ -74,12 +74,12 @@ class DemoLayerPage extends Component {
     this.setState({ dialog1: false });
     this.setState({ dialog2: false });
     this.setState({ edit: false });
-  }
+  };
 
   _onSubmit = () => {
     alert('Make it so!');
     this._onClose();
-  }
+  };
 
   render() {
     return (

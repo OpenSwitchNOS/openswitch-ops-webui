@@ -24,7 +24,7 @@ export default class BrandLogo extends Component {
   static propTypes = {
     className: PropTypes.string,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
-  }
+  };
 
   render() {
     const cns = classNames(

@@ -45,11 +45,11 @@ class DemoHeaderPage extends Component {
 
   _onClick = () => {
     alert('Do it!');
-  }
+  };
 
   _onSearch = (s) => {
     this.setState({ search: s });
-  }
+  };
 
   render() {
 

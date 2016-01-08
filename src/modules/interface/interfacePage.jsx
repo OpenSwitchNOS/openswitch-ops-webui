@@ -55,7 +55,7 @@ class InterfacePage extends Component {
 
   _onRefresh = () => {
     this.props.actions.interface.fetchIfNeeded();
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const inf = nextProps.interface;

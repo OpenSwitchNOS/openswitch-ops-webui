@@ -55,7 +55,7 @@ class DemoDataGridPage extends Component {
 
   _onRefresh = () => {
     this.props.actions.demo.fetchIfNeeded();
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const demo = nextProps.demo;
@@ -81,11 +81,11 @@ class DemoDataGridPage extends Component {
         }</i>
       </CustomCell>
     );
-  }
+  };
 
   _onEdit = (selection) => {
     alert(selection);
-  }
+  };
 
   render() {
     const demoProps = this.props.demo;

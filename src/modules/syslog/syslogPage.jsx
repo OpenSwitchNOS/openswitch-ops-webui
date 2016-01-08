@@ -48,7 +48,7 @@ class SyslogPage extends Component {
 
   _onRefresh = () => {
     this.props.actions.syslog.fetchIfNeeded();
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const syslog = nextProps.syslog;
@@ -67,7 +67,7 @@ class SyslogPage extends Component {
 
   _onClick = () => {
     this.props.actions.syslog.readAll();
-  }
+  };
 
   render() {
     const syslogProps = this.props.syslog;

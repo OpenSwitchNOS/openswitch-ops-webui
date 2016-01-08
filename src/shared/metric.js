@@ -20,6 +20,7 @@ export default class Metric {
 
   constructor(cacheSize) {
     this._cacheSize = cacheSize || Metric.CACHE_SIZE;
+    this._colorIndex = '';
     this._name = '';
     this._units = '';
     this._dataPoints = [];
@@ -30,6 +31,9 @@ export default class Metric {
   }
 
   cacheSize() { return this._cacheSize; }
+
+  setColorIndex(colorIndex) { this._colorIndex = colorIndex; return this; }
+  getColorIndex() { return this._colorIndex; }
 
   setName(name) { this._name = name; return this; }
   getName() { return this._name; }

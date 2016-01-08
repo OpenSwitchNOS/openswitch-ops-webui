@@ -34,7 +34,7 @@ class DemoTablePage extends Component {
   }
 
   _onMultipleSelect = () => {
-  }
+  };
 
   render() {
 

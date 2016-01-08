@@ -57,7 +57,7 @@ export default class ResponsiveBox extends Component {
       computedWidth: node.getBoundingClientRect().width,
       computedHeight: node.getBoundingClientRect().height,
     });
-  }
+  };
 
   render() {
     const children = React.Children.map(this.props.children, child => {

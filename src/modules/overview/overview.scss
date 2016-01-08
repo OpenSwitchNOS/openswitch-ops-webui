@@ -16,18 +16,10 @@
 
 @import "~_settings.scss";
 
-
-.metricTable {
-  .labelCol {
-    padding-left: 0px;
-    padding-right: 0px;
-  }
-  .valueCol {
-    padding-right: 0px;
-  }
-  .chartCol {
-    .chart__graphic {
-      height: 20px;
+#pageContent {
+  #overviewPage {
+    .pageBox {
+      min-width: 500px;
     }
   }
 }

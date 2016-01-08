@@ -43,11 +43,11 @@ export default class FetchToolbar extends Component {
 
   _onStatusClicked = () => {
     this.setState({ showDetail: true });
-  }
+  };
 
   _onCloseDetail = () => {
     this.setState({ showDetail: false });
-  }
+  };
 
   render() {
     const p = this.props;

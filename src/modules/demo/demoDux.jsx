@@ -14,6 +14,8 @@
     under the License.
 */
 
+import DemoBox1Page from './demoBox1Page.jsx';
+import DemoBox2Page from './demoBox2Page.jsx';
 import DemoIconPage from './demoIconPage.jsx';
 import DemoColorPage from './demoColorPage.jsx';
 import DemoHeaderPage from './demoHeaderPage.jsx';
@@ -30,6 +32,14 @@ export const MODULE = 'demo';
 
 // Optional 'NAVS' object
 export const NAVS = [
+  {
+    route: { path: '/demoBox1', component: DemoBox1Page },
+    link: { path: '/demo/box1', order: 5 }
+  },
+  {
+    route: { path: '/demoBox2', component: DemoBox2Page },
+    link: { path: '/demo/box2', order: 7 }
+  },
   {
     route: { path: '/demoIcon', component: DemoIconPage },
     link: { path: '/demo/icon', order: 10 }

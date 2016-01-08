@@ -47,7 +47,8 @@ class DemoMetricPage extends Component {
             new DataPoint(1, ts, ['msg1 msg2']),
             new DataPoint(91, ts+1000, ['msg3']),
             new DataPoint(3, ts+2000, [])
-          ]),
+          ])
+          .setColorIndex('graph-2'),
         new Metric()
           .setName('Metric #2').setUnits('GB').setThresholds(0, 500)
           .setDataPoints([
@@ -71,11 +72,11 @@ class DemoMetricPage extends Component {
       selectedMetric: idx,
       selectedDataPoint: null,
     });
-  }
+  };
 
   _onSelectDataPoint = (dp) => {
     this.setState({ selectedDataPoint: dp });
-  }
+  };
 
   render() {
     const chartMetric = this.state.metrics[this.state.selectedMetric];

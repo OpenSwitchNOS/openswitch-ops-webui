@@ -25,7 +25,7 @@ export default class MetricChart extends Component {
   static propTypes = {
     metric: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -55,7 +55,7 @@ export default class MetricChart extends Component {
     if (this.props.onSelect) {
       this.props.onSelect(dp);
     }
-  }
+  };
 
   render() {
     const len = this.props.metric.size();
@@ -75,7 +75,9 @@ export default class MetricChart extends Component {
       }
       chart = (
         <Chart
-            series={[ {values: series0} ]}
+            series={[
+              {values: series0, colorIndex: this.props.metric.getColorIndex() }
+            ]}
             type="area"
             smooth
             legend={{position: 'after'}}

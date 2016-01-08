@@ -32,6 +32,7 @@ describe('Metric', () => {
   it('constructs with defaults', () => {
     const m = new Metric();
     expect(m.cacheSize()).toEqual(Metric.CACHE_SIZE);
+    expect(m.getColorIndex()).toEqual('');
     expect(m.getName()).toEqual('');
     expect(m.getUnits()).toEqual('');
     expect(m.getDataPoints()).toEqual([]);
@@ -47,10 +48,14 @@ describe('Metric', () => {
     expect(m.cacheSize()).toEqual(3);
   });
 
-  it('constructs with name & units', () => {
-    const m = new Metric().setName('name').setUnits('units');
+  it('constructs with simple configuration', () => {
+    const m = new Metric()
+      .setName('name')
+      .setUnits('units')
+      .setColorIndex('neutral-3');
     expect(m.getName()).toEqual('name');
     expect(m.getUnits()).toEqual('units');
+    expect(m.getColorIndex()).toEqual('neutral-3');
   });
 
   it('constructs with datapoints', () => {

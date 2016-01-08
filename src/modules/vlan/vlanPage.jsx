@@ -55,7 +55,7 @@ class VlanPage extends Component {
 
   _onRefresh = () => {
     this.props.actions.vlan.fetchIfNeeded();
-  }
+  };
 
   componentWillReceiveProps(nextProps) {
     const vlan = nextProps.vlan;

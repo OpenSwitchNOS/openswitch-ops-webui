@@ -60,7 +60,7 @@ class DemoFormPage extends Component {
 
   _onSubmit = () => {
     alert('Submit!');
-  }
+  };
 
   _validate = () => {
     const user = this.state.user;
@@ -85,19 +85,19 @@ class DemoFormPage extends Component {
       }
     ];
     return Validator.validate(rules);
-  }
+  };
 
   _onChange = (e) => {
     const fn = e.target.getAttribute('name');
     const user = { ...this.state.user, [fn]: e.target.value };
     this.setState({ user, validation: this._validate() });
-  }
+  };
 
   _onChangeCheckBox = (e) => {
     const fn = e.target.getAttribute('name');
     const user = {...this.state.user, [fn]: e.target.checked };
     this.setState({ user, validation: this._validate() });
-  }
+  };
 
   _id = s => `${this.fid}_${s}`;
 

@@ -30,7 +30,7 @@ export default class StatusLayer extends Component {
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string,
     value: PropTypes.string,
-  }
+  };
 
   constructor(props) {
     super(props);

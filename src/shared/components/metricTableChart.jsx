@@ -35,7 +35,7 @@ export default class MetricTableChart extends Component {
       chart: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     }),
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -52,13 +52,13 @@ export default class MetricTableChart extends Component {
     });
     const fn = this.props.onSelectMetric;
     if (fn) { fn(metric, idx); }
-  }
+  };
 
   _onSelectDataPoint = (dp) => {
     this.setState({ selectedDataPoint: dp });
     const fn = this.props.onSelectDataPoint;
     if (fn) { fn(dp); }
-  }
+  };
 
   render() {
     const labeledMetric = this.props.metrics[this.state.selectedMetric];
