@@ -96,19 +96,25 @@ export function reducer(moduleState = INITIAL_STATE, action) {
           severity: 1,
           date: '2015-12-17 01:01:01',
           facility: 'Auth',
-          text: 'This is syslog with Severity: 1'
+          text: 'This is Alert syslog with Severity: 1'
         },
         '2': {
-          severity: 2,
+          severity: 3,
           date: '2015-12-17 02:02:02',
           facility: 'System',
-          text: 'This is syslog with Severity: 2'
+          text: 'This is Error syslog with Severity: 3'
         },
         '3': {
-          severity: 3,
+          severity: 4,
           date: '2015-12-17 03:03:03',
           facility: 'LAG',
-          text: 'This is syslog with Severity: 3'
+          text: 'This is Warning syslog with Severity: 4'
+        },
+        '4': {
+          severity: 5,
+          date: '2015-12-17 04:04:04',
+          facility: 'LLDP',
+          text: 'This is Info syslog with Severity: 5'
         }
       };
       return {
@@ -116,7 +122,7 @@ export function reducer(moduleState = INITIAL_STATE, action) {
         isFetching: false,
         lastUpdate: Date.now(),
         entities,
-        numUnread: 3,
+        numUnread: 4,
       };
 
     case READ_ALL:

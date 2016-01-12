@@ -37,6 +37,8 @@ export const MESSAGES = {
   vlan: 'VLANs',
 
   // messages
+  alert: 'Alert',
+  all: 'All',
   areYouSure: 'Are you sure?',
   confirmation: 'Confirmation',
   date: 'Date',
