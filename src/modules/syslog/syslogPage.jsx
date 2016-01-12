@@ -20,9 +20,9 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
 import ResponsiveBox from 'responsiveBox.jsx';
-import DataGrid from 'dataGrid.jsx';
+import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
-
+import SpanStatus from 'spanStatus.jsx';
 
 class SyslogPage extends Component {
 
@@ -31,10 +31,22 @@ class SyslogPage extends Component {
     syslog: PropTypes.object.isRequired,
   };
 
+  //const ALERT_SEV = 1;
+  //const ERROR_SEV = 3;
+  //const WARNING_SEV = 4;
+  //const ALL_SEV = 7;
+
   constructor(props) {
     super(props);
     this.cols = [
-      { columnKey: 'severity', header: t('severity'), width: 20, flexGrow: 1 },
+      {
+        columnKey: 'severity',
+        header: t('severity'),
+        width: 5,
+        flexGrow: 1,
+        align: 'center',
+        cell: this._onCustomCell,
+      },
       { columnKey: 'date', header: t('date'), width: 100, flexGrow: 1 },
       { columnKey: 'facility', header: t('facility'), width: 20, flexGrow: 1 },
       { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
@@ -64,6 +76,24 @@ class SyslogPage extends Component {
   componentWillUnmount() {
     this.props.actions.toolbar.clear();
   }
+
+  _onCustomCell = (cellData, cellProps) => {
+    let severity = 'ok';
+    if (cellData <= 1) {        // Alert severity
+      severity = 'error';
+    } else if (cellData <= 3) { // Error severity
+      severity = 'warning';
+    } else if (cellData <= 4) { // Warning severity
+      severity = 'unknown';
+    } else {
+      severity = 'ok';
+    }
+    return (
+      <CustomCell {...cellProps}>
+      <SpanStatus value={severity} />
+      </CustomCell>
+    );
+  };
 
   _onClick = () => {
     this.props.actions.syslog.readAll();
