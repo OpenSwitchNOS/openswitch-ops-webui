@@ -20,9 +20,9 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
 import ResponsiveBox from 'responsiveBox.jsx';
-import DataGrid from 'dataGrid.jsx';
+import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
-
+import SpanStatus from 'spanStatus.jsx';
 
 class SyslogPage extends Component {
 
@@ -34,7 +34,14 @@ class SyslogPage extends Component {
   constructor(props) {
     super(props);
     this.cols = [
-      { columnKey: 'severity', header: t('severity'), width: 20, flexGrow: 1 },
+      {
+        columnKey: 'severity',
+        header: t('severity'),
+        width: 1,
+        flexGrow: 1,
+        align: 'left',
+        cell: this._onCustomCell,
+      },
       { columnKey: 'date', header: t('date'), width: 100, flexGrow: 1 },
       { columnKey: 'facility', header: t('facility'), width: 20, flexGrow: 1 },
       { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
@@ -65,6 +72,30 @@ class SyslogPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
+  _onCustomCell = (cellData, cellProps) => {
+    let severity = 'ok';
+    let sevTitle = 'ok';
+    if (cellData <= 1) {        // Alert severity
+      severity = 'error';
+      sevTitle = 'Alert';
+    } else if (cellData <= 3) { // Error severity
+      severity = 'warning';
+      sevTitle = 'Error';
+    } else if (cellData <= 4) { // Warning severity
+      severity = 'unknown';
+      sevTitle = 'Warning';
+    } else {
+      severity = 'ok';
+      sevTitle = 'Info';
+    }
+    return (
+      <CustomCell {...cellProps}>
+      <div><SpanStatus value={severity}>{sevTitle}</SpanStatus></div>
+      </CustomCell>
+    );
+  };
+
+// TODO: Figure out action based upon button pressed
   _onClick = () => {
     this.props.actions.syslog.readAll();
   };
@@ -73,7 +104,12 @@ class SyslogPage extends Component {
     const syslogProps = this.props.syslog;
     return (
       <Box className="flex1">
-        <Button primary label={t('readAll')} onClick={this._onClick} />
+        <div>
+          <Button primary label={t('alert')} onClick={this._onClick} />
+          <Button primary label={t('error')} onClick={this._onClick} />
+          <Button primary label={t('warning')} onClick={this._onClick} />
+          <Button primary label={t('all')} onClick={this._onClick} />
+          </div>
         <p/>
         <ResponsiveBox>
           <DataGrid width={500} height={400}
