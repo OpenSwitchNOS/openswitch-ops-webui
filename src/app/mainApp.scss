@@ -61,10 +61,13 @@ h1, h2, h3, .headline, .title {
   -webkit-flex-wrap: wrap;
 }
 
-.minBox {
-  min-height: 200px;
-  min-width: 200px;
+@mixin minHxW($h: 200px, $w: 200px) {
+  min-height: $h;
+  min-width: $w;
 }
+
+.min200x200 { @include minHxW(); }
+.min200x400 { @include minHxW(200px, 400px); }
 
 #page {
   background-color: $pageBgColor;
@@ -97,7 +100,6 @@ h1, h2, h3, .headline, .title {
       padding-top: $space/2;
       padding-bottom: $space/2;
       box-sizing: border-box;
-      @extend .minBox;
       margin-top: $space;
       margin-left: $space;
       overflow: auto;

@@ -64,7 +64,7 @@ export default class MetricChart extends Component {
     if (len > 0) {
       const series0 = [];
       const xAxisData = [];
-      for (let i=0; i<len; i++) {
+      for (let i=len-1; i>=0; i--) {
         const x = i + 1;
         const dp = this.props.metric.getDataPoint(i);
         series0.push( [x, dp.value()] );

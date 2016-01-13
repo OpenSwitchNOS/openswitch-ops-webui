@@ -19,11 +19,14 @@ export const LOCALE = 'en-US';
 export const MESSAGES = {
 
   // navigation items
+  box1: 'Box Layout #1',
+  box2: 'Box Layout #2',
   button: 'Button',
   color: 'Color',
   dataGrid: 'DataGrid',
   dataGridSmall: 'DataGrid (small)',
   demo: 'Demo',
+  ecmp: 'ECMP',
   form: 'Form & Validator',
   general: 'General',
   header: 'Header & Toolbar',

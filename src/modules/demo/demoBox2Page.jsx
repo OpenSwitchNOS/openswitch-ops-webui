@@ -33,8 +33,21 @@ class DemoBoxPage extends Component {
 
   render() {
     return (
-      <Box>
-        Hello
+      <Box className="flex1">
+        <Box className="flex0 pageBox min200x400">
+          <b>Box</b>Row1 (min 200x400)
+        </Box>
+        <Box className="flex1 pageBox min200x400">
+          <b>Box</b>Row2 (min 200x400)
+          <br/>
+          This page consists of a top-level Box (column) with 2 rows.
+          The first (top) row contains a single Box that will not expand
+          vertically. The second (bottom) row contains a single expanding Box.
+          <br/>
+          Each Box should have similar background color and styling. There
+          should be even gaps between the Boxes and between the Boxes and the
+          page edges at all times.
+        </Box>
       </Box>
     );
   }
