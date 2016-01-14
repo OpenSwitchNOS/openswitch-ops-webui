@@ -30,6 +30,9 @@ export const NAVS = [
 const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
 const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
 const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
+const READ_ALERT = `${MODULE}/READ_ALERT`;
+const READ_ERROR = `${MODULE}/READ_ERROR`;
+const READ_WARNING = `${MODULE}/READ_WARNING`;
 const READ_ALL = `${MODULE}/READ_ALL`;
 
 // Optional 'ACTIONS' object
@@ -66,6 +69,18 @@ export const ACTIONS = {
     };
   },
 
+  readAlert() {
+    return { type: READ_ALERT };
+  },
+
+  readError() {
+    return { type: READ_ERROR };
+  },
+
+  readWarning() {
+    return { type: READ_WARNING };
+  },
+
   readAll() {
     return { type: READ_ALL };
   }
@@ -80,6 +95,33 @@ const INITIAL_STATE = {
   numUnread: 0,
 };
 
+const syslogData = {
+  '1': {
+    severity: 1,
+    date: '2015-12-17 01:01:01',
+    facility: 'Auth',
+    text: 'This is Alert syslog with Severity: 1'
+  },
+  '2': {
+    severity: 3,
+    date: '2015-12-17 02:02:02',
+    facility: 'System',
+    text: 'This is Error syslog with Severity: 3'
+  },
+  '3': {
+    severity: 4,
+    date: '2015-12-17 03:03:03',
+    facility: 'LAG',
+    text: 'This is Warning syslog with Severity: 4'
+  },
+  '4': {
+    severity: 5,
+    date: '2015-12-17 04:04:04',
+    facility: 'LLDP',
+    text: 'This is Info syslog with Severity: 5'
+  }
+};
+
 // Optional 'reducer' function
 export function reducer(moduleState = INITIAL_STATE, action) {
   switch (action.type) {
@@ -91,32 +133,7 @@ export function reducer(moduleState = INITIAL_STATE, action) {
       return { ...moduleState, isFetching: false, lastError: action.error };
 
     case FETCH_SUCCESS:
-      const entities = {
-        '1': {
-          severity: 1,
-          date: '2015-12-17 01:01:01',
-          facility: 'Auth',
-          text: 'This is Alert syslog with Severity: 1'
-        },
-        '2': {
-          severity: 3,
-          date: '2015-12-17 02:02:02',
-          facility: 'System',
-          text: 'This is Error syslog with Severity: 3'
-        },
-        '3': {
-          severity: 4,
-          date: '2015-12-17 03:03:03',
-          facility: 'LAG',
-          text: 'This is Warning syslog with Severity: 4'
-        },
-        '4': {
-          severity: 5,
-          date: '2015-12-17 04:04:04',
-          facility: 'LLDP',
-          text: 'This is Info syslog with Severity: 5'
-        }
-      };
+      let entities = syslogData;
       return {
         ...moduleState,
         isFetching: false,
@@ -125,8 +142,42 @@ export function reducer(moduleState = INITIAL_STATE, action) {
         numUnread: 4,
       };
 
+    case READ_ALERT:
+      entities = {
+        '1': {
+          severity: 1,
+          date: '2015-12-17 01:01:01',
+          facility: 'Auth',
+          text: 'This is Alert syslog with Severity: 1'
+        }
+      };
+      return { ...moduleState, entities, lastRead: Date.now(), numUnread: 0 };
+
+    case READ_ERROR:
+      entities = {
+        '1': {
+          severity: 3,
+          date: '2015-12-17 02:02:02',
+          facility: 'System',
+          text: 'This is Error syslog with Severity: 3'
+        }
+      };
+      return { ...moduleState, entities, lastRead: Date.now(), numUnread: 0 };
+
+    case READ_WARNING:
+      entities = {
+        '1': {
+          severity: 4,
+          date: '2015-12-17 03:03:03',
+          facility: 'LAG',
+          text: 'This is Warning syslog with Severity: 4'
+        }
+      };
+      return { ...moduleState, entities, lastRead: Date.now(), numUnread: 0 };
+
     case READ_ALL:
-      return { ...moduleState, lastRead: Date.now(), numUnread: 0 };
+      entities = syslogData;
+      return { ...moduleState, entities, lastRead: Date.now(), numUnread: 0 };
 
     default:
       return moduleState;

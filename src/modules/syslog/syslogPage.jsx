@@ -77,39 +77,56 @@ class SyslogPage extends Component {
     let sevTitle = 'ok';
     if (cellData <= 1) {        // Alert severity
       severity = 'error';
-      sevTitle = 'Alert';
+      sevTitle = 'alert';
     } else if (cellData <= 3) { // Error severity
       severity = 'warning';
-      sevTitle = 'Error';
+      sevTitle = 'error';
     } else if (cellData <= 4) { // Warning severity
       severity = 'unknown';
-      sevTitle = 'Warning';
+      sevTitle = 'warning';
     } else {
       severity = 'ok';
-      sevTitle = 'Info';
+      sevTitle = 'information';
     }
     return (
       <CustomCell {...cellProps}>
-      <div><SpanStatus value={severity}>{sevTitle}</SpanStatus></div>
+      <div><SpanStatus value={severity}>{t(sevTitle)}</SpanStatus></div>
       </CustomCell>
     );
   };
 
 // TODO: Figure out action based upon button pressed. So need to parse button
-  _onClick = () => {
-    this.props.actions.syslog.readAll();
+  _onClick = (event) => {
+    switch (event) {
+      case t('alert'):
+        this.props.actions.syslog.readAlert();
+        break;
+      case t('error'):
+        this.props.actions.syslog.readError();
+        break;
+      case t('warning'):
+        this.props.actions.syslog.readWarning();
+        break;
+      default:
+        this.props.actions.syslog.readAll();
+        break;
+    }
   };
 
   render() {
     const syslogProps = this.props.syslog;
     return (
       <Box className="flex1">
-        <div>
-          <Button primary label={t('alert')} onClick={this._onClick} />
-          <Button primary label={t('error')} onClick={this._onClick} />
-          <Button primary label={t('warning')} onClick={this._onClick} />
-          <Button primary label={t('all')} onClick={this._onClick} />
-          </div>
+        <div float="right" position="relative">
+          <Button primary label={t('alert')} onClick={this._onClick.bind(this,
+            t('alert'))} />
+          <Button primary label={t('error')} onClick={this._onClick.bind(this,
+            t('error'))} />
+          <Button primary label={t('warning')} onClick={this._onClick.bind(this,
+            t('warning'))} />
+          <Button primary label={t('all')} onClick={this._onClick.bind(this,
+            t('all'))} />
+        </div>
         <p/>
         <ResponsiveBox>
           <DataGrid width={500} height={400}
@@ -124,9 +141,9 @@ class SyslogPage extends Component {
 
 }
 
-function select(state) {
+function select(store) {
   return {
-    syslog: state.syslog,
+    syslog: store.syslog,
   };
 }
 
