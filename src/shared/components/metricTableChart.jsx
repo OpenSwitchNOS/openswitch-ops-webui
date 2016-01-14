@@ -23,10 +23,7 @@ import MetricTable from 'metricTable.jsx';
 export default class MetricTableChart extends Component {
 
   static propTypes = {
-    metrics: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string,
-      metric: PropTypes.object.isRequired,
-    })).isRequired,
+    labeledMetrics: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSelectDataPoint: PropTypes.func,
     onSelectMetric: PropTypes.func,
     widths: PropTypes.shape({
@@ -40,18 +37,18 @@ export default class MetricTableChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedMetric: 0,
+      selectedMetricIdx: 0,
       selectedDataPoint: null,
     };
   }
 
-  _onSelectMetric = (metric, idx) => {
+  _onSelectMetric = (labeledMetric, idx) => {
     this.setState({
-      selectedMetric: idx,
+      selectedMetricIdx: idx,
       selectedDataPoint: null,
     });
     const fn = this.props.onSelectMetric;
-    if (fn) { fn(metric, idx); }
+    if (fn) { fn(labeledMetric, idx); }
   };
 
   _onSelectDataPoint = (dp) => {
@@ -61,17 +58,18 @@ export default class MetricTableChart extends Component {
   };
 
   render() {
-    const labeledMetric = this.props.metrics[this.state.selectedMetric];
+    const idx = this.state.selectedMetricIdx;
+    const sel = this.props.labeledMetrics[idx];
     return (
       <div>
         <MetricTable
             onSelect={this._onSelectMetric}
             widths={this.props.widths}
-            metrics={this.props.metrics}
+            labeledMetrics={this.props.labeledMetrics}
         />
-        <div><b>{labeledMetric.label}</b></div>
+        <div><b>{sel.label()}</b></div>
         <MetricChart
-            metric={labeledMetric.metric}
+            metric={sel.metric()}
             onSelect={this._onSelectDataPoint}/>
       </div>
     );

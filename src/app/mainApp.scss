@@ -99,11 +99,33 @@ h1, h2, h3, .headline, .title {
       margin-top: $space;
       margin-left: $space;
       overflow: auto;
-    }
 
-    .table th {
-      font-size: 1em;
-      font-weight: bold;
+      // Single line for the 'hr' plain html element
+      hr {
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+      }
+
+      table {
+        margin-bottom: 0px;
+      }
+
+      table th {
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      // Property styles for plain html tables
+      table.propTable {
+        td:first-child {
+          font-weight: bold;
+          padding-right: 8px;
+        }
+        td {
+          padding-bottom: 12px;
+        }
+      }
     }
   }
 }

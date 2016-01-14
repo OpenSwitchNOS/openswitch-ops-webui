@@ -25,6 +25,7 @@ export default class MetricChart extends Component {
   static propTypes = {
     metric: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
+    size: PropTypes.string,
   };
 
   constructor(props) {
@@ -87,6 +88,7 @@ export default class MetricChart extends Component {
               data: xAxisData,
               placement: 'bottom',
             }}
+            size={this.props.size}
         />
       );
     }

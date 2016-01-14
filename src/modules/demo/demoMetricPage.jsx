@@ -21,6 +21,7 @@ import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import Metric from 'metric.js';
+import LabeledMetric from 'labeledMetric.js';
 import DataPoint from 'dataPoint.js';
 import MetricChart from 'metricChart.jsx';
 import MetricTable from 'metricTable.jsx';
@@ -38,9 +39,11 @@ class DemoMetricPage extends Component {
     super(props);
     const ts = Date.now();
     this.state = {
-      selectedMetric: 0,
+      selectedMetricIdx: 0,
       selectedDataPoint: null,
-      metrics: [
+    };
+    this.labeledMetrics = [
+      new LabeledMetric('Label #1',
         new Metric()
           .setName('Metric #1').setUnits('%')
           .setDataPoints([
@@ -48,29 +51,33 @@ class DemoMetricPage extends Component {
             new DataPoint(91, ts+1000, ['msg3']),
             new DataPoint(3, ts+2000, [])
           ])
-          .setColorIndex('graph-2'),
+          .setColorIndex('graph-2')
+      ),
+      new LabeledMetric('Label #2',
         new Metric()
           .setName('Metric #2').setUnits('GB').setThresholds(0, 500)
           .setDataPoints([
             new DataPoint(100, ts, ['msg1', 'msg2']),
             new DataPoint(50, ts+1000),
             new DataPoint(200, ts+2000)
-          ]),
+          ])
+      ),
+      new LabeledMetric('Label #3',
         new Metric()
           .setName('Metric #3').setThresholds(0, 3)
           .setDataPoints([
             new DataPoint(2.3, ts, ['msg1 msg2']),
             new DataPoint(1.1, ts+1000, ['msg3']),
             new DataPoint(0.8, ts+2000, [])
-          ]),
-      ]
-    };
+          ])
+      ),
+    ];
     this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
-  _onSelectMetric = (metric, idx) => {
+  _onSelectMetric = (labeledMetric, idx) => {
     this.setState({
-      selectedMetric: idx,
+      selectedMetricIdx: idx,
       selectedDataPoint: null,
     });
   };
@@ -80,7 +87,7 @@ class DemoMetricPage extends Component {
   };
 
   render() {
-    const chartMetric = this.state.metrics[this.state.selectedMetric];
+    const sel = this.labeledMetrics[this.state.selectedMetricIdx];
     const dp = this.state.selectedDataPoint;
     return (
       <div>
@@ -91,27 +98,21 @@ class DemoMetricPage extends Component {
           <MetricTable
               onSelect={this._onSelectMetric}
               widths={{label: '130px', value: '70px'}}
-              metrics={[
-                { label: 'Metric title #1', metric: this.state.metrics[0] },
-                { label: 'Metric title #2', metric: this.state.metrics[1] },
-                { label: 'Metric title #3', metric: this.state.metrics[2] },
-              ]}
+              labeledMetrics={this.labeledMetrics}
           />
           <MetricTable
               onSelect={this._onSelectMetric}
               widths={{table: '500px', label: '130px', value: '70px'}}
-              metrics={[
-                { label: 'Metric title #1', metric: this.state.metrics[0] },
-                { label: 'Metric title #2', metric: this.state.metrics[1] },
-                { label: 'Metric title #3', metric: this.state.metrics[2] },
-              ]}
+              labeledMetrics={this.labeledMetrics}
           />
         </Box>
         <Box pad={this.pad} className="pageBox">
           <Header>
             <Title>MetricChart</Title>
           </Header>
-          <MetricChart metric={chartMetric} onSelect={this._onSelectDataPoint}/>
+          <MetricChart
+              metric={sel.metric()}
+              onSelect={this._onSelectDataPoint}/>
           <div>
             Selected datapoint value: {dp && dp.value()}
           </div>
@@ -128,11 +129,7 @@ class DemoMetricPage extends Component {
           </Header>
           <MetricTableChart
               widths={{label: '130px', value: '70px'}}
-              metrics={[
-                { label: 'Metric title #1', metric: this.state.metrics[0] },
-                { label: 'Metric title #2', metric: this.state.metrics[1] },
-                { label: 'Metric title #3', metric: this.state.metrics[2] },
-              ]}
+              labeledMetrics={this.labeledMetrics}
               onSelectMetric={this._onSelectMetric}
               onSelectDataPoint={this._onSelectDataPoint}
           />

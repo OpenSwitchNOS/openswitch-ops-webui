@@ -14,12 +14,13 @@
     under the License.
 */
 
-@import "~_settings.scss";
+export default class LabeledMetric {
 
-// #pageContent {
-//   #overviewPage {
-//     .pageBox {
-//       min-width: 500px;
-//     }
-//   }
-// }
+  constructor(label, metric) {
+    this._label = label;
+    this._metric = metric;
+  }
+
+  label() { return this._label; }
+  metric() { return this._metric; }
+}

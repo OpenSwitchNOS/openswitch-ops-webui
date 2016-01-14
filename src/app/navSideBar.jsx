@@ -130,7 +130,7 @@ class NavSideBar extends Component {
             <div>alswitch.rose.hp.com</div>
             <br/>
             <div><b>{t('model')}</b></div>
-            <div>#X-10-power-armor</div>
+            <div>#X-01-power-armor</div>
           </Box>
           <br/>
           <Menu primary>
