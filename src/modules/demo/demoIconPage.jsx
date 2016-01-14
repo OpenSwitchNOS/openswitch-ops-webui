@@ -34,31 +34,54 @@ class DemoIconPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
   render() {
     return (
       <Box>
-        <Section colorIndex="neutral-4">
+        <Section pad={this.pad} className="pageBox" colorIndex="neutral-4">
           <BrandLogo size="small" />
           <BrandLogo size="medium" />
           <BrandLogo size="large" />
         </Section>
-        <Section colorIndex="neutral-1">
+        <Section className="pageBox" colorIndex="neutral-1">
           <EditIcon />
         </Section>
-        <Section colorIndex="neutral-2">
+        <Section className="pageBox" colorIndex="neutral-2">
           <EditIcon large />
         </Section>
-        <Section colorIndex="neutral-1">
+        <Section className="pageBox" colorIndex="neutral-1">
           <EditIcon className="tiny" />
         </Section>
-        <Section>
-          <SpanStatus value="ok">This is text gg yy ABC</SpanStatus>
+        <Section pad={this.pad} className="pageBox" >
+          <SpanStatus value="ok">
+            SpanStatus with value="ok"
+          </SpanStatus>
           <br/>
-          <SpanStatus value="error">This is text gg yy ABC</SpanStatus>
+          <SpanStatus value="critical">
+            SpanStatus with value="critical"
+          </SpanStatus>
           <br/>
-          <SpanStatus disabled value="error">Disabled</SpanStatus>
+          <SpanStatus value="warning">
+            SpanStatus with value="warning"
+          </SpanStatus>
+          <br/>
+          <SpanStatus value="unknown">
+            SpanStatus with value="unknown"
+          </SpanStatus>
+          <br/>
+          <SpanStatus value="disabled">
+            SpanStatus with value="disabled"
+          </SpanStatus>
+          <br/>
+          <SpanStatus value="label">
+            SpanStatus with value="label"
+          </SpanStatus>
+          <br/>
+          <SpanStatus disabled value="warning">
+            SpanStatus disabled with value="warning"
+          </SpanStatus>
           <br/>
           <SpanStatus value="ok">
             Loaded the page&nbsp;<TimeAgo date={new Date()}/>

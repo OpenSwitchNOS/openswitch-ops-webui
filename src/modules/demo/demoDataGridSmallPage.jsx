@@ -78,7 +78,7 @@ class DemoDataGridSmallPage extends Component {
   render() {
     const demoProps = this.props.demo;
     return (
-      <div>
+      <div className="mLeft">
         <Section>
           <DataGrid title="Full Toolbar" width={500} height={200}
               data={demoProps.entities}

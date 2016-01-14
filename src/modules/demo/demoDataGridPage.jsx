@@ -90,7 +90,7 @@ class DemoDataGridPage extends Component {
   render() {
     const demoProps = this.props.demo;
     return (
-      <Box className="flex1">
+      <Box className="mLeft flex1">
         Stuff can go here.
         <p/>
         <ResponsiveBox>

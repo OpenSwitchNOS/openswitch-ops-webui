@@ -106,7 +106,7 @@ class DemoFormPage extends Component {
     const errors = validation.errors;
     const user = this.state.user;
     return (
-      <Form onSubmit={this._onSubmit}>
+      <Form className="mLeft" onSubmit={this._onSubmit}>
         <Header>
           <h1>Add User</h1>
         </Header>

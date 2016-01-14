@@ -29,15 +29,16 @@ class DemoBoxPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
   render() {
     return (
       <Box className="flex1">
-        <Box className="flex0 pageBox min200x400">
+        <Box pad={this.pad} className="flex0 pageBox min200x400">
           <b>Box</b>Row1 (min 200x400)
         </Box>
-        <Box className="flex1 pageBox min200x400">
+        <Box pad={this.pad} className="flex1 pageBox min200x400">
           <b>Box</b>Row2 (min 200x400)
           <br/>
           This page consists of a top-level Box (column) with 2 rows.

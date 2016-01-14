@@ -17,6 +17,7 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
+import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
 
 class DemoButtonPage extends Component {
@@ -37,7 +38,7 @@ class DemoButtonPage extends Component {
 
   render() {
     return (
-      <div>
+      <Box pad={{vertical: 'large', horizontal: 'large'}} className="pageBox">
         <Button onClick={this._onClick} label="Default-Active"/>
         <p/>
         <Button label="Default-Disabled"/>
@@ -45,7 +46,7 @@ class DemoButtonPage extends Component {
         <Button primary onClick={this._onClick} label="Primary"/>
         <p/>
         <Button primary label="Primary-Disabled"/>
-      </div>
+      </Box>
     );
   }
 

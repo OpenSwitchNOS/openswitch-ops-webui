@@ -83,7 +83,7 @@ class DemoLayerPage extends Component {
 
   render() {
     return (
-      <div>
+      <div className="mLeft">
 
         <p>
           <Button label="Info" onClick={this._onOpenInfo}/>

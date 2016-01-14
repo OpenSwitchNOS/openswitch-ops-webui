@@ -65,6 +65,7 @@ class DemoMetricPage extends Component {
           ]),
       ]
     };
+    this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
   _onSelectMetric = (metric, idx) => {
@@ -83,7 +84,7 @@ class DemoMetricPage extends Component {
     const dp = this.state.selectedDataPoint;
     return (
       <div>
-        <Box className="pageBox">
+        <Box pad={this.pad} className="pageBox">
           <Header>
             <Title>MetricTables</Title>
           </Header>
@@ -106,7 +107,7 @@ class DemoMetricPage extends Component {
               ]}
           />
         </Box>
-        <Box className="pageBox">
+        <Box pad={this.pad} className="pageBox">
           <Header>
             <Title>MetricChart</Title>
           </Header>
@@ -121,7 +122,7 @@ class DemoMetricPage extends Component {
             Selected datapoint userdata: {dp && dp.userData()}
           </div>
         </Box>
-        <Box className="pageBox">
+        <Box pad={this.pad} className="pageBox">
           <Header>
             <Title>MetricTableChart</Title>
           </Header>
