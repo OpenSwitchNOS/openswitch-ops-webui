@@ -14,26 +14,27 @@
     under the License.
 */
 
-/*eslint no-console:0*/
 
 import defaults from 'superagent-defaults';
 
 const Agent = defaults();
+let prefix = null;
 
 export function agentInit(settings) {
-  const prefix = settings && (settings.prefix || '');
+  prefix = settings && settings.prefix;
   if (prefix) {
-    console.log(`Agent request prefix: ${prefix}`);
+    Agent
+      // .auth(..., ...) <- user, pwd
+      // .set(..., ...) <- headers
+      .on('request', (req) => {
+        if (req.url[0] === '/') {
+          req.url = prefix + req.url;
+        }
+      });
   }
-  Agent
-    // .auth(..., ...) <- user, pwd
-    // .set(..., ...) <- headers
-    .on('request', (req) => {
-      if (req.url[0] === '/') {
-        req.url = prefix + req.url;
-      }
-    });
 }
+
+export function getPrefix() { return prefix; }
 
 export function parseError(url, error) {
   const resp = error.response;
@@ -42,6 +43,16 @@ export function parseError(url, error) {
     status: error.status,
     title: error.message,
     msg: resp && resp.error && resp.error.message,
+  };
+}
+
+export function mkAgentHandler(url, cb) {
+  return (err, res) => {
+    if (err) {
+      const fullUrl = `${prefix || ''}${url}`;
+      return cb(parseError(fullUrl, err), res);
+    }
+    cb(null, res);
   };
 }
 
