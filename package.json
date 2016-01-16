@@ -20,6 +20,7 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
+    "async": "1.5.2",
     "classnames": "2.2.3",
     "element-resize-event": "2.0.3",
     "fixed-data-table": "0.6.0",

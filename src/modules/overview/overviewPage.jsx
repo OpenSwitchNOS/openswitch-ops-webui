@@ -128,11 +128,11 @@ class OverviewPage extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.overview.fetchIfNeeded();
+    this.props.actions.overview.fetch();
   }
 
   _onRefresh = () => {
-    this.props.actions.overview.fetchIfNeeded();
+    this.props.actions.overview.fetch();
   };
 
   componentWillReceiveProps(nextProps) {

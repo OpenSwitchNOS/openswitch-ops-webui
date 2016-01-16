@@ -14,7 +14,11 @@
     under the License.
 */
 
+import { mkFetchHandler, mkFetchReducer } from 'dux.js';
+import Agent, { mkAgentHandler } from 'agent.js';
+import Async from 'async';
 import OverviewPage from './overviewPage.jsx';
+
 
 // Required 'MODULE' name
 export const MODULE = 'overview';
@@ -23,7 +27,7 @@ export const MODULE = 'overview';
 export const NAVS = [
   {
     route: { path: '/overview', component: OverviewPage },
-    link: { path: '/overview', order: 5 }
+    link: { path: '/overview', order: 100 }
   },
 ];
 
@@ -31,73 +35,63 @@ const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
 const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
 const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
 
+const SS_BASE_URL = '/rest/v1/system/subsystems/base';
+const SYS_URL = '/rest/v1/system';
+
+const UPDATE_INTERVAL = 10000;
+
 // Optional 'ACTIONS' object
 export const ACTIONS = {
 
-  fetchRequest() {
-    return { type: FETCH_REQUEST };
-  },
-
-  fetchFailure(url, error) {
-    return { type: FETCH_FAILURE, url, error };
-  },
-
-  fetchSuccess(resp) {
-    return { type: FETCH_SUCCESS, resp };
-  },
-
-  fetchIfNeeded() {
-    return (dispatch, getState) => {
-      if (ACTIONS.shouldFetch(getState())) {
-        return dispatch(ACTIONS.fetch());
-      }
-    };
-  },
-
-  shouldFetch(state) {
-    return state || true; // hide state warning;
-  },
-
   fetch() {
-    return dispatch => {
-      dispatch(ACTIONS.fetchRequest());
-      dispatch(ACTIONS.fetchSuccess({}));
+    return (dispatch, getStoreFn) => {
+      const store = getStoreFn();
+      const now = Date.now();
+
+      if (store.isFetching || now - store.lastInfoUpdate < UPDATE_INTERVAL) {
+        return;
+      }
+
+      dispatch({ type: FETCH_REQUEST });
+
+      const handler = mkFetchHandler(dispatch, FETCH_FAILURE, FETCH_SUCCESS);
+      const ah = mkAgentHandler;
+
+      Async.parallel(
+        {
+          ssBase: (cb) => { Agent.get(SS_BASE_URL).end(ah(SS_BASE_URL, cb)); },
+          sys: (cb) => { Agent.get(SYS_URL).end(ah(SYS_URL, cb)); },
+        },
+        handler,
+      );
     };
-  },
+  }
 
 };
 
-const INITIAL_STATE = {
-  isFetching: false,
-  lastUpdate: 0,
-  lastError: null,
-  metrics: {},
-  entities: {},
-};
-
-function mkEntity(i) { return { id: i, text: `This is item ${i}` }; }
+export function setup() {
+  // TODO: special action that will get called by the framework once during
+  // TODO: initialization, setup the timer here.
+}
 
 // Optional 'reducer' function
-export function reducer(moduleState = INITIAL_STATE, action) {
-  switch (action.type) {
-
-    case FETCH_REQUEST:
-      return { ...moduleState, isFetching: true };
-
-    case FETCH_FAILURE:
-      return { ...moduleState, isFetching: false, lastError: action.error };
-
-    case FETCH_SUCCESS:
-      const entities = {};
-      for (let i=1; i<=15; i++) { entities[i] = mkEntity(i); }
-      return {
-        ...moduleState,
-        isFetching: false,
-        lastUpdate: Date.now(),
-        entities,
-      };
-
-    default:
-      return moduleState;
+export const reducer = mkFetchReducer(
+  MODULE,
+  { FETCH_REQUEST, FETCH_FAILURE, FETCH_SUCCESS },
+  {
+    info: {
+      initialValue: {},
+      protectedParser: (result) => {
+        return {
+          hostName: result.sys.body.configuration,
+        };
+      },
+    },
+    // metrics: {
+    //   initialValue: {},
+    //   protectedParser: (result) => {
+    //     return {};
+    //   },
+    // }
   }
-}
+);
