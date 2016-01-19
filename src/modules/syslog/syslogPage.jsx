@@ -36,11 +36,19 @@ class SyslogPage extends Component {
     this.cols = [
       {
         columnKey: 'severity',
-        header: t('severity'),
-        width: 1,
+        header: '',
+        width: 10,
         flexGrow: 1,
         align: 'left',
-        cell: this._onCustomCell,
+        cell: this._onIconCell,
+      },
+      {
+        columnKey: 'severity',
+        header: t('severity'),
+        width: 10,
+        flexGrow: 1,
+        align: 'left',
+        cell: this._onSeverityCell,
       },
       { columnKey: 'date', header: t('date'), width: 100, flexGrow: 1 },
       { columnKey: 'facility', header: t('facility'), width: 20, flexGrow: 1 },
@@ -72,44 +80,77 @@ class SyslogPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onCustomCell = (cellData, cellProps) => {
+  _onIconCell = (cellData, cellProps) => {
     let severity = 'ok';
-    let sevTitle = 'ok';
-    if (cellData <= 1) {        // Alert severity
-      severity = 'error';
-      sevTitle = 'Alert';
-    } else if (cellData <= 3) { // Error severity
+    if (cellData >=0 && cellData <= 3) {        // Critical severity
+      severity = 'critical';
+    } else if (cellData >=4 && cellData <= 5) { // Warning severity
       severity = 'warning';
-      sevTitle = 'Error';
-    } else if (cellData <= 4) { // Warning severity
-      severity = 'unknown';
-      sevTitle = 'Warning';
     } else {
       severity = 'ok';
-      sevTitle = 'Info';
     }
     return (
       <CustomCell {...cellProps}>
-      <div><SpanStatus value={severity}>{sevTitle}</SpanStatus></div>
+      <div><SpanStatus value={severity} /></div>
       </CustomCell>
     );
   };
 
-// TODO: Figure out action based upon button pressed. So need to parse button
-  _onClick = () => {
-    this.props.actions.syslog.readAll();
+  _onSeverityCell = (cellData, cellProps) => {
+    let text = t('info');
+    switch (cellData) {
+      case 0:
+        text = t('emerg');
+        break;
+      case 1:
+        text = t('alert');
+        break;
+      case 2:
+        text = t('critical');
+        break;
+      case 3:
+        text = t('error');
+        break;
+      case 4:
+        text = t('warning');
+        break;
+      case 5:
+        text = t('notice');
+        break;
+      case 6:
+        text = t('info');
+        break;
+      case 7:
+        text = t('debug');
+        break;
+      default:
+        text = t('info');
+        break;
+    }
+
+    return (
+      <CustomCell {...cellProps}>
+      {text}
+      </CustomCell>
+    );
+  };
+
+  _onClick = (event) => {
+    this.props.actions.syslog.fetch(event);
   };
 
   render() {
     const syslogProps = this.props.syslog;
     return (
       <Box className="flex1">
-        <div>
-          <Button primary label={t('alert')} onClick={this._onClick} />
-          <Button primary label={t('error')} onClick={this._onClick} />
-          <Button primary label={t('warning')} onClick={this._onClick} />
-          <Button primary label={t('all')} onClick={this._onClick} />
-          </div>
+        <div float="right" position="relative">
+          <Button primary label={t('critical')} onClick={this._onClick.bind(this,
+            t('critical'))} />
+          <Button primary label={t('warning')} onClick={this._onClick.bind(this,
+            t('warning'))} />
+          <Button primary label={t('all')} onClick={this._onClick.bind(this,
+            t('all'))} />
+        </div>
         <p/>
         <ResponsiveBox>
           <DataGrid width={500} height={400}
@@ -121,12 +162,11 @@ class SyslogPage extends Component {
       </Box>
     );
   }
-
 }
 
-function select(state) {
+function select(store) {
   return {
-    syslog: state.syslog,
+    syslog: store.syslog,
   };
 }
 
