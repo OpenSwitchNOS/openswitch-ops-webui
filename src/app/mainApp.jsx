@@ -30,24 +30,55 @@ import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
 import NotificationIcon from 'grommet/components/icons/base/Notification';
 
+import LoginLayer from 'loginLayer.jsx';
+
 import NavSideBar from './navSideBar.jsx';
+
+
+const AUTO_ACTIONS_INTERVAL = 10000;
 
 class MainApp extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    auth: PropTypes.object.isRequired,
+    autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
-    location: PropTypes.object,
-    nav: PropTypes.object,
-    routeToLink: PropTypes.object,
-    status: PropTypes.object,
-    syslog: PropTypes.object,
-    toolbar: PropTypes.object,
+    location: PropTypes.object.isRequired,
+    nav: PropTypes.object.isRequired,
+    routeToLink: PropTypes.object.isRequired,
+    syslog: PropTypes.object.isRequired,
+    toolbar: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
+    this.autoActionsTimer = null;
     this.state = {};
+  }
+
+  _invokeAutoActions = () => {
+    const aaModules = this.props.autoActions;
+    Object.getOwnPropertyNames(aaModules).forEach(moduleKey => {
+      const aa = aaModules[moduleKey];
+      Object.getOwnPropertyNames(aa).forEach(k => { aa[k](); });
+    });
+  };
+
+  _onAutoActionTimer = () => { this._invokeAutoActions(); };
+
+  componentWillReceiveProps(newProps) {
+    const wasLoggedIn = this.props.auth.isLoggedIn;
+    const isLoggedIn = newProps.auth.isLoggedIn;
+    if (wasLoggedIn !== isLoggedIn) {
+      if (this.autoActionsTimer) { clearInterval(this.autoActionsTimer); }
+      if (isLoggedIn) {
+        this._invokeAutoActions();
+        this.autoActionsTimer = setInterval(
+          this._onAutoActionTimer, AUTO_ACTIONS_INTERVAL
+        );
+      }
+    }
   }
 
   // Called when a responsive change happens on the main Split component.
@@ -72,13 +103,15 @@ class MainApp extends Component {
       const name = [];
       const parts = linkPath.split('/');
       parts.forEach(p => {
-        if (p) {
-          name.push(t(p));
-        }
+        if (p) { name.push(t(p)); }
       });
       return name.join('/');
     }
     return '/';
+  };
+
+  _onLoginSubmit = () => {
+    this.props.actions.auth.login();
   };
 
   render() {
@@ -89,7 +122,7 @@ class MainApp extends Component {
       <NavSideBar location={this.props.location} actions={this.props.actions}/>
       : null;
 
-    const numSyslog = this.props.syslog.numUnread;
+    const numSyslog = 0; // FIXME: this.props.syslog.numUnread;
 
     const pageHdr = (
       <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
@@ -116,27 +149,34 @@ class MainApp extends Component {
       </Box>
     );
 
+    const splitContent = (
+      <Split flex="right" onResponsive={this._onNavSplitResponsive}
+          priority="left">
+        {nav}
+        <Box id="page">
+          {pageHdr}
+          {page}
+        </Box>
+      </Split>
+    );
+
+    const login = <LoginLayer onSubmit={this._onLoginSubmit}/>;
+
     return (
       <App centered={false}>
-        <Split flex="right" onResponsive={this._onNavSplitResponsive}
-            priority="left">
-          {nav}
-          <Box id="page">
-            {pageHdr}
-            {page}
-          </Box>
-        </Split>
+        {this.props.auth.isLoggedIn ? splitContent : login}
       </App>
     );
   }
 
 }
 
-const select = (state) => ({
-  nav: state.nav,
-  routeToLink: state.routeToLink,
-  toolbar: state.toolbar,
-  syslog: state.syslog,
+const select = (store) => ({
+  auth: store.auth,
+  nav: store.nav,
+  routeToLink: store.routeToLink,
+  toolbar: store.toolbar,
+  syslog: store.syslog,
 });
 
 export default connect(select)(MainApp);

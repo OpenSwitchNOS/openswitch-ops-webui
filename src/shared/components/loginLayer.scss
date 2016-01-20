@@ -14,35 +14,9 @@
     under the License.
 */
 
-const NAME = 'nav';
-const SHOW_PANE = `${NAME}/SHOW_PANE`;
-const HIDE_PANE = `${NAME}/HIDE_PANE`;
+@import "~_settings.scss";
 
-const ACTIONS = {
-  showPane() { return { type: SHOW_PANE }; },
-  hidePane() { return { type: HIDE_PANE }; },
-};
 
-const INITIAL_STORE = {
-  paneActive: false,
-};
-
-function REDUCER(moduleStore = INITIAL_STORE, action) {
-  switch (action.type) {
-
-    case SHOW_PANE:
-      return { ...moduleStore, paneActive: true };
-
-    case HIDE_PANE:
-      return { ...moduleStore, paneActive: false };
-
-    default:
-      return moduleStore;
-  }
+#loginLayer {
+  background-image: radial-gradient(circle at top, #fff, #000 100%, rgba(128, 128, 128, 0.6));
 }
-
-export default {
-  NAME,
-  ACTIONS,
-  REDUCER,
-};

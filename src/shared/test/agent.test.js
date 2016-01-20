@@ -14,7 +14,7 @@
     under the License.
 */
 
-/*global describe, beforeAll, afterAll, it, expect */
+/*global describe, beforeAll, afterAll, afterEach, it, expect */
 /*eslint no-undefined:0*/
 
 import Agent, {
@@ -50,6 +50,10 @@ describe('agent', () => {
     AgentMock.unset();
   });
 
+  afterEach(() => {
+    agentInit('');
+  });
+
   it('gets mock server data for /data1', () => {
     Agent.get('https://test.com/data1', (err, res) => {
       expect(err).toBeNull();
@@ -58,12 +62,16 @@ describe('agent', () => {
   });
 
   it('injects a prefix for URLs', () => {
-    expect(getPrefix()).toBeNull();
+    expect(getPrefix()).toEqual('');
     agentInit({ prefix: 'https://test.com' });
     expect(getPrefix()).toEqual('https://test.com');
     Agent.get('/data1', (err, res) => {
       expect(res.body).toEqual('DATA1');
     });
+  });
+
+  it('clears prefix after each test', () => {
+    expect(getPrefix()).toEqual('');
   });
 
   it('parses errors with various responses', () => {

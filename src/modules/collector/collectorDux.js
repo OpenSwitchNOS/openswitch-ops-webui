@@ -14,35 +14,39 @@
     under the License.
 */
 
-const NAME = 'nav';
-const SHOW_PANE = `${NAME}/SHOW_PANE`;
-const HIDE_PANE = `${NAME}/HIDE_PANE`;
+import Dux from 'dux.js';
 
-const ACTIONS = {
-  showPane() { return { type: SHOW_PANE }; },
-  hidePane() { return { type: HIDE_PANE }; },
+const NAME = 'collector';
+
+const URLS = [
+  '/rest/v1/system/subsystems/base',
+  '/rest/v1/system',
+];
+
+const AUTO_ACTIONS = {
+  fetch() {
+    return Dux.fetchAction(NAME, URLS);
+  }
 };
 
 const INITIAL_STORE = {
-  paneActive: false,
+  info: {},
+  interfaces: {},
 };
 
-function REDUCER(moduleStore = INITIAL_STORE, action) {
-  switch (action.type) {
-
-    case SHOW_PANE:
-      return { ...moduleStore, paneActive: true };
-
-    case HIDE_PANE:
-      return { ...moduleStore, paneActive: false };
-
-    default:
-      return moduleStore;
-  }
+function parseResult(result) {
+  const sys = result[1];
+  return {
+    info: {
+      hostName: sys.body.configuration.hostname,
+    },
+  };
 }
+
+const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
 
 export default {
   NAME,
-  ACTIONS,
+  AUTO_ACTIONS,
   REDUCER,
 };

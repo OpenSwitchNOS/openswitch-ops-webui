@@ -41,9 +41,9 @@ class DemoIconPage extends Component {
     return (
       <Box>
         <Section pad={this.pad} className="pageBox" colorIndex="neutral-4">
-          <BrandLogo size="small" />
-          <BrandLogo size="medium" />
-          <BrandLogo size="large" />
+          <BrandLogo size="small" lightColor="grey" />
+          <BrandLogo size="medium" lightColor="grey" />
+          <BrandLogo size="large" lightColor="grey" />
         </Section>
         <Section className="pageBox" colorIndex="neutral-1">
           <EditIcon />
@@ -93,6 +93,6 @@ class DemoIconPage extends Component {
 
 }
 
-const select = (state) => ({ demo: state.demo });
+const select = (store) => ({ demo: store.demo });
 
 export default connect(select)(DemoIconPage);

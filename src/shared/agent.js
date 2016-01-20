@@ -18,20 +18,18 @@
 import defaults from 'superagent-defaults';
 
 const Agent = defaults();
-let prefix = null;
+let prefix = '';
 
 export function agentInit(settings) {
-  prefix = settings && settings.prefix;
-  if (prefix) {
-    Agent
-      // .auth(..., ...) <- user, pwd
-      // .set(..., ...) <- headers
-      .on('request', (req) => {
-        if (req.url[0] === '/') {
-          req.url = prefix + req.url;
-        }
-      });
-  }
+  prefix = (settings && settings.prefix) || '';
+  Agent
+    // .auth(..., ...) <- user, pwd
+    // .set(..., ...) <- headers
+    .on('request', (req) => {
+      if (req.url[0] === '/') {
+        req.url = prefix + req.url;
+      }
+    });
 }
 
 export function getPrefix() { return prefix; }
@@ -49,7 +47,7 @@ export function parseError(url, error) {
 export function mkAgentHandler(url, cb) {
   return (err, res) => {
     if (err) {
-      const fullUrl = `${prefix || ''}${url}`;
+      const fullUrl = `${prefix}${url}`;
       return cb(parseError(fullUrl, err), res);
     }
     cb(null, res);

@@ -14,17 +14,21 @@
     under the License.
 */
 
+import './loginLayer.scss';
+
 import React, { PropTypes, Component } from 'react';
-import { connect } from 'react-redux';
+import LoginForm from 'grommet/components/LoginForm';
+import Layer from 'grommet/components/Layer';
 
-import Box from 'grommet/components/Box';
-import Button from 'grommet/components/Button';
+import { t } from 'i18n/lookup.js';
 
-class DemoButtonPage extends Component {
+import BrandLogo from 'brandLogo.jsx';
+
+
+export default class LoginLayer extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
-    demo: PropTypes.object,
+    onSubmit: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -32,26 +36,16 @@ class DemoButtonPage extends Component {
     this.state = {};
   }
 
-  _onClick = () => {
-    alert('Clicked me!');
-  };
-
   render() {
     return (
-      <Box pad={{vertical: 'large', horizontal: 'large'}} className="pageBox">
-        <Button onClick={this._onClick} label="Default-Active"/>
-        <p/>
-        <Button label="Default-Disabled"/>
-        <p/>
-        <Button primary onClick={this._onClick} label="Primary"/>
-        <p/>
-        <Button primary label="Primary-Disabled"/>
-      </Box>
+      <Layer id="loginLayer" flush align="top">
+        <LoginForm
+            logo={<BrandLogo size="large" lightColor="grey"/>}
+            title={t('openSwitch')}
+            onSubmit={this.props.onSubmit}
+        />
+      </Layer>
     );
   }
 
 }
-
-const select = (store) => ({ demo: store.demo });
-
-export default connect(select)(DemoButtonPage);

@@ -114,6 +114,6 @@ class DemoHeaderPage extends Component {
 
 }
 
-const select = (state) => ({ demo: state.demo });
+const select = (store) => ({ demo: store.demo });
 
 export default connect(select)(DemoHeaderPage);

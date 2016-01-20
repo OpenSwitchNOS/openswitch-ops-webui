@@ -14,84 +14,18 @@
     under the License.
 */
 
-import { mkFetchHandler, mkFetchReducer } from 'dux.js';
-import Agent, { mkAgentHandler } from 'agent.js';
-import Async from 'async';
 import OverviewPage from './overviewPage.jsx';
 
+const NAME = 'overview';
 
-// Required 'MODULE' name
-export const MODULE = 'overview';
-
-// Optional 'NAVS' object
-export const NAVS = [
+const NAVS = [
   {
     route: { path: '/overview', component: OverviewPage },
     link: { path: '/overview', order: 100 }
   },
 ];
 
-const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
-
-const SS_BASE_URL = '/rest/v1/system/subsystems/base';
-const SYS_URL = '/rest/v1/system';
-
-const UPDATE_INTERVAL = 10000;
-
-// Optional 'ACTIONS' object
-export const ACTIONS = {
-
-  fetch() {
-    return (dispatch, getStoreFn) => {
-      const store = getStoreFn();
-      const now = Date.now();
-
-      if (store.isFetching || now - store.lastInfoUpdate < UPDATE_INTERVAL) {
-        return;
-      }
-
-      dispatch({ type: FETCH_REQUEST });
-
-      const handler = mkFetchHandler(dispatch, FETCH_FAILURE, FETCH_SUCCESS);
-      const ah = mkAgentHandler;
-
-      Async.parallel(
-        {
-          ssBase: (cb) => { Agent.get(SS_BASE_URL).end(ah(SS_BASE_URL, cb)); },
-          sys: (cb) => { Agent.get(SYS_URL).end(ah(SYS_URL, cb)); },
-        },
-        handler,
-      );
-    };
-  }
-
+export default {
+  NAME,
+  NAVS,
 };
-
-export function setup() {
-  // TODO: special action that will get called by the framework once during
-  // TODO: initialization, setup the timer here.
-}
-
-// Optional 'reducer' function
-export const reducer = mkFetchReducer(
-  MODULE,
-  { FETCH_REQUEST, FETCH_FAILURE, FETCH_SUCCESS },
-  {
-    info: {
-      initialValue: {},
-      protectedParser: (result) => {
-        return {
-          hostName: result.sys.body.configuration,
-        };
-      },
-    },
-    // metrics: {
-    //   initialValue: {},
-    //   protectedParser: (result) => {
-    //     return {};
-    //   },
-    // }
-  }
-);

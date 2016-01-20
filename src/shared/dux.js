@@ -16,52 +16,58 @@
 
 /*eslint no-console:0*/
 
-export function mkFetchHandler(dispatch, failureType, successType) {
-  return (error, result) => {
-    if (error) {
-      dispatch({ type: failureType, error });
-    } else {
-      dispatch({ type: successType, result });
-    }
+import Agent, { mkAgentHandler } from 'agent.js';
+import Async from 'async';
+
+
+const FETCH_INITIAL_STORE = {
+  isFetching: false,
+  lastUpdate: 0,
+  lastError: null,
+};
+
+function fetchActionTypes(moduleName) {
+  return {
+    REQUEST: `${moduleName}/FETCH_REQUEST`,
+    SUCCESS: `${moduleName}/FETCH_SUCCESS`,
+    FAILURE: `${moduleName}/FETCH_FAILURE`,
   };
 }
 
-export function mkFetchReducer(module, actions, specs) {
-
-  const initialStore = {
-    isFetching: false,
-    lastUpdate: 0,
-    lastError: null,
-  };
-
-  Object.getOwnPropertyNames(specs).forEach(k => {
-    initialStore[k] = specs[k].initialValue;
-  });
-
-  function processProtectedParsers(result) {
-    const store = {};
-    Object.getOwnPropertyNames(specs).forEach(k => {
-      try {
-        store[k] = specs[k].protectedParser(result);
-      } catch (e) {
-        console.log(`DUX parsing failure in: ${module}, key: ${k}`);
-        console.log(`Exception message: ${e.message}`);
-      }
-    });
-    return store;
+function protectedParse(moduleName, moduleParseFn, result) {
+  try {
+    return moduleParseFn(result);
+  } catch (e) {
+    console.log(`DUX parsing failure in: ${moduleName}`);
+    console.log(`Exception message: ${e.message}`);
   }
+  return {};
+}
 
-  return (moduleStore = initialStore, action) => {
+function fetchReducer(moduleName, moduleInitialStore, moduleParseFn) {
+  const ACTION_TYPES = fetchActionTypes(moduleName);
+  const INITIAL_STORE = { ...FETCH_INITIAL_STORE, ...moduleInitialStore };
+
+  return (moduleStore = INITIAL_STORE, action) => {
     switch (action.type) {
 
-      case actions.FETCH_REQUEST:
-        return { ...moduleStore, isFetching: true };
+      case ACTION_TYPES.REQUEST:
+        return {
+          ...moduleStore,
+          isFetching: true
+        };
 
-      case actions.FETCH_FAILURE:
-        return { ...moduleStore, isFetching: false, lastError: action.error };
+      case ACTION_TYPES.FAILURE:
+        return {
+          ...moduleStore,
+          isFetching: false,
+          lastError: action.error
+        };
 
-      case actions.FETCH_SUCCESS:
-        const fetchedStore = processProtectedParsers(action.result);
+      case ACTION_TYPES.SUCCESS:
+        const fetchedStore =
+          protectedParse(moduleName, moduleParseFn, action.result);
+
         return {
           ...moduleStore,
           isFetching: false,
@@ -75,3 +81,54 @@ export function mkFetchReducer(module, actions, specs) {
     }
   };
 }
+
+const DEBOUNCE_INTERVAL = 3000;
+
+function isReadyToFetch(store, now) {
+  return !store.isFetching && (now - store.lastUpdate) > DEBOUNCE_INTERVAL;
+}
+
+function performFetch(actionTypes, dispatch, urls) {
+  dispatch({ type: actionTypes.REQUEST });
+
+  function dispatcher(error, result) {
+    if (error) {
+      dispatch({ type: actionTypes.FAILURE, error });
+    } else {
+      dispatch({ type: actionTypes.SUCCESS, result });
+    }
+  }
+
+  if (Array.isArray(urls)) {
+    const gets = [];
+    urls.forEach(url => {
+      gets.push(cb => Agent.get(url).end(mkAgentHandler(url, cb)));
+    });
+    Async.parallel(gets, dispatcher);
+
+  } else {
+    const url = urls;
+    Agent.get(url).end(mkAgentHandler(url, dispatcher));
+  }
+}
+
+function fetchAction(moduleName, urls) {
+  const ACTION_TYPES = fetchActionTypes(moduleName);
+
+  return (dispatch, getStoreFn) => {
+    const store = getStoreFn()[moduleName];
+    if (isReadyToFetch(store, Date.now())) {
+      performFetch(ACTION_TYPES, dispatch, urls);
+    }
+  };
+}
+
+export default {
+  fetchActionTypes,
+  fetchAction,
+  fetchReducer,
+
+  isReadyToFetch,
+  protectedParse,
+  performFetch,
+};

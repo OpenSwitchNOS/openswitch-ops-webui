@@ -14,27 +14,27 @@
     under the License.
 */
 
-const NAME = 'nav';
-const SHOW_PANE = `${NAME}/SHOW_PANE`;
-const HIDE_PANE = `${NAME}/HIDE_PANE`;
+const NAME = 'auth';
+const LOGIN = `${NAME}/LOGIN`;
+const LOGOUT = `${NAME}/LOGOUT`;
 
 const ACTIONS = {
-  showPane() { return { type: SHOW_PANE }; },
-  hidePane() { return { type: HIDE_PANE }; },
+  login() { return { type: LOGIN }; },
+  logout() { return { type: LOGOUT }; },
 };
 
 const INITIAL_STORE = {
-  paneActive: false,
+  isLoggedIn: false
 };
 
 function REDUCER(moduleStore = INITIAL_STORE, action) {
   switch (action.type) {
 
-    case SHOW_PANE:
-      return { ...moduleStore, paneActive: true };
+    case LOGIN:
+      return { ...moduleStore, isLoggedIn: true };
 
-    case HIDE_PANE:
-      return { ...moduleStore, paneActive: false };
+    case LOGOUT:
+      return { ...moduleStore, isLoggedIn: false };
 
     default:
       return moduleStore;

@@ -36,7 +36,8 @@ class OverviewPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    overview: PropTypes.object.isRequired,
+    autoActions: PropTypes.object.isRequred,
+    collector: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -128,21 +129,21 @@ class OverviewPage extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.overview.fetch();
+    this.props.autoActions.collector.fetch();
   }
 
   _onRefresh = () => {
-    this.props.actions.overview.fetch();
+    this.props.autoActions.collector.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
-    const overview = nextProps.overview;
+    const collector = nextProps.collector;
     this.props.actions.toolbar.set(
       <FetchToolbar
-          isFetching={overview.isFetching}
-          error={overview.lastError}
-          date={overview.lastUpdate}
-          onRefresh={overview._onRefresh}/>
+          isFetching={collector.isFetching}
+          error={collector.lastError}
+          date={collector.lastUpdate}
+          onRefresh={this._onRefresh}/>
     );
   }
 
@@ -160,7 +161,7 @@ class OverviewPage extends Component {
         <tbody>
           <tr>
             <td>{t('productName')}:</td>
-            <td>TBD</td>
+            <td>{this.props.collector.info.hostName}</td>
           </tr>
           <tr>
             <td>{t('serialNumber')}:</td>
@@ -600,9 +601,9 @@ class OverviewPage extends Component {
 
 }
 
-function select(state) {
+function select(store) {
   return {
-    overview: state.overview,
+    collector: store.collector,
   };
 }
 

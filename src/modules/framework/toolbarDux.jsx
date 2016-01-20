@@ -14,33 +14,35 @@
     under the License.
 */
 
-// Required 'MODULE' name
-export const MODULE = 'toolbar';
+const NAME = 'toolbar';
+const CLEAR = `${NAME}/CLEAR`;
+const SET = `${NAME}/SET`;
 
-const CLEAR = `${MODULE}/CLEAR`;
-const SET = `${MODULE}/SET`;
-
-// Optional 'ACTIONS' object
-export const ACTIONS = {
+const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
 };
 
-const INITIAL_STATE = {
+const INITIAL_STORE = {
   component: null,
 };
 
-// Optional 'reducer' function
-export function reducer(moduleState = INITIAL_STATE, action) {
+function REDUCER(moduleStore = INITIAL_STORE, action) {
   switch (action.type) {
 
     case CLEAR:
-      return { ...INITIAL_STATE };
+      return { ...INITIAL_STORE };
 
     case SET:
       return { component: action.component };
 
     default:
-      return moduleState;
+      return moduleStore;
   }
 }
+
+export default {
+  NAME,
+  ACTIONS,
+  REDUCER,
+};

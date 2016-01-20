@@ -45,11 +45,11 @@ class DemoDataGridSmallPage extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.demo.fetchIfNeeded();
+    this.props.actions.demo.fetch();
   }
 
   _onRefresh = () => {
-    this.props.actions.demo.fetchIfNeeded();
+    this.props.actions.demo.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
@@ -107,6 +107,6 @@ class DemoDataGridSmallPage extends Component {
 
 }
 
-const select = (state) => ({ demo: state.demo });
+const select = (store) => ({ demo: store.demo });
 
 export default connect(select)(DemoDataGridSmallPage);

@@ -32,13 +32,15 @@ import { createNavModel, createRouteElements } from './navModel.jsx';
 import { setLocale } from 'i18n/lookup.js';
 import { agentInit } from 'agent.js';
 
-import * as navDux from 'framework/navDux.jsx';
-import * as toolbarDux from 'framework/toolbarDux.jsx';
+import NavDux from 'framework/navDux.jsx';
+import ToolbarDux from 'framework/toolbarDux.jsx';
+import AuthDux from 'framework/authDux.jsx';
 
 import MainApp from './mainApp.jsx';
 
 let store;
 let actions;
+let autoActions;
 let routes;
 
 // Based on the modules loaded by the BuildConfig, we look for the well known
@@ -48,10 +50,10 @@ let routes;
 function createReducers(BuildConfig) {
   const modules = BuildConfig.modules;
   const reducers = {
-    links: (state = {}) => { return state; },
-    routeToLink: (state = {}) => { return state; },
+    links: (moduleStore = {}) => { return moduleStore; },
+    routeToLink: (moduleStore = {}) => { return moduleStore; },
   };
-  modules.forEach(i => reducers[i.MODULE] = i.reducer);
+  modules.forEach(i => reducers[i.NAME] = i.REDUCER);
   return combineReducers(reducers);
 }
 
@@ -64,7 +66,22 @@ function createActions(BuildConfig, s) {
   const result = {};
   modules.forEach(i => {
     if (i.ACTIONS) {
-      result[i.MODULE] = bindActionCreators(i.ACTIONS, s.dispatch);
+      result[i.NAME] = bindActionCreators(i.ACTIONS, s.dispatch);
+    }
+  });
+  return result;
+}
+
+// Based on the modules loaded by the BuildConfig, we look for the well known
+// 'MODULE' string and 'AUTO_ACTIONS' object, and create a combinded object
+// that we later call periodically in the background.
+
+function createAutoActions(BuildConfig, s) {
+  const modules = BuildConfig.modules;
+  const result = {};
+  modules.forEach(i => {
+    if (i.AUTO_ACTIONS) {
+      result[i.NAME] = bindActionCreators(i.AUTO_ACTIONS, s.dispatch);
     }
   });
   return result;
@@ -94,8 +111,9 @@ export function mainInit(BuildConfig) {
   setLocale(BuildConfig.settings.i18nLocale);
   agentInit(BuildConfig.settings.agent);
 
-  BuildConfig.modules.splice(0, 0, navDux);
-  BuildConfig.modules.splice(0, 0, toolbarDux);
+  BuildConfig.modules.splice(0, 0, NavDux);
+  BuildConfig.modules.splice(0, 0, ToolbarDux);
+  BuildConfig.modules.splice(0, 0, AuthDux);
 
   const navModel = createNavModel(BuildConfig, MainApp);
   const initStore = {
@@ -105,6 +123,7 @@ export function mainInit(BuildConfig) {
 
   store = createReducersAndStore(BuildConfig, initStore);
   actions = createActions(BuildConfig, store);
+  autoActions = createAutoActions(BuildConfig, store);
   routes = createRouteElements(navModel);
 }
 
@@ -113,7 +132,9 @@ export function mainInit(BuildConfig) {
 // Any route component will have 'this.props.actions.<module>.<fn>' available.
 
 function createElement(RouteComponent, props) {
-  return <RouteComponent {...props} actions={actions} />;
+  return (
+    <RouteComponent {...props} actions={actions} autoActions={autoActions} />
+  );
 }
 
 export default class Main extends Component {

@@ -139,7 +139,7 @@ class NavSideBar extends Component {
         </Box>
         <Footer pad="medium" align="center">
           <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
-            <a href="#/demoColor">{t('logout')}</a>
+            <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
           </Menu>
           <span>jpowell</span>
         </Footer>
