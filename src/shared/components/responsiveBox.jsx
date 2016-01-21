@@ -20,11 +20,13 @@ import React, { PropTypes, Component } from 'react';
 import ReactDOM from 'react-dom';
 import elementResizeEvent from 'element-resize-event';
 import Box from 'grommet/components/Box';
+import classNames from 'classnames';
 
 export default class ResponsiveBox extends Component {
 
   static propTypes = {
     children: PropTypes.node,
+    className: PropTypes.string,
   };
 
   constructor(props) {
@@ -67,8 +69,10 @@ export default class ResponsiveBox extends Component {
       });
     });
 
+    const cns = classNames('minBox', 'flex1', this.props.className);
+
     return (
-      <Box className="minBox flex1" {...this.props}>
+      <Box className={cns} {...this.props}>
         {children}
       </Box>
     );

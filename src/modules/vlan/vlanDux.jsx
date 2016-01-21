@@ -14,105 +14,54 @@
     under the License.
 */
 
+import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
-import Agent, { parseError } from 'agent.js';
 
-// Required 'MODULE' name
-export const MODULE = 'vlan';
+const NAME = 'vlan';
 
-// Optional 'NAVS' object
 export const NAVS = [
   {
     route: { path: '/vlan', component: VlanPage },
-    link: { path: '/vlan', order: 30 }
+    link: { path: '/vlan', order: 300 }
   },
 ];
 
-// export optional action names and "ACTIONS" function object
-
-const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
-
 const URL = '/rest-poc/v1/system/bridges/bridge_normal/vlans';
 
-// Optional 'ACTIONS' object
-export const ACTIONS = {
-
-  fetchRequest() {
-    return { type: FETCH_REQUEST };
-  },
-
-  fetchFailure(error) {
-    return { type: FETCH_FAILURE, error };
-  },
-
-  fetchSuccess(resp) {
-    return { type: FETCH_SUCCESS, resp };
-  },
-
-  fetchIfNeeded() {
-    return (dispatch, getState) => {
-      if (ACTIONS.shouldFetch(getState())) {
-        return dispatch(ACTIONS.fetch());
-      }
-    };
-  },
-
-  shouldFetch(state) {
-    return state || true; // hide state warning;
-  },
-
-  fetch() {
-    return dispatch => {
-      dispatch(ACTIONS.fetchRequest());
-      return Agent.get(URL).end((error, resp) => {
-        if (error) {
-          dispatch(ACTIONS.fetchFailure(parseError(URL, error)));
-        } else {
-          dispatch(ACTIONS.fetchSuccess(resp));
-        }
-      });
-    };
-  },
-
+const ACTIONS = {
+  fetch() { return Dux.fetchAction(NAME, URL); }
 };
 
-// Optional 'reducer' function
-const INITIAL_STATE = {
-  isFetching: false,
-  lastUpdate: 0,
-  lastError: null,
+const INITIAL_STORE = {
   entities: {},
+  length: 0,
 };
 
-export function reducer(moduleState = INITIAL_STATE, action) {
-  switch (action.type) {
+function parseResult(result) {
+  const body = result.body;
 
-    case FETCH_REQUEST:
-      return { ...moduleState, isFetching: true };
+  let length = 0;
+  const entities = {};
 
-    case FETCH_FAILURE:
-      return { ...moduleState, isFetching: false, lastError: action.error };
-
-    case FETCH_SUCCESS:
-      const entities = {};
-      const len = action.resp.body.length;
-      for (let i=0; i<len; i++) {
-        const item = action.resp.body[i];
-        const config = item.configuration;
-        const id = config.id;
-        const name = config.name;
-        entities[id] = { id, name };
-      }
-      return {
-        ...moduleState,
-        isFetching: false,
-        lastUpdate: Date.now(),
-        entities,
+  Object.getOwnPropertyNames(body).forEach(k => {
+    const data = body[k];
+    if (k !== 'length') {
+      entities[k] = {
+        id: k,
+        name: data.configuration.name,
       };
-
-    default:
-      return moduleState;
-  }
+    } else {
+      length = data;
+    }
+  });
+  return { length, entities };
 }
+
+const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+
+export default {
+  NAME,
+  NAVS,
+  ACTIONS,
+  REDUCER,
+};

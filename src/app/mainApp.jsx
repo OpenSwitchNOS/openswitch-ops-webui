@@ -44,10 +44,10 @@ class MainApp extends Component {
     auth: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
+    collector: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
-    syslog: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired,
   };
 
@@ -122,7 +122,9 @@ class MainApp extends Component {
       <NavSideBar location={this.props.location} actions={this.props.actions}/>
       : null;
 
-    const numSyslog = 0; // FIXME: this.props.syslog.numUnread;
+    // FIXME: this.props.syslog.numUnread;
+    // data retieved from this.props.collector.?
+    const numSyslog = 99;
 
     const pageHdr = (
       <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
@@ -176,7 +178,7 @@ const select = (store) => ({
   nav: store.nav,
   routeToLink: store.routeToLink,
   toolbar: store.toolbar,
-  syslog: store.syslog,
+  collector: store.collector,
 });
 
 export default connect(select)(MainApp);

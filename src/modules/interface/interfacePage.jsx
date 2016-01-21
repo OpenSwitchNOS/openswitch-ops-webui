@@ -27,18 +27,18 @@ class InterfacePage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    interface: PropTypes.object.isRequired,
+    autoActions: PropTypes.object.isRequired,
+    collector: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.cols = [
       {
-        columnKey: 'name',
-        header: t('name'),
-        flexGrow: 2,
+        columnKey: 'id',
+        header: t('id'),
         width: 100,
-        align: 'left',
+        align: 'right',
       },
       {
         columnKey: 'adminState',
@@ -49,23 +49,29 @@ class InterfacePage extends Component {
     this.state = {};
   }
 
+  _setToolbar = (props) => {
+    const collector = props.collector;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={collector.isFetching}
+          error={collector.lastError}
+          date={collector.lastUpdate}
+          onRefresh={this._onRefresh}
+      />
+    );
+  };
+
   componentDidMount() {
-    this.props.actions.interface.fetchIfNeeded();
+    this.props.autoActions.collector.fetch();
+    this._setToolbar(this.props);
   }
 
   _onRefresh = () => {
-    this.props.actions.interface.fetchIfNeeded();
+    this.props.autoActions.collector.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
-    const inf = nextProps.interface;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={inf.isFetching}
-          error={inf.lastError}
-          date={inf.lastUpdate}
-          onRefresh={this._onRefresh}/>
-    );
+    this._setToolbar(nextProps);
   }
 
   componentWillUnmount() {
@@ -73,14 +79,15 @@ class InterfacePage extends Component {
   }
 
   render() {
-    const infProps = this.props.interface;
+    const interfaces = this.props.collector.interfaces.entities;
     return (
-      <Box className="flex1">
-        Keep for BoxGraphic.
-        <p/>
+      <Box className="mLeft flex1">
+        <Box className="pageBox mLeft0 min200x200">
+          ...BoxGraphic goes here...
+        </Box>
         <ResponsiveBox>
           <DataGrid width={300} height={400}
-              data={infProps.entities}
+              data={interfaces}
               columns={this.cols}
               noSelect
           />
@@ -91,9 +98,9 @@ class InterfacePage extends Component {
 
 }
 
-function select(state) {
+function select(store) {
   return {
-    interface: state.interface,
+    collector: store.collector,
   };
 }
 

@@ -36,7 +36,7 @@ class OverviewPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    autoActions: PropTypes.object.isRequred,
+    autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
   };
 
@@ -128,8 +128,21 @@ class OverviewPage extends Component {
     this.state = { selectedLabeledMetric: this.systemLabeledMetrics[0] };
   }
 
+  _setToolbar = (props) => {
+    const collector = props.collector;
+    this.props.actions.toolbar.set(
+      <FetchToolbar
+          isFetching={collector.isFetching}
+          error={collector.lastError}
+          date={collector.lastUpdate}
+          onRefresh={this._onRefresh}
+      />
+    );
+  };
+
   componentDidMount() {
     this.props.autoActions.collector.fetch();
+    this._setToolbar(this.props);
   }
 
   _onRefresh = () => {
@@ -137,14 +150,7 @@ class OverviewPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const collector = nextProps.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}/>
-    );
+    this._setToolbar(nextProps);
   }
 
   componentWillUnmount() {
@@ -227,7 +233,7 @@ class OverviewPage extends Component {
           </tr>
           <tr>
             <td>{t('interfaces')}:</td>
-            <td>TBD</td>
+            <td>{this.props.collector.interfaces.length}</td>
           </tr>
           <tr>
             <td>{t('mtu')}:</td>

@@ -31,7 +31,7 @@ import DemoMetricPage from './demoMetricPage.jsx';
 
 const NAME = 'demo';
 
-let order = 100;
+let order = 1000;
 
 const NAVS = [
   {

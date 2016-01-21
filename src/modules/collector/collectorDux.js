@@ -21,26 +21,68 @@ const NAME = 'collector';
 const URLS = [
   '/rest/v1/system/subsystems/base',
   '/rest/v1/system',
+  '/rest-poc/v1/system/interfaces',
+  '/rest-poc/v1/system/ports',
 ];
 
 const AUTO_ACTIONS = {
-  fetch() {
-    return Dux.fetchAction(NAME, URLS);
-  }
+  fetch() { return Dux.fetchAction(NAME, URLS); }
 };
 
 const INITIAL_STORE = {
   info: {},
-  interfaces: {},
+  interfaces: {
+    length: 0,
+    entities: {},
+  },
+  ports: {
+    length: 0,
+    entities: {},
+  },
 };
 
 function parseResult(result) {
-  const sys = result[1];
-  return {
-    info: {
-      hostName: sys.body.configuration.hostname,
-    },
+  const sysBody = result[1].body;
+  const infBody = result[2].body;
+  const portBody = result[3].body;
+
+  const info = {
+    hostName: sysBody.configuration.hostname,
   };
+
+  let length = 0;
+  let entities = {};
+
+  Object.getOwnPropertyNames(infBody).forEach(k => {
+    const data = infBody[k];
+    if (k !== 'length') {
+      entities[k] = {
+        id: k,
+        adminState: data.status.admin_state,
+      };
+    } else {
+      length = data;
+    }
+  });
+  const interfaces = { length, entities };
+
+  length = 0;
+  entities = {};
+
+  Object.getOwnPropertyNames(portBody).forEach(k => {
+    const data = portBody[k];
+    if (k !== 'length') {
+      entities[k] = {
+        id: k,
+        name: data.configuration.name,
+      };
+    } else {
+      length = data;
+    }
+  });
+  const ports = { length, entities };
+
+  return { info, interfaces, ports };
 }
 
 const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);

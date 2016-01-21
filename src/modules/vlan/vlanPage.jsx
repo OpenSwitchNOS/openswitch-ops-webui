@@ -22,6 +22,7 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
 
+
 class VlanPage extends Component {
 
   static propTypes = {
@@ -35,30 +36,21 @@ class VlanPage extends Component {
       {
         columnKey: 'id',
         header: t('id'),
-        flexGrow: 1,
-        width: 200,
+        width: 100,
         align: 'right',
       },
       {
         columnKey: 'name',
         header: t('name'),
-        flexGrow: 2,
+        flexGrow: 1,
         width: 200,
       },
     ];
     this.state = {};
   }
 
-  componentDidMount() {
-    this.props.actions.vlan.fetchIfNeeded();
-  }
-
-  _onRefresh = () => {
-    this.props.actions.vlan.fetchIfNeeded();
-  };
-
-  componentWillReceiveProps(nextProps) {
-    const vlan = nextProps.vlan;
+  _setToolbar = (props) => {
+    const vlan = props.vlan;
     this.props.actions.toolbar.set(
       <FetchToolbar
           isFetching={vlan.isFetching}
@@ -66,6 +58,19 @@ class VlanPage extends Component {
           date={vlan.lastUpdate}
           onRefresh={this._onRefresh}/>
     );
+  };
+
+  componentDidMount() {
+    this.props.actions.vlan.fetch();
+    this._setToolbar(this.props);
+  }
+
+  _onRefresh = () => {
+    this.props.actions.vlan.fetch();
+  };
+
+  componentWillReceiveProps(nextProps) {
+    this._setToolbar(nextProps);
   }
 
   componentWillUnmount() {
@@ -73,14 +78,15 @@ class VlanPage extends Component {
   }
 
   render() {
-    const vlanProps = this.props.vlan;
+    const vlans = this.props.vlan.entities;
     return (
-      <Box className="flex1">
-        Keep for BoxGraphic.
-        <p/>
+      <Box className="mLeft flex1">
+        <Box className="pageBox mLeft0 min200x200">
+          ...BoxGraphic goes here...
+        </Box>
         <ResponsiveBox>
           <DataGrid width={300} height={400}
-              data={vlanProps.entities}
+              data={vlans}
               columns={this.cols}
               noSelect
           />
@@ -91,9 +97,9 @@ class VlanPage extends Component {
 
 }
 
-function select(state) {
+function select(store) {
   return {
-    vlan: state.vlan,
+    vlan: store.vlan,
   };
 }
 
