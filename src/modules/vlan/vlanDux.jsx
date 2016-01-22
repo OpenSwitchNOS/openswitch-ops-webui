@@ -16,6 +16,7 @@
 
 import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
+import VlanDetails from './vlanDetails.jsx';
 
 const NAME = 'vlan';
 
@@ -23,6 +24,10 @@ export const NAVS = [
   {
     route: { path: '/vlan', component: VlanPage },
     link: { path: '/vlan', order: 300 }
+  },
+  {
+    route: { path: '/vlan/:id', component: VlanDetails },
+    link: { path: '/vlan', hidden: true }
   },
 ];
 

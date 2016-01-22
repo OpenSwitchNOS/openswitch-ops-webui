@@ -73,7 +73,9 @@ export function createNavModel(BuildConfig, rootComponent) {
     if (m.NAVS) {
       m.NAVS.forEach(i => {
         processRouteDesc(navModel.routes, i.route);
-        processLinkDesc(navModel.links, i);
+        if (!i.link.hidden) {
+          processLinkDesc(navModel.links, i);
+        }
         navModel.routeToLink[i.route.path] = i.link.path;
       });
     }

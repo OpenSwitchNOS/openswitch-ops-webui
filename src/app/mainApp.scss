@@ -172,7 +172,7 @@ $fontsPath: '../shared/assets';
     margin-bottom: 0px;
 }
 
-// Addes animation to the sidebar's
+// Addes animation to the sidebars
 .sidebar {
   @include media-query(lap-and-up) {
     @include animation('slide-sidebar 0.5s');
@@ -182,13 +182,32 @@ $fontsPath: '../shared/assets';
   }
 }
 @include keyframes(slide-sidebar) {
-  0% {
-    width: 0px;
-  }
-  100% {
-    width: $sidebar-width;
-  }
+  0% { width: 0px; }
+  100% { width: $sidebar-width; }
 }
+
+// Different width for the detail panes
+@mixin detailPane($name, $width) {
+  @include media-query(lap-and-up) {
+    @include animation($name + ' 0.5s');
+  }
+  @include keyframes($name) {
+    0% { width: 0px; }
+    100% { width: $width; }
+  }
+  width: $width;
+}
+.detailPane {
+  &.w300 { @include detailPane('slideDetail300', 300px); }
+  &.w350 { @include detailPane('slideDetail350', 350px); }
+  &.w400 { @include detailPane('slideDetail400', 400px); }
+  &.w450 { @include detailPane('slideDetail450', 450px); }
+  &.w500 { @include detailPane('slideDetail500', 500px); }
+  &.w550 { @include detailPane('slideDetail550', 550px); }
+  &.w600 { @include detailPane('slideDetail600', 600px); }
+  &.w700 { @include detailPane('slideDetail700', 700px); }
+  &.w800 { @include detailPane('slideDetail800', 800px); }
+};
 
 // Nice for debugging
 .redBorder {

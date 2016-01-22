@@ -27,6 +27,11 @@ class VlanPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    children: PropTypes.node,
+    history: PropTypes.object.isRequired,
+    params: PropTypes.shape({
+      id: PropTypes.string
+    }),
     vlan: PropTypes.object.isRequired,
   };
 
@@ -77,20 +82,33 @@ class VlanPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
+  _onSelect = (id) => {
+    this.props.history.pushState(null, `/vlan/${id}`);
+  };
+
   render() {
     const vlans = this.props.vlan.entities;
     return (
-      <Box className="mLeft flex1">
-        <Box className="pageBox mLeft0 min200x200">
-          ...BoxGraphic goes here...
+      <Box direction="row" className="mLeft flex1">
+        <Box className="flex1">
+          <Box className="pageBox mLeft0 min200x200">
+            ...BoxGraphic goes here...
+          </Box>
+          <ResponsiveBox>
+            <DataGrid width={300} height={400}
+                data={vlans}
+                columns={this.cols}
+                singleSelect
+                onSelectChange={this._onSelect}
+            />
+          </ResponsiveBox>
         </Box>
-        <ResponsiveBox>
-          <DataGrid width={300} height={400}
-              data={vlans}
-              columns={this.cols}
-              noSelect
-          />
-        </ResponsiveBox>
+        {this.props.params.id ?
+          <Box className="detailPane w300 pageBox">
+            Details
+            {this.props.children}
+          </Box> : null
+        }
       </Box>
     );
   }
