@@ -14,6 +14,10 @@
     under the License.
 */
 
+import React from 'react';
+import FetchToolbar from 'fetchToolbar.jsx';
+
+
 const NAME = 'toolbar';
 const CLEAR = `${NAME}/CLEAR`;
 const SET = `${NAME}/SET`;
@@ -21,6 +25,18 @@ const SET = `${NAME}/SET`;
 const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
+  setFetchTB(data, onRefresh) {
+    return {
+      type: SET,
+      component: (
+        <FetchToolbar
+            isFetching={data.isFetching}
+            error={data.lastError}
+            date={data.lastUpdate}
+            onRefresh={onRefresh}/>
+      )
+    };
+  }
 };
 
 const INITIAL_STORE = {

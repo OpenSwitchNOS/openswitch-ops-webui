@@ -20,7 +20,6 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class InterfacePage extends Component {
@@ -49,21 +48,9 @@ class InterfacePage extends Component {
     this.state = {};
   }
 
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
-  };
-
   componentDidMount() {
     this.props.autoActions.collector.fetch();
-    this._setToolbar(this.props);
+    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
   }
 
   _onRefresh = () => {
@@ -71,7 +58,7 @@ class InterfacePage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this._setToolbar(nextProps);
+    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
   }
 
   componentWillUnmount() {

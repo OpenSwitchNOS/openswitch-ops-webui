@@ -142,7 +142,7 @@ class OverviewPage extends Component {
 
   componentDidMount() {
     this.props.autoActions.collector.fetch();
-    this._setToolbar(this.props);
+    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
   }
 
   _onRefresh = () => {
@@ -150,7 +150,7 @@ class OverviewPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this._setToolbar(nextProps);
+    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
   }
 
   componentWillUnmount() {

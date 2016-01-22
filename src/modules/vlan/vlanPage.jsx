@@ -20,7 +20,6 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
-import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class VlanPage extends Component {
@@ -54,20 +53,9 @@ class VlanPage extends Component {
     this.state = {};
   }
 
-  _setToolbar = (props) => {
-    const vlan = props.vlan;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={vlan.isFetching}
-          error={vlan.lastError}
-          date={vlan.lastUpdate}
-          onRefresh={this._onRefresh}/>
-    );
-  };
-
   componentDidMount() {
     this.props.actions.vlan.fetch();
-    this._setToolbar(this.props);
+    this.props.actions.toolbar.setFetchTB(this.props.vlan, this._onRefresh);
   }
 
   _onRefresh = () => {
@@ -75,7 +63,7 @@ class VlanPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this._setToolbar(nextProps);
+    this.props.actions.toolbar.setFetchTB(nextProps.vlan, this._onRefresh);
   }
 
   componentWillUnmount() {

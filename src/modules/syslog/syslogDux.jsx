@@ -14,29 +14,34 @@
     under the License.
 */
 
+import Dux from 'dux.js';
 import SyslogPage from './syslogPage.jsx';
-import { t } from 'i18n/lookup.js';
-import Agent, { parseError } from 'agent.js';
 
-// Required 'MODULE' name
-export const MODULE = 'syslog';
+const NAME = 'syslog';
 
-// Optional 'NAVS' object
-export const NAVS = [
+const NAVS = [
   {
     route: { path: '/syslog', component: SyslogPage },
-    link: { path: '/syslog', order: 10 }
+    link: { path: '/syslog', order: 400 }
   },
 ];
 
-const FETCH_REQUEST = `${MODULE}/FETCH_REQUEST`;
-const FETCH_FAILURE = `${MODULE}/FETCH_FAILURE`;
-const FETCH_SUCCESS = `${MODULE}/FETCH_SUCCESS`;
-const FETCH_CRITICAL = `${MODULE}/FETCH_CRITICAL`;
-const FETCH_WARNING = `${MODULE}/FETCH_WARNING`;
-const FETCH_ALL = `${MODULE}/FETCH_ALL`;
 
-const local = true; // To get fake data avoding REST call
+// TODO - for syslog REST
+const URL = '/rest-poc/v1/system/bridges/bridge_normal';
+const ACTIONS = {
+  fetch(filter) {
+    const url = `${URL}/${filter}`;
+    return Dux.fetchAction(NAME, url);
+  }
+};
+
+const INITIAL_STORE = {
+  entities: {},
+  lastRead: 0,
+  length: 0,
+};
+
 const syslogData = {
   '1': {
     severity: 0,
@@ -88,122 +93,35 @@ const syslogData = {
   },
 };
 
-function fetchLocal(severity) {
-  let entities = new Object();
-  let idx = 1;
-  switch (severity) {
-    case t('critical'):
-      for (const key in syslogData) {
-        if (syslogData[key].severity >=0 && syslogData[key].severity <=3) {
-          entities[idx++] = syslogData[key];
-        }
-      }
-      break;
-    case t('warning'):
-      for (const key in syslogData) {
-        if (syslogData[key].severity >=4 && syslogData[key].severity <=5) {
-          entities[idx++] = syslogData[key];
-        }
-      }
-      break;
-    case 3:
-    default:
-      entities = syslogData;
-      break;
-  }
-  return entities;
+
+function parseResult() {
+  //const body = result.body;
+
+  let entities = {};
+  // let length = 0;
+  //
+  // Object.getOwnPropertyNames(body).forEach(k => {
+  //   const data = body[k];
+  //   if (k !== 'length') {
+  //     entities[k] = {
+  //       id: k,
+  //       name: data.configuration.name,
+  //     };
+  //   } else {
+  //     length = data;
+  //   }
+  // });
+
+  // for fake data
+  entities = syslogData;
+  return { length: entities.length, entities };
 }
 
-// Optional 'ACTIONS' object
-export const ACTIONS = {
-  fetchRequest(severity) {
-    let action;
-    switch (severity) {
-      case t('critical'):
-        action = FETCH_CRITICAL;
-        break;
-      case t('warning'):
-        action = FETCH_WARNING;
-        break;
-      default:
-        action = FETCH_ALL;
-        break;
-    }
-    return { type: action };
-  },
+const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
 
-  fetchFailure(url, error) {
-    return { type: FETCH_FAILURE, url, error };
-  },
-
-  fetchSuccess(resp) {
-    return { type: FETCH_SUCCESS, resp };
-  },
-
-  fetchIfNeeded() {
-    return (dispatch, getState) => {
-      if (ACTIONS.shouldFetch(getState())) {
-        return dispatch(ACTIONS.fetch());
-      }
-    };
-  },
-
-  shouldFetch(state) {
-    return state || true; // hide state warning;
-  },
-
-  fetch(severity) {
-    return dispatch => {
-      if (local) {
-        const data = fetchLocal(severity);
-        dispatch(ACTIONS.fetchSuccess(data));
-      } else {
-        Agent.get(URL).end((error, resp) => {
-          if (error) {
-            dispatch({ type: FETCH_FAILURE, error: parseError(URL, error)});
-          } else {
-            dispatch({ type: FETCH_SUCCESS, resp });
-          }
-        });
-      }
-    };
-  }
+export default {
+  NAME,
+  NAVS,
+  ACTIONS,
+  REDUCER,
 };
-
-const INITIAL_STATE = {
-  isFetching: false,
-  lastUpdate: 0,
-  lastError: null,
-  entities: {},
-  lastRead: 0,
-  numUnread: 0,
-};
-
-// Optional 'reducer' function
-export function reducer(moduleState = INITIAL_STATE, action) {
-  switch (action.type) {
-    case FETCH_REQUEST:
-      return { ...moduleState, isFetching: true };
-
-    case FETCH_FAILURE:
-      return { ...moduleState, isFetching: false, lastError: action.error };
-
-    case FETCH_SUCCESS:
-      let entities;
-      if (local) {
-        entities = action.resp;
-      } else {
-        entities = action.resp.body;
-      }
-      return {
-        ...moduleState,
-        isFetching: false,
-        lastUpdate: Date.now(),
-        entities,
-        numUnread: 8, // need function to get length from entities
-      };
-
-    default:
-      return moduleState;
-  }
-}
