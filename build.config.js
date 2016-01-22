@@ -15,7 +15,7 @@
 */
 
 import CollectorDux from 'collector/collectorDux.js';
-// import * as syslogDux from 'syslog/syslogDux.jsx';
+import SyslogDux from 'syslog/syslogDux.jsx';
 import DemoDux from 'demo/demoDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
@@ -28,7 +28,7 @@ const modules = [
   OverviewDux,
   InterfaceDux,
   VlanDux,
-  // syslogDux,
+  SyslogDux,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';

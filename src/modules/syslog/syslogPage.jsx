@@ -21,8 +21,8 @@ import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
-import FetchToolbar from 'fetchToolbar.jsx';
 import SpanStatus from 'spanStatus.jsx';
+
 
 class SyslogPage extends Component {
 
@@ -58,22 +58,16 @@ class SyslogPage extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.syslog.fetchIfNeeded();
+    this.props.actions.syslog.fetch('vlans');
+    this.props.actions.toolbar.setFetchTB(this.props.syslog, this._onRefresh);
   }
 
   _onRefresh = () => {
-    this.props.actions.syslog.fetchIfNeeded();
+    this.props.actions.syslog.fetch('vlans');
   };
 
   componentWillReceiveProps(nextProps) {
-    const syslog = nextProps.syslog;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={syslog.isFetching}
-          error={syslog.lastError}
-          date={syslog.lastUpdate}
-          onRefresh={syslog._onRefresh}/>
-    );
+    this.props.actions.toolbar.setFetchTB(nextProps.syslog, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -135,30 +129,33 @@ class SyslogPage extends Component {
     );
   };
 
-  _onClick = (event) => {
-    this.props.actions.syslog.fetch(event);
+  _onClick = () => {
+    this.props.actions.syslog.fetch('vlans');
   };
 
   render() {
     const syslogProps = this.props.syslog;
     return (
       <Box className="flex1">
-        <div float="right" position="relative">
-          <Button primary label={t('critical')} onClick={this._onClick.bind(this,
-            t('critical'))} />
-          <Button primary label={t('warning')} onClick={this._onClick.bind(this,
-            t('warning'))} />
-          <Button primary label={t('all')} onClick={this._onClick.bind(this,
-            t('all'))} />
-        </div>
-        <p/>
-        <ResponsiveBox>
-          <DataGrid width={500} height={400}
-              data={syslogProps.entities}
-              columns={this.cols}
-              noSelect
-          />
-        </ResponsiveBox>
+        <Box className="pageBox flex0auto">
+          <div float="right" position="relative">
+            <Button primary label={t('critical')} onClick={this._onClick.bind(this,
+              t('critical'))} />
+            <Button primary label={t('warning')} onClick={this._onClick.bind(this,
+              t('warning'))} />
+            <Button primary label={t('all')} onClick={this._onClick.bind(this,
+              t('all'))} />
+          </div>
+        </Box>
+        <Box className="flex1 mTopHalf mLeft">
+          <ResponsiveBox>
+            <DataGrid width={500} height={400}
+                data={syslogProps.entities}
+                columns={this.cols}
+                noSelect
+            />
+          </ResponsiveBox>
+        </Box>
       </Box>
     );
   }

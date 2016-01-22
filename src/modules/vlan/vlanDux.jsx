@@ -20,7 +20,7 @@ import VlanDetails from './vlanDetails.jsx';
 
 const NAME = 'vlan';
 
-export const NAVS = [
+const NAVS = [
   {
     route: { path: '/vlan', component: VlanPage },
     link: { path: '/vlan', order: 300 }
