@@ -17,10 +17,12 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
+
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
 import ResponsiveBox from 'responsiveBox.jsx';
 import Box from 'grommet/components/Box';
+
 
 class DemoDataGridPage extends Component {
 

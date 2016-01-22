@@ -21,6 +21,8 @@ export const MESSAGES = {
   // navigation items
   box1: 'Box Layout #1',
   box2: 'Box Layout #2',
+  box3: 'Box Layout #3',
+  boxDataGrid: 'Box Layout DataGrid',
   button: 'Button',
   color: 'Color',
   critical: 'Critical',

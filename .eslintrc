@@ -1,9 +1,7 @@
 {
   "rules": {
     "no-console": 1,
-    "indent": [ 2, 2 ],
     "quotes": [ 1, "single" ],
-    "linebreak-style": [ 2, "unix" ],
     "semi": [ 2, "always" ],
     "eqeqeq": [ 2, "smart" ],
     "valid-jsdoc": 2,
@@ -51,7 +49,6 @@
     "no-spaced-func": 2,
     "no-trailing-spaces": 1,
     "no-unneeded-ternary": 2,
-    "quotes": [ 1, "single" ],
     "require-jsdoc": 0,
     "semi-spacing": 2,
     "space-after-keywords": [ 2, "always" ],

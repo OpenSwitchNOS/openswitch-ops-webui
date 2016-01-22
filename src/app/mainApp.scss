@@ -111,6 +111,7 @@ h1, h2, h3, .headline, .title {
   height: 100vh;
 
   .mTop { margin-top: $space; }
+  .mTopHalf { margin-top: $space/2; }
   .mRight { margin-right: $space; }
   .mBottom { margin-bottom: $space; }
   .mLeft { margin-left: $space; }
@@ -130,9 +131,6 @@ h1, h2, h3, .headline, .title {
 
     .pageBox {
       @include pageBox();
-      &.mLeft0 {
-        margin-left: 0px;
-      }
     }
   }
 }
@@ -160,6 +158,34 @@ h1, h2, h3, .headline, .title {
   to { transform: rotate(360deg); }
 }
 
+@media screen and (min-width: 45em) {
+  .edit .layer__container {
+    margin: 8px;
+    border: 3px solid $brand-color;
+  }
+}
+
+// Nice for debugging
+.redBorder {
+  border: 3px solid red;
+}
+.greenBorder {
+  border: 3px solid green;
+}
+.blueBorder {
+  border: 3px solid blue;
+}
+.redBg {
+  background-color: red;
+}
+.greenBg {
+  background-color: green;
+}
+.blueBg {
+  background-color: blue;
+}
+
+
 // Override the sidebar-width for the navigation pane.
 $sidebar-width: 320px;
 
@@ -184,47 +210,4 @@ $fontsPath: '../shared/assets';
 @include keyframes(slide-sidebar) {
   0% { width: 0px; }
   100% { width: $sidebar-width; }
-}
-
-// Different width for the detail panes
-@mixin detailPane($name, $width) {
-  @include media-query(lap-and-up) {
-    @include animation($name + ' 0.5s');
-  }
-  @include keyframes($name) {
-    0% { width: 0px; }
-    100% { width: $width; }
-  }
-  width: $width;
-}
-.detailPane {
-  &.w300 { @include detailPane('slideDetail300', 300px); }
-  &.w350 { @include detailPane('slideDetail350', 350px); }
-  &.w400 { @include detailPane('slideDetail400', 400px); }
-  &.w450 { @include detailPane('slideDetail450', 450px); }
-  &.w500 { @include detailPane('slideDetail500', 500px); }
-  &.w550 { @include detailPane('slideDetail550', 550px); }
-  &.w600 { @include detailPane('slideDetail600', 600px); }
-  &.w700 { @include detailPane('slideDetail700', 700px); }
-  &.w800 { @include detailPane('slideDetail800', 800px); }
-};
-
-// Nice for debugging
-.redBorder {
-  border: 3px solid red;
-}
-.greenBorder {
-  border: 3px solid green;
-}
-.blueBorder {
-  border: 3px solid blue;
-}
-.redBg {
-  background-color: red;
-}
-.greenBg {
-  background-color: green;
-}
-.blueBg {
-  background-color: blue;
 }

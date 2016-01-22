@@ -88,27 +88,33 @@ class VlanPage extends Component {
 
   render() {
     const vlans = this.props.vlan.entities;
+
+    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
+    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
+    const details = !this.props.params.id ? null : (
+      <Box className="pageBox">
+        {this.props.children}
+      </Box>
+    );
+
     return (
-      <Box direction="row" className="mLeft flex1">
+      <Box direction="row" className="flex1">
         <Box className="flex1">
-          <Box className="pageBox mLeft0 min200x200">
+          <Box className="pageBox min200x200">
             ...BoxGraphic goes here...
           </Box>
-          <ResponsiveBox>
-            <DataGrid width={300} height={400}
-                data={vlans}
-                columns={this.cols}
-                singleSelect
-                onSelectChange={this._onSelect}
-            />
-          </ResponsiveBox>
+          <Box className="flex1 mTopHalf mLeft">
+            <ResponsiveBox>
+              <DataGrid width={300} height={400}
+                  data={vlans}
+                  columns={this.cols}
+                  singleSelect
+                  onSelectChange={this._onSelect}
+              />
+            </ResponsiveBox>
+          </Box>
         </Box>
-        {this.props.params.id ?
-          <Box className="detailPane w300 pageBox">
-            Details
-            {this.props.children}
-          </Box> : null
-        }
+        {details}
       </Box>
     );
   }

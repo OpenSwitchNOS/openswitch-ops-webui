@@ -96,6 +96,7 @@ class MainApp extends Component {
     this.props.actions.nav.showPane();
   };
 
+  // FIXME: this is broken with /vlan/:id - use a "breadcrumb" plug in?
   _linkPathName = () => {
     const loc = this.props.location.pathname;
     const linkPath = this.props.routeToLink[loc];

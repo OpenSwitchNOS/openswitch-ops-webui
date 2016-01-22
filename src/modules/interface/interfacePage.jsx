@@ -81,17 +81,19 @@ class InterfacePage extends Component {
   render() {
     const interfaces = this.props.collector.interfaces.entities;
     return (
-      <Box className="mLeft flex1">
-        <Box className="pageBox mLeft0 min200x200">
+      <Box className="flex1">
+        <Box className="pageBox min200x200">
           ...BoxGraphic goes here...
         </Box>
-        <ResponsiveBox>
-          <DataGrid width={300} height={400}
-              data={interfaces}
-              columns={this.cols}
-              noSelect
-          />
-        </ResponsiveBox>
+        <Box className="flex1 mTopHalf mLeft">
+          <ResponsiveBox>
+            <DataGrid width={300} height={400}
+                data={interfaces}
+                columns={this.cols}
+                noSelect
+            />
+          </ResponsiveBox>
+        </Box>
       </Box>
     );
   }

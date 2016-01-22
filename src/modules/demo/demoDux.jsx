@@ -18,6 +18,8 @@ import Dux from 'dux.js';
 
 import DemoBox1Page from './demoBox1Page.jsx';
 import DemoBox2Page from './demoBox2Page.jsx';
+import DemoBox3Page from './demoBox3Page.jsx';
+import DemoBoxDataGridPage from './demoBoxDataGridPage.jsx';
 import DemoIconPage from './demoIconPage.jsx';
 import DemoColorPage from './demoColorPage.jsx';
 import DemoHeaderPage from './demoHeaderPage.jsx';
@@ -41,6 +43,14 @@ const NAVS = [
   {
     route: { path: '/demoBox2', component: DemoBox2Page },
     link: { path: '/demo/box2', order: order++ }
+  },
+  {
+    route: { path: '/demoBox3', component: DemoBox3Page },
+    link: { path: '/demo/box3', order: order++ }
+  },
+  {
+    route: { path: '/demoBoxDataGrid', component: DemoBoxDataGridPage },
+    link: { path: '/demo/boxDataGrid', order: order++ }
   },
   {
     route: { path: '/demoIcon', component: DemoIconPage },
