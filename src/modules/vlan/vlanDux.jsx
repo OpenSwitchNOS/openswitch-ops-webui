@@ -31,7 +31,7 @@ const NAVS = [
   },
 ];
 
-const URL = '/rest-poc/v1/system/bridges/bridge_normal/vlans';
+const URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
 
 const ACTIONS = {
   fetch() { return Dux.fetchAction(NAME, URL); }

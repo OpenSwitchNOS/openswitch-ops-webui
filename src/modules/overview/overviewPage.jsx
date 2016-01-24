@@ -21,7 +21,7 @@ import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 // import Header from 'grommet/components/Header';
-// import Title from 'grommet/components/Title';
+import Meter from 'grommet/components/Meter';
 import Table from 'grommet/components/Table';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Metric from 'metric.js';
@@ -29,7 +29,7 @@ import LabeledMetric from 'labeledMetric.js';
 import DataPoint from 'dataPoint.js';
 import MetricTable from 'metricTable.jsx';
 import MetricChart from 'metricChart.jsx';
-// import SpanStatus from 'spanStatus.jsx';
+import SpanStatus from 'spanStatus.jsx';
 
 
 class OverviewPage extends Component {
@@ -47,54 +47,10 @@ class OverviewPage extends Component {
       { columnKey: 'id', header: t('id'), width: 100 },
       { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
     ];
-    this.entities = {
-      '1': { id: 1, text: 'Item 1' },
-      '2': { id: 2, text: 'This 2' },
-      '3': { id: 3, text: 'This 3' },
-      '4': { id: 4, text: 'Item 4' },
-      '5': { id: 5, text: 'This 5' },
-      '6': { id: 6, text: 'This 6' },
-      '7': { id: 7, text: 'Item 7' },
-      '8': { id: 8, text: 'This 8' },
-      '9': { id: 9, text: 'This 9' },
-      '10': { id: 10, text: 'Item 10' },
-      '11': { id: 11, text: 'Item 11' },
-      '12': { id: 12, text: 'This 12' },
-      '13': { id: 13, text: 'This 13' },
-      '14': { id: 14, text: 'Item 14' },
-      '15': { id: 15, text: 'This 15' },
-      '16': { id: 16, text: 'This 16' },
-      '17': { id: 17, text: 'Item 17' },
-      '18': { id: 18, text: 'This 18' },
-      '19': { id: 19, text: 'This 19' },
-    };
     const ts = Date.now();
-    const systemChartColor = 'graph-3';
-    this.systemLabeledMetrics = [
-      new LabeledMetric(`${t('cpuLoad')}:`,
-        new Metric()
-          .setName('Metric #1').setUnits('')
-          .setDataPoints([
-            new DataPoint(1, ts, ['msg1 msg2']),
-            new DataPoint(91, ts+1000, ['msg3']),
-            new DataPoint(3, ts+2000, [])
-          ])
-          .setColorIndex(systemChartColor)
-      ),
-      new LabeledMetric(`${t('memory')}:`,
-        new Metric()
-          .setName('Metric #2').setUnits('GB').setThresholds(0, 500)
-          .setDataPoints([
-            new DataPoint(100, ts, ['msg1', 'msg2']),
-            new DataPoint(50, ts+1000),
-            new DataPoint(200, ts+2000)
-          ])
-          .setColorIndex(systemChartColor)
-      ),
-    ];
-    const networkChartColor = 'graph-4';
+    const networkChartColor = 'graph-3';
     this.networkLabeledMetrics = [
-      new LabeledMetric('Interface 23:',
+      new LabeledMetric('Interface 23',
         new Metric()
           .setName('Metric #1').setUnits('%')
           .setDataPoints([
@@ -104,7 +60,7 @@ class OverviewPage extends Component {
           ])
           .setColorIndex(networkChartColor)
       ),
-      new LabeledMetric('Interface 3:',
+      new LabeledMetric('Interface 3',
         new Metric()
           .setName('Metric #2').setUnits('%')
           .setDataPoints([
@@ -114,7 +70,27 @@ class OverviewPage extends Component {
           ])
           .setColorIndex(networkChartColor)
       ),
-      new LabeledMetric('Interface 15:',
+      new LabeledMetric('Interface 15',
+        new Metric()
+          .setName('Metric #3').setUnits('%')
+          .setDataPoints([
+            new DataPoint(15, ts, ['msg1 msg2']),
+            new DataPoint(8, ts+1000, ['msg3']),
+            new DataPoint(35, ts+2000, [])
+          ])
+          .setColorIndex(networkChartColor)
+      ),
+      new LabeledMetric('Interface 15',
+        new Metric()
+          .setName('Metric #3').setUnits('%')
+          .setDataPoints([
+            new DataPoint(15, ts, ['msg1 msg2']),
+            new DataPoint(8, ts+1000, ['msg3']),
+            new DataPoint(35, ts+2000, [])
+          ])
+          .setColorIndex(networkChartColor)
+      ),
+      new LabeledMetric('Interface 15',
         new Metric()
           .setName('Metric #3').setUnits('%')
           .setDataPoints([
@@ -125,7 +101,7 @@ class OverviewPage extends Component {
           .setColorIndex(networkChartColor)
       ),
     ];
-    this.state = { selectedLabeledMetric: this.systemLabeledMetrics[0] };
+    this.state = { selectedLabeledMetric: this.networkLabeledMetrics[0] };
   }
 
   _setToolbar = (props) => {
@@ -162,73 +138,125 @@ class OverviewPage extends Component {
   };
 
   _mkInfoProps = () => {
+    const info = this.props.collector.info;
     return (
-      <table className="propTable">
+      <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
-            <td>{t('productName')}:</td>
-            <td>{this.props.collector.info.hostName}</td>
+            <td style={{width: '140px', verticalAlign: 'top'}}>
+              {t('productName')}:
+            </td>
+            <td>{info.product}</td>
           </tr>
           <tr>
             <td>{t('serialNumber')}:</td>
-            <td>TBD</td>
+            <td>{info.serialNum}</td>
           </tr>
           <tr>
             <td>{t('vendor')}:</td>
-            <td>TBD</td>
+            <td>{info.vendor}</td>
           </tr>
           <tr>
             <td>{t('version')}:</td>
-            <td>TBD</td>
+            <td>{info.version}</td>
           </tr>
           <tr>
             <td>{t('onieVersion')}:</td>
-            <td>TBD</td>
+            <td>{info.onieVersion}</td>
           </tr>
           <tr>
             <td>{t('baseMac')}:</td>
-            <td>TBD</td>
-          </tr>
-          <tr>
-            <td>{t('systemMac')}:</td>
-            <td>TBD</td>
+            <td>{info.baseMac}</td>
           </tr>
         </tbody>
       </table>
     );
   };
 
-  _mkSystemProps = () => {
+  _mkPowerProps = () => {
+    const ps = this.props.collector.powerSupplies;
+    const trs = [];
+    Object.getOwnPropertyNames(ps).forEach(k => {
+      const data = ps[k];
+      trs.push(
+        <tr key={data.id}>
+          <td>{data.id}:</td>
+          <td>
+            <SpanStatus value={data.status}>
+              {t(data.text)}
+            </SpanStatus>
+          </td>
+        </tr>
+      );
+    });
     return (
       <table className="propTable">
         <tbody>
-          <tr>
-            <td>{t('temperature')}:</td>
-            <td>TBD</td>
-          </tr>
-          <tr>
-            <td>{t('fans')}:</td>
-            <td>TBD</td>
-          </tr>
-          <tr>
-            <td>{t('power')}:</td>
-            <td>TBD</td>
-          </tr>
-          <tr>
-            <td>{t('storage')}:</td>
-            <td>TBD</td>
-          </tr>
+          {trs}
         </tbody>
       </table>
+    );
+  };
+
+  _mkFanProps = () => {
+    const fans = this.props.collector.fans;
+    const trs = [];
+    Object.getOwnPropertyNames(fans).forEach(k => {
+      const data = fans[k];
+      trs.push(
+        <tr key={data.id}>
+          <td>{data.id}:</td>
+          <td>
+            <SpanStatus value={data.status}>
+              {t(data.text)}
+            </SpanStatus>
+          </td>
+        </tr>
+      );
+    });
+    return (
+      <table className="propTable">
+        <tbody>
+          {trs}
+        </tbody>
+      </table>
+    );
+  };
+
+  _mkTempMeters = () => {
+    const temps = this.props.collector.temps;
+    const meters = [];
+    Object.getOwnPropertyNames(temps).forEach(k => {
+      const data = temps[k];
+      meters.push(
+        <Box key={k} pad={{horizontal: 'small'}}>
+          {data.id}
+          <br/>
+          <Meter
+              size="small"
+              colorIndex="neutral-3"
+              value={40}
+              min={{value: 0, label: '0 GB'}}
+              max={{value: 80, label: '80 GB'}}
+              threshold={75}
+              units="GB"
+              vertical />
+        </Box>
+      );
+    });
+    return (
+      <Box direction="row">
+        {meters}
+      </Box>
     );
   };
 
   _mkNetworkProps = () => {
     return (
-      <table className="propTable">
+      <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
-            <td>{t('vlans')}:</td>
+            <td style={{width: '140px'}}>{t('vlans')}:</td>
             <td>TBD</td>
           </tr>
           <tr>
@@ -252,72 +280,85 @@ class OverviewPage extends Component {
       <Box className="flex1">
         <Box direction="row" className="flexWrap">
           <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('information')}</b>
+            <b>{t('system')}</b>
             <hr/>
             {this._mkInfoProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('system')}</b>
+            <b>{t('power')}</b>
             <hr/>
-            {this._mkSystemProps()}
-            <br/>
-            <MetricTable
-                onSelect={this._onSelectMetric}
-                widths={{label: '130px', value: '70px'}}
-                labeledMetrics={this.systemLabeledMetrics}
-            />
+            {this._mkPowerProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min200x200">
+            <b>{t('temperature')}</b>
+            <hr/>
+            {this._mkTempMeters()}
+          </Box>
+          <Box pad={this.pad} className="flex1 pageBox min200x200">
+            <b>{t('fans')}</b>
+            <hr/>
+            {this._mkFanProps()}
+          </Box>
+        </Box>
+        <Box direction="row" pad={this.pad} className="flex1 pageBox min200x400">
+          <Box>
             <b>{t('network')}</b>
             <hr/>
             {this._mkNetworkProps()}
             <br/>
             <b>{t('topUtilization')}</b>
-            <br/>
-            <MetricTable
-                onSelect={this._onSelectMetric}
-                widths={{label: '130px', value: '70px'}}
-                labeledMetrics={this.networkLabeledMetrics}
-            />
+            <Box pad={{vertical: 'small'}}>
+              <MetricTable
+                  onSelect={this._onSelectMetric}
+                  widths={{label: '130px', chart: '90px', value: '70px'}}
+                  labeledMetrics={this.networkLabeledMetrics}
+              />
+            </Box>
           </Box>
-        </Box>
-        <Box pad={this.pad} className="flex1 pageBox min200x400">
-          <b>{label}</b>
-          <MetricChart
-              size="large"
-              metric={metric}
-              onSelect={this._onSelectDataPoint}/>
-          <i>Syslog entries: [4:41:35 PM - 4:41:45 PM]</i>
-          <Table>
-            <thead>
-              <tr>
-                <th>Severity</th>
-                <th>Date</th>
-                <th>Facility</th>
-                <th>Text</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Critical</td>
-                <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1</td>
-              </tr>
-              <tr>
-                <td>Critical</td>
-                <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1</td>
-              </tr>
-              <tr>
-                <td>Critical</td>
-                <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1</td>
-              </tr>
-            </tbody>
-          </Table>
+          <Box>
+            &nbsp;&nbsp;&nbsp;
+            <hr/>
+          </Box>
+          <Box className="flex1">
+            <b>&nbsp;</b>
+            <hr/>
+            <span><b>{`${t('utilization')} - `}</b>{`${label}`}</span>
+            <MetricChart
+                size="large"
+                metric={metric}
+                onSelect={this._onSelectDataPoint}/>
+            <i>Syslog entries: [4:41:35 PM - 4:41:45 PM]</i>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Date</th>
+                  <th>Facility</th>
+                  <th>Text</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Critical</td>
+                  <td>4:22:50 PM</td>
+                  <td>System</td>
+                  <td>This is syslog message text for #1</td>
+                </tr>
+                <tr>
+                  <td>Critical</td>
+                  <td>4:22:50 PM</td>
+                  <td>System</td>
+                  <td>This is syslog message text for #1</td>
+                </tr>
+                <tr>
+                  <td>Critical</td>
+                  <td>4:22:50 PM</td>
+                  <td>System</td>
+                  <td>This is syslog message text for #1</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Box>
         </Box>
       {/*
 

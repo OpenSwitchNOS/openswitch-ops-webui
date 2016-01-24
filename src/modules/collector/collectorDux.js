@@ -21,8 +21,11 @@ const NAME = 'collector';
 const URLS = [
   '/rest/v1/system/subsystems/base',
   '/rest/v1/system',
-  '/rest-poc/v1/system/interfaces',
-  '/rest-poc/v1/system/ports',
+  '/rest/v1/system/interfaces?depth=1',
+  '/rest/v1/system/ports?depth=1',
+  '/rest/v1/system/subsystems/base/power_supplies?depth=1',
+  '/rest/v1/system/subsystems/base/fans?depth=1',
+  '/rest/v1/system/subsystems/base/temp_sensors?depth=1',
 ];
 
 const AUTO_ACTIONS = {
@@ -31,58 +34,112 @@ const AUTO_ACTIONS = {
 
 const INITIAL_STORE = {
   info: {},
-  interfaces: {
-    length: 0,
-    entities: {},
-  },
-  ports: {
-    length: 0,
-    entities: {},
-  },
+  interfaces: {},
+  ports: {},
+  powerSupplies: {},
+  fans: {},
+  temps: {},
 };
 
+function normalizePowerStatus(s) {
+  if (s === 'ok') {
+    return { text: 'ok', status: 'ok' };
+  } else if (s === 'fault_input') {
+    return { text: 'powerFaultInput', status: 'warning' };
+  } else if (s === 'fault_output') {
+    return { text: 'powerFaultOutput', status: 'critical' };
+  }
+  return { text: 'powerAbsent', status: 'warning' };
+}
+
+function normalizeFanStatus(s) {
+  if (s === 'ok') {
+    return { text: 'ok', status: 'ok' };
+  } else if (s === 'fault') {
+    return { text: 'fanFault', status: 'critical' };
+  }
+  return { text: 'fanUninitialized', status: 'warning' };
+}
+
+function normalizeTempStatus(id, s) {
+  return {
+    id,
+    location: s.location,
+    max: Number(s.max) / 1000,
+    min: Number(s.min) / 1000,
+    value: Number(s.temperature) / 1000,
+  };
+}
+
 function parseResult(result) {
+  const ssBaseBody = result[0].body;
   const sysBody = result[1].body;
   const infBody = result[2].body;
   const portBody = result[3].body;
+  const pwrBody = result[4].body;
+  const fanBody = result[5].body;
+  const tempBody = result[6].body;
 
+  const oi = ssBaseBody.status.other_info;
+  const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
   const info = {
-    hostName: sysBody.configuration.hostname,
+    hostname: sysBody.configuration.hostname,
+    version: sysBody.status.switch_version,
+    product: oi['Product Name'],
+    partNum: oi.part_number,
+    onieVersion: oi.onie_version,
+    baseMac,
+    serialNum: oi.serial_number,
+    vendor: oi.vendor,
   };
 
-  let length = 0;
-  let entities = {};
-
-  Object.getOwnPropertyNames(infBody).forEach(k => {
-    const data = infBody[k];
-    if (k !== 'length') {
-      entities[k] = {
-        id: k,
-        adminState: data.status.admin_state,
-      };
-    } else {
-      length = data;
-    }
+  const interfaces = {};
+  infBody.forEach((elm) => {
+    const id = elm.configuration.name;
+    interfaces[id] = {
+      id,
+      adminState: elm.status.admin_state,
+      linkState: elm.status.link_state,
+    };
   });
-  const interfaces = { length, entities };
 
-  length = 0;
-  entities = {};
-
-  Object.getOwnPropertyNames(portBody).forEach(k => {
-    const data = portBody[k];
-    if (k !== 'length') {
-      entities[k] = {
-        id: k,
-        name: data.configuration.name,
-      };
-    } else {
-      length = data;
-    }
+  const ports = {};
+  portBody.forEach((elm) => {
+    const id = elm.configuration.name;
+    ports[id] = {
+      id
+    };
   });
-  const ports = { length, entities };
 
-  return { info, interfaces, ports };
+  const powerSupplies = {};
+  pwrBody.forEach((elm) => {
+    const id = elm.status.name;
+    const ps = normalizePowerStatus(elm.status.status);
+    powerSupplies[id] = {
+      id,
+      text: ps.text,
+      status: ps.status,
+    };
+  });
+
+  const fans = {};
+  fanBody.forEach((elm) => {
+    const id = elm.status.name;
+    const ps = normalizeFanStatus(elm.status.status);
+    fans[id] = {
+      id,
+      text: ps.text,
+      status: ps.status,
+    };
+  });
+
+  const temps = {};
+  tempBody.forEach((elm) => {
+    const id = elm.status.name;
+    temps[id] = normalizeTempStatus(id, elm.status);
+  });
+
+  return { info, interfaces, ports, powerSupplies, fans, temps };
 }
 
 const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);

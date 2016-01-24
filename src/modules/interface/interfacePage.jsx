@@ -41,8 +41,13 @@ class InterfacePage extends Component {
       },
       {
         columnKey: 'adminState',
-        header: t('state'),
-        width: 100,
+        header: t('adminState'),
+        width: 160,
+      },
+      {
+        columnKey: 'linkState',
+        header: t('linkState'),
+        width: 150,
       },
     ];
     this.state = {};
@@ -50,7 +55,9 @@ class InterfacePage extends Component {
 
   componentDidMount() {
     this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.collector, this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -66,7 +73,7 @@ class InterfacePage extends Component {
   }
 
   render() {
-    const interfaces = this.props.collector.interfaces.entities;
+    const interfaces = this.props.collector.interfaces;
     return (
       <Box className="flex1">
         <Box className="pageBox min200x200">

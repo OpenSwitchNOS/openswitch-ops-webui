@@ -38,6 +38,7 @@ class NavSideBar extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    collector: PropTypes.object.isRequired,
     links: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
   };
@@ -127,10 +128,10 @@ class NavSideBar extends Component {
         <Box>
           <Box pad={{horizontal: 'medium', vertical: 'small'}}>
             <div><b>{t('hostname')}</b></div>
-            <div>alswitch.rose.hp.com</div>
+            <div>{this.props.collector.info.hostname}</div>
             <br/>
             <div><b>{t('model')}</b></div>
-            <div>#X-01-power-armor</div>
+            <div>{this.props.collector.info.partNum}</div>
           </Box>
           <br/>
           <Menu primary>
@@ -149,6 +150,10 @@ class NavSideBar extends Component {
 
 }
 
-const select = (state) => ({ links: state.links, nav: state.nav });
+const select = (store) => ({
+  links: store.links,
+  nav: store.nav,
+  collector: store.collector,
+});
 
 export default connect(select)(NavSideBar);
