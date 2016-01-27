@@ -1,0 +1,66 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+// SCSS partial that can be included multiple times
+// *** VARIABLE DEFINITIONS ONLY ***
+
+// Grommet settings
+
+$brand-color: #FF6F3E;
+$brand-neutral-colors: (#432965, #724230, #3D7791, #CDCCCC);
+$brand-accent-colors: (#D0703E, #B2AA61, #6492A6);
+$brand-link-color: inherit;
+$brand-status-colors: (
+  critical: #FF324D,
+  error: #FF324D,
+  warning: #FFD602,
+  ok: #8CC800,
+  unknown: #a8a8a8,
+  disabled: #EDEDED
+);
+$brand-grey-colors: (#333333, #3B3B3B, #434343, #666666);
+@if not variable-exists(brand-graph-colors) {
+  $brand-graph-colors: ();
+  $brand-graph-colors: join($brand-graph-colors, $brand-accent-colors);
+  $brand-graph-colors: join($brand-graph-colors, $brand-neutral-colors);
+};
+
+$button-secondary-color: nth($brand-neutral-colors, 2);
+
+$button-primary-text-color: #fff;
+$button-primary-background-color: $brand-color;
+$border-radius: 8px;
+
+// Brand specific settings
+
+//$pageBgColor: #F5F5F5;
+$pageBgColor: #E5E5E5;
+
+$headerBgColor: #eee;
+$headerHoverColor: $brand-color;
+
+$rowHoverBgColor: #eee;
+$rowHoverColor: #000;
+
+$rowOddBgColor: lighten($rowHoverBgColor, 3%);
+
+$rowActiveBgColor: lighten($brand-color, 23%);
+$rowActiveColor: #333;
+$rowActiveHoverBgColor: darken($rowActiveBgColor, 5%);
+
+$border: 1px solid grey;
+
+$space: 16px;
