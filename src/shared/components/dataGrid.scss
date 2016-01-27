@@ -1,0 +1,87 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+@import "~_settings.scss";
+@import "~fixed-data-table/dist/fixed-data-table.css";
+
+.dataGrid {
+
+  overflow: hidden;
+
+  .header {
+    height: 48px;
+    input.search-input__input {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+    .search-input__control {
+      .control-icon {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  }
+
+  .public_fixedDataTableCell_cellContent {
+    padding-right: 24px; // allow for the scrollbar when cell is right aligned
+  }
+
+  .public_fixedDataTable_header .public_fixedDataTableCell_main  {
+    background-color: $headerBgColor;
+    background-image: none; // git rid of the gradient (you're welcome Kelsey)
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover {
+      color: $headerHoverColor;
+      .control-icon.tiny:not(.noColor) {
+        fill: $headerHoverColor;
+        stroke: $headerHoverColor;
+      }
+    }
+    .control-icon.tiny {
+      margin-top: 0px;
+      margin-bottom: 0px;
+      margin-left: -8px;
+    }
+  }
+
+  .public_fixedDataTableCell_main,
+  .public_fixedDataTableRow_highlighted,
+  .public_fixedDataTableRow_highlighted .public_fixedDataTableCell_main {
+    background-color: transparent;
+  }
+
+  .public_fixedDataTableRow_main {
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+    &.public_fixedDataTableRow_odd {
+      background-color: $rowOddBgColor;
+    }
+    &:hover {
+      background-color: $rowHoverBgColor;
+      color: $rowHoverColor;
+    }
+    &.active {
+      background-color: $rowActiveBgColor;
+      color: $rowActiveColor;
+      &:hover {
+        background-color: $rowActiveHoverBgColor;
+      }
+    }
+  }
+
+}
