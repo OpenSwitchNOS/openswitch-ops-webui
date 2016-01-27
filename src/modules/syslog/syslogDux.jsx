@@ -16,6 +16,7 @@
 
 import Dux from 'dux.js';
 import SyslogPage from './syslogPage.jsx';
+import {genData} from './genData.js';
 
 const NAME = 'syslog';
 
@@ -26,12 +27,17 @@ const NAVS = [
   },
 ];
 
+//const local = true; // To get fake data avoding REST call
+//const lastPullDate = new Date();
+const syslogData = genData();
 
 // TODO - for syslog REST
 const URL = '/rest/v1/system/bridges/bridge_normal';
 const ACTIONS = {
   fetch(filter) {
-    const url = `${URL}/${filter}`;
+    // filter has endPath such as syslog and 2 other queries for time and
+    // priority
+    const url = `${URL}/${filter.endPath}`;
     return Dux.fetchAction(NAME, url);
   }
 };
@@ -41,58 +47,6 @@ const INITIAL_STORE = {
   lastRead: 0,
   length: 0,
 };
-
-const syslogData = {
-  '1': {
-    severity: 0,
-    date: '2015-12-17 00:00:00',
-    facility: 'Auth',
-    text: 'This is Emerg syslog with Severity: 0'
-  },
-  '2': {
-    severity: 1,
-    date: '2015-12-17 01:01:01',
-    facility: 'Auth',
-    text: 'This is Alert syslog with Severity: 1'
-  },
-  '3': {
-    severity: 2,
-    date: '2015-12-17 02:02:02',
-    facility: 'System',
-    text: 'This is Critical syslog with Severity: 2'
-  },
-  '4': {
-    severity: 3,
-    date: '2015-12-17 03:03:03',
-    facility: 'System',
-    text: 'This is Error syslog with Severity: 3'
-  },
-  '5': {
-    severity: 4,
-    date: '2015-12-17 04:04:04',
-    facility: 'LAG',
-    text: 'This is Warning syslog with Severity: 4'
-  },
-  '6': {
-    severity: 5,
-    date: '2015-12-17 05:05:05',
-    facility: 'LLDP',
-    text: 'This is Notice syslog with Severity: 5'
-  },
-  '7': {
-    severity: 6,
-    date: '2015-12-17 06:06:06',
-    facility: 'LLDP',
-    text: 'This is Info syslog with Severity: 6'
-  },
-  '8': {
-    severity: 7,
-    date: '2015-12-17 07:07:07',
-    facility: 'LLDP',
-    text: 'This is Debug syslog with Severity: 7'
-  },
-};
-
 
 function parseResult() {
   //const body = result.body;
