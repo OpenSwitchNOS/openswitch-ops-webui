@@ -55,11 +55,12 @@ export default class StatusLayer extends Component {
           <Header>
             <Title>
               <SpanStatus size="large" space={false} value={value}>
-                {title}
+              {title}
               </SpanStatus>
             </Title>
           </Header>
-          <p>{this.props.children}</p>
+          <br/>
+          {this.props.children}
         </Form>
       </Layer>
     );

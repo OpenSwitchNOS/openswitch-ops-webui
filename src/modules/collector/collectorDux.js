@@ -38,6 +38,7 @@ const INITIAL_STORE = {
   ports: {},
   powerSupplies: {},
   fans: {},
+  fansRollup: {},
   temps: {},
 };
 
@@ -62,12 +63,17 @@ function normalizeFanStatus(s) {
 }
 
 function normalizeTempStatus(id, s) {
+  const max = Number(s.max) / 1000;
+  const min = Number(s.min) / 1000;
+  const value = Number(s.temperature) / 1000;
+  const status = value < max ? 'ok' : 'warning';
   return {
     id,
     location: s.location,
-    max: Number(s.max) / 1000,
-    min: Number(s.min) / 1000,
-    value: Number(s.temperature) / 1000,
+    max,
+    min,
+    value,
+    status,
   };
 }
 
@@ -123,6 +129,9 @@ function parseResult(result) {
   });
 
   const fans = {};
+  let critical = 0;
+  let warning = 0;
+  let ok = 0;
   fanBody.forEach((elm) => {
     const id = elm.status.name;
     const ps = normalizeFanStatus(elm.status.status);
@@ -131,7 +140,15 @@ function parseResult(result) {
       text: ps.text,
       status: ps.status,
     };
+    if (ps.status === 'critical') {
+      critical++;
+    } else if (ps.status === 'warning') {
+      warning++;
+    } else if (ps.status === 'ok') {
+      ok++;
+    }
   });
+  const fansRollup = { critical, warning, ok };
 
   const temps = {};
   tempBody.forEach((elm) => {
@@ -139,7 +156,7 @@ function parseResult(result) {
     temps[id] = normalizeTempStatus(id, elm.status);
   });
 
-  return { info, interfaces, ports, powerSupplies, fans, temps };
+  return { info, interfaces, ports, powerSupplies, fans, fansRollup, temps };
 }
 
 const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);

@@ -69,6 +69,30 @@ h1, h2, h3, .headline, .title {
 .min200x200 { @include minHxW(); }
 .min200x400 { @include minHxW(200px, 400px); }
 
+// Single line for the 'hr' plain html element
+hr {
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+
+table th {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+// Property styles for plain html tables
+table.propTable {
+  td:first-child {
+    font-weight: bold;
+    padding-right: 16px;
+  }
+  td {
+    padding-bottom: 16px;
+  }
+  margin-bottom: 0px;
+}
+
 @mixin pageBox($marginTop: $space, $marginLeft: $space) {
   background-color: white;
   border-radius: 5px;
@@ -77,33 +101,6 @@ h1, h2, h3, .headline, .title {
   margin-top: $marginTop;
   margin-left: $marginLeft;
   overflow: auto;
-
-  // Single line for the 'hr' plain html element
-  hr {
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-  }
-
-  table {
-    margin-bottom: 0px;
-  }
-
-  table th {
-    font-size: 1em;
-    font-weight: bold;
-  }
-
-  // Property styles for plain html tables
-  table.propTable {
-    td:first-child {
-      font-weight: bold;
-      padding-right: 16px;
-    }
-    td {
-      padding-bottom: 16px;
-    }
-  }
 }
 
 #page {

@@ -28,8 +28,8 @@ import Metric from 'metric.js';
 import LabeledMetric from 'labeledMetric.js';
 import DataPoint from 'dataPoint.js';
 import MetricTable from 'metricTable.jsx';
-import MetricChart from 'metricChart.jsx';
 import SpanStatus from 'spanStatus.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 
 class OverviewPage extends Component {
@@ -101,7 +101,10 @@ class OverviewPage extends Component {
           .setColorIndex(networkChartColor)
       ),
     ];
-    this.state = { selectedLabeledMetric: this.networkLabeledMetrics[0] };
+    this.state = {
+      selectedLabeledMetric: this.networkLabeledMetrics[0],
+      showFansLayer: false,
+    };
   }
 
   _setToolbar = (props) => {
@@ -173,6 +176,31 @@ class OverviewPage extends Component {
     );
   };
 
+  _mkHw = () => {
+    const ps = this.props.collector.powerSupplies;
+    const trs = [];
+    Object.getOwnPropertyNames(ps).forEach(k => {
+      const data = ps[k];
+      trs.push(
+        <tr key={data.id}>
+          <td><a>{data.id}:</a></td>
+          <td>
+            <a href="#/syslog">
+              <SpanStatus value={data.status}>Test</SpanStatus>
+            </a>
+          </td>
+        </tr>
+      );
+    });
+    return (
+      <table className="propTable">
+        <tbody>
+          {trs}
+        </tbody>
+      </table>
+    );
+  };
+
   _mkPowerProps = () => {
     const ps = this.props.collector.powerSupplies;
     const trs = [];
@@ -208,7 +236,7 @@ class OverviewPage extends Component {
           <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
-              {t(data.text)}
+            {t(data.text)}
             </SpanStatus>
           </td>
         </tr>
@@ -223,6 +251,28 @@ class OverviewPage extends Component {
     );
   };
 
+  _mkFansRollup = () => {
+    const fansRollup = this.props.collector.fansRollup;
+    const status =
+      fansRollup.critical ? 'critical' :
+        fansRollup.warning ? 'warning' :
+          fansRollup.ok ? 'ok' : 'unknown';
+    return (
+      <table className="propTable">
+        <tbody>
+          <tr>
+            <td>{t('fans')}:</td>
+            <td>
+              <a onClick={this._onToggleFansLayer}>
+                <SpanStatus value={status}>{t(status)}</SpanStatus>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
   _mkTempMeters = () => {
     const temps = this.props.collector.temps;
     const meters = [];
@@ -230,17 +280,16 @@ class OverviewPage extends Component {
       const data = temps[k];
       meters.push(
         <Box key={k} pad={{horizontal: 'small'}}>
-          {data.id}
+        <span>{data.id}&nbsp;{data.location}</span>
           <br/>
           <Meter
               size="small"
-              colorIndex="neutral-3"
               value={40}
-              min={{value: 0, label: '0 GB'}}
-              max={{value: 80, label: '80 GB'}}
-              threshold={75}
-              units="GB"
-              vertical />
+              series={[{value: data.value, colorIndex: 'graph-3'}]}
+              min={{value: data.min, label: data.min}}
+              max={{value: data.max, label: data.max}}
+              units={t('degreesCelsius')}
+              />
         </Box>
       );
     });
@@ -248,6 +297,31 @@ class OverviewPage extends Component {
       <Box direction="row">
         {meters}
       </Box>
+    );
+  };
+
+  _mkTempProps = () => {
+    const temps = this.props.collector.temps;
+    const trs = [];
+    Object.getOwnPropertyNames(temps).forEach(k => {
+      const data = temps[k];
+      trs.push(
+        <tr key={data.id}>
+          <td>{data.id}&nbsp;{data.location}:</td>
+          <td>
+            <SpanStatus value={data.status}>
+              {t(data.value)}
+            </SpanStatus>
+          </td>
+        </tr>
+      );
+    });
+    return (
+      <table className="propTable">
+        <tbody>
+          {trs}
+        </tbody>
+      </table>
     );
   };
 
@@ -272,41 +346,68 @@ class OverviewPage extends Component {
     );
   };
 
-  render() {
-    const label = this.state.selectedLabeledMetric.label();
-    const metric = this.state.selectedLabeledMetric.metric();
+  _mkFeatureProps = () => {
+    return (
+      <table style={{tableLayout: 'fixed'}} className="propTable">
+        <tbody>
+          <tr>
+            <td style={{width: '140px'}}>{t('Protocol#1')}:</td>
+            <td>{t('disabled')}</td>
+          </tr>
+          <tr>
+            <td>{t('Protocol#2')}:</td>
+            <td>{t('enabled')}</td>
+          </tr>
+          <tr>
+            <td>{t('Protocol#3')}:</td>
+            <td>{t('enabled')}</td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
 
+  _onToggleFansLayer = () => {
+    const showFansLayer = !this.state.showFansLayer;
+    this.setState({ showFansLayer });
+  };
+
+  render() {
     return (
       <Box className="flex1">
-        <Box direction="row" className="flexWrap">
+        <Box direction="row" className="flex0auto flexWrap">
           <Box pad={this.pad} className="flex1 pageBox min200x200">
             <b>{t('system')}</b>
             <hr/>
             {this._mkInfoProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('power')}</b>
+            <b>{t('hardware')}</b>
             <hr/>
-            {this._mkPowerProps()}
-          </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('temperature')}</b>
-            <hr/>
-            {this._mkTempMeters()}
-          </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('fans')}</b>
-            <hr/>
-            {this._mkFanProps()}
-          </Box>
-        </Box>
-        <Box direction="row" pad={this.pad} className="flex1 pageBox min200x400">
-          <Box>
-            <b>{t('network')}</b>
-            <hr/>
-            {this._mkNetworkProps()}
+            {this._mkHw()}
             <br/>
-            <b>{t('topUtilization')}</b>
+            {this._mkTempProps()}
+            <br/>
+            {this._mkFansRollup()}
+            {!this.state.showFansLayer ? null :
+            <StatusLayer
+                onClose={this._onToggleFansLayer}
+                title={t('Fan Status')}
+                value="ok">
+                {this._mkFanProps()}
+            </StatusLayer>
+            }
+          </Box>
+          <Box pad={this.pad} className="flex1 pageBox min200x200">
+            <b>{t('features')}</b>
+            <hr/>
+            {this._mkFeatureProps()}
+            <br/>
+            {this._mkNetworkProps()}
+          </Box>
+          <Box pad={this.pad} className="flex1 pageBox min200x200">
+            <b>{t('traffic')}</b>
+            <hr/>
             <Box pad={{vertical: 'small'}}>
               <MetricTable
                   onSelect={this._onSelectMetric}
@@ -315,333 +416,33 @@ class OverviewPage extends Component {
               />
             </Box>
           </Box>
-          <Box>
-            &nbsp;&nbsp;&nbsp;
-            <hr/>
-          </Box>
-          <Box className="flex1">
-            <b>&nbsp;</b>
-            <hr/>
-            <span><b>{`${t('utilization')} - `}</b>{`${label}`}</span>
-            <MetricChart
-                size="large"
-                metric={metric}
-                onSelect={this._onSelectDataPoint}/>
-            <i>Syslog entries: [4:41:35 PM - 4:41:45 PM]</i>
-            <Table>
-              <thead>
-                <tr>
-                  <th>Severity</th>
-                  <th>Date</th>
-                  <th>Facility</th>
-                  <th>Text</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Critical</td>
-                  <td>4:22:50 PM</td>
-                  <td>System</td>
-                  <td>This is syslog message text for #1</td>
-                </tr>
-                <tr>
-                  <td>Critical</td>
-                  <td>4:22:50 PM</td>
-                  <td>System</td>
-                  <td>This is syslog message text for #1</td>
-                </tr>
-                <tr>
-                  <td>Critical</td>
-                  <td>4:22:50 PM</td>
-                  <td>System</td>
-                  <td>This is syslog message text for #1</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Box>
         </Box>
-      {/*
-
-
-/rest/v1/system/subsystems/base
-        body: Object
-          configuration: Object
-          statistics: Object
-        status: Object
-         macs_remaining: 72
-         name: "base"
-         next_mac_address: "48:0f:cf:af:d1:34"
-         other_info: Object
-
-        Product Name: "HP Altoline 5712-48XG-6QSFP+ x86 ONIE AC Front-to-Back Switch"
-        base_mac_address: "48:0f:cf:af:d1:32"
-        country_code: "TW"
-        device_version: ""
-        diag_version: "2.0.1.3"
-        interface_count: "78"
-        l3_port_requires_internal_vlan: "1"
-        label_revision: "R01I"
-        manufacture_date: "07/25/2015 04:48:24"
-        manufacturer: "Accton"
-        max_bond_count: "1024"
-        max_bond_member_count: "256"
-        max_interface_speed: "40000"
-        max_transmission_unit: "9216"
-        number_of_macs: "74"
-        onie_version: "2014.08.00.05"
-        part_number: "FP18J5654000A"
-        platform_name: "x86_64-accton_as5712_54x-r0"
-        serial_number: "TW57HCR00N"
-        vendor: "Hewlett-Packard"
-
-/rest/v1/system
-        body: Object
-        configuration: Object
-        asset_tag_number: "OpenSwitch asset tag"
-        external_ids: Object
-        fans: Array[10]
-        0: "/rest/v1/system/subsystems/base/fans/base-1L"
-        1: "/rest/v1/system/subsystems/base/fans/base-2R"
-        2: "/rest/v1/system/subsystems/base/fans/base-4R"
-        3: "/rest/v1/system/subsystems/base/fans/base-3L"
-        4: "/rest/v1/system/subsystems/base/fans/base-5L"
-        5: "/rest/v1/system/subsystems/base/fans/base-1R"
-        6: "/rest/v1/system/subsystems/base/fans/base-2L"
-        7: "/rest/v1/system/subsystems/base/fans/base-5R"
-        8: "/rest/v1/system/subsystems/base/fans/base-4L"
-        9: "/rest/v1/system/subsystems/base/fans/base-3R"
-        length: 10
-        __proto__: Array[0]
-        interfaces: Array[78]
-        leds: Array[1]
-        0: "/rest/v1/system/subsystems/base/leds/base-loc"
-        length: 1
-        __proto__: Array[0]
-        other_config: Object
-        fan_speed_override: "slow"
-        __proto__: Object
-        power_supplies: Array[2]
-        0: "/rest/v1/system/subsystems/base/power_supplies/base-2"
-        1: "/rest/v1/system/subsystems/base/power_supplies/base-1"
-        length: 2
-        __proto__: Array[0]
-        temp_sensors: Array[3]
-        0: "/rest/v1/system/subsystems/base/temp_sensors/base-1"
-        1: "/rest/v1/system/subsystems/base/temp_sensors/base-2"
-        2: "/rest/v1/system/subsystems/base/temp_sensors/base-3"
-        length: 3
-
-        body: Object
-        configuration: Object
-        aaa: Object
-        fallback: "true"
-        radius: "false"
-        ssh_passkeyauthentication: "enable"
-        ssh_publickeyauthentication: "enable"
-        __proto__: Object
-
-        statistics: Object
-        lldp_statistics: Object
-        statistics: Object
-        cpu: "4"
-        file_systems: "/,1998672,308000 /var/local,122835,1894"
-        load_average: "0.12,0.13,0.14"
-        memory: "8167696,831088,499952,0,0"
-        process_ops-arpmgrd: "27840,1416,34210,0,2402803314,2402803314"
-        process_ops-bgpd: "41384,3912,20160,0,2402803113,2402803113"
-        process_ops-fand: "39180,3704,1072210,0,2402803043,2402803043"
-        process_ops-intfd: "28636,2204,160,0,2402803304,2402803304"
-        process_ops-lacpd: "183624,2460,100590,0,2402803254,2402803254"
-        process_ops-ledd: "39172,3512,220,0,2402803043,2402803043"
-        process_ops-pmd: "39636,4140,15843270,0,2402802553,2402802553"
-        process_ops-portd: "35928,9592,34080,0,2402803334,2402803334"
-        process_ops-powerd: "39168,3716,235910,0,2402803043,2402803043"
-        process_ops-switchd: "513424,83764,135106060,0,2402803363,2402803363"
-        process_ops-sysd: "43788,4388,310,0,2402803043,2402803043"
-        process_ops-tempd: "39172,3692,189660,0,2402803043,2402803043"
-        process_ops-vland: "38780,12356,380,0,2402803284,2402803284"
-        process_ops-zebra: "39632,2880,20,0,2402803154,2402803154"
-        process_ops_aaautilspamcfg: "100124,10656,804480,0,2402800872,2402800872"
-        process_ops_mgmtintfcfg: "107624,14448,833260,0,2402800352,2402800352"
-        process_ovsdb-server: "46612,20844,54329920,0,2402803474,2402803474"
-        __proto__: Object
-        __proto__: Object
-        status: Object
-        auto_provisioning_status: Object
-        __proto__: Object
-        boot_time: 0
-        bufmon_info: Object
-        __proto__: Object
-        db_version: ""
-        management_mac: "48:0f:cf:af:d1:32"
-        mgmt_intf_status: Object
-        default_gateway: "15.108.28.50"
-        hostname: "alswitch5"
-        ip: "15.108.30.248"
-        link_state: "UP"
-        subnet_mask: "22"
-        __proto__: Object
-        software_info: Object
-        __proto__: Object
-        status: Object
-        __proto__: Object
-        switch_version: "0.1.0 (Build: developer_image)"
-        system_mac: "48:0f:cf:af:d1:33"
-
-
-        <Box direction="row flex1">
-          <Box className="flex1 pageBox">
-            <Header>
-              <Title>Information</Title>
-            </Header>
-            <Table>
-              <tbody>
-                <tr>
-                  <td><b>Product:</b></td>
-                  <td>Blah blah blah blah blah blah blah blah blah</td>
-                </tr>
-                <tr>
-                  <td><b>Vendor:</b></td>
-                  <td>Blah blah blah blah blah blah blah blah blah</td>
-                </tr>
-                <tr>
-                  <td><b>Version:</b></td>
-                  <td>Blah blah blah</td>
-                </tr>
-                <tr>
-                  <td><b>ONIE Version:</b></td>
-                  <td>Blah blah blah</td>
-                </tr>
-                <tr>
-                  <td><b>Base MAC:</b></td>
-                  <td>Blah blah blah</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Box>
-          <Box className="flex1 pageBox">
-            <Header>
-              <Title>System</Title>
-            </Header>
-            <Table>
-              <tbody>
-                <tr>
-                  <td><b>Storage:</b></td>
-                  <td><SpanStatus value="warning">112 of 150 GBs used</SpanStatus></td>
-                </tr>
-                <tr>
-                  <td><b>Power Supply:</b></td>
-                  <td><SpanStatus value="critical">1 of 2 power supplies down</SpanStatus></td>
-                </tr>
-                <tr>
-                  <td><b>Fans:</b></td>
-                  <td><SpanStatus value="ok">5 fans reporting</SpanStatus></td>
-                </tr>
-                <tr>
-                  <td><b>Temperatures:</b></td>
-                  <td><SpanStatus value="ok">3 sensors reporting</SpanStatus></td>
-                </tr>
-              </tbody>
-            </Table>
-            <MetricTableChart
-                widths={{label: '130px', value: '70px', chart: '100px'}}
-                metrics={[
-                  { label: 'CPU Load:', metric: this.systemMetrics[0] },
-                  { label: 'Memory Used:', metric: this.systemMetrics[1] },
-                ]}
-                onSelectMetric={this._onSelectMetric}
-                onSelectDataPoint={this._onSelectDataPoint}
-            />
-            <Table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Severity</th>
-                  <th>Syslog Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>4:22:50 PM</td>
-                  <td>Critical</td>
-                  <td>This is syslog message text for #1</td>
-                </tr>
-                <tr>
-                  <td>second</td>
-                  <td>second</td>
-                  <td>note 2</td>
-                </tr>
-                <tr>
-                  <td>second</td>
-                  <td>third</td>
-                  <td>note 3</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Box>
-          <Box className="flex1 pageBox">
-            <Header>
-              <Title>Network</Title>
-            </Header>
-            <Table>
-              <tbody>
-                <tr>
-                  <td><b>VLANs:</b></td>
-                  <td><SpanStatus value="warning">1-1000, 1003-4096 (4094 of 4096 used)</SpanStatus></td>
-                </tr>
-                <tr>
-                  <td><b>Interfaces:</b></td>
-                  <td>1-48, 49, 51</td>
-                </tr>
-                <tr>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-              </tbody>
-            </Table>
-            <MetricTableChart
-                widths={{label: '130px', value: '70px', chart: '100px'}}
-                metrics={[
-                  { label: 'Interface 11:', metric: this.networkMetrics[0] },
-                  { label: 'Interface 48:', metric: this.networkMetrics[1] },
-                  { label: 'Interface 2:', metric: this.networkMetrics[2] },
-                ]}
-                onSelectMetric={this._onSelectMetric}
-                onSelectDataPoint={this._onSelectDataPoint}
-            />
-            <Table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Severity</th>
-                  <th>Syslog Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>4:22:50 PM</td>
-                  <td>Critical</td>
-                  <td>This is syslog message text for #1</td>
-                </tr>
-                <tr>
-                  <td>second</td>
-                  <td>second</td>
-                  <td>note 2</td>
-                </tr>
-                <tr>
-                  <td>second</td>
-                  <td>third</td>
-                  <td>note 3</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Box>
+        <Box pad={this.pad} className="flex1 pageBox min200x400">
+          <span><b>{t('syslog')}&nbsp;&nbsp;</b><small>4:41:35 PM to 4:41:45 PM</small></span>
+          <hr/>
+          <Table>
+            <tbody>
+              <tr>
+                <td>Critical</td>
+                <td>4:22:50 PM</td>
+                <td>System</td>
+                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+              </tr>
+              <tr>
+                <td>Critical</td>
+                <td>4:22:50 PM</td>
+                <td>System</td>
+                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+              </tr>
+              <tr>
+                <td>Critical</td>
+                <td>4:22:50 PM</td>
+                <td>System</td>
+                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+              </tr>
+            </tbody>
+          </Table>
         </Box>
-        <Box className="flex1 pageBox">
-          Big Chart
-        </Box>
-      </Box>
-      */}
       </Box>
     );
   }

@@ -28,7 +28,7 @@ const NAVS = [
 
 
 // TODO - for syslog REST
-const URL = '/rest-poc/v1/system/bridges/bridge_normal';
+const URL = '/rest/v1/system/bridges/bridge_normal';
 const ACTIONS = {
   fetch(filter) {
     const url = `${URL}/${filter}`;
