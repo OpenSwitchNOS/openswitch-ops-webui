@@ -48,6 +48,7 @@ class MainApp extends Component {
     autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
     collector: PropTypes.object.isRequired,
+    guide: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
@@ -155,7 +156,7 @@ class MainApp extends Component {
       </Box>
     );
 
-    const guide = (
+    const guide = !this.props.guide.component ? null : (
       <Box className="guide">
         <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
             justify="between">
@@ -163,7 +164,7 @@ class MainApp extends Component {
             <Title>Quick Guide</Title>
           </Menu>
           <Menu direction="row" responsive={false}>
-            <Anchor onClick={this._onClose}>
+            <Anchor onClick={this.props.actions.guide.hide}>
               <CloseIcon />
             </Anchor>
           </Menu>
@@ -190,7 +191,7 @@ class MainApp extends Component {
       <Split flex="right" onResponsive={this._onNavSplitResponsive}
           priority="left">
         <Box direction="row">
-          {this.state.showGuidePane ? guide : null}
+          {guide}
           {nav}
         </Box>
         <Box direction="row">
@@ -219,6 +220,7 @@ const select = (store) => ({
   routeToLink: store.routeToLink,
   toolbar: store.toolbar,
   collector: store.collector,
+  guide: store.guide,
 });
 
 export default connect(select)(MainApp);

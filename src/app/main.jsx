@@ -35,6 +35,7 @@ import { agentInit } from 'agent.js';
 import NavDux from 'framework/navDux.jsx';
 import ToolbarDux from 'framework/toolbarDux.jsx';
 import AuthDux from 'framework/authDux.jsx';
+import GuideDux from 'framework/guideDux.jsx';
 
 import MainApp from './mainApp.jsx';
 
@@ -114,6 +115,7 @@ export function mainInit(BuildConfig) {
   BuildConfig.modules.splice(0, 0, NavDux);
   BuildConfig.modules.splice(0, 0, ToolbarDux);
   BuildConfig.modules.splice(0, 0, AuthDux);
+  BuildConfig.modules.splice(0, 0, GuideDux);
 
   const navModel = createNavModel(BuildConfig, MainApp);
   const initStore = {

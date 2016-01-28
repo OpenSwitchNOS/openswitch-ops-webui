@@ -14,29 +14,35 @@
     under the License.
 */
 
-import CollectorDux from 'collector/collectorDux.js';
-import SyslogDux from 'syslog/syslogDux.jsx';
-import OverviewDux from 'overview/overviewDux.jsx';
-import InterfaceDux from 'interface/interfaceDux.jsx';
-import VlanDux from 'vlan/vlanDux.jsx';
+const NAME = 'guide';
+const SHOW = `${NAME}/SHOW`;
+const HIDE = `${NAME}/HIDE`;
 
-
-const modules = [
-  CollectorDux,
-  OverviewDux,
-  InterfaceDux,
-  VlanDux,
-  SyslogDux,
-];
-
-import * as i18nLocale from 'i18n/en-US.js';
-
-const settings = {
-  i18nLocale,
-  reduxLogger: true,
-  agent: {
-    prefix: 'http://15.108.30.248:8091',
-  }
+const ACTIONS = {
+  show(component) { return { type: SHOW, component }; },
+  hide() { return { type: HIDE }; },
 };
 
-export default { modules, settings };
+const INITIAL_STORE = {
+  component: null,
+};
+
+function REDUCER(moduleStore = INITIAL_STORE, action) {
+  switch (action.type) {
+
+    case SHOW:
+      return { ...moduleStore, component: action.component };
+
+    case HIDE:
+      return { ...moduleStore, component: null };
+
+    default:
+      return moduleStore;
+  }
+}
+
+export default {
+  NAME,
+  ACTIONS,
+  REDUCER,
+};
