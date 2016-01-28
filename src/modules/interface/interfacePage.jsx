@@ -27,7 +27,12 @@ class InterfacePage extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
+    children: PropTypes.node,
     collector: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    params: PropTypes.shape({
+      id: PropTypes.string
+    }),
   };
 
   constructor(props) {
@@ -36,18 +41,33 @@ class InterfacePage extends Component {
       {
         columnKey: 'id',
         header: t('id'),
-        width: 100,
-        align: 'right',
+        width: 80,
+        align: 'left',
       },
       {
         columnKey: 'adminState',
         header: t('adminState'),
-        width: 160,
+        width: 215,
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
-        width: 150,
+        width: 215,
+      },
+      {
+        columnKey: 'duplex',
+        header: t('duplex'),
+        width: 215,
+      },
+      {
+        columnKey: 'speed',
+        header: t('speed'),
+        width: 215,
+      },
+      {
+        columnKey: 'connector',
+        header: t('connector'),
+        width: 215,
       },
     ];
     this.state = {};
@@ -72,22 +92,39 @@ class InterfacePage extends Component {
     this.props.actions.toolbar.clear();
   }
 
+  _onSelect = (id) => {
+    this.props.history.pushState(null, `/interface/${id}`);
+  };
+
   render() {
     const interfaces = this.props.collector.interfaces;
+
+    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
+    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
+    const details = !this.props.params.id ? null : (
+      <Box className="pageBox">
+        {this.props.children}
+      </Box>
+    );
+
     return (
-      <Box className="flex1">
-        <Box className="pageBox min200x200">
+      <Box direction="row" className="flex1">
+        <Box className="flex1">
+          <Box className="pageBox min200x200">
           ...BoxGraphic goes here...
+          </Box>
+          <Box className="flex1 mTopHalf mLeft">
+            <ResponsiveBox>
+              <DataGrid width={300} height={400}
+                  data={interfaces}
+                  columns={this.cols}
+                  singleSelect
+                  onSelectChange={this._onSelect}
+              />
+            </ResponsiveBox>
+          </Box>
         </Box>
-        <Box className="flex1 mTopHalf mLeft">
-          <ResponsiveBox>
-            <DataGrid width={300} height={400}
-                data={interfaces}
-                columns={this.cols}
-                noSelect
-            />
-          </ResponsiveBox>
-        </Box>
+        {details}
       </Box>
     );
   }

@@ -15,6 +15,8 @@
 */
 
 import InterfacePage from './interfacePage.jsx';
+import InterfaceDetails from './interfaceDetails.jsx';
+
 
 const NAME = 'interface';
 
@@ -23,6 +25,10 @@ export const NAVS = [
     route: { path: '/interface', component: InterfacePage },
     link: { path: '/interface', order: 200 }
   },
+  {
+    route: {path: '/interface/:id', component: InterfaceDetails},
+    link: {path: '/interface', hidden: true}
+  }
 ];
 
 export default {
