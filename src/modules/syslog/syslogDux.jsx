@@ -26,13 +26,21 @@ const NAVS = [
   },
 ];
 
-
 // TODO - for syslog REST
-const URL = '/rest/v1/system/bridges/bridge_normal';
+const URL = '/rest/v1/system/syslogs';
+
+function buildUrl(filter) {
+  let url = URL;
+  url=`${URL}?priority=${filter.priority}`;
+  url=`${url}&since=${filter.since}&until=${filter.until}`;
+  return url;
+}
+
 const ACTIONS = {
   fetch(filter) {
-    const url = `${URL}/${filter}`;
-    return Dux.fetchAction(NAME, url);
+    // filter has endPath such as syslog and 2 other queries for time and
+    // priority
+    return Dux.fetchAction(NAME, buildUrl(filter));
   }
 };
 
@@ -42,78 +50,19 @@ const INITIAL_STORE = {
   length: 0,
 };
 
-const syslogData = {
-  '1': {
-    severity: 0,
-    date: '2015-12-17 00:00:00',
-    facility: 'Auth',
-    text: 'This is Emerg syslog with Severity: 0'
-  },
-  '2': {
-    severity: 1,
-    date: '2015-12-17 01:01:01',
-    facility: 'Auth',
-    text: 'This is Alert syslog with Severity: 1'
-  },
-  '3': {
-    severity: 2,
-    date: '2015-12-17 02:02:02',
-    facility: 'System',
-    text: 'This is Critical syslog with Severity: 2'
-  },
-  '4': {
-    severity: 3,
-    date: '2015-12-17 03:03:03',
-    facility: 'System',
-    text: 'This is Error syslog with Severity: 3'
-  },
-  '5': {
-    severity: 4,
-    date: '2015-12-17 04:04:04',
-    facility: 'LAG',
-    text: 'This is Warning syslog with Severity: 4'
-  },
-  '6': {
-    severity: 5,
-    date: '2015-12-17 05:05:05',
-    facility: 'LLDP',
-    text: 'This is Notice syslog with Severity: 5'
-  },
-  '7': {
-    severity: 6,
-    date: '2015-12-17 06:06:06',
-    facility: 'LLDP',
-    text: 'This is Info syslog with Severity: 6'
-  },
-  '8': {
-    severity: 7,
-    date: '2015-12-17 07:07:07',
-    facility: 'LLDP',
-    text: 'This is Debug syslog with Severity: 7'
-  },
-};
+function parseResult(result) {
+  const body = result.body;
 
+  const entities = {};
 
-function parseResult() {
-  //const body = result.body;
+  // TODO: Incorrectly assuming data is an object but is an array of objects
+  Object.getOwnPropertyNames(body).forEach(k => {
+    const data = body[k];
+    if (k !== 'length') {
+      entities[k] = Object.assign({}, data);
+    }
+  });
 
-  let entities = {};
-  // let length = 0;
-  //
-  // Object.getOwnPropertyNames(body).forEach(k => {
-  //   const data = body[k];
-  //   if (k !== 'length') {
-  //     entities[k] = {
-  //       id: k,
-  //       name: data.configuration.name,
-  //     };
-  //   } else {
-  //     length = data;
-  //   }
-  // });
-
-  // for fake data
-  entities = syslogData;
   return { length: entities.length, entities };
 }
 
