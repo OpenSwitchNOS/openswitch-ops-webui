@@ -66,6 +66,7 @@ export const MESSAGES = {
   fanFault: 'Fault',
   fanUninitialized: 'Uninitialized',
   features: 'Features',
+  guides: 'Quick Guides',
   hardware: 'Hardware',
   hostname: 'Hostname',
   id: 'ID',

@@ -28,7 +28,7 @@ $brand-status-colors: (
   error: #FF324D,
   warning: #FFD602,
   ok: #8CC800,
-  unknown: #a8a8a8,
+  unknown: #A8A8A8,
   disabled: #EDEDED
 );
 $brand-grey-colors: (#333333, #3B3B3B, #434343, #666666);
@@ -40,7 +40,7 @@ $brand-grey-colors: (#333333, #3B3B3B, #434343, #666666);
 
 $button-secondary-color: nth($brand-neutral-colors, 2);
 
-$button-primary-text-color: #fff;
+$button-primary-text-color: #FFF;
 $button-primary-background-color: $brand-color;
 $border-radius: 8px;
 
@@ -49,13 +49,13 @@ $border-radius: 8px;
 //$pageBgColor: #F5F5F5;
 $pageBgColor: #E5E5E5;
 
-$headerBgColor: #eee;
+$headerBgColor: #EEE;
 $headerHoverColor: $brand-color;
 
-$rowHoverBgColor: #eee;
+$rowHoverBgColor: #EEE;
 $rowHoverColor: #000;
 
-$rowOddBgColor: lighten($rowHoverBgColor, 3%);
+$rowOddBgColor: darken(#FFF, 1%);
 
 $rowActiveBgColor: lighten($brand-color, 23%);
 $rowActiveColor: #333;
