@@ -163,7 +163,9 @@ class MainApp extends Component {
         <ReactCSSTG
             transitionName="slideInColumn"
             transitionAppear
-            transitionAppearTimeout={500}>
+            transitionAppearTimeout={500}
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
 
           <div key="guideContentKey">
             <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
@@ -193,6 +195,7 @@ class MainApp extends Component {
               </ul>
             </Box>
           </div>
+
         </ReactCSSTG>
 
       </Box>

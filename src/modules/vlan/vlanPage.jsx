@@ -85,7 +85,9 @@ class VlanPage extends Component {
           <ReactCSSTG
               transitionName="slideInColumn"
               transitionAppear
-              transitionAppearTimeout={500}>
+              transitionAppearTimeout={500}
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}>
             {this.props.children}
           </ReactCSSTG>
         </Box>

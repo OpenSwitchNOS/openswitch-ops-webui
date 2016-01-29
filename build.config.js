@@ -31,11 +31,12 @@ const modules = [
 
 import * as i18nLocale from 'i18n/en-US.js';
 
+
 const settings = {
   i18nLocale,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.30.248:8091',
+    prefix: `http://${window.location.hostname}:8091`,
   }
 };
 
