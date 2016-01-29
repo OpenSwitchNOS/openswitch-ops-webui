@@ -19,6 +19,7 @@
 import './mainApp.scss';
 
 import React, { PropTypes, Component } from 'react';
+import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 
@@ -48,6 +49,7 @@ class MainApp extends Component {
     autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
     collector: PropTypes.object.isRequired,
+    guide: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
@@ -155,34 +157,47 @@ class MainApp extends Component {
       </Box>
     );
 
-    const guide = (
-      <Box className="guide">
-        <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
-            justify="between">
-          <Menu direction="row" responsive={false}>
-            <Title>Quick Guide</Title>
-          </Menu>
-          <Menu direction="row" responsive={false}>
-            <Anchor onClick={this._onClose}>
-              <CloseIcon />
-            </Anchor>
-          </Menu>
-        </Header>
-        <Box pad={{horizontal: 'small'}}>
-          <b>Setup the Management Interface</b>
-          <br/>
-          <ul>
-            <li>Navigate to the page:</li>
-            <Anchor primary href="#/interface">interface</Anchor>
-            <li>Select the interface in the table.</li>
-            <li>Click the edit icon:</li>
-            <EditIcon/>
-            <li>Configure the IP from within the <b>Edit</b> slide-in pane</li>
-            <li><b>Deploy</b> the modification.</li>
-            <li>Click the <b>Restart</b> from within the confirmation dialog.</li>
-            <li><i>Switch will need to be restarted.</i></li>
-          </ul>
-        </Box>
+    const guide = !this.props.guide.component ? null : (
+      <Box key="guideKey" className="guide">
+
+        <ReactCSSTG
+            transitionName="slideInColumn"
+            transitionAppear
+            transitionAppearTimeout={500}
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+
+          <div key="guideContentKey">
+            <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
+                justify="between">
+              <Menu direction="row" responsive={false}>
+                <Title>Quick Guide</Title>
+              </Menu>
+              <Menu direction="row" responsive={false}>
+                <Anchor onClick={this.props.actions.guide.hide}>
+                  <CloseIcon />
+                </Anchor>
+              </Menu>
+            </Header>
+            <Box pad={{horizontal: 'small'}}>
+              <b>Setup the Management Interface</b>
+              <br/>
+              <ul>
+                <li>Navigate to the page:</li>
+                <Anchor primary href="#/interface">interface</Anchor>
+                <li>Select the interface in the table.</li>
+                <li>Click the edit icon:</li>
+                <EditIcon/>
+                <li>Configure the IP from within the <b>Edit</b> slide-in pane</li>
+                <li><b>Deploy</b> the modification.</li>
+                <li>Click the <b>Restart</b> from within the confirmation dialog.</li>
+                <li><i>Switch will need to be restarted.</i></li>
+              </ul>
+            </Box>
+          </div>
+
+        </ReactCSSTG>
+
       </Box>
     );
 
@@ -190,7 +205,7 @@ class MainApp extends Component {
       <Split flex="right" onResponsive={this._onNavSplitResponsive}
           priority="left">
         <Box direction="row">
-          {this.state.showGuidePane ? guide : null}
+          {guide}
           {nav}
         </Box>
         <Box direction="row">
@@ -219,6 +234,7 @@ const select = (store) => ({
   routeToLink: store.routeToLink,
   toolbar: store.toolbar,
   collector: store.collector,
+  guide: store.guide,
 });
 
 export default connect(select)(MainApp);

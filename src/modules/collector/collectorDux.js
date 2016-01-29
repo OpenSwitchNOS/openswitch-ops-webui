@@ -106,6 +106,9 @@ function parseResult(result) {
       id,
       adminState: elm.status.admin_state,
       linkState: elm.status.link_state,
+      duplex: elm.status.duplex,
+      speed: elm.status.link_speed,
+      connector: elm.status.pm_info.connector,
     };
   });
 

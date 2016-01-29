@@ -16,7 +16,6 @@
 
 import CollectorDux from 'collector/collectorDux.js';
 import SyslogDux from 'syslog/syslogDux.jsx';
-// import DemoDux from 'demo/demoDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import VlanDux from 'vlan/vlanDux.jsx';
@@ -24,7 +23,6 @@ import VlanDux from 'vlan/vlanDux.jsx';
 
 const modules = [
   CollectorDux,
-  // DemoDux,
   OverviewDux,
   InterfaceDux,
   VlanDux,
@@ -33,11 +31,12 @@ const modules = [
 
 import * as i18nLocale from 'i18n/en-US.js';
 
+
 const settings = {
   i18nLocale,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.30.248:8091',
+    prefix: `http://${window.location.hostname}:8091`,
   }
 };
 

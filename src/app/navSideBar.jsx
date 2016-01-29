@@ -31,6 +31,8 @@ import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
+import HelpIcon from 'grommet/components/icons/base/Help';
+import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
 
@@ -39,6 +41,7 @@ class NavSideBar extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
+    guide: PropTypes.object.isRequired,
     links: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
   };
@@ -105,10 +108,20 @@ class NavSideBar extends Component {
     const tree = NavSideBar.mkOrderedNavItemTree(this.props.links, {});
     this.items = [];
     NavSideBar.mkNavItems(tree.items, this.items);
+
+    // TODO: this will come from the build config
+    this.guide = [
+      { menuKey: 'configMgmtInterface', component: <div>ConfigMgmtIntf</div> },
+      { menuKey: 'configVlan', component: <div>ConfigVLAN</div> },
+    ];
   }
 
   _onClose = () => {
     this.props.actions.nav.hidePane();
+  };
+
+  _onClickGuide = (index) => {
+    this.props.actions.guide.show(this.guide[index].component);
   };
 
   render() {
@@ -135,14 +148,30 @@ class NavSideBar extends Component {
           </Box>
           <br/>
           <Menu primary>
-            {this.items}
+          {this.items}
           </Menu>
         </Box>
-        <Footer pad="medium" align="center">
-          <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
-            <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
-          </Menu>
-          <span>jpowell</span>
+        <Footer pad={{vertical: 'small'}} direction="column" align="start">
+          <Box align="center" direction="row" pad={{horizontal: 'small'}}>
+            <Menu icon={<HelpIcon />} dropAlign={{bottom: 'bottom'}}>
+              <a onClick={this._onClickGuide.bind(this, 0)}>{t(this.guide[0].menuKey)}</a>
+              <a onClick={this._onClickGuide.bind(this, 1)}>{t(this.guide[1].menuKey)}</a>
+            </Menu>
+            <span>{t('guides')}</span>
+          </Box>
+          <Box align="center" direction="row" pad={{horizontal: 'small'}}>
+            <Menu icon={<WorldIcon />} dropAlign={{bottom: 'bottom'}}>
+              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+            </Menu>
+            <span>{t('links')}</span>
+          </Box>
+          <Box pad={{vertical: 'small'}}/>
+          <Box align="center" direction="row" pad={{horizontal: 'small'}}>
+            <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
+              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+            </Menu>
+            <span>jpowell</span>
+          </Box>
         </Footer>
       </Sidebar>
     );
@@ -153,6 +182,7 @@ class NavSideBar extends Component {
 const select = (store) => ({
   links: store.links,
   nav: store.nav,
+  guide: store.guide,
   collector: store.collector,
 });
 
