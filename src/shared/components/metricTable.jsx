@@ -23,9 +23,8 @@ import Chart from 'grommet/components/Chart';
 import _ from 'lodash';
 
 
-function mkRow(widths, lm) {
-  const metric = lm.metric();
-  const label = lm.label() || metric.name();
+function mkRow(widths, metric) {
+  const label = metric.getName();
   let chart = null;
 
   if (metric.size() > 0) {
@@ -58,10 +57,10 @@ function mkRow(widths, lm) {
 export default class MetricTable extends Component {
 
   static propTypes = {
-    labeledMetrics: PropTypes.arrayOf(PropTypes.object).isRequired,
+    metrics: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSelect: PropTypes.func,
     selection: PropTypes.number,
-    simple: PropTypes.boolean,
+    simple: PropTypes.bool,
     widths: PropTypes.shape({
       table: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       label: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -77,13 +76,13 @@ export default class MetricTable extends Component {
 
   _onSelect = (idx) => {
     const fn = this.props.onSelect;
-    const lm = this.props.labeledMetrics[idx];
+    const lm = this.props.metrics[idx];
     if (fn) { fn(lm, idx); }
   };
 
   render() {
     const widths = this.props.widths;
-    const rows = this.props.labeledMetrics.map(lm => mkRow(widths, lm));
+    const rows = this.props.metrics.map(lm => mkRow(widths, lm));
 
     if (!this.props.simple) {
       const sel = this.props.selection;

@@ -23,12 +23,14 @@ import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Metric from 'metric.js';
-import LabeledMetric from 'labeledMetric.js';
 import DataPoint from 'dataPoint.js';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
 
+
+const CHART_COLOR = 'graph-2';
+const NUM_TRAFFIC_METRICS = 7;
 
 class OverviewPage extends Component {
 
@@ -42,58 +44,31 @@ class OverviewPage extends Component {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
     const ts = Date.now();
-    const networkChartColor = 'graph-3';
-    this.networkLabeledMetrics = [
-      new LabeledMetric('Interface 23',
-        new Metric()
-          .setName('Metric #1').setUnits('%')
-          .setDataPoints([
-            new DataPoint(1, ts, ['msg1 msg2']),
-            new DataPoint(91, ts+1000, ['msg3']),
-            new DataPoint(3, ts+2000, [])
-          ])
-          .setColorIndex(networkChartColor)
-      ),
-      new LabeledMetric('Interface 3',
-        new Metric()
-          .setName('Metric #2').setUnits('%')
-          .setDataPoints([
-            new DataPoint(11, ts, ['msg1 msg2']),
-            new DataPoint(1, ts+1000, ['msg3']),
-            new DataPoint(15, ts+2000, [])
-          ])
-          .setColorIndex(networkChartColor)
-      ),
-      new LabeledMetric('Interface 15',
-        new Metric()
-          .setName('Metric #3').setUnits('%')
-          .setDataPoints([
-            new DataPoint(15, ts, ['msg1 msg2']),
-            new DataPoint(8, ts+1000, ['msg3']),
-            new DataPoint(35, ts+2000, [])
-          ])
-          .setColorIndex(networkChartColor)
-      ),
-      new LabeledMetric('Interface 15',
-        new Metric()
-          .setName('Metric #3').setUnits('%')
-          .setDataPoints([
-            new DataPoint(15, ts, ['msg1 msg2']),
-            new DataPoint(8, ts+1000, ['msg3']),
-            new DataPoint(35, ts+2000, [])
-          ])
-          .setColorIndex(networkChartColor)
-      ),
-      new LabeledMetric('Interface 15',
-        new Metric()
-          .setName('Metric #3').setUnits('%')
-          .setDataPoints([
-            new DataPoint(15, ts, ['msg1 msg2']),
-            new DataPoint(8, ts+1000, ['msg3']),
-            new DataPoint(35, ts+2000, [])
-          ])
-          .setColorIndex(networkChartColor)
-      ),
+    this.trafficMetrics = [
+      new Metric()
+        .setName('Metric #1').setUnits('%')
+        .setDataPoints([
+          new DataPoint(1, ts, ['msg1 msg2']),
+          new DataPoint(91, ts+1000, ['msg3']),
+          new DataPoint(3, ts+2000, [])
+        ])
+        .setColorIndex(CHART_COLOR),
+      new Metric()
+        .setName('Metric #2').setUnits('%')
+        .setDataPoints([
+          new DataPoint(11, ts, ['msg1 msg2']),
+          new DataPoint(1, ts+1000, ['msg3']),
+          new DataPoint(15, ts+2000, [])
+        ])
+        .setColorIndex(CHART_COLOR),
+      new Metric()
+        .setName('Metric #3').setUnits('%')
+        .setDataPoints([
+          new DataPoint(15, ts, ['msg1 msg2']),
+          new DataPoint(8, ts+1000, ['msg3']),
+          new DataPoint(35, ts+2000, [])
+        ])
+        .setColorIndex(CHART_COLOR),
     ];
     this.state = {
       showFansLayer: false,
@@ -351,6 +326,10 @@ class OverviewPage extends Component {
           {this._mkFansProps()}
       </StatusLayer>;
 
+    const trafficMetrics = coll.interfaceUtilizationMetrics.slice(
+      0, NUM_TRAFFIC_METRICS
+    );
+
     return (
       <Box className="flex1">
         <Box direction="row" className="flex0auto flexWrap">
@@ -383,8 +362,8 @@ class OverviewPage extends Component {
             <hr/>
             <MetricTable
                 simple
-                widths={{label: '130px', chart: '90px', value: '70px'}}
-                labeledMetrics={this.networkLabeledMetrics}
+                widths={{label: '70px', value: '70px'}}
+                metrics={trafficMetrics}
             />
           </Box>
         </Box>

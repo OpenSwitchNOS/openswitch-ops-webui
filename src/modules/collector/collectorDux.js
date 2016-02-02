@@ -101,11 +101,20 @@ function getOrCreateCachedInterface(data) {
 
   if (!cachedInterface) {
     if (data.duplex === 'half') {
-      const txRxMetric = new Metric().setName(`txRx-${id}`).setUnits('%');
+      const txRxMetric = new Metric()
+        .setName(`${id} TxRx`)
+        .setUnits('%')
+        .setColorIndex('graph-3');
       cachedInterface = { txRxMetric };
     } else {
-      const txMetric = new Metric().setName(`tx-${id}`).setUnits('%');
-      const rxMetric = new Metric().setName(`rx-${id}`).setUnits('%');
+      const txMetric = new Metric()
+        .setName(`${id} Tx`)
+        .setUnits('%')
+        .setColorIndex('graph-3');
+      const rxMetric = new Metric()
+        .setName(`${id} Rx`)
+        .setUnits('%')
+        .setColorIndex('graph-3');
       cachedInterface = { txMetric, rxMetric };
     }
 
@@ -118,10 +127,9 @@ function getOrCreateCachedInterface(data) {
 function processInterfaceMetric(metric, now, pTs, pBytes, cBytes, spd) {
   const interval = now - pTs;
   if (interval > 0) {
-    const utl = Calc.utilization(pBytes, cBytes, spd, interval);
-    if (utl > 0) {
-      metric.addDataPoint(new DataPoint(utl, now));
-    }
+    const rawUtl = Calc.utilization(pBytes, cBytes, spd, interval);
+    const utl = Math.round(rawUtl);
+    metric.addDataPoint(new DataPoint(utl, now));
     return metric;
   }
   return null;
