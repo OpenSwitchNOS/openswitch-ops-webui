@@ -20,8 +20,6 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
-// import Header from 'grommet/components/Header';
-import Meter from 'grommet/components/Meter';
 import Table from 'grommet/components/Table';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Metric from 'metric.js';
@@ -43,10 +41,6 @@ class OverviewPage extends Component {
   constructor(props) {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
-    this.cols = [
-      { columnKey: 'id', header: t('id'), width: 100 },
-      { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
-    ];
     const ts = Date.now();
     const networkChartColor = 'graph-3';
     this.networkLabeledMetrics = [
@@ -102,8 +96,9 @@ class OverviewPage extends Component {
       ),
     ];
     this.state = {
-      selectedLabeledMetric: this.networkLabeledMetrics[0],
       showFansLayer: false,
+      showPowerSuppliesLayer: false,
+      showTempsLayer: false,
     };
   }
 
@@ -136,11 +131,7 @@ class OverviewPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelectMetric = (selectedLabeledMetric) => {
-    this.setState({ selectedLabeledMetric });
-  };
-
-  _mkInfoProps = () => {
+  _mkSystemProps = () => {
     const info = this.props.collector.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
@@ -176,32 +167,7 @@ class OverviewPage extends Component {
     );
   };
 
-  _mkHw = () => {
-    const ps = this.props.collector.powerSupplies;
-    const trs = [];
-    Object.getOwnPropertyNames(ps).forEach(k => {
-      const data = ps[k];
-      trs.push(
-        <tr key={data.id}>
-          <td><a>{data.id}:</a></td>
-          <td>
-            <a href="#/syslog">
-              <SpanStatus value={data.status}>Test</SpanStatus>
-            </a>
-          </td>
-        </tr>
-      );
-    });
-    return (
-      <table className="propTable">
-        <tbody>
-          {trs}
-        </tbody>
-      </table>
-    );
-  };
-
-  _mkPowerProps = () => {
+  _mkPowerSuppliesProps = () => {
     const ps = this.props.collector.powerSupplies;
     const trs = [];
     Object.getOwnPropertyNames(ps).forEach(k => {
@@ -211,7 +177,7 @@ class OverviewPage extends Component {
           <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
-              {t(data.text)}
+            {t(data.text)}
             </SpanStatus>
           </td>
         </tr>
@@ -226,7 +192,7 @@ class OverviewPage extends Component {
     );
   };
 
-  _mkFanProps = () => {
+  _mkFansProps = () => {
     const fans = this.props.collector.fans;
     const trs = [];
     Object.getOwnPropertyNames(fans).forEach(k => {
@@ -251,56 +217,7 @@ class OverviewPage extends Component {
     );
   };
 
-  _mkFansRollup = () => {
-    const fansRollup = this.props.collector.fansRollup;
-    const status =
-      fansRollup.critical ? 'critical' :
-        fansRollup.warning ? 'warning' :
-          fansRollup.ok ? 'ok' : 'unknown';
-    return (
-      <table className="propTable">
-        <tbody>
-          <tr>
-            <td>{t('fans')}:</td>
-            <td>
-              <a onClick={this._onToggleFansLayer}>
-                <SpanStatus value={status}>{t(status)}</SpanStatus>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  };
-
-  _mkTempMeters = () => {
-    const temps = this.props.collector.temps;
-    const meters = [];
-    Object.getOwnPropertyNames(temps).forEach(k => {
-      const data = temps[k];
-      meters.push(
-        <Box key={k} pad={{horizontal: 'small'}}>
-        <span>{data.id}&nbsp;{data.location}</span>
-          <br/>
-          <Meter
-              size="small"
-              value={40}
-              series={[{value: data.value, colorIndex: 'graph-3'}]}
-              min={{value: data.min, label: data.min}}
-              max={{value: data.max, label: data.max}}
-              units={t('degreesCelsius')}
-              />
-        </Box>
-      );
-    });
-    return (
-      <Box direction="row">
-        {meters}
-      </Box>
-    );
-  };
-
-  _mkTempProps = () => {
+  _mkTempsProps = () => {
     const temps = this.props.collector.temps;
     const trs = [];
     Object.getOwnPropertyNames(temps).forEach(k => {
@@ -310,7 +227,7 @@ class OverviewPage extends Component {
           <td>{data.id}&nbsp;{data.location}:</td>
           <td>
             <SpanStatus value={data.status}>
-              {t(data.value)}
+              {`${data.value} ${t('degreesCelsius')}`}
             </SpanStatus>
           </td>
         </tr>
@@ -325,24 +242,33 @@ class OverviewPage extends Component {
     );
   };
 
-  _mkNetworkProps = () => {
+  _onToggleFansLayer = () => {
+    const showFansLayer = !this.state.showFansLayer;
+    this.setState({ showFansLayer });
+  };
+
+  _onTogglePowerSuppliesLayer = () => {
+    const showPowerSuppliesLayer = !this.state.showPowerSuppliesLayer;
+    this.setState({ showPowerSuppliesLayer });
+  };
+
+  _onToggleTempsLayer = () => {
+    const showTempsLayer = !this.state.showTempsLayer;
+    this.setState({ showTempsLayer });
+  };
+
+  _mkRollup = (labelKey, rollupData, toggleLayerFn) => {
     return (
-      <table style={{tableLayout: 'fixed'}} className="propTable">
-        <tbody>
-          <tr>
-            <td style={{width: '140px'}}>{t('vlans')}:</td>
-            <td>TBD</td>
-          </tr>
-          <tr>
-            <td>{t('interfaces')}:</td>
-            <td>{this.props.collector.interfaces.length}</td>
-          </tr>
-          <tr>
-            <td>{t('mtu')}:</td>
-            <td>TBD</td>
-          </tr>
-        </tbody>
-      </table>
+      <tr>
+        <td>{t(labelKey)}:</td>
+        <td>
+          <SpanStatus value={rollupData.status}>
+            <a onClick={toggleLayerFn}>
+              <u>{t(rollupData.status)}</u>
+            </a>
+          </SpanStatus>
+        </td>
+      </tr>
     );
   };
 
@@ -351,7 +277,7 @@ class OverviewPage extends Component {
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
-            <td style={{width: '140px'}}>{t('Protocol#1')}:</td>
+            <td style={{width: '180px'}}>{t('Protocol#1')}:</td>
             <td>{t('disabled')}</td>
           </tr>
           <tr>
@@ -362,83 +288,125 @@ class OverviewPage extends Component {
             <td>{t('Protocol#3')}:</td>
             <td>{t('enabled')}</td>
           </tr>
+          <tr>
+            <td>{t('vlans')}:</td>
+            <td>TBD</td>
+          </tr>
+          <tr>
+            <td>{t('interfaces')}:</td>
+            <td>{this.props.collector.info.interfaceCount}</td>
+          </tr>
+          <tr>
+            <td>{t('mtu')}:</td>
+            <td>{this.props.collector.info.mtu}</td>
+          </tr>
+          <tr>
+            <td>{t('maxInterfaceSpeed')}:</td>
+            <td>{this.props.collector.info.maxInterfaceSpeed}</td>
+          </tr>
         </tbody>
       </table>
     );
   };
 
-  _onToggleFansLayer = () => {
-    const showFansLayer = !this.state.showFansLayer;
-    this.setState({ showFansLayer });
-  };
-
   render() {
+    const coll = this.props.collector;
+
+    const psRollup = this._mkRollup(
+      'powerSupplies',
+      coll.powerSuppliesRollup,
+      this._onTogglePowerSuppliesLayer
+    );
+    const psLayer = !this.state.showPowerSuppliesLayer ? null :
+      <StatusLayer
+          onClose={this._onTogglePowerSuppliesLayer}
+          title={t('powerSupplies')}
+          value={coll.powerSuppliesRollup.status}>
+          {this._mkPowerSuppliesProps()}
+      </StatusLayer>;
+
+    const tempsRollup = this._mkRollup(
+      'temperatures',
+      coll.tempsRollup,
+      this._onToggleTempsLayer
+    );
+    const tempsLayer = !this.state.showTempsLayer ? null :
+      <StatusLayer
+          onClose={this._onToggleTempsLayer}
+          title={t('temperatures')}
+          value={coll.tempsRollup.status}>
+          {this._mkTempsProps()}
+      </StatusLayer>;
+
+    const fansRollup = this._mkRollup(
+      'fans',
+      coll.fansRollup,
+      this._onToggleFansLayer
+    );
+    const fansLayer = !this.state.showFansLayer ? null :
+      <StatusLayer
+          onClose={this._onToggleFansLayer}
+          title={t('fans')}
+          value={coll.fansRollup.status}>
+          {this._mkFansProps()}
+      </StatusLayer>;
+
     return (
       <Box className="flex1">
         <Box direction="row" className="flex0auto flexWrap">
           <Box pad={this.pad} className="flex1 pageBox min200x200">
             <b>{t('system')}</b>
             <hr/>
-            {this._mkInfoProps()}
-          </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('hardware')}</b>
-            <hr/>
-            {this._mkHw()}
-            <br/>
-            {this._mkTempProps()}
-            <br/>
-            {this._mkFansRollup()}
-            {!this.state.showFansLayer ? null :
-            <StatusLayer
-                onClose={this._onToggleFansLayer}
-                title={t('Fan Status')}
-                value="ok">
-                {this._mkFanProps()}
-            </StatusLayer>
-            }
+            {this._mkSystemProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min200x200">
             <b>{t('features')}</b>
             <hr/>
             {this._mkFeatureProps()}
-            <br/>
-            {this._mkNetworkProps()}
+          </Box>
+          <Box pad={this.pad} className="flex1 pageBox min200x200">
+            <b>{t('hardware')}</b>
+            <hr/>
+            <table className="propTable">
+              <tbody>
+              {psRollup}
+              {psLayer}
+              {tempsRollup}
+              {tempsLayer}
+              {fansRollup}
+              {fansLayer}
+              </tbody>
+            </table>
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min200x200">
             <b>{t('traffic')}</b>
             <hr/>
-            <Box pad={{vertical: 'small'}}>
-              <MetricTable
-                  onSelect={this._onSelectMetric}
-                  widths={{label: '130px', chart: '90px', value: '70px'}}
-                  labeledMetrics={this.networkLabeledMetrics}
-              />
-            </Box>
+            <MetricTable
+                simple
+                widths={{label: '130px', chart: '90px', value: '70px'}}
+                labeledMetrics={this.networkLabeledMetrics}
+            />
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min200x400">
-          <span><b>{t('syslog')}&nbsp;&nbsp;</b><small>4:41:35 PM to 4:41:45 PM</small></span>
+          <span><b>{t('log')}&nbsp;&nbsp;</b><small>start-time to end-time</small></span>
           <hr/>
           <Table>
             <tbody>
               <tr>
+                <td>4:22:59 PM</td>
                 <td>Critical</td>
-                <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+                <td>This is syslog message text for #1 This is syslog message text for #1 This is syslog message text for #1</td>
               </tr>
               <tr>
+                <td>4:22:53 PM</td>
                 <td>Critical</td>
-                <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+                <td>This is syslog message text for #2 This is syslog message text for #2 This is syslog message text for #2</td>
               </tr>
               <tr>
-                <td>Critical</td>
                 <td>4:22:50 PM</td>
-                <td>System</td>
-                <td>This is syslog message text for #1 This is syslog message text for #1 his is syslog</td>
+                <td>Critical</td>
+                <td>This is syslog message text for #3 This is syslog message text for #3 This is syslog message text for #3</td>
               </tr>
             </tbody>
           </Table>

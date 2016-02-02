@@ -37,7 +37,7 @@ const settings = {
   i18nLocale,
   reduxLogger: true,
   agent: {
-    prefix: 'https://15.108.30.247:443',
+    prefix: 'http://15.108.30.248:8091',
   }
 };
 
