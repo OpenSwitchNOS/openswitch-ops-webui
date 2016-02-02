@@ -14,24 +14,35 @@
     under the License.
 */
 
-import InterfacePage from './interfacePage.jsx';
-import InterfaceDetails from './interfaceDetails.jsx';
+const NAME = 'guide';
+const SHOW = `${NAME}/SHOW`;
+const HIDE = `${NAME}/HIDE`;
 
+const ACTIONS = {
+  show(component) { return { type: SHOW, component }; },
+  hide() { return { type: HIDE }; },
+};
 
-const NAME = 'interface';
+const INITIAL_STORE = {
+  component: null,
+};
 
-export const NAVS = [
-  {
-    route: { path: '/interface', component: InterfacePage },
-    link: { path: '/interface', order: 200 }
-  },
-  {
-    route: {path: '/interface/:id', component: InterfaceDetails},
-    link: {path: '/interface', hidden: true}
+function REDUCER(moduleStore = INITIAL_STORE, action) {
+  switch (action.type) {
+
+    case SHOW:
+      return { ...moduleStore, component: action.component };
+
+    case HIDE:
+      return { ...moduleStore, component: null };
+
+    default:
+      return moduleStore;
   }
-];
+}
 
 export default {
   NAME,
-  NAVS,
+  ACTIONS,
+  REDUCER,
 };

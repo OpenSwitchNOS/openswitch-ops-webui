@@ -14,24 +14,31 @@
     under the License.
 */
 
-import InterfacePage from './interfacePage.jsx';
-import InterfaceDetails from './interfaceDetails.jsx';
+import CollectorDux from 'collector/collectorDux.js';
+import SyslogDux from 'syslog/syslogDux.jsx';
+import DemoDux from 'demo/demoDux.jsx';
+import OverviewDux from 'overview/overviewDux.jsx';
+import InterfaceDux from 'interface/interfaceDux.jsx';
+import VlanDux from 'vlan/vlanDux.jsx';
 
 
-const NAME = 'interface';
-
-export const NAVS = [
-  {
-    route: { path: '/interface', component: InterfacePage },
-    link: { path: '/interface', order: 200 }
-  },
-  {
-    route: {path: '/interface/:id', component: InterfaceDetails},
-    link: {path: '/interface', hidden: true}
-  }
+const modules = [
+  CollectorDux,
+  DemoDux,
+  OverviewDux,
+  InterfaceDux,
+  VlanDux,
+  SyslogDux,
 ];
 
-export default {
-  NAME,
-  NAVS,
+import * as i18nLocale from 'i18n/en-US.js';
+
+const settings = {
+  i18nLocale,
+  reduxLogger: true,
+  agent: {
+    prefix: 'https://15.108.30.247:443',
+  }
 };
+
+export default { modules, settings };

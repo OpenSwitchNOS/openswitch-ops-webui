@@ -1,5 +1,5 @@
 /*
- (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+ (C) Copyright 2016 Hewlett Packard Enterprise Development LP
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may
     not use this file except in compliance with the License. You may obtain
@@ -22,7 +22,15 @@ import Button from 'grommet/components/Button';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import SpanStatus from 'spanStatus.jsx';
+import Menu from 'grommet/components/Menu';
+import Anchor from 'grommet/components/Anchor';
 
+
+const FILTER = {
+  since: '',    // time in 12 digit long
+  until: '',     // time in 12 digit long
+  priority: '3'
+};
 
 class SyslogPage extends Component {
 
@@ -51,19 +59,91 @@ class SyslogPage extends Component {
         cell: this._onSeverityCell,
       },
       { columnKey: 'date', header: t('date'), width: 100, flexGrow: 1 },
-      { columnKey: 'facility', header: t('facility'), width: 20, flexGrow: 1 },
-      { columnKey: 'text', header: t('text'), width: 200, flexGrow: 1 },
+      { columnKey: 'identifier', header: t('identifier'), width: 20, flexGrow: 1 },
+      { columnKey: 'message', header: t('message'), width: 200, flexGrow: 1 },
     ];
     this.state = {};
+
+    // Move inside to be able to use t()
+    this.TimeRangeEnum = {
+      LAST_HOUR: 0,
+      LAST_24_HRS: 1,
+      LST_7_DAYS: 2,
+      properties: {
+        0: {name: 'lastHour', value: 0, text: t('lastHour')},
+        1: {name: 'last24hrs', value: 1, text: t('last24hrs')},
+        2: {name: 'last7days', value: 2, text: t('last7days')}
+      }
+    };
+    this.SyslogEnum = {
+      EMERG: 0,
+      ALERT: 1,
+      CRIT: 2,
+      ERROR: 3,
+      WARNING: 4,
+      NOTICE: 5,
+      INFO: 6,
+      DEBUG: 7,
+      properties: {
+        0: {name: 'emerg', value: 0, text: t('emerg')},
+        1: {name: 'alert', value: 1, text: t('alert')},
+        2: {name: 'critical', value: 2, text: t('critical')},
+        3: {name: 'error', value: 3, text: t('error')},
+        4: {name: 'warning', value: 4, text: t('warning')},
+        5: {name: 'notice', value: 5, text: t('notice')},
+        6: {name: 'info', value: 6, text: t('info')},
+        7: {name: 'debug', value: 7, text: t('debug')}
+      }
+    };
+    this.SeverityEnum = {
+      CRITICAL: 0,
+      WARNING: 1,
+      INFO: 2,
+      properties: {
+        0: {name: 'critical', value: 0, text: t('critical')},
+        1: {name: 'warning', value: 1, text: t('warning')},
+        2: {name: 'info', value: 2, text: t('info')}
+      }
+    };
+
+    this.sev = this.SyslogEnum.DEBUG; // this.syslogEnum.DEBUG is not accessible here?
+    this.time = 0;
   }
 
+  // Return date as a long in millisecs
+  _getsince = (fromDate, timeAgo) => {
+    const d = new Date(fromDate);
+    switch (timeAgo) {
+      case this.TimeRangeEnum.LAST_HOUR:
+        d.setMinutes(d.getMinutes() - 60);
+        break;
+      case this.TimeRangeEnum.LAST_24_HRS:
+        d.setHours(d.getHours() - 24);
+        break;
+      case this.TimeRangeEnum.LAST_7_DAYS:
+        d.setDate(d.getDate() - 7);
+        break;
+      default:
+        break;
+    }
+    return d.getTime();
+  };
+
+  _buildFilter = () => {
+    const url = FILTER;
+    url.priority = this.sev;
+    url.until = new Date().getTime();
+    url.since = this._getsince(url.until, this.time);
+    return url;
+  };
+
   componentDidMount() {
-    this.props.actions.syslog.fetch('vlans');
+    this.props.actions.syslog.fetch(this._buildFilter());
     this.props.actions.toolbar.setFetchTB(this.props.syslog, this._onRefresh);
   }
 
   _onRefresh = () => {
-    this.props.actions.syslog.fetch('vlans');
+    this.props.actions.syslog.fetch(this._buildFilter());
   };
 
   componentWillReceiveProps(nextProps) {
@@ -76,9 +156,11 @@ class SyslogPage extends Component {
 
   _onIconCell = (cellData, cellProps) => {
     let severity = 'ok';
-    if (cellData >=0 && cellData <= 3) {        // Critical severity
+    if (cellData >= this.SyslogEnum.EMERG &&
+      cellData <= this.SyslogEnum.ERROR) {
       severity = 'critical';
-    } else if (cellData >=4 && cellData <= 5) { // Warning severity
+    } else if (cellData >= this.SyslogEnum.WARNING &&
+      cellData <= this.SyslogEnum.NOTICE) {
       severity = 'warning';
     } else {
       severity = 'ok';
@@ -91,46 +173,39 @@ class SyslogPage extends Component {
   };
 
   _onSeverityCell = (cellData, cellProps) => {
-    let text = t('info');
-    switch (cellData) {
-      case 0:
-        text = t('emerg');
-        break;
-      case 1:
-        text = t('alert');
-        break;
-      case 2:
-        text = t('critical');
-        break;
-      case 3:
-        text = t('error');
-        break;
-      case 4:
-        text = t('warning');
-        break;
-      case 5:
-        text = t('notice');
-        break;
-      case 6:
-        text = t('info');
-        break;
-      case 7:
-        text = t('debug');
-        break;
-      default:
-        text = t('info');
-        break;
+    let v = cellData;
+    if (v < this.SyslogEnum.EMERG || v > this.SyslogEnum.DEBUG) {
+      v = this.SyslogEnum.DEBUG;
     }
-
     return (
       <CustomCell {...cellProps}>
-      {text}
+        {this.SyslogEnum.properties[v].text}
       </CustomCell>
     );
   };
 
+  _onTimeClick = (event) => {
+    this.time = event;
+    this.props.actions.syslog.fetch(this._buildFilter());
+  };
+
+  _onSeverityClick = (event) => {
+    switch (event) {
+      case this.SeverityEnum.INFO:
+        this.sev = this.SyslogEnum.DEBUG;
+        break;
+      case this.SeverityEnum.WARNING:
+        this.sev = this.SyslogEnum.NOTICE;
+        break;
+      default:
+        this.sev = this.SyslogEnum.ERROR;
+        break;
+    }
+    this.props.actions.syslog.fetch(this._buildFilter());
+  };
+
   _onClick = () => {
-    this.props.actions.syslog.fetch('vlans');
+    this.props.actions.syslog.fetch(this._buildFilter());
   };
 
   render() {
@@ -139,12 +214,33 @@ class SyslogPage extends Component {
       <Box className="flex1">
         <Box className="pageBox flex0auto">
           <div float="right" position="relative">
-            <Button primary label={t('critical')} onClick={this._onClick.bind(this,
-              t('critical'))} />
-            <Button primary label={t('warning')} onClick={this._onClick.bind(this,
-              t('warning'))} />
-            <Button primary label={t('all')} onClick={this._onClick.bind(this,
-              t('all'))} />
+              <Menu label={this.props.syslog.timeLabel} responsive
+                  selectable inline="false" >
+                <Anchor href="/#/syslog"
+                    onClick={this._onTimeClick.bind(this,
+                      this.TimeRangeEnum.LAST_HOUR)}>
+                  {this.TimeRangeEnum.properties[this.TimeRangeEnum.LAST_HOUR].text}
+                </Anchor>
+                <Anchor href="/#/syslog"
+                    onClick={this._onTimeClick.bind(this,
+                        this.TimeRangeEnum.LAST_24_HRS)}>
+                  {t('last24hrs')}
+                </Anchor>
+                <Anchor href="/#/syslog"
+                    onClick={this._onTimeClick.bind(this,
+                      this.TimeRangeEnum.LAST_7_DAYS)}>
+                  {t('last7days')}
+                </Anchor>
+              </Menu>
+            <Button primary label={t('critical')}
+                onClick={this._onSeverityClick.bind(this,
+                  this.SeverityEnum.CRITICAL)} />
+            <Button primary label={t('warning')}
+                onClick={this._onSeverityClick.bind(this,
+                  this.SeverityEnum.WARNING)} />
+            <Button primary label={t('info')}
+                onClick={this._onSeverityClick.bind(this,
+                  this.SeverityEnum.INFO)} />
           </div>
         </Box>
         <Box className="flex1 mTopHalf mLeft">

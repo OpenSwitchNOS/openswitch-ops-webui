@@ -15,6 +15,7 @@
 */
 
 import React, { PropTypes, Component } from 'react';
+import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
@@ -80,9 +81,16 @@ class VlanPage extends Component {
     // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
     // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
     const details = !this.props.params.id ? null : (
-      <Box className="pageBox">
-        {this.props.children}
-      </Box>
+        <Box className="pageBox">
+          <ReactCSSTG
+              transitionName="slideInColumn"
+              transitionAppear
+              transitionAppearTimeout={500}
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}>
+            {this.props.children}
+          </ReactCSSTG>
+        </Box>
     );
 
     return (

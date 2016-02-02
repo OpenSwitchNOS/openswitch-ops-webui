@@ -199,9 +199,22 @@ table.propTable {
   background-color: blue;
 }
 
+// General slide in animation for a column
+
+$slideInColumnMinWidth: 350px;
+
+.slideInColumn-appear {
+  width: 0px;
+  &.slideInColumn-appear-active {
+    width: $slideInColumnMinWidth;
+    transition: all .5s ease-in;
+  }
+}
+
+// Grommet overrides start here...
 
 // Override the sidebar-width for the navigation pane.
-$sidebar-width: 320px;
+$navSideBarWidth: 320px;
 
 // Include all the Grommet styles.
 $fontsPath: '../shared/assets';
@@ -223,5 +236,5 @@ $fontsPath: '../shared/assets';
 }
 @include keyframes(slide-sidebar) {
   0% { width: 0px; }
-  100% { width: $sidebar-width; }
+  100% { width: $navSideBarWidth; }
 }
