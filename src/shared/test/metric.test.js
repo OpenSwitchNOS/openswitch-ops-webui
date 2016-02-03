@@ -17,7 +17,6 @@
 /*global describe, it, expect */
 
 import Metric from '../metric.js';
-import LabeledMetric from '../labeledMetric.js';
 import DataPoint from '../dataPoint.js';
 
 
@@ -150,14 +149,6 @@ describe('Metric', () => {
       new DataPoint(4, ts+2000, 'ud#2'),
     ]);
     expect(m.latestDataPoint().userData()).toEqual('ud#2');
-  });
-
-  it('constructs a labeled metric', () => {
-    const l = 'My Label';
-    const m = new Metric();
-    const lm = new LabeledMetric(l, m);
-    expect(lm.label()).toEqual('My Label');
-    expect(lm.metric()).toEqual(m);
   });
 
 });
