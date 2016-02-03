@@ -23,12 +23,44 @@ import Chart from 'grommet/components/Chart';
 import _ from 'lodash';
 
 
+function mkRow(widths, metric) {
+  const label = metric.getName();
+  let chart = null;
+
+  if (metric.size() > 1) {
+    const values = metric.getDataPoints().map((dp, idx) => {
+      return [ idx + 1, dp.value() ];
+    });
+    chart = (
+      <Chart type="area" smooth series={[
+        { values, colorIndex: metric.getColorIndex() }
+      ]}/>
+    );
+  }
+
+  const rowUid = _.uniqueId('mt_');
+  return (
+    <tr key={rowUid}>
+      <td className="labelCol" style={{width: widths.label}}>
+        <b>{label}</b>
+      </td>
+      <td className="valueCol" style={{width: widths.value}}>
+        {metric.latestValueUnits()}
+      </td>
+      <td className="chartCol" style={{width: widths.chart}}>
+        {chart}
+      </td>
+    </tr>
+  );
+}
+
 export default class MetricTable extends Component {
 
   static propTypes = {
-    labeledMetrics: PropTypes.arrayOf(PropTypes.object).isRequired,
+    metrics: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSelect: PropTypes.func,
     selection: PropTypes.number,
+    simple: PropTypes.bool,
     widths: PropTypes.shape({
       table: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       label: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -42,58 +74,34 @@ export default class MetricTable extends Component {
     this.state = {};
   }
 
-  _mkRow = (widths, lm) => {
-    const metric = lm.metric();
-    const label = lm.label() || metric.name();
-    let chart = null;
-
-    if (metric.size() > 0) {
-      const values = metric.getDataPoints().map((dp, idx) => {
-        return [ idx + 1, dp.value() ];
-      });
-      chart = (
-        <Chart type="area" smooth series={[
-          { values, colorIndex: metric.getColorIndex() }
-        ]}/>
-      );
-    }
-
-    const rowUid = _.uniqueId('mt_');
-    return (
-      <tr key={rowUid}>
-        <td className="labelCol" style={{width: widths.label}}>
-          <b>{label}</b>
-        </td>
-        <td className="valueCol" style={{width: widths.value}}>
-          {metric.latestValueUnits()}
-        </td>
-        <td className="chartCol" style={{width: widths.chart}}>
-          {chart}
-        </td>
-      </tr>
-    );
-  };
-
   _onSelect = (idx) => {
     const fn = this.props.onSelect;
-    const lm = this.props.labeledMetrics[idx];
+    const lm = this.props.metrics[idx];
     if (fn) { fn(lm, idx); }
   };
 
   render() {
     const widths = this.props.widths;
-    const rows = this.props.labeledMetrics.map(
-      lm => this._mkRow(widths, lm)
-    );
-    const sel = this.props.selection;
+    const rows = this.props.metrics.map(lm => mkRow(widths, lm));
+
+    if (!this.props.simple) {
+      const sel = this.props.selection;
+      return (
+        <div className="metricTable" style={{width: widths.table}}>
+          <Table selection={sel} onSelect={this._onSelect} selectable>
+            <tbody>
+              {rows}
+            </tbody>
+          </Table>
+        </div>
+      );
+    }
     return (
-      <div className="metricTable" style={{width: widths.table}}>
-        <Table selection={sel} onSelect={this._onSelect} selectable>
-          <tbody>
-            {rows}
-          </tbody>
-        </Table>
-      </div>
+      <table className="metricTable simple" style={{width: widths.table}}>
+        <tbody>
+        {rows}
+        </tbody>
+      </table>
     );
   }
 

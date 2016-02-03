@@ -30,4 +30,10 @@
       height: 20px;
     }
   }
+  &.simple {
+    margin: 0px;
+    td {
+      padding-bottom: 16px;
+    }
+  }
 }

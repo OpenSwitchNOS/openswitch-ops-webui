@@ -23,7 +23,7 @@ import MetricTable from 'metricTable.jsx';
 export default class MetricTableChart extends Component {
 
   static propTypes = {
-    labeledMetrics: PropTypes.arrayOf(PropTypes.object).isRequired,
+    metrics: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSelectDataPoint: PropTypes.func,
     onSelectMetric: PropTypes.func,
     widths: PropTypes.shape({
@@ -42,13 +42,13 @@ export default class MetricTableChart extends Component {
     };
   }
 
-  _onSelectMetric = (labeledMetric, idx) => {
+  _onSelectMetric = (metric, idx) => {
     this.setState({
       selectedMetricIdx: idx,
       selectedDataPoint: null,
     });
     const fn = this.props.onSelectMetric;
-    if (fn) { fn(labeledMetric, idx); }
+    if (fn) { fn(metric, idx); }
   };
 
   _onSelectDataPoint = (dp) => {
@@ -59,17 +59,17 @@ export default class MetricTableChart extends Component {
 
   render() {
     const idx = this.state.selectedMetricIdx;
-    const sel = this.props.labeledMetrics[idx];
+    const sel = this.props.metrics[idx];
     return (
       <div>
         <MetricTable
             onSelect={this._onSelectMetric}
             widths={this.props.widths}
-            labeledMetrics={this.props.labeledMetrics}
+            metrics={this.props.metrics}
         />
-        <div><b>{sel.label()}</b></div>
+        <div><b>{sel.getName()}</b></div>
         <MetricChart
-            metric={sel.metric()}
+            metric={sel}
             onSelect={this._onSelectDataPoint}/>
       </div>
     );
