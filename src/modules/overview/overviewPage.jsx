@@ -21,6 +21,7 @@ import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
+import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Metric from 'metric.js';
 import DataPoint from 'dataPoint.js';
@@ -30,7 +31,7 @@ import StatusLayer from 'statusLayer.jsx';
 
 
 const CHART_COLOR = 'graph-2';
-const NUM_TRAFFIC_METRICS = 7;
+const NUM_TRAFFIC_METRICS = 5;
 
 class OverviewPage extends Component {
 
@@ -326,9 +327,35 @@ class OverviewPage extends Component {
           {this._mkFansProps()}
       </StatusLayer>;
 
+    let trafficMetricsCaption = null;
     const trafficMetrics = coll.interfaceUtilizationMetrics.slice(
       0, NUM_TRAFFIC_METRICS
     );
+
+    if (trafficMetrics.length === 0) {
+      trafficMetricsCaption = (
+        <div style={{textAlign: 'center'}}>
+          <RefreshIcon className="spin"/>
+          {t('loading')}
+        </div>
+      );
+    } else {
+      const m = trafficMetrics[0];
+      if (m.size() > 1) {
+        const oldDate = new Date(m.getDataPoint(0).ts()).toLocaleTimeString();
+        const newDate = new Date(m.latestDataPoint().ts()).toLocaleTimeString();
+        trafficMetricsCaption = (
+          <div>
+            <div style={{textAlign: 'right'}}><small>
+              {`${oldDate} - ${newDate}`}
+            </small></div>
+            <div style={{textAlign: 'right'}}><small>
+              {`(${m.size()} ${t('dataPoints')})`}
+            </small></div>
+          </div>
+        );
+      }
+    }
 
     return (
       <Box className="flex1">
@@ -365,6 +392,7 @@ class OverviewPage extends Component {
                 widths={{label: '70px', value: '70px'}}
                 metrics={trafficMetrics}
             />
+            {trafficMetricsCaption}
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min200x400">

@@ -27,7 +27,7 @@ function mkRow(widths, metric) {
   const label = metric.getName();
   let chart = null;
 
-  if (metric.size() > 0) {
+  if (metric.size() > 1) {
     const values = metric.getDataPoints().map((dp, idx) => {
       return [ idx + 1, dp.value() ];
     });
