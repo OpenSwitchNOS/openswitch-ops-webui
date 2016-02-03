@@ -39,7 +39,8 @@ const AUTO_ACTIONS = {
 const INITIAL_STORE = {
   info: {},
   interfaces: {},
-  interfaceUtilizationMetrics: [],
+  interfaceUtlMetrics: {},
+  interfaceUtlMetricsTop: [],
   ports: {},
   powerSupplies: {},
   powerSuppliesRollup: {},
@@ -102,17 +103,17 @@ function getOrCreateCachedInterface(data) {
   if (!cachedInterface) {
     if (data.duplex === 'half') {
       const txRxMetric = new Metric()
-        .setName(`${id} TxRx`)
+        .setName(`${id}-TxRx`)
         .setUnits('%')
         .setColorIndex('graph-3');
       cachedInterface = { txRxMetric };
     } else {
       const txMetric = new Metric()
-        .setName(`${id} Tx`)
+        .setName(`${id}-Tx`)
         .setUnits('%')
         .setColorIndex('graph-3');
       const rxMetric = new Metric()
-        .setName(`${id} Rx`)
+        .setName(`${id}-Rx`)
         .setUnits('%')
         .setColorIndex('graph-3');
       cachedInterface = { txMetric, rxMetric };
@@ -135,7 +136,7 @@ function processInterfaceMetric(metric, now, pTs, pBytes, cBytes, spd) {
   return null;
 }
 
-function processInterfaceUtilization(data, modifiedMetrics) {
+function processInterfaceUtilization(data, modMetrics) {
   const cachedInterface = getOrCreateCachedInterface(data);
   const cd = data;            // current data
   const pd = cachedInterface; // previous data
@@ -146,20 +147,20 @@ function processInterfaceUtilization(data, modifiedMetrics) {
       const pBytes = pd.rxBytes + pd.txBytes;
       const cBytes = cd.rxBytes + cd.txBytes;
       if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modifiedMetrics.push(metric);
+        modMetrics[metric.getName()] = metric;
       }
     } else {
       let metric = cachedInterface.txMetric;
       let pBytes = pd.txBytes;
       let cBytes = cd.txBytes;
       if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modifiedMetrics.push(metric);
+        modMetrics[metric.getName()] = metric;
       }
       metric = cachedInterface.rxMetric;
       pBytes = pd.rxBytes;
       cBytes = cd.rxBytes;
       if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modifiedMetrics.push(metric);
+        modMetrics[metric.getName()] = metric;
       }
     }
   }
@@ -196,7 +197,7 @@ function parseResult(result) {
     interfaceCount: oi.interface_count,
   };
 
-  const interfaceUtilizationMetrics = [];
+  const interfaceUtlMetrics = {};
   const interfaces = {};
   infBody.forEach((elm) => {
     const cfg = elm.configuration;
@@ -213,12 +214,16 @@ function parseResult(result) {
         rxBytes: Number(stats.rx_bytes),
         txBytes: Number(stats.tx_bytes)
       };
-      processInterfaceUtilization(data, interfaceUtilizationMetrics);
+      processInterfaceUtilization(data, interfaceUtlMetrics);
       interfaces[id] = data;
     }
   });
 
-  interfaceUtilizationMetrics.sort((m1, m2) => {
+  const interfaceUtlMetricsTop = [];
+  Object.getOwnPropertyNames(interfaceUtlMetrics).forEach(k => {
+    interfaceUtlMetricsTop.push(interfaceUtlMetrics[k]);
+  });
+  interfaceUtlMetricsTop.sort((m1, m2) => {
     return m2.latestDataPoint().value() - m1.latestDataPoint().value();
   });
 
@@ -305,7 +310,8 @@ function parseResult(result) {
   return {
     info,
     interfaces,
-    interfaceUtilizationMetrics,
+    interfaceUtlMetrics,
+    interfaceUtlMetricsTop,
     ports,
     powerSupplies,
     powerSuppliesRollup,
