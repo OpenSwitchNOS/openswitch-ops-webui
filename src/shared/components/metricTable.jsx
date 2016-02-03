@@ -23,7 +23,7 @@ import Chart from 'grommet/components/Chart';
 import _ from 'lodash';
 
 
-function mkRow(widths, metric) {
+function mkRow(widths, metric, onSelectFn) {
   const label = metric.getName();
   let chart = null;
 
@@ -40,9 +40,14 @@ function mkRow(widths, metric) {
 
   const rowUid = _.uniqueId('mt_');
   return (
-    <tr key={rowUid}>
+    <tr
+        key={rowUid}
+        style={onSelectFn ? {cursor: 'pointer'} : null}
+        onClick={onSelectFn}>
       <td className="labelCol" style={{width: widths.label}}>
-        <b>{label}</b>
+        <b>
+          {onSelectFn ? <u>{label}</u> : label}
+        </b>
       </td>
       <td className="valueCol" style={{width: widths.value}}>
         {metric.latestValueUnits()}
@@ -76,16 +81,16 @@ export default class MetricTable extends Component {
 
   _onSelect = (idx) => {
     const fn = this.props.onSelect;
-    const lm = this.props.metrics[idx];
-    if (fn) { fn(lm, idx); }
+    const m = this.props.metrics[idx];
+    if (fn) { fn(m, idx); }
   };
 
   render() {
     const widths = this.props.widths;
-    const rows = this.props.metrics.map(lm => mkRow(widths, lm));
 
     if (!this.props.simple) {
       const sel = this.props.selection;
+      const rows = this.props.metrics.map(m => mkRow(widths, m));
       return (
         <div className="metricTable" style={{width: widths.table}}>
           <Table selection={sel} onSelect={this._onSelect} selectable>
@@ -96,6 +101,9 @@ export default class MetricTable extends Component {
         </div>
       );
     }
+    const rows = this.props.metrics.map((m, idx) => {
+      return mkRow(widths, m, this._onSelect.bind(this, idx));
+    });
     return (
       <table className="metricTable simple" style={{width: widths.table}}>
         <tbody>

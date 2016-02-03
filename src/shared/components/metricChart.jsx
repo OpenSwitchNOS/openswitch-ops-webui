@@ -25,6 +25,7 @@ export default class MetricChart extends Component {
   static propTypes = {
     metric: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
+    points: PropTypes.bool,
     size: PropTypes.string,
   };
 
@@ -89,6 +90,7 @@ export default class MetricChart extends Component {
               placement: 'bottom',
             }}
             size={this.props.size}
+            points={this.props.points}
         />
       );
     }
@@ -100,7 +102,7 @@ export default class MetricChart extends Component {
       <div
           key={this.props.metric.getName()}
           className="metricChart"
-          onClick={this._onSelect}>
+          onClick={this.props.onSelect ? this._onSelect : null}>
         {chart}
       </div>
     );

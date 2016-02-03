@@ -18,6 +18,8 @@ export const LOCALE = 'en-US';
 
 export const MESSAGES = {
 
+  // TODO: Need to fix this as interface -> interfaces (prefix with nav?)
+
   // navigation items
   // *** NAVIGATION ITEMS BELOW - ONLY***
   bgp: 'BGP',

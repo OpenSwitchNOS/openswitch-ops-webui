@@ -14,8 +14,6 @@
     under the License.
 */
 
-import './overview.scss';
-
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
@@ -23,14 +21,11 @@ import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import FetchToolbar from 'fetchToolbar.jsx';
-import Metric from 'metric.js';
-import DataPoint from 'dataPoint.js';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
 
 
-const CHART_COLOR = 'graph-2';
 const NUM_TRAFFIC_METRICS = 5;
 
 class OverviewPage extends Component {
@@ -39,38 +34,12 @@ class OverviewPage extends Component {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
-    const ts = Date.now();
-    this.trafficMetrics = [
-      new Metric()
-        .setName('Metric #1').setUnits('%')
-        .setDataPoints([
-          new DataPoint(1, ts, ['msg1 msg2']),
-          new DataPoint(91, ts+1000, ['msg3']),
-          new DataPoint(3, ts+2000, [])
-        ])
-        .setColorIndex(CHART_COLOR),
-      new Metric()
-        .setName('Metric #2').setUnits('%')
-        .setDataPoints([
-          new DataPoint(11, ts, ['msg1 msg2']),
-          new DataPoint(1, ts+1000, ['msg3']),
-          new DataPoint(15, ts+2000, [])
-        ])
-        .setColorIndex(CHART_COLOR),
-      new Metric()
-        .setName('Metric #3').setUnits('%')
-        .setDataPoints([
-          new DataPoint(15, ts, ['msg1 msg2']),
-          new DataPoint(8, ts+1000, ['msg3']),
-          new DataPoint(35, ts+2000, [])
-        ])
-        .setColorIndex(CHART_COLOR),
-    ];
     this.state = {
       showFansLayer: false,
       showPowerSuppliesLayer: false,
@@ -238,11 +207,11 @@ class OverviewPage extends Component {
       <tr>
         <td>{t(labelKey)}:</td>
         <td>
-          <SpanStatus value={rollupData.status}>
-            <a onClick={toggleLayerFn}>
+          <a onClick={toggleLayerFn}>
+            <SpanStatus value={rollupData.status}>
               <u>{t(rollupData.status)}</u>
-            </a>
-          </SpanStatus>
+            </SpanStatus>
+          </a>
         </td>
       </tr>
     );
@@ -282,6 +251,12 @@ class OverviewPage extends Component {
           </tr>
         </tbody>
       </table>
+    );
+  };
+
+  _onSelectInterface = (metric) => {
+    this.props.history.pushState(null,
+      `/monitorInterface/${metric.getName()}`
     );
   };
 
@@ -328,7 +303,7 @@ class OverviewPage extends Component {
       </StatusLayer>;
 
     let trafficMetricsCaption = null;
-    const trafficMetrics = coll.interfaceUtilizationMetrics.slice(
+    const trafficMetrics = coll.interfaceUtlMetricsTop.slice(
       0, NUM_TRAFFIC_METRICS
     );
 
@@ -389,6 +364,7 @@ class OverviewPage extends Component {
             <hr/>
             <MetricTable
                 simple
+                onSelect={this._onSelectInterface}
                 widths={{label: '70px', value: '70px'}}
                 metrics={trafficMetrics}
             />

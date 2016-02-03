@@ -14,12 +14,23 @@
     under the License.
 */
 
-@import "~_settings.scss";
+import InterfacePage from './monitorInterfacePage.jsx';
+import InterfaceMetric from './monitorInterfaceMetric.jsx';
 
-// #pageContent {
-//   #overviewPage {
-//     .pageBox {
-//       min-width: 500px;
-//     }
-//   }
-// }
+const NAME = 'monitor';
+
+const NAVS = [
+  {
+    route: { path: '/monitorInterface', component: InterfacePage },
+    link: { path: '/monitor', hidden: true }
+  },
+  {
+    route: { path: '/monitorInterface/:id', component: InterfaceMetric },
+    link: { path: '/monitor', hidden: true }
+  },
+];
+
+export default {
+  NAME,
+  NAVS,
+};
