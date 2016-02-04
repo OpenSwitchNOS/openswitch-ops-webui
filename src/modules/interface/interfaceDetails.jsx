@@ -26,7 +26,9 @@ import Box from 'grommet/components/Box';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import Layer from 'grommet/components/Layer';
 import Form from 'grommet/components/Form';
+import FormField from 'grommet/components/FormField';
 import FormFields from 'grommet/components/FormFields';
+import CheckBox from 'grommet/components/CheckBox';
 import Button from 'grommet/components/Button';
 import EditIcon from 'grommet/components/icons/base/Edit';
 
@@ -78,7 +80,12 @@ class InterfaceDetails extends Component {
     this.setState({ inEditMode });
   };
 
+  _onSubmit = () => {
+   //TODO :
+  };
+
   render() {
+    //TODO: Should be localized eventually
     const id = this.props.params.id;
     const data = this.props.collector.interfaces[id];
     const editLayer = !this.state.inEditMode ? null : (
@@ -90,16 +97,18 @@ class InterfaceDetails extends Component {
           align="right">
         <Form onSubmit={this._onSubmit}>
           <Header>
-            <h2>Edit Interface Detials</h2>
+            <h3> Editing Interface Details </h3>
           </Header>
           <FormFields>
             <fieldset>
-              <legend>You can edit here!!!</legend>
+            <FormField>
+              <CheckBox id="adminState" name="adminState" label="Admin State" toggle/>
+            </FormField>
             </fieldset>
           </FormFields>
           <Footer pad={{vertical: 'medium'}}>
             <Menu>
-              <Button label={t('deploy')} primary onClick={this._onSubmit}/>
+              <Button label={t('deploy')} primary/>
             </Menu>
           </Footer>
         </Form>
@@ -107,22 +116,31 @@ class InterfaceDetails extends Component {
     );
 
     return (
-      <Box>
+      <Box pad="small">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-          <Title>
-            INTERFACE: {id}
-          </Title>
-          <Menu direction="row" align="center" responsive={false}>
-            <Anchor onClick={this._onEditToggle}>
-              <EditIcon />
-            </Anchor>
-            <Anchor onClick={this._onClose}>
-              <CloseIcon />
-            </Anchor>
-          </Menu>
+        <Title>
+          Interface {id} Details
+        </Title>
+        <Menu direction="row" justify="end" responsive={false}>
+          <Anchor onClick={this._onEditToggle}>
+            <EditIcon className="tiny"/>
+          </Anchor>
+          <Anchor onClick={this._onClose}>
+            <CloseIcon className="tiny"/>
+          </Anchor>
+        </Menu>
         </Header>
-        <Box>
-          {!data ? 'no data' : `ID: ${data.id}  ADMIN STATE : ${data.adminState}`}
+        <Box pad="small">
+          {!data ? 'no data' : (
+            <div>
+            <h5>ID: {data.id}</h5>
+            <h5>Admin State: {data.adminState}</h5>
+            <h5>Link State: {data.linkState}</h5>
+            <h5>Duplex: {data.duplex}</h5>
+            <h5>Speed: {data.speedFormatted}</h5>
+            <h5>Connector: {data.connector}</h5>
+            </div>
+          )}
         </Box>
         {editLayer}
       </Box>

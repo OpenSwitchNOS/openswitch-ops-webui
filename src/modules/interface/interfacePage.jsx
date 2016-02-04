@@ -62,7 +62,7 @@ class InterfacePage extends Component {
         width: 215,
       },
       {
-        columnKey: 'speed',
+        columnKey: 'speedFormatted',
         header: t('speed'),
         width: 215,
       },
