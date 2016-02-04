@@ -17,6 +17,8 @@
 import Dux from 'dux.js';
 import InterfaceCache from './interfaceCache.js';
 import { TX, RX, TX_RX } from './interfaceData.js';
+import * as Formatter from 'numberFormatter.js';
+
 
 const NAME = 'collector';
 
@@ -97,6 +99,8 @@ function parseResult(result) {
   const tempBody = result[6].body;
 
   const oi = ssBaseBody.status.other_info;
+  // Since maxInterfaceSpeed comes back in bitspersecond/1000000
+  const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
   const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
   const sysOc = sysBody.configuration.other_config;
   const info = {
@@ -108,7 +112,7 @@ function parseResult(result) {
     baseMac,
     serialNum: oi.serial_number,
     vendor: oi.vendor,
-    maxInterfaceSpeed: oi.max_interface_speed,
+    maxInterfaceSpeed,
     mtu: oi.max_transmission_unit,
     interfaceCount: oi.interface_count,
     lldp: sysOc.lldp_enable === 'true' ? 'enabled' : 'disabled',
@@ -119,13 +123,14 @@ function parseResult(result) {
     const cfg = elm.configuration;
     if (cfg.type === 'system') {
       const id = cfg.name;
+      const speed = Formatter.bpsToString(elm.status.link_speed);
       const stats = elm.statistics.statistics;
       const data = {
         id,
         adminState: elm.status.admin_state,
         linkState: elm.status.link_state,
         duplex: elm.status.duplex,
-        speed: elm.status.link_speed,
+        speed,
         connector: elm.status.pm_info.connector,
         rxBytes: Number(stats.rx_bytes),
         txBytes: Number(stats.tx_bytes)
