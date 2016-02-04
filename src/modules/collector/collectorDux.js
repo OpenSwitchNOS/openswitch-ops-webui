@@ -15,10 +15,8 @@
 */
 
 import Dux from 'dux.js';
-import DataPoint from 'dataPoint.js';
-import Metric from 'metric.js';
-import * as Calc from 'calc.js';
-
+import InterfaceCache from './interfaceCache.js';
+import { TX, RX, TX_RX } from './interfaceData.js';
 
 const NAME = 'collector';
 
@@ -39,19 +37,18 @@ const AUTO_ACTIONS = {
 const INITIAL_STORE = {
   info: {},
   interfaces: {},
-  interfaceUtlMetrics: {},
-  interfaceUtlMetricsTop: [],
+  interfaceMetrics: {},
+  interfaceTopMetrics: [],
   ports: {},
   powerSupplies: {},
-  powerSuppliesRollup: {},
+  powerSuppliesRollup: { status: 'unknown' },
   fans: {},
-  fansRollup: {},
+  fansRollup: { status: 'unknown' },
   temps: {},
-  tempsRollup: {},
+  tempsRollup: { status: 'unknown' },
 };
 
-// Stores { txMetric, rxMetric, txRxMetric, prevData } for each entity.
-const interfaceCache = {};
+const interfaceCache = new InterfaceCache();
 
 function normalizePowerStatus(s) {
   if (s === 'ok') {
@@ -88,91 +85,9 @@ function normalizeTempStatus(id, s) {
   };
 }
 
-function getOrCreateCachedInterface(data) {
-  const id = data.id;
-  let cachedInterface = interfaceCache[id];
-
-  if (cachedInterface) {
-    // we have a cached interface make sure it is still valid
-    if (cachedInterface.duplex !== data.duplex ||
-        cachedInterface.speed !== data.speed) {
-      cachedInterface = null;
-    }
-  }
-
-  if (!cachedInterface) {
-    if (data.duplex === 'half') {
-      const txRxMetric = new Metric()
-        .setName(`${id}-TxRx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      cachedInterface = { txRxMetric };
-    } else {
-      const txMetric = new Metric()
-        .setName(`${id}-Tx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      const rxMetric = new Metric()
-        .setName(`${id}-Rx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      cachedInterface = { txMetric, rxMetric };
-    }
-
-    interfaceCache[id] = cachedInterface;
-  }
-
-  return cachedInterface;
-}
-
-function processInterfaceMetric(metric, now, pTs, pBytes, cBytes, spd) {
-  const interval = now - pTs;
-  if (interval > 0) {
-    const rawUtl = Calc.utilization(pBytes, cBytes, spd, interval);
-    const utl = Math.round(rawUtl);
-    metric.addDataPoint(new DataPoint(utl, now));
-    return metric;
-  }
-  return null;
-}
-
-function processInterfaceUtilization(data, modMetrics) {
-  const cachedInterface = getOrCreateCachedInterface(data);
-  const cd = data;            // current data
-  const pd = cachedInterface; // previous data
-  const ts = Date.now();
-  if (cd.linkState === 'up') {
-    if (cd.duplex === 'half') {
-      const metric = cachedInterface.txRxMetric;
-      const pBytes = pd.rxBytes + pd.txBytes;
-      const cBytes = cd.rxBytes + cd.txBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-    } else {
-      let metric = cachedInterface.txMetric;
-      let pBytes = pd.txBytes;
-      let cBytes = cd.txBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-      metric = cachedInterface.rxMetric;
-      pBytes = pd.rxBytes;
-      cBytes = cd.rxBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-    }
-  }
-  // Save the current data (which will be prevData next time).
-  cachedInterface.rxBytes = data.rxBytes;
-  cachedInterface.txBytes = data.txBytes;
-  cachedInterface.speed = data.speed;
-  cachedInterface.duplex = data.duplex;
-  cachedInterface.ts = ts;
-}
-
 function parseResult(result) {
+  const now = Date.now();
+
   const ssBaseBody = result[0].body;
   const sysBody = result[1].body;
   const infBody = result[2].body;
@@ -197,7 +112,6 @@ function parseResult(result) {
     interfaceCount: oi.interface_count,
   };
 
-  const interfaceUtlMetrics = {};
   const interfaces = {};
   infBody.forEach((elm) => {
     const cfg = elm.configuration;
@@ -214,18 +128,24 @@ function parseResult(result) {
         rxBytes: Number(stats.rx_bytes),
         txBytes: Number(stats.tx_bytes)
       };
-      processInterfaceUtilization(data, interfaceUtlMetrics);
+      if (data.linkState === 'up') {
+        const interfaceData = interfaceCache.getOrCreateInterface(
+          id, data.speed, data.duplex
+        );
+        if (data.duplex === 'half') {
+          interfaceData.updateMetric(TX_RX, data.rxBytes + data.txBytes, now);
+        } else if (data.duplex === 'full') {
+          interfaceData.updateMetric(TX, data.txBytes, now);
+          interfaceData.updateMetric(RX, data.rxBytes, now);
+        }
+      }
       interfaces[id] = data;
     }
   });
 
-  const interfaceUtlMetricsTop = [];
-  Object.getOwnPropertyNames(interfaceUtlMetrics).forEach(k => {
-    interfaceUtlMetricsTop.push(interfaceUtlMetrics[k]);
-  });
-  interfaceUtlMetricsTop.sort((m1, m2) => {
-    return m2.latestDataPoint().value() - m1.latestDataPoint().value();
-  });
+  const metrics = interfaceCache.metrics(now);
+  const interfaceMetrics = metrics.all;
+  const interfaceTopMetrics = metrics.top;
 
   const ports = {};
   portBody.forEach((elm) => {
@@ -310,8 +230,8 @@ function parseResult(result) {
   return {
     info,
     interfaces,
-    interfaceUtlMetrics,
-    interfaceUtlMetricsTop,
+    interfaceMetrics,
+    interfaceTopMetrics,
     ports,
     powerSupplies,
     powerSuppliesRollup,

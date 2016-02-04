@@ -17,9 +17,11 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
+
 import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
+
 import FetchToolbar from 'fetchToolbar.jsx';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
@@ -122,7 +124,7 @@ class OverviewPage extends Component {
           <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
-            {t(data.text)}
+              {t(data.text)}
             </SpanStatus>
           </td>
         </tr>
@@ -147,7 +149,7 @@ class OverviewPage extends Component {
           <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
-            {t(data.text)}
+              {t(data.text)}
             </SpanStatus>
           </td>
         </tr>
@@ -255,8 +257,9 @@ class OverviewPage extends Component {
   };
 
   _onSelectInterface = (metric) => {
-    this.props.history.pushState(null,
-      `/monitorInterface/${metric.getName()}`
+    this.props.history.pushState(
+      null,
+      `/monitorInterface/${metric.getGroup()}`
     );
   };
 
@@ -303,7 +306,7 @@ class OverviewPage extends Component {
       </StatusLayer>;
 
     let trafficMetricsCaption = null;
-    const trafficMetrics = coll.interfaceUtlMetricsTop.slice(
+    const trafficMetrics = coll.interfaceTopMetrics.slice(
       0, NUM_TRAFFIC_METRICS
     );
 
@@ -365,7 +368,7 @@ class OverviewPage extends Component {
             <MetricTable
                 simple
                 onSelect={this._onSelectInterface}
-                widths={{label: '70px', value: '70px'}}
+                widths={{label: '90px', value: '70px'}}
                 metrics={trafficMetrics}
             />
             {trafficMetricsCaption}

@@ -35,6 +35,7 @@ describe('Metric', () => {
     expect(m.cacheSize()).toEqual(Metric.CACHE_SIZE);
     expect(m.getColorIndex()).toEqual('');
     expect(m.getName()).toEqual('');
+    expect(m.getGroup()).toEqual('');
     expect(m.getUnits()).toEqual('');
     expect(m.getDataPoints()).toEqual([]);
     expect(m.size()).toEqual(0);
@@ -52,9 +53,11 @@ describe('Metric', () => {
   it('constructs with simple configuration', () => {
     const m = new Metric()
       .setName('name')
+      .setGroup('group')
       .setUnits('units')
       .setColorIndex('neutral-3');
     expect(m.getName()).toEqual('name');
+    expect(m.getGroup()).toEqual('group');
     expect(m.getUnits()).toEqual('units');
     expect(m.getColorIndex()).toEqual('neutral-3');
   });
