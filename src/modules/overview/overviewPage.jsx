@@ -220,20 +220,13 @@ class OverviewPage extends Component {
   };
 
   _mkFeatureProps = () => {
+    const info = this.props.collector.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
-            <td style={{width: '180px'}}>{t('Protocol#1')}:</td>
-            <td>{t('disabled')}</td>
-          </tr>
-          <tr>
-            <td>{t('Protocol#2')}:</td>
-            <td>{t('enabled')}</td>
-          </tr>
-          <tr>
-            <td>{t('Protocol#3')}:</td>
-            <td>{t('enabled')}</td>
+            <td style={{width: '180px'}}>{t('lldp')}:</td>
+            <td>{t(info.lldp)}</td>
           </tr>
           <tr>
             <td>{t('vlans')}:</td>
@@ -241,15 +234,15 @@ class OverviewPage extends Component {
           </tr>
           <tr>
             <td>{t('interfaces')}:</td>
-            <td>{this.props.collector.info.interfaceCount}</td>
+            <td>{info.interfaceCount}</td>
           </tr>
           <tr>
             <td>{t('mtu')}:</td>
-            <td>{this.props.collector.info.mtu}</td>
+            <td>{info.mtu}</td>
           </tr>
           <tr>
             <td>{t('maxInterfaceSpeed')}:</td>
-            <td>{this.props.collector.info.maxInterfaceSpeed}</td>
+            <td>{info.maxInterfaceSpeed}</td>
           </tr>
         </tbody>
       </table>

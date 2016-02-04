@@ -78,12 +78,13 @@ export default class MetricChart extends Component {
       chart = (
         <Chart
             series={[
-              {values: series0, colorIndex: this.props.metric.getColorIndex() }
+            {values: series0, colorIndex: this.props.metric.getColorIndex() }
             ]}
             type="area"
             smooth
             legend={{position: 'after'}}
             units={this.props.metric.getUnits()}
+            min={this.props.metric.min()}
             max={this.props.metric.max() * 1.25}
             xAxis={{
               data: xAxisData,

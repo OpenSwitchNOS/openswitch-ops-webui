@@ -98,6 +98,7 @@ function parseResult(result) {
 
   const oi = ssBaseBody.status.other_info;
   const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
+  const sysOc = sysBody.configuration.other_config;
   const info = {
     hostname: sysBody.configuration.hostname,
     version: sysBody.status.switch_version,
@@ -110,6 +111,7 @@ function parseResult(result) {
     maxInterfaceSpeed: oi.max_interface_speed,
     mtu: oi.max_transmission_unit,
     interfaceCount: oi.interface_count,
+    lldp: sysOc.lldp_enable === 'true' ? 'enabled' : 'disabled',
   };
 
   const interfaces = {};

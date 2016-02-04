@@ -32,9 +32,15 @@ function mkRow(widths, metric, onSelectFn) {
       return [ idx + 1, dp.value() ]; // FIXME: Grommet has a bug with 0 values here
     });
     chart = (
-      <Chart type="area" smooth series={[
-        { values, colorIndex: metric.getColorIndex() }
-      ]}/>
+      <Chart
+          max={metric.max()}
+          min={metric.min()}
+          threshold={metric.min()}
+          type="area"
+          smooth
+          series={[
+            { values, colorIndex: metric.getColorIndex() }
+          ]}/>
     );
   }
 
