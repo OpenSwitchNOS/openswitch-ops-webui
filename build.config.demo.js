@@ -22,7 +22,6 @@ import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import VlanDux from 'vlan/vlanDux.jsx';
 
-
 const modules = [
   CollectorDux,
   MonitorDux,
@@ -34,12 +33,14 @@ const modules = [
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
+import As5712 from 'boxGraphics/as5712.jsx';
 
 const settings = {
   i18nLocale,
+  boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.30.248:8091',
+    prefix: 'http://15.108.30.246:8091',
   }
 };
 

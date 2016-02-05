@@ -22,6 +22,7 @@ import React, { PropTypes, Component } from 'react';
 export default class BoxGraphic extends Component {
 
   static propTypes = {
+    children: PropTypes.node,
     className: PropTypes.string,
   };
 
@@ -32,7 +33,8 @@ export default class BoxGraphic extends Component {
       ri: 0,
       rj: 0,
       gi: 1,
-      gj: 4
+      gj: 4,
+      selection: {},
     };
   }
 
@@ -64,26 +66,39 @@ export default class BoxGraphic extends Component {
     this.setState({ ri, rj, gi, gj });
   };
 
+  _onClick = (e) => {
+    let el = this.state.selection.el;
+    if (el) {
+      el.classList.remove('selected');
+    }
+    el = e.target;
+    el.classList.add('selected');
+
+    // console.log(e);
+    // console.log(el);
+    // const marker = e.dispatchMarker;
+    // const loc = marker.substr(marker.indexOf('_x_band_') + 8);
+    // const s = loc.split('.');
+    // const x = s[0];
+    // const dp = this.props.metric.getDataPoint(x);
+
+    const selection = { el };
+    this.setState({ selection });
+    //
+    // if (this.props.onSelect) {
+    //   this.props.onSelect(dp);
+    // }
+  };
+
   render() {
     const s = this.state;
     const redCls = `rect-${s.ri}-${s.rj}`;
     const greenCls = `rect-${s.gi}-${s.rj}`;
     return (
-      <div className="boxGraphic">
+      <div className="boxGraphic" onClick={this._onClick}>
         <div className={`redOverlay ${redCls}`}>
           <div className={`greenOverlay ${greenCls}`}>
-            <svg viewBox="0 0 1000 200" version="1.1">
-              <rect id="rect-1-4" x="43.5" y="29" width="20" height="20"/>
-              <rect id="rect-1-3" x="71.5" y="29" width="20" height="20"/>
-              <rect id="rect-1-2" x="98.3" y="29" width="20" height="20"/>
-              <rect id="rect-1-1" x="125" y="29" width="20" height="20"/>
-              <rect id="rect-1-0" x="151.8" y="29" width="20" height="20"/>
-              <rect id="rect-0-4" x="44.8" y="102.8" width="20" height="20"/>
-              <rect id="rect-0-3" x="71.5" y="102.8" width="20" height="20"/>
-              <rect id="rect-0-2" x="98.3" y="102.8" width="20" height="20"/>
-              <rect id="rect-0-1" x="125" y="102.8" width="20" height="20"/>
-              <rect id="rect-0-0" x="151.8" y="102.8" width="20" height="20"/>
-            </svg>
+            {this.props.children}
           </div>
         </div>
       </div>

@@ -19,7 +19,12 @@
 
 @mixin port($c) {
   fill: $c;
-  stroke: lighten($c, 50%);
+  // stroke: lighten($c, 50%);
+}
+
+@mixin selectedPort($c) {
+  stroke: yellow;
+  stroke-width: 8;
 }
 
 @mixin overlay($c) {
@@ -35,6 +40,7 @@
 }
 
 .boxGraphic {
+  .selected { @include selectedPort(blue); }
   .redOverlay { @include overlay(red); }
   .greenOverlay { @include overlay(green); }
 }
