@@ -18,6 +18,7 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
+import BoxGraphic from 'boxGraphic.jsx';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 
@@ -111,7 +112,7 @@ class InterfacePage extends Component {
       <Box direction="row" className="flex1">
         <Box className="flex1">
           <Box className="pageBox min200x200">
-          ...BoxGraphic goes here...
+            <BoxGraphic/>
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
