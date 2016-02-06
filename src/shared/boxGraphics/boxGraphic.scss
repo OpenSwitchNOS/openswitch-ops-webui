@@ -16,31 +16,53 @@
 
 @import "~_settings.scss";
 
+$maxInterfaceId: 5;
 
-@mixin port($c) {
-  fill: $c;
-  // stroke: lighten($c, 50%);
-}
-
-@mixin selectedPort($c) {
+.selectedInterface {
   stroke: yellow;
   stroke-width: 8;
 }
 
-@mixin overlay($c) {
-  @for $i from 0 to 5 {
-    @for $j from 0 to 5 {
-      &.rect-#{$i}-#{$j} {
-        #rect-#{$i}-#{$j} {
-          @include port($c);
+.adminOffInterface {
+  fill: red;
+}
+
+.linkOnInterface {
+  fill: green;
+}
+
+.boxGraphic {
+
+  #bxgInf_x_1 { display: none; }
+
+  .selected {
+    @for $i from 1 to $maxInterfaceId {
+      &.bxgInf_#{$i} {
+        #bxgInf_#{$i} {
+          @extend .selectedInterface;
         }
       }
     }
   }
-}
 
-.boxGraphic {
-  .selected { @include selectedPort(blue); }
-  .redOverlay { @include overlay(red); }
-  .greenOverlay { @include overlay(green); }
+  .linkOn {
+    @for $i from 1 to $maxInterfaceId {
+      &.bxgInf_#{$i} {
+        #bxgInf_#{$i} {
+          @extend .linkOnInterface;
+        }
+      }
+    }
+  }
+
+  .adminOff {
+    @for $i from 1 to $maxInterfaceId {
+      &.bxgInf_#{$i} {
+        #bxgInf_x_#{$i} {
+          @extend .adminOffInterface;
+        }
+      }
+    }
+  }
+
 }

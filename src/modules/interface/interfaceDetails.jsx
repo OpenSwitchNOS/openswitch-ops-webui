@@ -38,7 +38,6 @@ class InterfaceDetails extends Component {
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
-    interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string.isRequired,
     }).isRequired,

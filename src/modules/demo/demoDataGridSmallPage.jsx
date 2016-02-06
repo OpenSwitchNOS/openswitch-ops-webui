@@ -20,6 +20,8 @@ import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
+import Button from 'grommet/components/Button';
+
 
 class DemoDataGridSmallPage extends Component {
 
@@ -42,6 +44,9 @@ class DemoDataGridSmallPage extends Component {
         width: 300,
       },
     ];
+    this.state = {
+      externalSelect: 2,
+    };
   }
 
   componentDidMount() {
@@ -75,6 +80,12 @@ class DemoDataGridSmallPage extends Component {
     alert(selection);
   };
 
+  _onForceSelect = () => {
+    const size = Object.keys(this.props.demo.entities).length;
+    const externalSelect = (this.state.externalSelect + 1) % size;
+    this.setState({ externalSelect });
+  };
+
   render() {
     const demoProps = this.props.demo;
     return (
@@ -99,6 +110,11 @@ class DemoDataGridSmallPage extends Component {
               columns={this.cols}
               noFilter
               singleSelect
+              select={[ this.state.externalSelect.toString() ]}
+          />
+          <Button
+              label={`Select ID ${this.state.externalSelect + 1}`}
+              onClick={this._onForceSelect}
           />
         </Section>
       </div>
