@@ -35,6 +35,16 @@ $maxInterfaceId: 5;
 
   #bxgInf_x_1 { display: none; }
 
+  svg {
+    min-width: 400px;
+    -webkit-box-shadow: 0px 0px 15px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow: 0px 0px 15px 0px rgba(50, 50, 50, 0.75);
+    box-shadow: 0px 0px 15px 0px rgba(50, 50, 50, 0.75);
+
+    background-color: red;
+  }
+
+
   .selected {
     @for $i from 1 to $maxInterfaceId {
       &.bxgInf_#{$i} {

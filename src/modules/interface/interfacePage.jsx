@@ -112,7 +112,7 @@ class InterfacePage extends Component {
     return (
       <Box direction="row" className="flex1">
         <Box className="flex1">
-          <Box className="pageBox min200x200">
+          <Box className="mtop mLeft pTop">
             <BoxGraphic
                 select={[ this.props.params.id ]}
                 onSelect={this._onSelect}>

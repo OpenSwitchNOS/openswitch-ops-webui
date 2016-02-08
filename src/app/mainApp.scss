@@ -68,6 +68,7 @@ h1, h2, h3, .headline, .title {
 
 .min200x200 { @include minHxW(); }
 .min200x400 { @include minHxW(200px, 400px); }
+.min100x200 { @include minHxW(100px, 200px); }
 
 // Single line for the 'hr' plain html element
 hr {
