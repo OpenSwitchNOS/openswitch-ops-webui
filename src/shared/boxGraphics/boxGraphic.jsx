@@ -19,7 +19,7 @@ import './boxGraphic.scss';
 import React, { PropTypes, Component } from 'react';
 import classNames from 'classnames';
 
-const ID_PREFIX = 'bxgInf_';
+const PREFIX = 'bxGfx_';
 
 export default class BoxGraphic extends Component {
 
@@ -38,8 +38,8 @@ export default class BoxGraphic extends Component {
   _onClick = (e) => {
     if (this.props.onSelect) {
       const id = e.target.id;
-      if (id.startsWith(ID_PREFIX)) {
-        const inf = id.substring(ID_PREFIX.length);
+      if (id.startsWith(PREFIX)) {
+        const inf = id.substring(PREFIX.length);
         this.props.onSelect(inf);
       }
     }
@@ -48,19 +48,19 @@ export default class BoxGraphic extends Component {
   render() {
     const adminOffCls = classNames(
       'adminOff',
-      { [`${ID_PREFIX}3`]: true },
+      // { [`${PREFIX}3`]: true },
     );
 
     const linkOnCls = classNames(
       'linkOn',
-      { [`${ID_PREFIX}2`]: true },
+      // { [`${PREFIX}2`]: true },
     );
 
     let selectedCls = null;
     if (this.props.select) {
       selectedCls = classNames(
         'selected',
-        this.props.select.map( k => `${ID_PREFIX}${k}` ),
+        this.props.select.map( k => `${PREFIX}${k}` ),
       );
     }
 
