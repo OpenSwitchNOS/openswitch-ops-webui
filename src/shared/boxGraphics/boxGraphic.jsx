@@ -14,12 +14,18 @@
     under the License.
 */
 
-import './boxGraphic.scss';
+// The box graphic SCSS file is not imported here by design. Because the
+// interface mappings will be different for each device, it is the resposibility
+// of the specific device SCSS to also import the box graphic SCSS "after"
+// defining mappings.
 
 import React, { PropTypes, Component } from 'react';
 import classNames from 'classnames';
 
-const PREFIX = 'bxGfx_';
+
+// This value must correspond to the value defined in the SCSS file.
+const INF_CLS_PREFIX = 'i_';
+
 
 export default class BoxGraphic extends Component {
 
@@ -31,44 +37,44 @@ export default class BoxGraphic extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
-  _onClick = (e) => {
-    if (this.props.onSelect) {
-      const id = e.target.id;
-      if (id.startsWith(PREFIX)) {
-        const inf = id.substring(PREFIX.length);
-        this.props.onSelect(inf);
-      }
-    }
+  _onClick = () => {
+    // if (this.props.onSelect) {
+    //   const id = e.target.id;
+    //   if (id.startsWith(PREFIX)) {
+    //     const inf = id.substring(PREFIX.length);
+    //     this.props.onSelect(inf);
+    //   }
+    // }
   };
 
   render() {
-    const adminOffCls = classNames(
-      'adminOff',
-      // { [`${PREFIX}3`]: true },
+
+    const adminCls = classNames(
+      'adminDown',
+      { [`${INF_CLS_PREFIX}3`]: true },
     );
 
-    const linkOnCls = classNames(
-      'linkOn',
-      // { [`${PREFIX}2`]: true },
+    const linkCls = classNames(
+      'linkUp',
+      { [`${INF_CLS_PREFIX}2`]: true },
     );
 
-    let selectedCls = null;
-    if (this.props.select) {
-      selectedCls = classNames(
-        'selected',
-        this.props.select.map( k => `${PREFIX}${k}` ),
-      );
-    }
+    const selectedCls = null;
+    // if (this.props.select) {
+    //   selectedCls = classNames(
+    //     'selected',
+    //     this.props.select.map( k => `${PREFIX}${k}` ),
+    //   );
+    // }
 
     return (
       <div className="boxGraphic" onClick={this._onClick}>
         <div className={selectedCls}>
-          <div className={adminOffCls}>
-            <div className={linkOnCls}>
+          <div className={adminCls}>
+            <div className={linkCls}>
               {this.props.children}
             </div>
           </div>

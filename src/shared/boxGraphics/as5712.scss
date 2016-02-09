@@ -14,18 +14,17 @@
     under the License.
 */
 
+@import "_boxGraphic.scss";
 
-@import "~_settings.scss";
-
-$P: bxGfx_;
 
 $as5712map: (
-  1: #{$P}1,
-  2: #{$P}2,
-  3: #{$P}3,
-  4: #{$P}4,
+  1: (#bxGfx_1, #bxGfx_s_1),
+  2: (#bxGfx_2, #bxGfx_s_2),
+  3: (#bxGfx_3, #bxGfx_s_3),
+  4: (#bxGfx_4, #bxGfx_s_4)
 );
 
+@include bxGfx(#as5712, $as5712map);
 
 #as5712 {
 
@@ -42,70 +41,14 @@ $as5712map: (
     stroke-width: 3px;
   }
 
-  // #bxGfx_interfaces {
-  //   stroke: silver;
-  // }
-
-  // #bxGfx_s_1 {
-  //   fill: #F00;
-  //   stroke: #F00;
-  // }
-
-  #bxGfx_1 {
-    fill: #0F0;
-    stroke: silver;
-    stroke-width: 3px;
-  }
-  #bxGfx_s_1 {
-    display: none;
-  }
-
-  #bxGfx_2 {
-    stroke: silver;
-    stroke-width: 3px;
-  }
-  #bxGfx_s_2 {
-    fill: #F00;
-  }
-
-  #bxGfx_3 {
-    stroke: silver;
-    stroke-width: 3px;
-  }
-
-  #bxGfx_4 {
-    stroke: silver;
-    stroke-width: 3px;
-    fill: #0F0;
-  }
-  #bxGfx_s_4 {
-    display: none;
-  }
-}
-
-@each $infId, $svgId in $as5712map {
-  #as5712 {
-    ##{$svgId}:hover { fill: lighten(black, 20%); }
-  }
-}
-
-@each $infId, $svgId in $as5712map {
-  .adminOff.#{$svgId} #as5712 {
-    ##{$svgId} { fill: red; }
-  }
-}
-
-@each $infId, $svgId in $as5712map {
-  .linkOn.#{$svgId} #as5712 {
-    ##{$svgId} { fill: green; }
-  }
-}
-
-@each $infId, $svgId in $as5712map {
-  .selected.#{$svgId} #as5712 {
-    ##{$svgId} {
-      stroke: $brand-color;
-      stroke-width: 7px;
+  #bxGfx_interfaces {
+    rect {
+      stroke: silver;
+      stroke-width: 3px;
+    }
+    polygon {
+      display: none;
     }
   }
+
 }

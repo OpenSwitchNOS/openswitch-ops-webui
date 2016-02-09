@@ -18,6 +18,12 @@ import './as5712.scss';
 
 import React from 'react';
 
+
+const ON_CLICK = () => {
+  // const cssId = e.target.id;
+  // console.log(cssId);
+};
+
 const SVG = (
   <svg id="as5712" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1802 203">
     <title>as5712</title>
@@ -497,4 +503,5 @@ const SVG = (
 
 export default {
   SVG,
+  ON_CLICK,
 };
