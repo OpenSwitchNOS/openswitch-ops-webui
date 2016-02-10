@@ -23,16 +23,18 @@ import React, { PropTypes, Component } from 'react';
 import classNames from 'classnames';
 
 
-// This value must correspond to the value defined in the SCSS file.
-const INF_CLS_PREFIX = 'i_';
-
-
 export default class BoxGraphic extends Component {
 
   static propTypes = {
-    children: PropTypes.node,
-    onSelect: PropTypes.func,
+    interfaces: PropTypes.object.isRequired,
+    onSelectChange: PropTypes.func,
     select: PropTypes.arrayOf(PropTypes.string),
+    spec: PropTypes.shape({
+      onClick: PropTypes.func.isRequired,
+      toExternalInterfaceId: PropTypes.func.isRequired,
+      toSvgInterfaceName: PropTypes.func.isRequired,
+      svg: PropTypes.node.isRequired,
+    }).isRequired,
   };
 
   constructor(props) {
@@ -40,42 +42,48 @@ export default class BoxGraphic extends Component {
     this.state = {};
   }
 
-  _onClick = () => {
-    // if (this.props.onSelect) {
-    //   const id = e.target.id;
-    //   if (id.startsWith(PREFIX)) {
-    //     const inf = id.substring(PREFIX.length);
-    //     this.props.onSelect(inf);
-    //   }
-    // }
+  _onClick = (e) => {
+    const sel = this.props.spec.onClick(e);
+    if (sel) {
+      this.props.onSelectChange(sel);
+    }
   };
 
   render() {
 
+    const adminDownIds = [];
+    const linkUpIds = [];
+    Object.getOwnPropertyNames(this.props.interfaces).forEach(k => {
+      const inf = this.props.interfaces[k];
+      if (inf.adminState === 'down') {
+        adminDownIds.push(k);
+      } else if (inf.linkState === 'up') {
+        linkUpIds.push(k);
+      }
+    });
+
     const adminCls = classNames(
       'adminDown',
-      { [`${INF_CLS_PREFIX}3`]: true },
+      adminDownIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const linkCls = classNames(
       'linkUp',
-      { [`${INF_CLS_PREFIX}2`]: true },
+      linkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
-    const selectedCls = null;
-    // if (this.props.select) {
-    //   selectedCls = classNames(
-    //     'selected',
-    //     this.props.select.map( k => `${PREFIX}${k}` ),
-    //   );
-    // }
+    const select = this.props.select || [];
+    const selectedCls = classNames(
+      'selected',
+      select.map(i => this.props.spec.toSvgInterfaceName(i)),
+    );
 
     return (
       <div className="boxGraphic" onClick={this._onClick}>
-        <div className={selectedCls}>
-          <div className={adminCls}>
-            <div className={linkCls}>
-              {this.props.children}
+        <div className={adminCls}>
+          <div className={linkCls}>
+            <div className={selectedCls}>
+              {this.props.spec.svg}
             </div>
           </div>
         </div>

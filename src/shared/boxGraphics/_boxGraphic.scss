@@ -17,40 +17,35 @@
 @import "~_settings.scss";
 
 
-$INF_CLS_PREFIX: i_;
+@mixin bxGfx($svgId, $cssIds) {
 
-@mixin bxGfx($id, $map) {
+  @each $i in $cssIds {
+    $mainCssId: #{nth($i, 1)};
+    $subCssId: #{nth($i, 2)};
 
-  @each $interfaceId, $cssIds in $map {
-    .boxGraphic #{$id} #{nth($cssIds, 1)}:hover,
-    .boxGraphic #{$id} #{nth($cssIds, 2)}:hover {
-      fill: lighten(black, 20%);
-    }
-  }
+    .boxGraphic {
 
-  @each $interfaceId, $cssIds in $map {
-    .boxGraphic .linkUp.#{$INF_CLS_PREFIX}#{$interfaceId} #{$id} {
-      #{nth($cssIds, 1)} {
-        fill: #0F0;
+      #{$svgId} ##{$mainCssId}:hover {
+        fill: lighten(black, 20%);
       }
-    }
-  }
 
-  @each $interfaceId, $cssIds in $map {
-    .boxGraphic .selected.#{$INF_CLS_PREFIX}#{$interfaceId} #{$id} {
-      #{nth($cssIds, 1)} {
+      .linkUp.#{$mainCssId} #{$svgId} ##{$mainCssId} {
+        fill: #0F0;
+        &:hover {
+          fill: #0A0;
+        }
+      }
+
+      .selected.#{$mainCssId} #{$svgId} ##{$mainCssId} {
         stroke: $brand-color;
         stroke-width: 7px;
       }
-    }
-  }
 
-  @each $interfaceId, $cssIds in $map {
-    .boxGraphic .adminDown.#{$INF_CLS_PREFIX}#{$interfaceId} #{$id} {
-      #{nth($cssIds, 2)} {
+      .adminDown.#{$mainCssId} #{$svgId} ##{$subCssId} {
         fill: #F00;
         display: block;
       }
+
     }
   }
 

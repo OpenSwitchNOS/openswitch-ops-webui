@@ -18,10 +18,25 @@ import './as5712.scss';
 
 import React from 'react';
 
+const SVG_INTERFACE_NAME_PREFIX = 'bxGfx_';
 
-const ON_CLICK = () => {
-  // const cssId = e.target.id;
-  // console.log(cssId);
+const toSvgInterfaceName = (id) => {
+  // TODO: determine other ID mappings
+  return `${SVG_INTERFACE_NAME_PREFIX}${id}`;
+};
+
+const toExternalInterfaceId = (name) => {
+  // TODO: determine other ID mappings
+  return name.substring(SVG_INTERFACE_NAME_PREFIX.length);
+};
+
+const onClick = (e) => {
+  const svgInfName = e.target.id;
+  const tagName = e.target.tagName;
+  if (tagName === 'rect' && svgInfName.startsWith(SVG_INTERFACE_NAME_PREFIX)) {
+    return toExternalInterfaceId(svgInfName);
+  }
+  return null;
 };
 
 const SVG = (
@@ -502,6 +517,8 @@ const SVG = (
 );
 
 export default {
-  SVG,
-  ON_CLICK,
+  svg: SVG,
+  onClick,
+  toSvgInterfaceName,
+  toExternalInterfaceId,
 };

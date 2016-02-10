@@ -17,14 +17,17 @@
 @import "_boxGraphic.scss";
 
 
-$as5712map: (
-  1: (#bxGfx_1, #bxGfx_s_1),
-  2: (#bxGfx_2, #bxGfx_s_2),
-  3: (#bxGfx_3, #bxGfx_s_3),
-  4: (#bxGfx_4, #bxGfx_s_4)
+$as5712_cssIds: (
+  ( bxGfx_mgmt, bxGfx_s_mgmt ),
+  ( bxGfx_console, bxGfx_s_console )
 );
 
-@include bxGfx(#as5712, $as5712map);
+@for $i from 1 through 54 {
+  $ids: ( bxGfx_#{$i}, bxGfx_s_#{$i} );
+  $as5712_cssIds: append($as5712_cssIds, $ids);
+}
+
+@include bxGfx(#as5712, $as5712_cssIds);
 
 #as5712 {
 
@@ -48,6 +51,7 @@ $as5712map: (
     }
     polygon {
       display: none;
+      pointer-events:none;
     }
   }
 

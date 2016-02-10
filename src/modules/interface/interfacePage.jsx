@@ -28,7 +28,7 @@ class InterfacePage extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
-    boxGraphicSvg: PropTypes.node.isRequired,
+    boxGraphic: PropTypes.object.isRequired,
     children: PropTypes.node,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
@@ -100,10 +100,11 @@ class InterfacePage extends Component {
 
   render() {
     const interfaces = this.props.collector.interfaces;
+    const sel = this.props.params.id;
 
     // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
     // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
-    const details = !this.props.params.id ? null : (
+    const details = !sel ? null : (
       <Box className="pageBox">
         {this.props.children}
       </Box>
@@ -114,10 +115,11 @@ class InterfacePage extends Component {
         <Box className="flex1">
           <Box className="mtop mLeft pTop">
             <BoxGraphic
-                select={[ this.props.params.id ]}
-                onSelect={this._onSelect}>
-                {this.props.boxGraphicSvg}
-            </BoxGraphic>
+                spec={this.props.boxGraphic}
+                interfaces={interfaces}
+                select={sel && [sel]}
+                onSelectChange={this._onSelect}
+            />
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
@@ -125,7 +127,7 @@ class InterfacePage extends Component {
                   data={interfaces}
                   columns={this.cols}
                   singleSelect
-                  select={[ this.props.params.id ]}
+                  select={[ sel ]}
                   onSelectChange={this._onSelect}
               />
             </ResponsiveBox>
@@ -141,7 +143,7 @@ class InterfacePage extends Component {
 function select(store) {
   return {
     collector: store.collector,
-    boxGraphicSvg: store.boxGraphicSvg,
+    boxGraphic: store.boxGraphic,
   };
 }
 

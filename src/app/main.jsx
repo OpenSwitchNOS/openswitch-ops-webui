@@ -53,7 +53,7 @@ function createReducers(BuildConfig) {
   const reducers = {
     links: (moduleStore = {}) => { return moduleStore; },
     routeToLink: (moduleStore = {}) => { return moduleStore; },
-    boxGraphicSvg: (moduleStore = {}) => { return moduleStore; },
+    boxGraphic: (moduleStore = {}) => { return moduleStore; },
   };
   modules.forEach(i => reducers[i.NAME] = i.REDUCER);
   return combineReducers(reducers);
@@ -122,7 +122,7 @@ export function mainInit(BuildConfig) {
   const initStore = {
     links: navModel.links,
     routeToLink: navModel.routeToLink,
-    boxGraphicSvg: BuildConfig.settings.boxGraphic.SVG,
+    boxGraphic: BuildConfig.settings.boxGraphic,
   };
 
   store = createReducersAndStore(BuildConfig, initStore);
