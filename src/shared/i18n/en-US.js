@@ -65,6 +65,8 @@ export const MESSAGES = {
   degreesCelsius: 'C',
   deploy: 'Deploy',
   disabled: 'Disabled',
+  dstIp: 'Destination IP',
+  dstPort: 'Destination Port',
   duplex: 'Duplex',
   emerg: 'Emerg',
   enabled: 'Enabled',
@@ -89,6 +91,7 @@ export const MESSAGES = {
   lastUpdate: 'Last Update',
   linkState: 'Link State',
   lldp: 'LLDP',
+  loadBalance: 'Load Balance',
   log: 'Log',
   logout: 'Logout',
   maxInterfaceSpeed: 'Max Interface Speed',
@@ -107,10 +110,17 @@ export const MESSAGES = {
   powerAbsent: 'Absent',
   productName: 'Product Name',
   readAll: 'Read All',
+  resilientHash: 'Resilience Hashing',
   search: 'Search',
   serialNumber: 'Serial #',
   severity: 'Severity',
+<<<<<<< HEAD
   speed: 'Speed',
+||||||| parent of c4b87c9... new: usr: webui to show ecmp status and configuration
+=======
+  srcIp: 'Source IP',
+  srcPort: 'Source Port',
+>>>>>>> c4b87c9... new: usr: webui to show ecmp status and configuration
   state: 'State',
   status: 'Status',
   storage: 'Storage',

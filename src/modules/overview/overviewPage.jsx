@@ -228,6 +228,12 @@ class OverviewPage extends Component {
             <td style={{width: '180px'}}>{t('lldp')}:</td>
             <td>{t(info.lldp)}</td>
           </tr>
+
+          <tr>
+            <td style={{width: '180px'}}>{t('ecmp')}:</td>
+            <td>{t(info.ecmp)}</td>
+          </tr>
+
           <tr>
             <td>{t('vlans')}:</td>
             <td>TBD</td>
