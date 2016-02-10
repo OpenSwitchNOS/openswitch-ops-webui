@@ -16,6 +16,12 @@
 
 @import "~_settings.scss";
 
+$adminDownColor: #A00;
+$linkUpColor: #F00;
+$linkUpHoverColor: #0A0;
+$hoverColor: lighten(black, 20%);
+$activeColor: $brand-color;
+
 
 @mixin bxGfx($svgId, $cssIds) {
 
@@ -26,23 +32,23 @@
     .boxGraphic {
 
       #{$svgId} ##{$mainCssId}:hover {
-        fill: lighten(black, 20%);
+        fill: $hoverColor;
       }
 
       .linkUp.#{$mainCssId} #{$svgId} ##{$mainCssId} {
-        fill: #0F0;
+        fill: $linkUpColor;
         &:hover {
-          fill: #0A0;
+          fill: $linkUpHoverColor;
         }
       }
 
       .selected.#{$mainCssId} #{$svgId} ##{$mainCssId} {
-        stroke: $brand-color;
-        stroke-width: 7px;
+        stroke: $activeColor;
+        stroke-width: 8px;
       }
 
       .adminDown.#{$mainCssId} #{$svgId} ##{$subCssId} {
-        fill: #F00;
+        fill: $adminDownColor;
         display: block;
       }
 

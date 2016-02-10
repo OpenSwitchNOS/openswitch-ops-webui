@@ -21,12 +21,10 @@ import React from 'react';
 const SVG_INTERFACE_NAME_PREFIX = 'bxGfx_';
 
 const toSvgInterfaceName = (id) => {
-  // TODO: determine other ID mappings
   return `${SVG_INTERFACE_NAME_PREFIX}${id}`;
 };
 
 const toExternalInterfaceId = (name) => {
-  // TODO: determine other ID mappings
   return name.substring(SVG_INTERFACE_NAME_PREFIX.length);
 };
 

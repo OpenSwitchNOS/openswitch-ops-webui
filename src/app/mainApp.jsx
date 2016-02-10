@@ -33,6 +33,7 @@ import NotificationIcon from 'grommet/components/icons/base/Notification';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import NextIcon from 'grommet/components/icons/base/Next';
 
 import LoginLayer from 'loginLayer.jsx';
 
@@ -135,19 +136,20 @@ class MainApp extends Component {
     const pageHdr = (
       <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
           justify="between">
-        <Menu direction="row" align="center" responsive={false}>
-          {!this.props.nav.paneActive ?
-            <Title onClick={this._onPageNavClicked}>{'>>>'}</Title>
-            : null
+        <Box direction="row" align="center" responsive={false}>
+          {this.props.nav.paneActive ? null :
+            <Anchor onClick={this._onPageNavClicked}>
+              <NextIcon />
+            </Anchor>
           }
           <Title>{this._linkPathName()}</Title>
-        </Menu>
-        <Menu direction="row" align="center" responsive={false}>
+        </Box>
+        <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar.component}
           <a href="#/syslog">
             <NotificationIcon/><small>{numSyslog}</small>
           </a>
-        </Menu>
+        </Box>
       </Header>
     );
 
