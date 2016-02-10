@@ -52,6 +52,11 @@ $as5712_cssIds: (
     polygon {
       display: none;
       pointer-events:none;
+      &#bxGfx_s_mgmt, &#bxGfx_s_console {
+        display: block;
+        stroke: lighten(black, 30%);
+        stroke-width: 3px;
+      }
     }
   }
 
