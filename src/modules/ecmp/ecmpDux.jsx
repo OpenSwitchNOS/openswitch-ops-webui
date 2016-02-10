@@ -14,14 +14,14 @@
     under the License.
 */
 
-import OverviewPage from './overviewPage.jsx';
+import EcmpPage from './ecmpPage.jsx';
 
-const NAME = 'overview';
+const NAME = 'ecmp';
 
 const NAVS = [
   {
-    route: { path: '/overview', component: OverviewPage },
-    link: { path: '/overview', order: 100 }
+    route: { path: '/ecmp', component: EcmpPage },
+    link: { path: '/ecmp', order: 350 }
   },
 ];
 

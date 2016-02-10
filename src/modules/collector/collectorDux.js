@@ -47,6 +47,7 @@ const INITIAL_STORE = {
   fansRollup: { status: 'unknown' },
   temps: {},
   tempsRollup: { status: 'unknown' },
+  ecmp: {},
 };
 
 const interfaceCache = new InterfaceCache();
@@ -97,6 +98,7 @@ function parseResult(result) {
   const fanBody = result[5].body;
   const tempBody = result[6].body;
 
+  const ecmpConfig = sysBody.configuration.ecmp_config;
   const oi = ssBaseBody.status.other_info;
   const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
   const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
@@ -114,6 +116,7 @@ function parseResult(result) {
     mtu: oi.max_transmission_unit,
     interfaceCount: oi.interface_count,
     lldp: sysOc.lldp_enable === 'true' ? 'enabled' : 'disabled',
+    ecmp: ecmpConfig.enabled === 'false' ? 'disabled' : 'enabled',
   };
 
   const interfaces = {};
@@ -232,6 +235,21 @@ function parseResult(result) {
       ok ? 'ok' : 'unknown';
   const tempsRollup = { status, critical, warning, ok };
 
+  const ecmp = {
+    status: ecmpConfig.enabled === 'false' ?
+      'disabled' : 'enabled',
+    hashDstip: ecmpConfig.hash_dstip_enabled === 'false' ?
+      'disabled' : 'enabled',
+    hashDstport: ecmpConfig.hash_dstport_enabled === 'false' ?
+      'disabled' : 'enabled',
+    hashSrcip: ecmpConfig.hash_srcip_enabled === 'false' ?
+      'disabled' : 'enabled',
+    hashSrcport: ecmpConfig.hash_srcport_enabled === 'false' ?
+      'disabled' : 'enabled',
+    resilientHash: ecmpConfig.resilient_hash_enabled === 'false' ?
+      'disabled' : 'enabled',
+  };
+
   return {
     info,
     interfaces,
@@ -244,6 +262,7 @@ function parseResult(result) {
     fansRollup,
     temps,
     tempsRollup,
+    ecmp,
   };
 }
 
