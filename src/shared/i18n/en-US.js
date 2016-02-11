@@ -100,6 +100,7 @@ export const MESSAGES = {
   model: 'Model',
   mtu: 'MTU',
   name: 'Name',
+  none: 'None',
   notice: 'Notice',
   ok: 'OK',
   onieVersion: 'ONIE Version',

@@ -69,6 +69,8 @@ h1, h2, h3, .headline, .title {
 .min200x200 { @include minHxW(); }
 .min200x400 { @include minHxW(200px, 400px); }
 .min100x200 { @include minHxW(100px, 200px); }
+.min300x300 { @include minHxW(300px, 300px); }
+.min300x300 { @include minHxW(300px, 300px); }
 
 // Single line for the 'hr' plain html element
 hr {
@@ -97,7 +99,7 @@ table.propTable {
 @mixin pageBox($marginTop: $space, $marginLeft: $space) {
   background-color: white;
   border-radius: 5px;
-  box-shadow: 0px 0px 3px lightgrey;
+  box-shadow: 0px 0px 3px lightgray;
   box-sizing: border-box;
   margin-top: $marginTop;
   margin-left: $marginLeft;

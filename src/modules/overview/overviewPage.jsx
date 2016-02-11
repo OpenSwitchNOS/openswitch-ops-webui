@@ -117,7 +117,7 @@ class OverviewPage extends Component {
   _mkPowerSuppliesProps = () => {
     const ps = this.props.collector.powerSupplies;
     const trs = [];
-    Object.getOwnPropertyNames(ps).forEach(k => {
+    Object.getOwnPropertyNames(ps).sort().forEach(k => {
       const data = ps[k];
       trs.push(
         <tr key={data.id}>
@@ -142,7 +142,7 @@ class OverviewPage extends Component {
   _mkFansProps = () => {
     const fans = this.props.collector.fans;
     const trs = [];
-    Object.getOwnPropertyNames(fans).forEach(k => {
+    Object.getOwnPropertyNames(fans).sort().forEach(k => {
       const data = fans[k];
       trs.push(
         <tr key={data.id}>
@@ -167,7 +167,7 @@ class OverviewPage extends Component {
   _mkTempsProps = () => {
     const temps = this.props.collector.temps;
     const trs = [];
-    Object.getOwnPropertyNames(temps).forEach(k => {
+    Object.getOwnPropertyNames(temps).sort().forEach(k => {
       const data = temps[k];
       trs.push(
         <tr key={data.id}>
@@ -337,17 +337,17 @@ class OverviewPage extends Component {
     return (
       <Box className="flex1">
         <Box direction="row" className="flex0auto flexWrap">
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('system')}</b>
             <hr/>
             {this._mkSystemProps()}
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('features')}</b>
             <hr/>
             {this._mkFeatureProps()}
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('hardware')}</b>
             <hr/>
             <table className="propTable">
@@ -361,7 +361,7 @@ class OverviewPage extends Component {
               </tbody>
             </table>
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('traffic')}</b>
             <hr/>
             <MetricTable
@@ -373,7 +373,7 @@ class OverviewPage extends Component {
             {trafficMetricsCaption}
           </Box>
         </Box>
-        <Box pad={this.pad} className="flex1 pageBox min200x400">
+        <Box pad={this.pad} className="flex1 pageBox min300x400">
           <span><b>{t('log')}&nbsp;&nbsp;</b><small>start-time to end-time</small></span>
           <hr/>
           <Table>

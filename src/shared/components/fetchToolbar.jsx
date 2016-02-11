@@ -28,7 +28,7 @@ export default class FetchToolbar extends Component {
     date: PropTypes.number,
     error: PropTypes.shape({
       url: PropTypes.string.isRequired,
-      status: PropTypes.number.isRequired,
+      status: PropTypes.number,
       title: PropTypes.string.isRequired,
       msg: PropTypes.string,
     }),
@@ -68,7 +68,7 @@ export default class FetchToolbar extends Component {
             <StatusLayer value="error" onClose={this._onCloseDetail}
                 title={e.title} >
               <b>{t('status')}</b><br/>
-              {e.status}
+              {e.status || t('none')}
               <p/>
               <b>{t('url')}</b><br/>
               {e.url}

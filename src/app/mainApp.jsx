@@ -206,11 +206,11 @@ class MainApp extends Component {
     const splitContent = (
       <Split flex="right" onResponsive={this._onNavSplitResponsive}
           priority="left">
-        <Box direction="row">
+        <Box responsive={false} direction="row">
           {guide}
           {nav}
         </Box>
-        <Box direction="row">
+        <Box responsive={false} direction="row">
           <Box id="page" className="flex1">
             {pageHdr}
             {page}
