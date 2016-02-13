@@ -54,7 +54,8 @@ function fetchReducer(moduleName, moduleInitialStore, moduleParseFn) {
       case ACTION_TYPES.REQUEST:
         return {
           ...moduleStore,
-          isFetching: true
+          isFetching: true,
+          lastError: null,
         };
 
       case ACTION_TYPES.FAILURE:

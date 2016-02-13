@@ -31,6 +31,43 @@ import FormFields from 'grommet/components/FormFields';
 import CheckBox from 'grommet/components/CheckBox';
 import Button from 'grommet/components/Button';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import _ from 'lodash';
+
+
+// TODO: needs to be cleaned up top to bottom.
+/* TODO: below
+We need to clean up:
+adminState 'up'/'down' vs enabled t/f
+  Pain to check for string everywhere
+  LLDP/ECMP also have this problem -> convert to t/f
+  Clean up related code in collector & interface modules
+*/
+/* TODO: need to create a dialog helper for edit errors.
+if (!p.isFetching) {
+  if (e) {
+    status = (
+      <SpanStatus onClick={this._onStatusClicked} value="error">
+        {e.title}
+      </SpanStatus>
+    );
+    if (this.state.showDetail) {
+      detail = (
+        <StatusLayer value="error" onClose={this._onCloseDetail}
+            title={e.title} >
+          <b>{t('status')}</b><br/>
+          {e.status || t('none')}
+          <p/>
+          <b>{t('url')}</b><br/>
+          {e.url}
+          {e.msg ? <p><i>"{e.msg}"</i></p> : null}
+        </StatusLayer>
+      );
+    }
+  } else if (p.date) {
+    status = <small><TimeAgo date={p.date}/></small>;
+  }
+}
+*/
 
 
 class InterfaceDetails extends Component {
@@ -40,35 +77,33 @@ class InterfaceDetails extends Component {
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
+    interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string.isRequired,
     }).isRequired,
   };
 
-
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      editMode: false,
+      user: {},
+    };
   }
 
   componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector, this._onRefresh
-    );
+    this.props.actions.interface.fetch(this.props.params.id);
   }
-
-  _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
-
-  };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
-  }
+    const p = this.props;
+    const id = p.params.id;
+    const currData = p.collector.interfaces[id];
+    const nextData = nextProps.collector.interfaces[id];
 
-  componentWillUnmount() {
-    this.props.actions.toolbar.clear();
+    if (nextProps.params.id !== id || !_.isEqual(currData, nextData)) {
+      p.actions.interface.fetch(nextProps.params.id);
+    }
   }
 
   _onClose = () => {
@@ -76,19 +111,39 @@ class InterfaceDetails extends Component {
   };
 
   _onEditToggle = () => {
-    const inEditMode = !this.state.inEditMode;
-    this.setState({ inEditMode });
+    const editMode = !this.state.editMode;
+    let user = this.state.user;
+    if (editMode) {
+      user = { adminState: this.props.interface.vAdminState };
+    }
+    this.setState({ editMode, user });
+  };
+
+  _onChangeCheckBox = (e) => {
+    const fn = e.target.getAttribute('name');
+    const state = e.target.checked ? 'up' : 'down';
+    const user = {...this.state.user, [fn]: state };
+    this.setState({ user });
   };
 
   _onSubmit = () => {
-   //TODO :
+    const actions = this.props.actions.interface;
+    const id = this.props.params.id;
+    const state = this.state.user.adminState;
+    if (state === 'up') {
+      actions.adminStateUp(id);
+    } else {
+      actions.adminStateDown(id);
+    }
   };
 
   render() {
     //TODO: Should be localized eventually
     const id = this.props.params.id;
     const data = this.props.collector.interfaces[id];
-    const editLayer = !this.state.inEditMode ? null : (
+    const infData = this.props.interface;
+    const user = this.state.user;
+    const editLayer = !this.state.editMode ? null : (
       <Layer
           className="edit"
           onClose={this._onEditToggle}
@@ -102,13 +157,13 @@ class InterfaceDetails extends Component {
           <FormFields>
             <fieldset>
             <FormField>
-              <CheckBox id="adminState" name="adminState" label="Admin State" toggle/>
+              <CheckBox onChange={this._onChangeCheckBox} checked={user.adminState === 'up'} id="adminState" name="adminState" label="Admin State" toggle/>
             </FormField>
             </fieldset>
           </FormFields>
           <Footer pad={{vertical: 'medium'}}>
             <Menu>
-              <Button label={t('deploy')} primary/>
+              <Button label={t('deploy')} primary onClick={this._onSubmit}/>
             </Menu>
           </Footer>
         </Form>
@@ -118,27 +173,35 @@ class InterfaceDetails extends Component {
     return (
       <Box pad="small">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-        <Title>
+          <Title>
           Interface {id} Details
-        </Title>
-        <Menu direction="row" justify="end" responsive={false}>
-          <Anchor onClick={this._onEditToggle}>
-            <EditIcon className="tiny"/>
-          </Anchor>
-          <Anchor onClick={this._onClose}>
-            <CloseIcon className="tiny"/>
-          </Anchor>
-        </Menu>
+          </Title>
+          <Menu direction="row" justify="end" responsive={false}>
+            <Anchor onClick={this._onEditToggle}>
+              <EditIcon className="tiny"/>
+            </Anchor>
+            <Anchor onClick={this._onClose}>
+              <CloseIcon className="tiny"/>
+            </Anchor>
+          </Menu>
         </Header>
         <Box pad="small">
-          {!data ? 'no data' : (
-            <div>
+        {!data ? 'no data' : (
+          <div>
             <h5>ID: {data.id}</h5>
             <h5>Admin State: {data.adminState}</h5>
             <h5>Link State: {data.linkState}</h5>
             <h5>Duplex: {data.duplex}</h5>
             <h5>Speed: {data.speedFormatted}</h5>
             <h5>Connector: {data.connector}</h5>
+            <br/>
+            <h5>ports etag: {infData.ports.etag}</h5>
+            <h5>entity id: {infData.entity.id}</h5>
+            <h5>entity etag: {infData.entity.etag}</h5>
+            <h5>entity adminState: {infData.entity.adminState}</h5>
+            <h5>port id: {infData.port && infData.port.id}</h5>
+            <h5>port adminState: {infData.port && infData.port.adminState}</h5>
+            <h5>port etag: {infData.port && infData.port.etag}</h5>
             </div>
           )}
         </Box>
@@ -151,6 +214,7 @@ class InterfaceDetails extends Component {
 function select(store) {
   return {
     collector: store.collector,
+    interface: store.interface,
   };
 }
 

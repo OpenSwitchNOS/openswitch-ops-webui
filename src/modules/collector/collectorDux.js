@@ -87,49 +87,25 @@ function normalizeTempStatus(id, s) {
   };
 }
 
-function parseResult(result) {
-  const now = Date.now();
-
-  const ssBaseBody = result[0].body;
-  const sysBody = result[1].body;
-  const infBody = result[2].body;
-  const portBody = result[3].body;
-  const pwrBody = result[4].body;
-  const fanBody = result[5].body;
-  const tempBody = result[6].body;
-
-  const ecmpConfig = sysBody.configuration.ecmp_config;
-  const oi = ssBaseBody.status.other_info;
-  const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
-  const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
-  const sysOc = sysBody.configuration.other_config;
-  const info = {
-    hostname: sysBody.configuration.hostname,
-    version: sysBody.status.switch_version,
-    product: oi['Product Name'],
-    partNum: oi.part_number,
-    onieVersion: oi.onie_version,
-    baseMac,
-    serialNum: oi.serial_number,
-    vendor: oi.vendor,
-    maxInterfaceSpeed,
-    mtu: oi.max_transmission_unit,
-    interfaceCount: oi.interface_count,
-    lldp: sysOc.lldp_enable === 'true' ? 'enabled' : 'disabled',
-    ecmp: ecmpConfig.enabled === 'false' ? 'disabled' : 'enabled',
-  };
-
+function parseInterfaces(infBody, ports, now) {
   const interfaces = {};
   infBody.forEach((elm) => {
     const cfg = elm.configuration;
     if (cfg.type === 'system') {
       const id = cfg.name;
       const stats = elm.statistics.statistics;
+      const uc = cfg.user_config;
+      const port = ports[id];
+      const adminState = (uc && uc.admin === 'up') ? 'up' : 'down';
+      const vAdminState = adminState === 'up'
+        && port && port.adminState === 'up' ? 'up' : 'down';
       const data = {
         id,
-        adminState: elm.status.admin_state,
+        port,
+        adminState,
+        vAdminState,
+        duplex: (uc && uc.duplex === 'full') ? 'full' : 'half',
         linkState: elm.status.link_state,
-        duplex: elm.status.duplex,
         speed: elm.status_link_speed,
         speedFormatted: Formatter.bpsToString(elm.status.link_speed),
         connector: elm.status.pm_info.connector,
@@ -150,18 +126,58 @@ function parseResult(result) {
       interfaces[id] = data;
     }
   });
+  return interfaces;
+}
+
+function parsePorts(portBody) {
+  const ports = {};
+  portBody.forEach((elm) => {
+    const cfg = elm.configuration;
+    const id = cfg.name;
+    ports[id] = {
+      id,
+      adminState: cfg.admin === 'up' ? 'up' : 'down',
+    };
+  });
+  return ports;
+}
+
+function parseResult(result) {
+  const now = Date.now();
+
+  const ssBaseBody = result[0].body;
+  const sysBody = result[1].body;
+  const infBody = result[2].body;
+  const portBody = result[3].body;
+  const pwrBody = result[4].body;
+  const fanBody = result[5].body;
+  const tempBody = result[6].body;
+
+  const oi = ssBaseBody.status.other_info;
+  const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
+  const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
+  const sysOc = sysBody.configuration.other_config;
+
+  const info = {
+    hostname: sysBody.configuration.hostname,
+    version: sysBody.status.switch_version,
+    product: oi['Product Name'],
+    partNum: oi.part_number,
+    onieVersion: oi.onie_version,
+    baseMac,
+    serialNum: oi.serial_number,
+    vendor: oi.vendor,
+    maxInterfaceSpeed,
+    mtu: oi.max_transmission_unit,
+    interfaceCount: oi.interface_count,
+  };
+
+  const ports = parsePorts(portBody);
+  const interfaces = parseInterfaces(infBody, ports, now);
 
   const metrics = interfaceCache.metrics(now);
   const interfaceMetrics = metrics.all;
   const interfaceTopMetrics = metrics.top;
-
-  const ports = {};
-  portBody.forEach((elm) => {
-    const id = elm.configuration.name;
-    ports[id] = {
-      id
-    };
-  });
 
   const powerSupplies = {};
   let critical = 0;
@@ -235,6 +251,11 @@ function parseResult(result) {
       ok ? 'ok' : 'unknown';
   const tempsRollup = { status, critical, warning, ok };
 
+  const lldp = {
+    status: sysOc.lldp_enable === 'true' ? 'enabled' : 'disabled',
+  };
+
+  const ecmpConfig = sysBody.configuration.ecmp_config;
   const ecmp = {
     status: ecmpConfig.enabled === 'false' ?
       'disabled' : 'enabled',
@@ -262,6 +283,7 @@ function parseResult(result) {
     fansRollup,
     temps,
     tempsRollup,
+    lldp,
     ecmp,
   };
 }

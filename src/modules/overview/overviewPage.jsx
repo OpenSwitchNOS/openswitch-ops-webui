@@ -22,7 +22,6 @@ import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
 
-import FetchToolbar from 'fetchToolbar.jsx';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
@@ -49,29 +48,19 @@ class OverviewPage extends Component {
     };
   }
 
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
-  };
-
-  componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
-  }
-
   _onRefresh = () => {
     this.props.autoActions.collector.fetch();
   };
 
+  componentDidMount() {
+    const p = this.props;
+    p.autoActions.collector.fetch();
+    p.actions.toolbar.setFetchTB(p.collector, this._onRefresh);
+  }
+
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    const p = this.props;
+    p.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
   }
 
   componentWillUnmount() {

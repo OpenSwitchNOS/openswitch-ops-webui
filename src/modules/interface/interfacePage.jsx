@@ -47,7 +47,7 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'adminState',
+        columnKey: 'vAdminState',
         header: t('adminState'),
         width: 215,
       },
