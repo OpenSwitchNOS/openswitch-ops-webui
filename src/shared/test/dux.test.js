@@ -58,11 +58,16 @@ describe('dux', () => {
   }
 
   it('creates action types', () => {
-    const at = Dux.fetchActionTypes('abc');
+    const at = Dux.actionTypes('abc');
     expect(at).toEqual({
-      REQUEST: 'abc/FETCH_REQUEST',
-      SUCCESS: 'abc/FETCH_SUCCESS',
-      FAILURE: 'abc/FETCH_FAILURE',
+      FETCH_REQUEST: 'abc/FETCH_REQUEST',
+      FETCH_SUCCESS: 'abc/FETCH_SUCCESS',
+      FETCH_FAILURE: 'abc/FETCH_FAILURE',
+      FETCH_CLEAR_ERROR: 'abc/FETCH_CLEAR_ERROR',
+      SET_REQUEST: 'abc/SET_REQUEST',
+      SET_SUCCESS: 'abc/SET_SUCCESS',
+      SET_FAILURE: 'abc/SET_FAILURE',
+      SET_CLEAR_ERROR: 'abc/SET_CLEAR_ERROR',
     });
   });
 
@@ -78,7 +83,7 @@ describe('dux', () => {
     expect(dispatchedActions.length).toBe(0);
 
     Dux.performFetch(
-      Dux.fetchActionTypes('abc'),
+      Dux.actionTypes('abc'),
       dispatch,
       'https://test.com/data1'
     );
@@ -96,7 +101,7 @@ describe('dux', () => {
     expect(getPrefix()).toEqual('');
 
     Dux.performFetch(
-      Dux.fetchActionTypes('abc'),
+      Dux.actionTypes('abc'),
       dispatch,
       'https://test.com/e404'
     );
@@ -118,7 +123,7 @@ describe('dux', () => {
     expect(dispatchedActions.length).toBe(0);
 
     Dux.performFetch(
-      Dux.fetchActionTypes('abc'),
+      Dux.actionTypes('abc'),
       dispatch,
       [ 'https://test.com/data1', 'https://test.com/data2' ]
     );
@@ -131,12 +136,13 @@ describe('dux', () => {
     });
   });
 
+
   it('performFetch - error with multiple URLs', () => {
     expect(dispatchedActions.length).toBe(0);
     expect(getPrefix()).toEqual('');
 
     Dux.performFetch(
-      Dux.fetchActionTypes('abc'),
+      Dux.actionTypes('abc'),
       dispatch,
       [ 'https://test.com/e404', 'https://test.com/data2' ]
     );
@@ -155,14 +161,14 @@ describe('dux', () => {
   });
 
   it('isReadyToFetch', () => {
-    const store = {};
+    const store = { fetch: {} };
     expect(Dux.isReadyToFetch(store, 0)).toBeFalsy();
-    store.isFetching = true;
+    store.fetch.inProgress = true;
     expect(Dux.isReadyToFetch(store, 0)).toBeFalsy();
-    store.lastUpdate = 10;
+    store.fetch.lastSuccessMillis = 10;
     expect(Dux.isReadyToFetch(store, 0)).toBeFalsy();
     expect(Dux.isReadyToFetch(store, 10)).toBeFalsy();
-    store.isFetching = false;
+    store.fetch.inProgress = false;
     expect(Dux.isReadyToFetch(store, 10)).toBeFalsy();
     expect(Dux.isReadyToFetch(store, 100000)).toBeTruthy();
   });
@@ -172,14 +178,14 @@ describe('dux', () => {
       'https://test.com/data1', 'https://test.com/data2'
     ]);
     const store = {
-      abc: { isFetching: true, lastUpdate: 0 }
+      abc: { fetch: { inProgress: true, lastSuccessMillis: 0 } }
     };
     function getStoreFn() { return store; }
 
     actionFn(dispatch, getStoreFn);
     expect(dispatchedActions.length).toBe(0);
 
-    store.abc.isFetching = false;
+    store.abc.fetch.inProgress = false;
 
     actionFn(dispatch, getStoreFn);
     expect(dispatchedActions.length).toBe(2);
@@ -193,7 +199,7 @@ describe('dux', () => {
   it('fetchAction debounce works', () => {
     const actionFn = Dux.fetchAction('abc', 'https://test.com/data1');
     const store = {
-      abc: { isFetching: false, lastUpdate: 0 }
+      abc: { fetch: { inProgress: false, lastSuccessMillis: 0 } }
     };
     function getStoreFn() { return store; }
 
@@ -202,7 +208,7 @@ describe('dux', () => {
     actionFn(dispatch, getStoreFn);
     expect(dispatchedActions.length).toBe(2);
 
-    store.abc.lastUpdate = Date.now();
+    store.abc.fetch.lastSuccessMillis = Date.now();
 
     actionFn(dispatch, getStoreFn);
     expect(dispatchedActions.length).toBe(2);
@@ -211,38 +217,116 @@ describe('dux', () => {
     expect(dispatchedActions.length).toBe(2);
   });
 
-  it('creates fetchReducer correctly', () => {
+  it('reducer handles fetch', () => {
     function parseFn(result) {
       return {
         b: result.b,
       };
     }
-    const reducer = Dux.fetchReducer('abc', { a: 'a' }, parseFn);
+    const reducer = Dux.reducer('abc', { a: 'a' }, parseFn);
 
     let s = reducer(undefined, {type: 'bogos'});
     expect(s).toEqual({
-      isFetching: false, lastUpdate: 0, lastError: null, a: 'a'
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: 'a'
     });
 
     s = reducer(s, {type: 'abc/FETCH_REQUEST'});
     expect(s).toEqual({
-      isFetching: true, lastUpdate: 0, lastError: null, a: 'a'
+      fetch: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: 'a'
     });
 
     s = reducer(s, {type: 'abc/FETCH_FAILURE', error: 'E1'});
     expect(s).toEqual({
-      isFetching: false, lastUpdate: 0, lastError: 'E1', a: 'a'
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: 'E1' },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: 'a'
     });
 
     s = reducer(s, {type: 'abc/FETCH_SUCCESS', result: {b: 'rb', c: 'rc'}});
-    expect(s.lastUpdate).toBeGreaterThan(0);
-    s.lastUpdate = 0;
+    expect(s.fetch.lastSuccessMillis).toBeGreaterThan(0);
+    s.fetch.lastSuccessMillis = 0;
     expect(s).toEqual({
-      isFetching: false,
-      lastError: null,
-      lastUpdate: 0,
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
       a: 'a',
       b: 'rb',
+    });
+
+    s = reducer(s, {type: 'abc/FETCH_FAILURE', error: 'E2'});
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: 'E2' },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: 'a',
+      b: 'rb',
+    });
+
+    s = reducer(s, {type: 'abc/SET_REQUEST' });
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: 'E2' },
+      set: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      a: 'a',
+      b: 'rb',
+    });
+
+    s = reducer(s, {type: 'abc/FETCH_CLEAR_ERROR' });
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      a: 'a',
+      b: 'rb',
+    });
+  });
+
+  it('reducer handles set', () => {
+    function parseFn() { return {}; }
+    const reducer = Dux.reducer('abc', {}, parseFn);
+
+    let s = reducer(undefined, {type: 'bogos'});
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+    });
+
+    s = reducer(s, {type: 'abc/SET_REQUEST'});
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+    });
+
+    s = reducer(s, {type: 'abc/SET_FAILURE', error: 'E1'});
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: 'E1' },
+    });
+
+    s = reducer(s, {type: 'abc/SET_SUCCESS'});
+    expect(s.set.lastSuccessMillis).toBeGreaterThan(0);
+    s.set.lastSuccessMillis = 0;
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+    });
+
+    s = reducer(s, {type: 'abc/SET_FAILURE', error: 'E2'});
+    expect(s).toEqual({
+      fetch: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: 'E2' },
+    });
+
+    s = reducer(s, {type: 'abc/FETCH_REQUEST' });
+    expect(s).toEqual({
+      fetch: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: 'E2' },
+    });
+
+    s = reducer(s, {type: 'abc/SET_CLEAR_ERROR' });
+    expect(s).toEqual({
+      fetch: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      set: { inProgress: false, lastSuccessMillis: 0, lastError: null },
     });
   });
 

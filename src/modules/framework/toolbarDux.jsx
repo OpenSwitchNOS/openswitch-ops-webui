@@ -25,14 +25,14 @@ const SET = `${NAME}/SET`;
 const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
-  setFetchTB(data, onRefresh) {
+  setFetchTB(fetch, onRefresh) {
     return {
       type: SET,
       component: (
         <FetchToolbar
-            isFetching={data.isFetching}
-            error={data.lastError}
-            date={data.lastUpdate}
+            isFetching={fetch.inProgress}
+            error={fetch.lastError}
+            date={fetch.lastSuccessMillis}
             onRefresh={onRefresh}/>
       )
     };

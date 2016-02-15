@@ -139,7 +139,10 @@ class SyslogPage extends Component {
 
   componentDidMount() {
     this.props.actions.syslog.fetch(this._buildFilter());
-    this.props.actions.toolbar.setFetchTB(this.props.syslog, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.syslog.fetch,
+      this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -147,7 +150,10 @@ class SyslogPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.syslog, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.syslog.fetch,
+      this._onRefresh
+    );
   }
 
   componentWillUnmount() {

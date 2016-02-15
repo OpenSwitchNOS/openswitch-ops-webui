@@ -20,17 +20,29 @@ import Agent, { mkAgentHandler } from 'agent.js';
 import Async from 'async';
 
 
-const FETCH_INITIAL_STORE = {
-  isFetching: false,
-  lastUpdate: 0,
-  lastError: null,
+const DEFAULT_INITIAL_STORE = {
+  fetch: {
+    inProgress: false,
+    lastSuccessMillis: 0,
+    lastError: null,
+  },
+  set: {
+    inProgress: false,
+    lastSuccessMillis: 0,
+    lastError: null,
+  }
 };
 
-function fetchActionTypes(moduleName) {
+function actionTypes(moduleName) {
   return {
-    REQUEST: `${moduleName}/FETCH_REQUEST`,
-    SUCCESS: `${moduleName}/FETCH_SUCCESS`,
-    FAILURE: `${moduleName}/FETCH_FAILURE`,
+    FETCH_REQUEST: `${moduleName}/FETCH_REQUEST`,
+    FETCH_SUCCESS: `${moduleName}/FETCH_SUCCESS`,
+    FETCH_FAILURE: `${moduleName}/FETCH_FAILURE`,
+    FETCH_CLEAR_ERROR: `${moduleName}/FETCH_CLEAR_ERROR`,
+    SET_REQUEST: `${moduleName}/SET_REQUEST`,
+    SET_SUCCESS: `${moduleName}/SET_SUCCESS`,
+    SET_FAILURE: `${moduleName}/SET_FAILURE`,
+    SET_CLEAR_ERROR: `${moduleName}/SET_CLEAR_ERROR`,
   };
 }
 
@@ -44,38 +56,72 @@ function protectedParse(moduleName, moduleParseFn, result) {
   return {};
 }
 
-function fetchReducer(moduleName, moduleInitialStore, moduleParseFn) {
-  const ACTION_TYPES = fetchActionTypes(moduleName);
-  const INITIAL_STORE = { ...FETCH_INITIAL_STORE, ...moduleInitialStore };
+function reducer(moduleName, moduleInitialStore, moduleParseFn) {
+  const ACTION_TYPES = actionTypes(moduleName);
+  const INITIAL_STORE = { ...DEFAULT_INITIAL_STORE, ...moduleInitialStore };
 
   return (moduleStore = INITIAL_STORE, action) => {
     switch (action.type) {
 
-      case ACTION_TYPES.REQUEST:
-        return {
-          ...moduleStore,
-          isFetching: true,
-          lastError: null,
-        };
+      case ACTION_TYPES.SET_CLEAR_ERROR: {
+        const set = { ...moduleStore.set, lastError: null };
+        return { ...moduleStore, set };
+      }
 
-      case ACTION_TYPES.FAILURE:
-        return {
-          ...moduleStore,
-          isFetching: false,
+      case ACTION_TYPES.FETCH_CLEAR_ERROR: {
+        const fetch = { ...moduleStore.fetch, lastError: null };
+        return { ...moduleStore, fetch };
+      }
+
+      case ACTION_TYPES.SET_REQUEST: {
+        const set = { ...moduleStore.set, inProgress: true };
+        return { ...moduleStore, set };
+      }
+
+      case ACTION_TYPES.FETCH_REQUEST: {
+        const fetch = { ...moduleStore.fetch, inProgress: true };
+        return { ...moduleStore, fetch };
+      }
+
+      case ACTION_TYPES.SET_FAILURE: {
+        const set = {
+          ...moduleStore.set,
+          inProgress: false,
           lastError: action.error
         };
+        return { ...moduleStore, set };
+      }
 
-      case ACTION_TYPES.SUCCESS:
+      case ACTION_TYPES.FETCH_FAILURE: {
+        const fetch = {
+          ...moduleStore.fetch,
+          inProgress: false,
+          lastError: action.error
+        };
+        return { ...moduleStore, fetch };
+      }
+
+      case ACTION_TYPES.SET_SUCCESS: {
+        const set = {
+          ...moduleStore.set,
+          inProgress: false,
+          lastError: null,
+          lastSuccessMillis: Date.now()
+        };
+        return { ...moduleStore, set };
+      }
+
+      case ACTION_TYPES.FETCH_SUCCESS: {
         const fetchedStore =
           protectedParse(moduleName, moduleParseFn, action.result);
-
-        return {
-          ...moduleStore,
-          isFetching: false,
+        const fetch = {
+          ...moduleStore.fetch,
+          inProgress: false,
           lastError: null,
-          lastUpdate: Date.now(),
-          ...fetchedStore,
+          lastSuccessMillis: Date.now()
         };
+        return { ...moduleStore, fetch, ...fetchedStore };
+      }
 
       default:
         return moduleStore;
@@ -86,17 +132,18 @@ function fetchReducer(moduleName, moduleInitialStore, moduleParseFn) {
 const DEBOUNCE_INTERVAL = 3000;
 
 function isReadyToFetch(store, now) {
-  return !store.isFetching && (now - store.lastUpdate) > DEBOUNCE_INTERVAL;
+  const { inProgress, lastSuccessMillis } = store.fetch;
+  return !inProgress && (now - lastSuccessMillis) > DEBOUNCE_INTERVAL;
 }
 
-function performFetch(actionTypes, dispatch, urls) {
-  dispatch({ type: actionTypes.REQUEST });
+function performFetch(at, dispatch, urls) {
+  dispatch({ type: at.FETCH_REQUEST });
 
   function dispatcher(error, result) {
     if (error) {
-      dispatch({ type: actionTypes.FAILURE, error });
+      dispatch({ type: at.FETCH_FAILURE, error });
     } else {
-      dispatch({ type: actionTypes.SUCCESS, result });
+      dispatch({ type: at.FETCH_SUCCESS, result });
     }
   }
 
@@ -114,7 +161,7 @@ function performFetch(actionTypes, dispatch, urls) {
 }
 
 function fetchAction(moduleName, urls) {
-  const ACTION_TYPES = fetchActionTypes(moduleName);
+  const ACTION_TYPES = actionTypes(moduleName);
 
   return (dispatch, getStoreFn) => {
     const store = getStoreFn()[moduleName];
@@ -125,10 +172,9 @@ function fetchAction(moduleName, urls) {
 }
 
 export default {
-  fetchActionTypes,
+  actionTypes,
   fetchAction,
-  fetchReducer,
-
+  reducer,
   isReadyToFetch,
   protectedParse,
   performFetch,

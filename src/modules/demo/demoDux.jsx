@@ -96,10 +96,10 @@ const NAVS = [
 
 const ACTIONS = {
   fetch() {
-    const ACTION_TYPES = Dux.fetchActionTypes(NAME);
+    const ACTION_TYPES = Dux.actionTypes(NAME);
     return (dispatch) => {
-      dispatch({ type: ACTION_TYPES.REQUEST });
-      dispatch({ type: ACTION_TYPES.SUCCESS });
+      dispatch({ type: ACTION_TYPES.FETCH_REQUEST });
+      dispatch({ type: ACTION_TYPES.FETCH_SUCCESS });
     };
   }
 };
@@ -116,7 +116,7 @@ function parseResult() {
   return { entities };
 }
 
-const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
 
 export default {
   NAME,

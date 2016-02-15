@@ -78,7 +78,7 @@ class InterfacePage extends Component {
   componentDidMount() {
     this.props.autoActions.collector.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.collector, this._onRefresh
+      this.props.collector.fetch, this._onRefresh
     );
   }
 
@@ -87,7 +87,9 @@ class InterfacePage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.fetch, this._onRefresh
+    );
   }
 
   componentWillUnmount() {

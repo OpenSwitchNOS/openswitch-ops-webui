@@ -21,6 +21,9 @@ import * as Formatter from 'formatter.js';
 
 const NAME = 'collector';
 
+// TODO: remove ports fetch from collector?
+// TODO: update LLDP, ECMP to use true/false
+
 const URLS = [
   '/rest/v1/system/subsystems/base',
   '/rest/v1/system',
@@ -288,7 +291,7 @@ function parseResult(result) {
   };
 }
 
-const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
 
 export default {
   NAME,

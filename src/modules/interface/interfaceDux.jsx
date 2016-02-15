@@ -23,7 +23,7 @@ import Async from 'async';
 
 const NAME = 'interface';
 
-const ACTION_TYPES = Dux.fetchActionTypes(NAME);
+const AT = Dux.actionTypes(NAME);
 
 const URL_PORTS = '/rest/v1/system/ports';
 const URL_INFS = '/rest/v1/system/interfaces';
@@ -46,7 +46,7 @@ function createPort(id, store, cb) {
         uri: URL_BRIDGE,
       }],
     })
-    .set('etag', store.ports.etag)
+    .set('If-Match', store.ports.etag)
     .end(mkAgentHandler(URL_PORTS, cb));
 }
 
@@ -59,7 +59,7 @@ function patchPortEnabled(id, store, value, cb) {
       path: '/admin',
       value: value ? 'up' : 'down',
     }])
-    .set('etag', store.port.etag)
+    .set('If-Match', store.port.etag)
     .end(mkAgentHandler(URL_PORT, cb));
 }
 
@@ -72,11 +72,14 @@ function patchInterfaceEnabled(id, store, value, cb) {
       path: '/user_config/admin',
       value: value ? 'up' : 'down',
     }])
-    .set('etag', store.entity.etag)
+    .set('If-Match', store.entity.etag)
     .end(mkAgentHandler(URL_INF, cb));
 }
 
 const ACTIONS = {
+
+  clearError() { return { type: AT.SET_CLEAR_ERROR }; },
+
   fetch(id) {
     const URL_INF = `${URL_INFS}/${id}`;
     const URL_PORT = `${URL_PORTS}/${id}`;
@@ -85,22 +88,22 @@ const ACTIONS = {
 
       function dispatcher(e1, r1) {
         if (e1) {
-          dispatch({ type: ACTION_TYPES.FAILURE, error: e1 });
+          dispatch({ type: AT.FETCH_FAILURE, error: e1 });
         } else if (r1[0].body.indexOf(URL_PORT) >= 0) {
           Agent.get(URL_PORT).end(mkAgentHandler(URL_PORT, (e2, r2) => {
             if (e2) {
-              dispatch({ type: ACTION_TYPES.FAILURE, error: e2 });
+              dispatch({ type: AT.FETCH_FAILURE, error: e2 });
             } else {
               r1.push(r2);
-              dispatch({ type: ACTION_TYPES.SUCCESS, result: r1 });
+              dispatch({ type: AT.FETCH_SUCCESS, result: r1 });
             }
           }));
         } else {
-          dispatch({ type: ACTION_TYPES.SUCCESS, result: r1 });
+          dispatch({ type: AT.FETCH_SUCCESS, result: r1 });
         }
       }
 
-      dispatch({ type: ACTION_TYPES.REQUEST });
+      dispatch({ type: AT.FETCH_REQUEST });
 
       Async.parallel([
         cb => Agent.get(URL_PORTS).end(mkAgentHandler(URL_PORTS, cb)),
@@ -125,8 +128,8 @@ const ACTIONS = {
               console.log(r2);
               if (!e2) {
                 patchInterfaceEnabled(id, store, true, (e3, r3) => {
-                  console.log(e2);
-                  console.log(r2);
+                  console.log(e3);
+                  console.log(r3);
                 });
               }
             });
@@ -134,12 +137,13 @@ const ACTIONS = {
         });
       } else {
         patchPortEnabled(id, store, true, (e1, r1) => {
-          console.log(e1);
-          console.log(r1);
-          if (!e1) {
+          if (e1) {
+            dispatch({ type: AT.SET_FAILURE, error: e1 });
+          } else {
             patchInterfaceEnabled(id, store, true, (e2, r2) => {
-              console.log(e2);
-              console.log(r2);
+              if (e2) {
+                dispatch({ type: AT.SET_FAILURE, error: e2 });
+              }
             });
           }
         });
@@ -219,7 +223,7 @@ function parseResult(result) {
   };
 }
 
-const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
 
 export default {
   NAME,
