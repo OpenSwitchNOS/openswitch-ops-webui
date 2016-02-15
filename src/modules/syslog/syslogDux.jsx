@@ -66,7 +66,7 @@ function parseResult(result) {
   return { length: entities.length, entities };
 }
 
-const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
 
 export default {
   NAME,

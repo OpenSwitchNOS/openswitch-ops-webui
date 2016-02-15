@@ -58,12 +58,12 @@ class DemoDataGridSmallPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const demo = nextProps.demo;
+    const fetch = nextProps.demo.fetch;
     this.props.actions.toolbar.set(
       <FetchToolbar
-          isFetching={demo.isFetching}
-          error={demo.lastError}
-          date={demo.lastUpdate}
+          isFetching={fetch.inProgress}
+          error={fetch.lastError}
+          date={fetch.lastSuccessMillis}
           onRefresh={this._onRefresh}/>
     );
   }

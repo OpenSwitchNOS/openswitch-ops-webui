@@ -31,6 +31,7 @@ import FormFields from 'grommet/components/FormFields';
 import CheckBox from 'grommet/components/CheckBox';
 import Button from 'grommet/components/Button';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import ErrorLayer from 'errorLayer.jsx';
 import _ from 'lodash';
 
 
@@ -137,6 +138,11 @@ class InterfaceDetails extends Component {
     }
   };
 
+  _onCloseError = () => {
+    const actions = this.props.actions.interface;
+    actions.clearError();
+  };
+
   render() {
     //TODO: Should be localized eventually
     const id = this.props.params.id;
@@ -170,6 +176,9 @@ class InterfaceDetails extends Component {
       </Layer>
     );
 
+    const errorLayer = !this.props.interface.set.lastError ? null :
+      <ErrorLayer error={this.props.interface.set.lastError} onClose={this._onCloseError} />;
+
     return (
       <Box pad="small">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
@@ -202,10 +211,11 @@ class InterfaceDetails extends Component {
             <h5>port id: {infData.port && infData.port.id}</h5>
             <h5>port adminState: {infData.port && infData.port.adminState}</h5>
             <h5>port etag: {infData.port && infData.port.etag}</h5>
-            </div>
+          </div>
           )}
         </Box>
         {editLayer}
+        {errorLayer}
       </Box>
     );
   }

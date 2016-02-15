@@ -27,6 +27,7 @@ export default class StatusLayer extends Component {
 
   static propTypes = {
     children: PropTypes.node,
+    className: PropTypes.string,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string,
     value: PropTypes.string,
@@ -50,7 +51,12 @@ export default class StatusLayer extends Component {
       }
     }
     return (
-      <Layer onClose={this.props.onClose} closer flush align="top">
+      <Layer
+          className={this.props.className}
+          onClose={this.props.onClose}
+          closer
+          flush
+          align="top">
         <Form>
           <Header>
             <Title>

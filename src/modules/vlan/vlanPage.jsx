@@ -56,7 +56,10 @@ class VlanPage extends Component {
 
   componentDidMount() {
     this.props.actions.vlan.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.vlan, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.vlan.fetch,
+      this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -64,7 +67,10 @@ class VlanPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.vlan, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.vlan.fetch,
+      this._onRefresh
+    );
   }
 
   componentWillUnmount() {
