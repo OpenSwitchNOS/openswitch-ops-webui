@@ -17,9 +17,8 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, ed } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
-import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class ECMPPage extends Component {
@@ -33,23 +32,15 @@ class ECMPPage extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.pad = {horizontal: 'small', vertical: 'small'};
   }
-
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
-  };
 
   componentDidMount() {
     this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.collector.overview,
+      this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -57,7 +48,10 @@ class ECMPPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.overview,
+      this._onRefresh
+    );
   }
 
   componentWillUnmount() {
@@ -65,11 +59,11 @@ class ECMPPage extends Component {
   }
 
   render() {
-    const ecmp = this.props.collector.ecmp;
+    const ecmp = this.props.collector.overview.ecmp;
     return (
       <Box className="flex1">
         <Box pad={this.pad} className="flex1 pageBox min200x400">
-          <b> {t('ecmp')} {t('status')} : {t(ecmp.status)} </b>
+          <span><b>{t('ecmp')}: </b>{ed(ecmp.enable)}</span>
           <br/>
           <br/>
           <b>{t('ecmp')} {t('loadBalance')}</b>
@@ -78,27 +72,27 @@ class ECMPPage extends Component {
             <tbody>
               <tr>
                 <td style={{width: '180px'}}>{t('srcIp')}:</td>
-                <td>{t(ecmp.hashSrcip)}</td>
+                <td>{ed(ecmp.hashSrcIp)}</td>
               </tr>
 
               <tr>
-                <td style={{width: '180px'}}>{t('srcPort')}:</td>
-                <td>{t(ecmp.hashSrcport)}</td>
+                <td>{t('srcPort')}:</td>
+                <td>{ed(ecmp.hashSrcPort)}</td>
               </tr>
 
               <tr>
-                <td style={{width: '180px'}}>{t('dstIp')}:</td>
-                <td>{t(ecmp.hashDstip)}</td>
+                <td>{t('dstIp')}:</td>
+                <td>{ed(ecmp.hashDstIp)}</td>
               </tr>
 
               <tr>
-                <td style={{width: '180px'}}>{t('dstPort')}:</td>
-                <td>{t(ecmp.hashDstport)}</td>
+                <td>{t('dstPort')}:</td>
+                <td>{ed(ecmp.hashDstPort)}</td>
               </tr>
 
               <tr>
-                <td style={{width: '180px'}}>{t('resilientHash')}:</td>
-                <td>{t(ecmp.resilientHash)}</td>
+                <td>{t('resilientHash')}:</td>
+                <td>{ed(ecmp.resilientHash)}</td>
               </tr>
             </tbody>
           </table>

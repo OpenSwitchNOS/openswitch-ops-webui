@@ -109,7 +109,7 @@ class NavSideBar extends Component {
     this.items = [];
     NavSideBar.mkNavItems(tree.items, this.items);
 
-    // TODO: this will come from the build config
+    // TODO: Guides net to be implemented - this will come from the build config
     this.guide = [
       { menuKey: 'configMgmtInterface', component: <div>ConfigMgmtIntf</div> },
       { menuKey: 'configVlan', component: <div>ConfigVLAN</div> },
@@ -141,10 +141,10 @@ class NavSideBar extends Component {
         <Box>
           <Box pad={{horizontal: 'medium', vertical: 'small'}}>
             <div><b>{t('hostname')}</b></div>
-            <div>{this.props.collector.info.hostname}</div>
+            <div>{this.props.collector.overview.info.hostname}</div>
             <br/>
-            <div><b>{t('model')}</b></div>
-            <div>{this.props.collector.info.partNum}</div>
+            <div><b>{t('product')}</b></div>
+            <div>{this.props.collector.overview.info.product}</div>
           </Box>
           <br/>
           <Menu primary>

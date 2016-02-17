@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, ed } from 'i18n/lookup.js';
 
 import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
@@ -53,14 +53,16 @@ class OverviewPage extends Component {
   };
 
   componentDidMount() {
-    const p = this.props;
-    p.autoActions.collector.fetch();
-    p.actions.toolbar.setFetchTB(p.collector.fetch, this._onRefresh);
+    this.props.autoActions.collector.fetch();
+    this.props.actions.toolbar.setFetchTB(
+      this.props.collector.overview, this._onRefresh
+    );
   }
 
   componentWillReceiveProps(nextProps) {
-    const p = this.props;
-    p.actions.toolbar.setFetchTB(nextProps.collector.fetch, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.overview, this._onRefresh
+    );
   }
 
   componentWillUnmount() {
@@ -68,15 +70,15 @@ class OverviewPage extends Component {
   }
 
   _mkSystemProps = () => {
-    const info = this.props.collector.info;
+    const info = this.props.collector.overview.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
             <td style={{width: '140px', verticalAlign: 'top'}}>
-              {t('productName')}:
+              {t('partNumber')}:
             </td>
-            <td>{info.product}</td>
+            <td>{info.partNum}</td>
           </tr>
           <tr>
             <td>{t('serialNumber')}:</td>
@@ -104,7 +106,7 @@ class OverviewPage extends Component {
   };
 
   _mkPowerSuppliesProps = () => {
-    const ps = this.props.collector.powerSupplies;
+    const ps = this.props.collector.overview.powerSupplies;
     const trs = [];
     Object.getOwnPropertyNames(ps).sort().forEach(k => {
       const data = ps[k];
@@ -129,7 +131,7 @@ class OverviewPage extends Component {
   };
 
   _mkFansProps = () => {
-    const fans = this.props.collector.fans;
+    const fans = this.props.collector.overview.fans;
     const trs = [];
     Object.getOwnPropertyNames(fans).sort().forEach(k => {
       const data = fans[k];
@@ -154,7 +156,7 @@ class OverviewPage extends Component {
   };
 
   _mkTempsProps = () => {
-    const temps = this.props.collector.temps;
+    const temps = this.props.collector.overview.temps;
     const trs = [];
     Object.getOwnPropertyNames(temps).sort().forEach(k => {
       const data = temps[k];
@@ -209,18 +211,19 @@ class OverviewPage extends Component {
   };
 
   _mkFeatureProps = () => {
-    const info = this.props.collector.info;
+    const data = this.props.collector.overview;
+    const info = data.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
             <td style={{width: '180px'}}>{t('lldp')}:</td>
-            <td>{t(info.lldp)}</td>
+            <td>{ed(data.lldp.enabled)}</td>
           </tr>
 
           <tr>
             <td style={{width: '180px'}}>{t('ecmp')}:</td>
-            <td>{t(info.ecmp)}</td>
+            <td>{ed(data.ecmp.enabled)}</td>
           </tr>
 
           <tr>
@@ -252,7 +255,7 @@ class OverviewPage extends Component {
   };
 
   render() {
-    const coll = this.props.collector;
+    const coll = this.props.collector.overview;
 
     const psRollup = this._mkRollup(
       'powerSupplies',

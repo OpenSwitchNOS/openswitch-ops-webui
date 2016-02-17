@@ -48,7 +48,9 @@ class MonitorInterfacePage extends Component {
 
   componentDidMount() {
     this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.collector.overview, this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -56,7 +58,9 @@ class MonitorInterfacePage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.overview, this._onRefresh
+    );
   }
 
   componentWillUnmount() {

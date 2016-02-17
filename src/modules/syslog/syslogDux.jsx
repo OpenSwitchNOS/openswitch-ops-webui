@@ -26,6 +26,9 @@ const NAVS = [
   },
 ];
 
+const PAGE_ASYNC = 'page';
+const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
+
 // TODO - for syslog REST
 const URL = '/rest/v1/system/syslogs';
 
@@ -37,20 +40,18 @@ function buildUrl(filter) {
 }
 
 const ACTIONS = {
+
   fetch(filter) {
-    // filter has endPath such as syslog and 2 other queries for time and
-    // priority
-    return Dux.fetchAction(NAME, buildUrl(filter));
-  }
+    const url = buildUrl(filter);
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, url);
+    };
+  },
+
 };
 
-const INITIAL_STORE = {
-  entities: {},
-  lastRead: 0,
-  length: 0,
-};
-
-function parseResult(result) {
+function parsePageResult(result) {
   const body = result.body;
 
   const entities = {};
@@ -66,7 +67,18 @@ function parseResult(result) {
   return { length: entities.length, entities };
 }
 
-const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
+const INITIAL_STORE = {
+  page: {
+    ...Dux.mkAsyncStore(),
+    entities: {},
+    lastRead: 0,
+    length: 0,
+  }
+};
+
+const REDUCER = Dux.mkReducer(INITIAL_STORE, [
+  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+]);
 
 export default {
   NAME,

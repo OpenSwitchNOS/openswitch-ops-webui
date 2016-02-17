@@ -20,6 +20,9 @@ import VlanDetails from './vlanDetails.jsx';
 
 const NAME = 'vlan';
 
+const PAGE_ASYNC = 'page';
+const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
+
 const NAVS = [
   {
     route: { path: '/vlan', component: VlanPage },
@@ -34,20 +37,21 @@ const NAVS = [
 const URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
 
 const ACTIONS = {
-  fetch() { return Dux.fetchAction(NAME, URL); }
+  fetch() {
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, URL);
+    };
+  }
 };
 
-const INITIAL_STORE = {
-  entities: {},
-  length: 0,
-};
-
-function parseResult(result) {
+function parsePageResult(result) {
   const body = result.body;
 
   let length = 0;
   const entities = {};
 
+  // TODO: incorrectly assumes an object is an array.
   Object.getOwnPropertyNames(body).forEach(k => {
     const data = body[k];
     if (k !== 'length') {
@@ -62,7 +66,17 @@ function parseResult(result) {
   return { length, entities };
 }
 
-const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
+const INITIAL_STORE = {
+  page: {
+    ...Dux.mkAsyncStore(),
+    entities: {},
+    length: 0,
+  },
+};
+
+const REDUCER = Dux.mkReducer(INITIAL_STORE, [
+  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+]);
 
 export default {
   NAME,

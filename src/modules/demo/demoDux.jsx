@@ -94,21 +94,25 @@ const NAVS = [
   },
 ];
 
+const PAGE_ASYNC = 'page';
+const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
+
 const ACTIONS = {
   fetch() {
-    const ACTION_TYPES = Dux.actionTypes(NAME);
     return (dispatch) => {
-      dispatch({ type: ACTION_TYPES.FETCH_REQUEST });
-      dispatch({ type: ACTION_TYPES.FETCH_SUCCESS });
+      Dux.dispatchRequest(dispatch, PAGE_AT);
+      Dux.dispatchSuccess(dispatch, PAGE_AT);
     };
   }
 };
 
 const INITIAL_STORE = {
-  entities: {},
+  page: {
+    entities: {},
+  },
 };
 
-function parseResult() {
+function parsePageResult() {
   const entities = {};
   for (let i=1; i<=30; i++) {
     entities[`${i}`] = { id: i, text: `This is item ${i}` };
@@ -116,7 +120,9 @@ function parseResult() {
   return { entities };
 }
 
-const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
+const REDUCER = Dux.mkReducer(INITIAL_STORE, [
+  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+]);
 
 export default {
   NAME,

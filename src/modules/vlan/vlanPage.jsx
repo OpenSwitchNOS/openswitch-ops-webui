@@ -57,7 +57,7 @@ class VlanPage extends Component {
   componentDidMount() {
     this.props.actions.vlan.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.vlan.fetch,
+      this.props.vlan.page,
       this._onRefresh
     );
   }
@@ -68,7 +68,7 @@ class VlanPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.props.actions.toolbar.setFetchTB(
-      nextProps.vlan.fetch,
+      nextProps.vlan.page,
       this._onRefresh
     );
   }
@@ -82,7 +82,7 @@ class VlanPage extends Component {
   };
 
   render() {
-    const vlans = this.props.vlan.entities;
+    const vlans = this.props.vlan.page.entities;
 
     // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
     // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer

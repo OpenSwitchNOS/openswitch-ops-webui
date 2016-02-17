@@ -16,11 +16,14 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, ud } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
+
+// TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
+// TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
 
 
 class InterfacePage extends Component {
@@ -32,6 +35,7 @@ class InterfacePage extends Component {
     children: PropTypes.node,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
+    interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
     }),
@@ -47,19 +51,28 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'vAdminState',
+        columnKey: 'adminUserUp',
+        header: t('adminUser'),
+        width: 215,
+        format: ud,
+      },
+      {
+        columnKey: 'adminStateConnector',
         header: t('adminState'),
         width: 215,
+        format: t,
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
         width: 215,
+        format: t,
       },
       {
         columnKey: 'duplex',
         header: t('duplex'),
         width: 215,
+        format: t,
       },
       {
         columnKey: 'speedFormatted',
@@ -76,10 +89,10 @@ class InterfacePage extends Component {
   }
 
   componentDidMount() {
-    this.props.autoActions.collector.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.collector.fetch, this._onRefresh
+      this.props.collector.overview, this._onRefresh
     );
+    this.props.actions.interface.fetchPage();
   }
 
   _onRefresh = () => {
@@ -88,8 +101,12 @@ class InterfacePage extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.fetch, this._onRefresh
+      nextProps.collector.overview, this._onRefresh
     );
+    if (nextProps.collector.overview.lastSuccessMillis >
+        this.props.collector.overview.lastSuccessMillis) {
+      this.props.actions.interface.fetchPage();
+    }
   }
 
   componentWillUnmount() {
@@ -101,11 +118,9 @@ class InterfacePage extends Component {
   };
 
   render() {
-    const interfaces = this.props.collector.interfaces;
+    const infs = this.props.collector.overview.interfaces;
     const sel = this.props.params.id;
 
-    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
     const details = !sel ? null : (
       <Box className="pageBox">
         {this.props.children}
@@ -118,7 +133,7 @@ class InterfacePage extends Component {
           <Box className="mtop mLeft pTop">
             <BoxGraphic
                 spec={this.props.boxGraphic}
-                interfaces={interfaces}
+                interfaces={infs}
                 select={sel && [sel]}
                 onSelectChange={this._onSelect}
             />
@@ -126,7 +141,7 @@ class InterfacePage extends Component {
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
-                  data={interfaces}
+                  data={infs}
                   columns={this.cols}
                   singleSelect
                   select={[ sel ]}
@@ -145,6 +160,7 @@ class InterfacePage extends Component {
 function select(store) {
   return {
     collector: store.collector,
+    interface: store.interface,
     boxGraphic: store.boxGraphic,
   };
 }

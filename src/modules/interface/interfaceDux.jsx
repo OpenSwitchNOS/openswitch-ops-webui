@@ -18,170 +18,9 @@ import Dux from 'dux.js';
 import InterfacePage from './interfacePage.jsx';
 import InterfaceDetails from './interfaceDetails.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
-import Async from 'async';
 
 
 const NAME = 'interface';
-
-const AT = Dux.actionTypes(NAME);
-
-const URL_PORTS = '/rest/v1/system/ports';
-const URL_INFS = '/rest/v1/system/interfaces';
-const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal/';
-
-// TODO: need to verify that the etag is doing something or we need
-// to explicitly test the patch/post for etag equal to passed in header.
-
-
-function createPort(id, store, cb) {
-  const URL_INF = `${URL_INFS}/${id}`;
-  Agent
-    .post(URL_PORTS)
-    .send({
-      configuration: {
-        name: id,
-        interfaces: [ URL_INF ],
-      },
-      'referenced_by': [{
-        uri: URL_BRIDGE,
-      }],
-    })
-    .set('If-Match', store.ports.etag)
-    .end(mkAgentHandler(URL_PORTS, cb));
-}
-
-function patchPortEnabled(id, store, value, cb) {
-  const URL_PORT = `${URL_PORTS}/${id}`;
-  Agent
-    .patch(URL_PORT)
-    .send([{
-      op: 'add',
-      path: '/admin',
-      value: value ? 'up' : 'down',
-    }])
-    .set('If-Match', store.port.etag)
-    .end(mkAgentHandler(URL_PORT, cb));
-}
-
-function patchInterfaceEnabled(id, store, value, cb) {
-  const URL_INF = `${URL_INFS}/${id}`;
-  Agent
-    .patch(URL_INF)
-    .send([{
-      op: 'add',
-      path: '/user_config/admin',
-      value: value ? 'up' : 'down',
-    }])
-    .set('If-Match', store.entity.etag)
-    .end(mkAgentHandler(URL_INF, cb));
-}
-
-const ACTIONS = {
-
-  clearError() { return { type: AT.SET_CLEAR_ERROR }; },
-
-  fetch(id) {
-    const URL_INF = `${URL_INFS}/${id}`;
-    const URL_PORT = `${URL_PORTS}/${id}`;
-
-    return (dispatch) => {
-
-      function dispatcher(e1, r1) {
-        if (e1) {
-          dispatch({ type: AT.FETCH_FAILURE, error: e1 });
-        } else if (r1[0].body.indexOf(URL_PORT) >= 0) {
-          Agent.get(URL_PORT).end(mkAgentHandler(URL_PORT, (e2, r2) => {
-            if (e2) {
-              dispatch({ type: AT.FETCH_FAILURE, error: e2 });
-            } else {
-              r1.push(r2);
-              dispatch({ type: AT.FETCH_SUCCESS, result: r1 });
-            }
-          }));
-        } else {
-          dispatch({ type: AT.FETCH_SUCCESS, result: r1 });
-        }
-      }
-
-      dispatch({ type: AT.FETCH_REQUEST });
-
-      Async.parallel([
-        cb => Agent.get(URL_PORTS).end(mkAgentHandler(URL_PORTS, cb)),
-        cb => Agent.get(URL_INF).end(mkAgentHandler(URL_INF, cb)),
-      ], dispatcher);
-    };
-  },
-
-  adminStateUp(id) {
-    return (dispatch, getStoreFn) => {
-      const store = getStoreFn()[NAME];
-
-      // FIXME: have the function determine if necessary and invoke callback with success for next step?
-
-      if (!store.port.id) {
-        createPort(id, store, (e1, r1) => {
-          console.log(e1);
-          console.log(r1);
-          if (!e1) {
-            patchPortEnabled(id, store, true, (e2, r2) => {
-              console.log(e2);
-              console.log(r2);
-              if (!e2) {
-                patchInterfaceEnabled(id, store, true, (e3, r3) => {
-                  console.log(e3);
-                  console.log(r3);
-                });
-              }
-            });
-          }
-        });
-      } else {
-        patchPortEnabled(id, store, true, (e1, r1) => {
-          if (e1) {
-            dispatch({ type: AT.SET_FAILURE, error: e1 });
-          } else {
-            patchInterfaceEnabled(id, store, true, (e2, r2) => {
-              if (e2) {
-                dispatch({ type: AT.SET_FAILURE, error: e2 });
-              }
-            });
-          }
-        });
-      }
-    };
-  },
-
-  adminStateDown(id) {
-    return (dispatch, getStoreFn) => {
-      const store = getStoreFn()[NAME];
-
-      if (store.port.id) {
-        patchPortEnabled(id, store, false, (e1, r1) => {
-          console.log(e1);
-          console.log(r1);
-          if (!e1) {
-            patchInterfaceEnabled(id, store, false, (e2, r2) => {
-              console.log(e2);
-              console.log(r2);
-            });
-          }
-        });
-      } else {
-        patchInterfaceEnabled(id, store, true, (e1, r1) => {
-          console.log(e1);
-          console.log(r1);
-        });
-      }
-    };
-  },
-
-};
-
-const INITIAL_STORE = {
-  ports: {},
-  entity: {},
-  port: {},
-};
 
 export const NAVS = [
   {
@@ -194,36 +33,194 @@ export const NAVS = [
   }
 ];
 
-function parseResult(result) {
-  const ports = {
-    etag: result[0].headers.etag,
-  };
+const PAGE_ASYNC = 'page';
+const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
 
-  const infCfg = result[1].body.configuration;
-  const uc = infCfg.user_config;
-  const adminState = (uc && uc.admin === 'up') ? 'up' : 'down';
-  const entity = {
-    id: infCfg.name,
-    adminState,
-    etag: result[1].headers.etag,
-  };
+const DETAIL_ASYNC = 'detail';
+const DETAIL_AT = Dux.mkAsyncActionTypes(NAME, DETAIL_ASYNC);
 
-  const port = {};
-  if (result.length > 2) {
-    const portCfg = result[2].body.configuration;
-    port.id = portCfg.name;
-    port.adminState = portCfg.admin === 'up' ? 'up' : 'down';
-    port.etag = result[2].headers.etag;
+const SET_ASYNC = 'set';
+const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
+
+const PORTS_URL = '/rest/v1/system/ports';
+const INFS_URL = '/rest/v1/system/interfaces';
+const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
+
+const PAGE_URLS = [ PORTS_URL ];
+
+const INITIAL_STORE = {
+  page: {
+    ...Dux.mkAsyncStore(),
+    portRefs: {
+      urls: [],
+    },
+  },
+  detail: {
+    ...Dux.mkAsyncStore(),
+    port: {},
+    inf: {},
+  },
+  set: {
+    ...Dux.mkAsyncStore(),
   }
+};
 
-  return {
-    ports,
-    entity,
-    port,
+function parsePageResult(result) {
+  const portRefs = {
+    urls: result[0].body,
+    etag: result[0].headers.etag
   };
+  return { portRefs };
 }
 
-const REDUCER = Dux.reducer(NAME, INITIAL_STORE, parseResult);
+function parseDetailResult(result) {
+  let cfg = result[0].body.configuration;
+  const cfgUc = cfg.user_config;
+  const adminUserUp = cfgUc && cfgUc.admin === 'up';
+  const inf = {
+    id: cfg.name,
+    adminUserUp,
+    etag: result[0].headers.etag,
+  };
+  const port = {};
+  if (result.length > 1) {
+    cfg = result[1].body.configuration;
+    port.id = cfg.name;
+    port.adminUserUp = cfg.admin === 'up';
+    port.etag = result[1].headers.etag;
+  }
+  return { inf, port };
+}
+
+function agentAddPort(id, mStore, cb) {
+  const INF_URL = `${INFS_URL}/${id}`;
+  const PORT_URL = `${PORTS_URL}/${id}`;
+  Agent
+    .post(PORT_URL)
+    .send({
+      configuration: {
+        name: id,
+        interfaces: [ INF_URL ],
+      },
+      'referenced_by': [{
+        uri: BRIDGE_URL,
+      }],
+    })
+    .set('If-Match', mStore.page.portRefs.etag)
+    .end(mkAgentHandler(PORT_URL, cb));
+}
+
+function checkAgentAddPort(id, mStore, cb) {
+  const PORT_URL = `${PORTS_URL}/${id}`;
+  if (mStore.page.portRefs.urls.indexOf(PORT_URL) > 0) {
+    return cb(null, {});
+  }
+  agentAddPort(id, mStore, cb);
+}
+
+function agentSetPortAdmin(id, mStore, up, cb) {
+  const PORT_URL = `${PORTS_URL}/${id}`;
+  Agent
+    .patch(PORT_URL)
+    .send([{
+      op: 'add',
+      path: '/admin',
+      value: up ? 'up' : 'down',
+    }])
+    .set('If-Match', mStore.detail.port.etag)
+    .end(mkAgentHandler(PORT_URL, cb));
+}
+
+function checkAgentSetPortAdmin(id, mStore, up, cb) {
+  if (mStore.detail.port.adminUserUp === up) { return cb(null, {}); }
+  agentSetPortAdmin(id, mStore, up, cb);
+}
+
+function agentSetInfAdmin(id, mStore, up, cb) {
+  const INF_URL = `${INFS_URL}/${id}`;
+  Agent
+    .patch(INF_URL)
+    .send([{
+      op: 'add',
+      path: '/user_config/admin',
+      value: up ? 'up' : 'down',
+    }])
+    .set('If-Match', mStore.detail.inf.etag)
+    .end(mkAgentHandler(INF_URL, cb));
+}
+
+function checkAgentSetInfAdmin(id, mStore, up, cb) {
+  if (mStore.detail.inf.adminUserUp === up) { return cb(null, {}); }
+  agentSetInfAdmin(id, mStore, up, cb);
+}
+
+function enable(dispatch, mStore, id) {
+  Dux.dispatchRequest(dispatch, SET_AT);
+  checkAgentAddPort(id, mStore, (e1) => {
+    if (e1) { return Dux.dispatchFail(dispatch, SET_AT, e1); }
+    checkAgentSetPortAdmin(id, mStore, true, (e2) => {
+      if (e2) { return Dux.dispatchFail(dispatch, SET_AT, e2); }
+      checkAgentSetInfAdmin(id, mStore, true, (e3) => {
+        if (e3) { return Dux.dispatchFail(dispatch, SET_AT, e3); }
+        return Dux.dispatchSuccess(dispatch, SET_AT);
+      });
+    });
+  });
+}
+
+function disable(dispatch, mStore, id) {
+  Dux.dispatchRequest(dispatch, SET_AT);
+  checkAgentSetPortAdmin(id, mStore, false, (e1) => {
+    if (e1) { return Dux.dispatchFail(dispatch, SET_AT, e1); }
+    checkAgentSetInfAdmin(id, mStore, false, (e2) => {
+      if (e2) { return Dux.dispatchFail(dispatch, SET_AT, e2); }
+      return Dux.dispatchSuccess(dispatch, SET_AT);
+    });
+  });
+}
+
+const ACTIONS = {
+
+  fetchPage() {
+    return (dispatch) => {
+      Dux.get(dispatch, PAGE_AT, PAGE_URLS);
+    };
+  },
+
+  fetchDetails(id) {
+    const INF_URL = `${INFS_URL}/${id}`;
+    const PORT_URL = `${PORTS_URL}/${id}`;
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      const portExists = mStore.page.portRefs.urls.indexOf(PORT_URL) >= 0;
+      const urls = portExists ? [ INF_URL, PORT_URL ] : [ INF_URL ];
+      Dux.get(dispatch, DETAIL_AT, urls);
+    };
+  },
+
+  set(user) {
+    return (dispatch, getStoreFn) => {
+      const store = getStoreFn();
+      const mStore = store[NAME];
+      if (user.adminUserUp) {
+        enable(dispatch, mStore, user.id);
+      } else {
+        disable(dispatch, mStore, user.id);
+      }
+    };
+  },
+
+  clearErrorForSet() {
+    return { type: SET_AT.CLEAR_ERROR };
+  },
+
+};
+
+const REDUCER = Dux.mkReducer(INITIAL_STORE, [
+  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+  Dux.mkAsyncHandler(NAME, DETAIL_ASYNC, DETAIL_AT, parseDetailResult),
+  Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
+]);
 
 export default {
   NAME,

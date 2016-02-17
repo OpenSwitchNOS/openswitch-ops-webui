@@ -58,7 +58,7 @@ class DemoDataGridSmallPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const fetch = nextProps.demo.fetch;
+    const fetch = nextProps.demo.page;
     this.props.actions.toolbar.set(
       <FetchToolbar
           isFetching={fetch.inProgress}
@@ -81,7 +81,7 @@ class DemoDataGridSmallPage extends Component {
   };
 
   _onForceSelect = () => {
-    const size = Object.keys(this.props.demo.entities).length;
+    const size = Object.keys(this.props.demo.page.entities).length;
     const externalSelect = (this.state.externalSelect + 1) % size;
     this.setState({ externalSelect });
   };
@@ -92,21 +92,21 @@ class DemoDataGridSmallPage extends Component {
       <div className="mLeft">
         <Section>
           <DataGrid title="Full Toolbar" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               onEdit={this._onEdit}
           />
         </Section>
         <Section>
           <DataGrid title="Select / No Edit" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               onSelectChange={this._onSelectChange}
           />
         </Section>
         <Section>
           <DataGrid title="No Filter / Single Select" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               noFilter
               singleSelect

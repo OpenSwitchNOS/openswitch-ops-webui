@@ -41,7 +41,7 @@ class MonitorInterfaceMetric extends Component {
 
   render() {
     const id = this.props.params.id;
-    const metrics = this.props.collector.interfaceMetrics[id];
+    const metrics = this.props.collector.overview.interfaceMetrics[id];
 
     let content = null;
     if (!metrics || metrics.length === 0) {

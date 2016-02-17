@@ -25,14 +25,17 @@ const SET = `${NAME}/SET`;
 const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
-  setFetchTB(fetch, onRefresh) {
+  setFetchTB(async, onRefresh) {
+    if (!async) {
+      throw new Error('invalid async object set on toolbar');
+    }
     return {
       type: SET,
       component: (
         <FetchToolbar
-            isFetching={fetch.inProgress}
-            error={fetch.lastError}
-            date={fetch.lastSuccessMillis}
+            isFetching={async.inProgress}
+            error={async.lastError}
+            date={async.lastSuccessMillis}
             onRefresh={onRefresh}/>
       )
     };
@@ -47,7 +50,11 @@ function REDUCER(moduleStore = INITIAL_STORE, action) {
   switch (action.type) {
 
     case CLEAR:
-      return { ...INITIAL_STORE };
+      if (moduleStore.component) {
+        // TODO: need to invesigate why this is casing infinity loop sometimes.
+        return { ...INITIAL_STORE };
+      }
+      return moduleStore;
 
     case SET:
       return { component: action.component };

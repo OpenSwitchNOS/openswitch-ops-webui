@@ -16,59 +16,18 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, ud } from 'i18n/lookup.js';
 import Header from 'grommet/components/Header';
-import Footer from 'grommet/components/Footer';
 import Menu from 'grommet/components/Menu';
 import Title from 'grommet/components/Title';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import CloseIcon from 'grommet/components/icons/base/Close';
-import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
-import FormField from 'grommet/components/FormField';
-import FormFields from 'grommet/components/FormFields';
-import CheckBox from 'grommet/components/CheckBox';
-import Button from 'grommet/components/Button';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import ErrorLayer from 'errorLayer.jsx';
+import InterfaceEdit from './interfaceEdit.jsx';
 import _ from 'lodash';
-
-
-// TODO: needs to be cleaned up top to bottom.
-/* TODO: below
-We need to clean up:
-adminState 'up'/'down' vs enabled t/f
-  Pain to check for string everywhere
-  LLDP/ECMP also have this problem -> convert to t/f
-  Clean up related code in collector & interface modules
-*/
-/* TODO: need to create a dialog helper for edit errors.
-if (!p.isFetching) {
-  if (e) {
-    status = (
-      <SpanStatus onClick={this._onStatusClicked} value="error">
-        {e.title}
-      </SpanStatus>
-    );
-    if (this.state.showDetail) {
-      detail = (
-        <StatusLayer value="error" onClose={this._onCloseDetail}
-            title={e.title} >
-          <b>{t('status')}</b><br/>
-          {e.status || t('none')}
-          <p/>
-          <b>{t('url')}</b><br/>
-          {e.url}
-          {e.msg ? <p><i>"{e.msg}"</i></p> : null}
-        </StatusLayer>
-      );
-    }
-  } else if (p.date) {
-    status = <small><TimeAgo date={p.date}/></small>;
-  }
-}
-*/
 
 
 class InterfaceDetails extends Component {
@@ -86,24 +45,29 @@ class InterfaceDetails extends Component {
 
   constructor(props) {
     super(props);
+    this.fid = _.uniqueId('infForm_');
     this.state = {
       editMode: false,
-      user: {},
     };
   }
 
+  _id = s => `${this.fid}_${s}`;
+
   componentDidMount() {
-    this.props.actions.interface.fetch(this.props.params.id);
+    this.props.actions.interface.fetchDetails(this.props.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
-    const p = this.props;
-    const id = p.params.id;
-    const currData = p.collector.interfaces[id];
-    const nextData = nextProps.collector.interfaces[id];
+    if (nextProps.interface.set.lastSuccessMillis >
+        this.props.interface.set.lastSuccessMillis) {
 
-    if (nextProps.params.id !== id || !_.isEqual(currData, nextData)) {
-      p.actions.interface.fetch(nextProps.params.id);
+      this.props.actions.collector.fetchImmediate();
+
+    } else if (nextProps.params.id !== this.props.params.id ||
+        nextProps.collector.overview.lastSuccessMillis >
+        this.props.collector.overview.lastSuccessMillis) {
+
+      this.props.actions.interface.fetchDetails(nextProps.params.id);
     }
   }
 
@@ -113,107 +77,63 @@ class InterfaceDetails extends Component {
 
   _onEditToggle = () => {
     const editMode = !this.state.editMode;
-    let user = this.state.user;
-    if (editMode) {
-      user = { adminState: this.props.interface.vAdminState };
-    }
-    this.setState({ editMode, user });
+    this.setState({ editMode });
   };
 
-  _onChangeCheckBox = (e) => {
-    const fn = e.target.getAttribute('name');
-    const state = e.target.checked ? 'up' : 'down';
-    const user = {...this.state.user, [fn]: state };
-    this.setState({ user });
-  };
-
-  _onSubmit = () => {
-    const actions = this.props.actions.interface;
-    const id = this.props.params.id;
-    const state = this.state.user.adminState;
-    if (state === 'up') {
-      actions.adminStateUp(id);
-    } else {
-      actions.adminStateDown(id);
-    }
+  _onEditSubmit = (user) => {
+    this.props.actions.interface.set(user);
+    this._onEditToggle();
   };
 
   _onCloseError = () => {
-    const actions = this.props.actions.interface;
-    actions.clearError();
+    this.props.actions.interface.clearErrorForSet();
   };
 
   render() {
-    //TODO: Should be localized eventually
     const id = this.props.params.id;
-    const data = this.props.collector.interfaces[id];
-    const infData = this.props.interface;
-    const user = this.state.user;
-    const editLayer = !this.state.editMode ? null : (
-      <Layer
-          className="edit"
-          onClose={this._onEditToggle}
-          closer
-          flush
-          align="right">
-        <Form onSubmit={this._onSubmit}>
-          <Header>
-            <h3> Editing Interface Details </h3>
-          </Header>
-          <FormFields>
-            <fieldset>
-            <FormField>
-              <CheckBox onChange={this._onChangeCheckBox} checked={user.adminState === 'up'} id="adminState" name="adminState" label="Admin State" toggle/>
-            </FormField>
-            </fieldset>
-          </FormFields>
-          <Footer pad={{vertical: 'medium'}}>
-            <Menu>
-              <Button label={t('deploy')} primary onClick={this._onSubmit}/>
-            </Menu>
-          </Footer>
-        </Form>
-      </Layer>
-    );
+    const detail = this.props.interface.detail;
+    const set = this.props.interface.set;
 
-    const errorLayer = !this.props.interface.set.lastError ? null :
-      <ErrorLayer error={this.props.interface.set.lastError} onClose={this._onCloseError} />;
+    const editLayer = !this.state.editMode ? null :
+      <InterfaceEdit
+          actions={this.props.actions}
+          onClose={this._onEditToggle}
+          onSubmit={this._onEditSubmit}
+          user={{
+            id,
+            adminUserUp: detail.inf.adminUserUp,
+          }}
+      />;
+
+    const errorLayer = !set.lastError ? null :
+      <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
 
     return (
       <Box pad="small">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-          <Title>
-          Interface {id} Details
-          </Title>
+          <Title>{`${t('interface')}: ${id}`}</Title>
           <Menu direction="row" justify="end" responsive={false}>
-            <Anchor onClick={this._onEditToggle}>
-              <EditIcon className="tiny"/>
+            <Anchor onClick={set.inProgress ? null : this._onEditToggle}>
+              {set.inProgress ? <RefreshIcon className="spin"/> : <EditIcon/>}
             </Anchor>
             <Anchor onClick={this._onClose}>
-              <CloseIcon className="tiny"/>
+              <CloseIcon/>
             </Anchor>
           </Menu>
         </Header>
-        <Box pad="small">
-        {!data ? 'no data' : (
-          <div>
-            <h5>ID: {data.id}</h5>
-            <h5>Admin State: {data.adminState}</h5>
-            <h5>Link State: {data.linkState}</h5>
-            <h5>Duplex: {data.duplex}</h5>
-            <h5>Speed: {data.speedFormatted}</h5>
-            <h5>Connector: {data.connector}</h5>
-            <br/>
-            <h5>ports etag: {infData.ports.etag}</h5>
-            <h5>entity id: {infData.entity.id}</h5>
-            <h5>entity etag: {infData.entity.etag}</h5>
-            <h5>entity adminState: {infData.entity.adminState}</h5>
-            <h5>port id: {infData.port && infData.port.id}</h5>
-            <h5>port adminState: {infData.port && infData.port.adminState}</h5>
-            <h5>port etag: {infData.port && infData.port.etag}</h5>
-          </div>
-          )}
-        </Box>
+        <hr/>
+        <div>
+          <b>collector adminUserUp</b>{ud(this.props.collector.overview.interfaces[id] && this.props.collector.overview.interfaces[id].adminUserUp)}<br/>
+          <br/>
+          <b>detail.inf.adminUserUp</b>{ud(detail.inf.adminUserUp)}<br/>
+          <b>detail.inf.etag</b>{detail.inf.etag}<br/>
+          <br/>
+          <b>detail.port.adminUserUp</b>{ud(detail.port.adminUserUp)}<br/>
+          <b>detail.port.etag</b>{detail.port.etag}<br/>
+          <br/>
+          <b>page.ports.etag</b>{this.props.interface.page.portRefs.etag}<br/>
+          <br/>
+        </div>
         {editLayer}
         {errorLayer}
       </Box>

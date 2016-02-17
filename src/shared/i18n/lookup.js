@@ -25,3 +25,9 @@ export function setLocale(l) {
 export function getLocale() { return locale; }
 
 export function t(k) { return (msgs && msgs[k]) || `~${k}~`; }
+
+export function tf(v) { return t(v ? 'true' : 'false'); }
+
+export function ed(v) { return t(v ? 'enabled' : 'disabled'); }
+
+export function ud(v) { return t(v ? 'up' : 'down'); }

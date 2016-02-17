@@ -19,134 +19,124 @@
 import Agent, { mkAgentHandler } from 'agent.js';
 import Async from 'async';
 
+const ASYNC_TYPES = [ 'REQUEST', 'SUCCESS', 'FAILURE', 'CLEAR_ERROR' ];
 
-const DEFAULT_INITIAL_STORE = {
-  fetch: {
-    inProgress: false,
-    lastSuccessMillis: 0,
-    lastError: null,
-  },
-  set: {
-    inProgress: false,
-    lastSuccessMillis: 0,
-    lastError: null,
-  }
-};
-
-function actionTypes(moduleName) {
+function mkAsyncStore() {
   return {
-    FETCH_REQUEST: `${moduleName}/FETCH_REQUEST`,
-    FETCH_SUCCESS: `${moduleName}/FETCH_SUCCESS`,
-    FETCH_FAILURE: `${moduleName}/FETCH_FAILURE`,
-    FETCH_CLEAR_ERROR: `${moduleName}/FETCH_CLEAR_ERROR`,
-    SET_REQUEST: `${moduleName}/SET_REQUEST`,
-    SET_SUCCESS: `${moduleName}/SET_SUCCESS`,
-    SET_FAILURE: `${moduleName}/SET_FAILURE`,
-    SET_CLEAR_ERROR: `${moduleName}/SET_CLEAR_ERROR`,
+    inProgress: false,
+    lastSuccessMillis: 0,
+    lastError: null,
   };
 }
 
-function protectedParse(moduleName, moduleParseFn, result) {
+function mkAsyncActionTypes(moduleName, asyncName) {
+  const at = {};
+  ASYNC_TYPES.forEach(t => {
+    at[t] = `${moduleName}/${asyncName}/${t}`;
+  });
+  return at;
+}
+
+function protectedFn(moduleName, asyncName, fn, result) {
   try {
-    return moduleParseFn(result);
+    return fn(result);
   } catch (e) {
-    console.log(`DUX parsing failure in: ${moduleName}`);
+    console.log(`DUX failure in: ${moduleName}/${asyncName}`);
     console.log(`Exception message: ${e.message}`);
   }
   return {};
 }
 
-function reducer(moduleName, moduleInitialStore, moduleParseFn) {
-  const ACTION_TYPES = actionTypes(moduleName);
-  const INITIAL_STORE = { ...DEFAULT_INITIAL_STORE, ...moduleInitialStore };
-
-  return (moduleStore = INITIAL_STORE, action) => {
+function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
+  return (moduleStore, action) => {
     switch (action.type) {
 
-      case ACTION_TYPES.SET_CLEAR_ERROR: {
-        const set = { ...moduleStore.set, lastError: null };
-        return { ...moduleStore, set };
+      case asyncAts.REQUEST: {
+        const asyncStore = {
+          ...moduleStore[asyncName], inProgress: true };
+        return { ...moduleStore, [asyncName]: asyncStore };
       }
 
-      case ACTION_TYPES.FETCH_CLEAR_ERROR: {
-        const fetch = { ...moduleStore.fetch, lastError: null };
-        return { ...moduleStore, fetch };
+      case asyncAts.CLEAR_ERROR: {
+        const asyncStore = { ...moduleStore[asyncName], lastError: null };
+        return { ...moduleStore, [asyncName]: asyncStore };
       }
 
-      case ACTION_TYPES.SET_REQUEST: {
-        const set = { ...moduleStore.set, inProgress: true };
-        return { ...moduleStore, set };
-      }
-
-      case ACTION_TYPES.FETCH_REQUEST: {
-        const fetch = { ...moduleStore.fetch, inProgress: true };
-        return { ...moduleStore, fetch };
-      }
-
-      case ACTION_TYPES.SET_FAILURE: {
-        const set = {
-          ...moduleStore.set,
+      case asyncAts.FAILURE: {
+        const asyncStore = {
+          ...moduleStore[asyncName],
           inProgress: false,
-          lastError: action.error
+          lastError: action.error,
         };
-        return { ...moduleStore, set };
+        return { ...moduleStore, [asyncName]: asyncStore };
       }
 
-      case ACTION_TYPES.FETCH_FAILURE: {
-        const fetch = {
-          ...moduleStore.fetch,
-          inProgress: false,
-          lastError: action.error
-        };
-        return { ...moduleStore, fetch };
-      }
-
-      case ACTION_TYPES.SET_SUCCESS: {
-        const set = {
-          ...moduleStore.set,
+      case asyncAts.SUCCESS: {
+        const newAsyncStore = parseFn
+          ? protectedFn(moduleName, asyncName, parseFn, action.result)
+          : {};
+        const asyncStore = {
+          ...moduleStore[asyncName],
           inProgress: false,
           lastError: null,
-          lastSuccessMillis: Date.now()
+          lastSuccessMillis: Date.now(),
+          ...newAsyncStore,
         };
-        return { ...moduleStore, set };
+        return { ...moduleStore, [asyncName]: asyncStore };
       }
-
-      case ACTION_TYPES.FETCH_SUCCESS: {
-        const fetchedStore =
-          protectedParse(moduleName, moduleParseFn, action.result);
-        const fetch = {
-          ...moduleStore.fetch,
-          inProgress: false,
-          lastError: null,
-          lastSuccessMillis: Date.now()
-        };
-        return { ...moduleStore, fetch, ...fetchedStore };
-      }
-
-      default:
-        return moduleStore;
     }
+    return null;
   };
 }
 
-const DEBOUNCE_INTERVAL = 3000;
-
-function isReadyToFetch(store, now) {
-  const { inProgress, lastSuccessMillis } = store.fetch;
-  return !inProgress && (now - lastSuccessMillis) > DEBOUNCE_INTERVAL;
+function mkReducer(initialStore, asyncHandlers) {
+  return (moduleStore = initialStore, action) => {
+    for (let i=0; i<asyncHandlers.length; i++) {
+      const newModuleStore = asyncHandlers[i](moduleStore, action);
+      if (newModuleStore) {
+        return newModuleStore;
+      }
+    }
+    return moduleStore;
+  };
 }
 
-function performFetch(at, dispatch, urls) {
-  dispatch({ type: at.FETCH_REQUEST });
+function actionRequest(at) { return { type: at.REQUEST }; }
+function actionFail(at, error) { return { type: at.FAILURE, error }; }
+function actionSuccess(at, result) { return { type: at.SUCCESS, result }; }
+function actionClearError(at) { return { type: at.CLEAR_ERROR }; }
 
-  function dispatcher(error, result) {
+function dispatchRequest(dispatch, at) {
+  dispatch(actionRequest(at));
+}
+
+function dispatchFail(dispatch, at, error) {
+  dispatch(actionFail(at, error));
+}
+
+function dispatchSuccess(dispatch, at, result) {
+  dispatch(actionSuccess(at, result));
+}
+
+function mkAsyncDispatcher(dispatch, at) {
+  return (error, result) => {
     if (error) {
-      dispatch({ type: at.FETCH_FAILURE, error });
-    } else {
-      dispatch({ type: at.FETCH_SUCCESS, result });
+      return dispatchFail(dispatch, at, error);
     }
-  }
+    dispatchSuccess(dispatch, at, result);
+  };
+}
 
+const ASYNC_COOLDOWN_MILLIS = 5000;
+
+function waitForCooldown(moduleStore, asyncName, now) {
+  const { inProgress, lastSuccessMillis } = moduleStore[asyncName];
+  return !inProgress && (now - lastSuccessMillis) > ASYNC_COOLDOWN_MILLIS;
+}
+
+function get(dispatch, at, urls) {
+  dispatchRequest(dispatch, at);
+  const dispatcher = mkAsyncDispatcher(dispatch, at);
   if (Array.isArray(urls)) {
     const gets = [];
     urls.forEach(url => {
@@ -160,22 +150,27 @@ function performFetch(at, dispatch, urls) {
   }
 }
 
-function fetchAction(moduleName, urls) {
-  const ACTION_TYPES = actionTypes(moduleName);
-
-  return (dispatch, getStoreFn) => {
-    const store = getStoreFn()[moduleName];
-    if (isReadyToFetch(store, Date.now())) {
-      performFetch(ACTION_TYPES, dispatch, urls);
-    }
-  };
+function getIfCooledDown(dispatch, moduleStore, asyncName, at, urls) {
+  if (waitForCooldown(moduleStore, asyncName, Date.now())) {
+    get(dispatch, at, urls);
+  }
 }
 
 export default {
-  actionTypes,
-  fetchAction,
-  reducer,
-  isReadyToFetch,
-  protectedParse,
-  performFetch,
+  mkAsyncStore,
+  mkAsyncActionTypes,
+  protectedFn,
+  mkAsyncHandler,
+  mkReducer,
+  actionRequest,
+  actionFail,
+  actionSuccess,
+  actionClearError,
+  dispatchRequest,
+  dispatchFail,
+  dispatchSuccess,
+  mkAsyncDispatcher,
+  waitForCooldown,
+  get,
+  getIfCooledDown,
 };

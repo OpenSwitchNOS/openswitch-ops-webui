@@ -303,7 +303,10 @@ export default class DataGrid extends Component {
 
   _mkCell = (cellProps, colProps) => {
     const rowData = this.state.dataMap.getDataAt(cellProps.rowIndex);
-    const cellData = rowData && rowData[cellProps.columnKey];
+    let cellData = rowData && rowData[cellProps.columnKey];
+    if (colProps.format) {
+      cellData = colProps.format(cellData);
+    }
     if (!colProps.cell) {
       return ( <Cell {...cellProps}>{cellData}</Cell> );
     }
