@@ -113,7 +113,7 @@ export const MESSAGES = {
   lldpNeighborInfo: 'LLDP Neighbor Info',
   lldpPortStats: 'LLDP Port Stats',
   loading: 'Loading...',
-  loadBalance: 'Load Balance',
+  loadBalance: 'Load Balancing By',
   log: 'Log',
   logout: 'Logout',
   mac: 'MAC',

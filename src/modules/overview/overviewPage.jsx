@@ -223,7 +223,7 @@ class OverviewPage extends Component {
 
           <tr>
             <td style={{width: '180px'}}>{t('ecmp')}:</td>
-            <td>{ed(data.ecmp.enabled)}</td>
+            <td>{t(data.ecmp.enabled)}</td>
           </tr>
 
           <tr>

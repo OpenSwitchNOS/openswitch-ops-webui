@@ -261,12 +261,12 @@ function parseOverviewResult(result) {
 
   const ecmpCfg = sysBody.configuration.ecmp_config;
   const ecmp = {
-    enabled: ecmpCfg && ecmpCfg.enabled === 'true',
-    hashDstIp: ecmpCfg && ecmpCfg.hash_dstip_enabled === 'true',
-    hashDstPort: ecmpCfg && ecmpCfg.hash_dstport_enabled === 'true',
-    hashSrcIp: ecmpCfg && ecmpCfg.hash_srcip_enabled === 'true',
-    hashSrcPort: ecmpCfg && ecmpCfg.hash_srcport_enabled === 'true',
-    resilientHash: ecmpCfg && ecmpCfg.resilient_hash_enabled === 'true',
+    enabled: ecmpCfg && ecmpCfg.enabled === 'false' ? 'disabled' : 'enabled',
+    hashDstIp: ecmpCfg && ecmpCfg.hash_dstip_enabled === 'false' ? 'disabled' : 'enabled',
+    hashDstPort: ecmpCfg && ecmpCfg.hash_dstport_enabled === 'false' ? 'disabled' : 'enabled',
+    hashSrcIp: ecmpCfg && ecmpCfg.hash_srcip_enabled === 'false' ? 'disabled' : 'enabled',
+    hashSrcPort: ecmpCfg && ecmpCfg.hash_srcport_enabled === 'false' ? 'disabled' : 'enabled',
+    resilientHash: ecmpCfg && ecmpCfg.resilient_hash_enabled === 'false' ? 'disabled' : 'enabled',
   };
 
   return {

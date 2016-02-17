@@ -63,7 +63,7 @@ class ECMPPage extends Component {
     return (
       <Box className="flex1">
         <Box pad={this.pad} className="flex1 pageBox min200x400">
-          <span><b>{t('ecmp')}: </b>{ed(ecmp.enable)}</span>
+          <span><b>{t('ecmp')}: </b>{t(ecmp.enabled)}</span>
           <br/>
           <br/>
           <b>{t('ecmp')} {t('loadBalance')}</b>
@@ -72,27 +72,27 @@ class ECMPPage extends Component {
             <tbody>
               <tr>
                 <td style={{width: '180px'}}>{t('srcIp')}:</td>
-                <td>{ed(ecmp.hashSrcIp)}</td>
+                <td>{t(ecmp.hashSrcIp)}</td>
               </tr>
 
               <tr>
                 <td>{t('srcPort')}:</td>
-                <td>{ed(ecmp.hashSrcPort)}</td>
+                <td>{t(ecmp.hashSrcPort)}</td>
               </tr>
 
               <tr>
                 <td>{t('dstIp')}:</td>
-                <td>{ed(ecmp.hashDstIp)}</td>
+                <td>{t(ecmp.hashDstIp)}</td>
               </tr>
 
               <tr>
                 <td>{t('dstPort')}:</td>
-                <td>{ed(ecmp.hashDstPort)}</td>
+                <td>{t(ecmp.hashDstPort)}</td>
               </tr>
 
               <tr>
                 <td>{t('resilientHash')}:</td>
-                <td>{ed(ecmp.resilientHash)}</td>
+                <td>{t(ecmp.resilientHash)}</td>
               </tr>
             </tbody>
           </table>
