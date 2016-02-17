@@ -95,9 +95,12 @@ function parseInterfaces(infBody, now) {
       const id = cfg.name;
       const stats = elm.statistics.statistics;
       const adminState = elm.status.admin_state;
-      const connector = elm.status.pm_info.connector;
+      const hwIntfInfo = elm.status.hw_intf_info;
+      const connector = hwIntfInfo ? hwIntfInfo.connector : 'absent';
+      const mac = hwIntfInfo ? hwIntfInfo.mac_addr.toUpperCase() : '';
       const adminStateConnector = adminState === 'up' ? 'up'
           : connector === 'absent' ? 'downAbsent' : 'down';
+      const speed = elm.status.link_speed ? Number(elm.status.link_speed) : 0;
       const data = {
         id,
         adminUserUp: cfg.user_config && cfg.user_config.admin === 'up',
@@ -105,9 +108,10 @@ function parseInterfaces(infBody, now) {
         adminStateConnector,
         duplex: elm.status.duplex,
         linkState: elm.status.link_state,
-        speed: elm.status_link_speed,
-        speedFormatted: Formatter.bpsToString(elm.status.link_speed),
+        speed,
+        speedFormatted: Formatter.bpsToString(speed),
         connector,
+        mac,
         rxBytes: Number(stats.rx_bytes),
         txBytes: Number(stats.tx_bytes)
       };
@@ -250,19 +254,19 @@ function parseOverviewResult(result) {
   // LLDP
 
   const lldp = {
-    enabled: sysOc.lldp_enable === 'true',
+    enabled: sysOc && sysOc.lldp_enable === 'true',
   };
 
   // ECMP
 
   const ecmpCfg = sysBody.configuration.ecmp_config;
   const ecmp = {
-    enabled: ecmpCfg.enabled === 'true',
-    hashDstIp: ecmpCfg.hash_dstip_enabled === 'true',
-    hashDstPort: ecmpCfg.hash_dstport_enabled === 'true',
-    hashSrcIp: ecmpCfg.hash_srcip_enabled === 'true',
-    hashSrcPort: ecmpCfg.hash_srcport_enabled === 'true',
-    resilientHash: ecmpCfg.resilient_hash_enabled === 'true',
+    enabled: ecmpCfg && ecmpCfg.enabled === 'true',
+    hashDstIp: ecmpCfg && ecmpCfg.hash_dstip_enabled === 'true',
+    hashDstPort: ecmpCfg && ecmpCfg.hash_dstport_enabled === 'true',
+    hashSrcIp: ecmpCfg && ecmpCfg.hash_srcip_enabled === 'true',
+    hashSrcPort: ecmpCfg && ecmpCfg.hash_srcport_enabled === 'true',
+    resilientHash: ecmpCfg && ecmpCfg.resilient_hash_enabled === 'true',
   };
 
   return {

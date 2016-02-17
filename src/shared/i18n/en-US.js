@@ -116,6 +116,7 @@ export const MESSAGES = {
   loadBalance: 'Load Balance',
   log: 'Log',
   logout: 'Logout',
+  mac: 'MAC',
   maxInterfaceSpeed: 'Max Interface Speed',
   memory: 'Memory',
   message: 'Message',

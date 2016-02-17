@@ -161,6 +161,7 @@ class InterfaceDetails extends Component {
           {this._tr(t('duplex'), t(inf.duplex))}
           {this._tr(t('speed'), inf.speedFormatted)}
           {this._tr(t('connector'), inf.connector)}
+          {this._tr(t('mac'), inf.mac)}
           {this._tr(t('mtu'), inf.mtu)}
           {this._tr(t('autoNeg'), t(inf.autoNeg))}
           {this._tr(t('flowControl'), t(inf.flowControl))}
