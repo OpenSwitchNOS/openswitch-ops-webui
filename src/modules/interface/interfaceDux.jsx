@@ -18,6 +18,7 @@ import Dux from 'dux.js';
 import InterfacePage from './interfacePage.jsx';
 import InterfaceDetails from './interfaceDetails.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
+import * as Formatter from 'formatter.js';
 
 
 const NAME = 'interface';
@@ -58,7 +59,9 @@ const INITIAL_STORE = {
   detail: {
     ...Dux.mkAsyncStore(),
     port: {},
-    inf: {},
+    inf: {
+      lldp: {},
+    },
   },
   set: {
     ...Dux.mkAsyncStore(),
@@ -73,14 +76,56 @@ function parsePageResult(result) {
   return { portRefs };
 }
 
+function parseLldp(body) {
+  const stat = body.statistics;
+  return {
+    chassisName: body.status.lldp_neighbor_info.chassis_name,
+    chassisId: body.status.lldp_neighbor_info.chassis_id,
+    // TODO : Check if the LLDP ip statement is correct ...
+    ip: body.status.lldp_neighbor_info.mgmt_ip_list,
+    portId: body.status.lldp_neighbor_info.port_id,
+    sysDesc: body.status.lldp_neighbor_info.chassis_description,
+    capsSupported: body.status.lldp_neighbor_info.chassis_capability_available,
+    capsEnabled: body.status.lldp_neighbor_info.chassis_capability_enabled,
+    framesTx: stat.lldp_statistics.lldp_tx,
+    framesRx: stat.lldp_statistics.lldp_rx,
+    framesRxDiscarded: stat.lldp_statistics.lldp_rx_discard,
+    framesRxUnrecog: stat.lldp_statistics.lldp_rx_unrecognized
+  };
+}
+
 function parseDetailResult(result) {
   let cfg = result[0].body.configuration;
   const cfgUc = cfg.user_config;
   const adminUserUp = cfgUc && cfgUc.admin === 'up';
+  const status = result[0].body.status;
+  const stats = result[0].body.statistics.statistics;
+  const adminState = status.admin_state;
+  const connector = status.pm_info.connector;
+  const adminStateConnector = adminState === 'up' ? 'up'
+      : connector === 'absent' ? 'downAbsent' : 'down';
   const inf = {
     id: cfg.name,
     adminUserUp,
     etag: result[0].headers.etag,
+    adminStateConnector,
+    linkState: status.link_state,
+    duplex: status.duplex,
+    speedFormatted: Formatter.bpsToString(status.link_speed),
+    connector,
+    macAddress: status.hw_intf_info.mac_addr,
+    mtu: status.mtu,
+    lldp: parseLldp(result[0].body),
+    autoNeg: (cfgUc && cfgUc.autoneg) || 'on',
+    flowControl: (cfgUc && cfgUc.pause) || 'off',
+    rxBytes: Number(stats.rx_bytes),
+    txBytes: Number(stats.tx_bytes),
+    rxPackets: Number(stats.rx_packets),
+    txPackets: Number(stats.tx_packets),
+    rxErrors: Number(stats.rx_errors),
+    txErrors: Number(stats.tx_errors),
+    rxDropped: Number(stats.rx_dropped),
+    txDropped: Number(stats.tx_dropped),
   };
   const port = {};
   if (result.length > 1) {
