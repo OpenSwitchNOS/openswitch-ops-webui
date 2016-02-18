@@ -62,10 +62,18 @@ function parseInterface(inf) {
   tmp = status.hw_intf_info;
   const mac = (tmp && tmp.mac_addr) ? tmp.mac_addr.toUpperCase() : '';
 
-  const adminStateConnector = (adminState !== 'up' && connector === 'absent')
+  const adminStateConnector =
+    adminState !== 'up' && userCfgAdmin === 'up' && connector === 'absent'
     ? 'downAbsent' : adminState;
 
-  const speed = status.link_speed ? Number(status.link_speed) : 0;
+  let speed = '';
+  let speedFormatted = '';
+  let duplex = '';
+  if (adminState === 'up') {
+    speed = status.link_speed ? Number(status.link_speed) : 0;
+    speedFormatted = Formatter.bpsToString(speed);
+    duplex = status.duplex;
+  }
 
   return {
     id: cfg.name,
@@ -79,10 +87,10 @@ function parseInterface(inf) {
     adminStateConnector,
     mac,
     speed,
-    speedFormatted: Formatter.bpsToString(speed),
+    speedFormatted,
+    duplex,
 
     linkState: status.link_state,
-    duplex: status.duplex,
     mtu: status.mtu,
 
     rxBytes: Number(stats.rx_bytes),

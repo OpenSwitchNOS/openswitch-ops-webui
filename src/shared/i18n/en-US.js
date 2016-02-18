@@ -16,12 +16,7 @@
 
 export const LOCALE = 'en-US';
 
-export const MESSAGES = {
-
-  // TODO: Need to fix this as interface -> interfaces (prefix with nav?)
-
-  // navigation items
-  // *** NAVIGATION ITEMS BELOW - ONLY***
+export const NAVS = {
   bgp: 'BGP',
   box1: 'Box Layout #1',
   box2: 'Box Layout #2',
@@ -46,9 +41,9 @@ export const MESSAGES = {
   syslog: 'Syslog',
   table: 'Table',
   vlan: 'VLANs',
-  // *** NAVIGATION ITEMS ABOVE - ONLY***
+};
 
-  // messages
+export const MESSAGES = {
   adminState: 'Admin State',
   alert: 'Alert',
   all: 'All',
@@ -78,6 +73,7 @@ export const MESSAGES = {
   dstIp: 'Destination IP',
   dstPort: 'Destination Port',
   duplex: 'Duplex',
+  ecmp: 'ECMP',
   edit: 'Edit',
   emerg: 'Emerg',
   enabled: 'Enabled',
@@ -103,7 +99,10 @@ export const MESSAGES = {
   id: 'ID',
   identifier: 'Identifier',
   information: 'Information',
+  interface: 'Interface',
   interfaces: 'Interfaces',
+  interfaceUtiization: 'Interface Utilization',
+  topInterfaceUtilization: 'Top Interface Utilization',
   ip: 'IP',
   ipV4: 'IPv4',
   ipV6: 'IPv6',
@@ -170,7 +169,6 @@ export const MESSAGES = {
   systemMac: 'System MAC',
   temperatures: 'Temperatures',
   text: 'Text',
-  traffic: 'Traffic',
   true: 'True',
   tx: 'Tx',
   txPackets: 'Tx Packets',

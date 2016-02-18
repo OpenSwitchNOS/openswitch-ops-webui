@@ -366,7 +366,7 @@ class OverviewPage extends Component {
             </table>
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min300x300">
-            <b>{t('traffic')}</b>
+            <b>{t('topInterfaceUtilization')}</b>
             <hr/>
             <MetricTable
                 simple

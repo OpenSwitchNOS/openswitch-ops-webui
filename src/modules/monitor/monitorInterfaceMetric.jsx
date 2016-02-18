@@ -65,7 +65,7 @@ class MonitorInterfaceMetric extends Component {
 
     return (
       <Box pad={this.pad} className="pageBox">
-        <large><b>{`${t('interface')}: `}</b>{id}</large>
+        <large><b>{`${t('interfaceUtiization')}: `}</b>{id}</large>
         <br/>
         {content}
       </Box>

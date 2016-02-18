@@ -53,36 +53,36 @@ class InterfacePage extends Component {
       {
         columnKey: 'userCfgAdmin',
         header: t('userCfgAdmin'),
-        width: 215,
+        width: 150,
         format: t,
       },
       {
         columnKey: 'adminStateConnector',
         header: t('adminState'),
-        width: 215,
+        width: 160,
         format: t,
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
-        width: 215,
+        width: 150,
         format: t,
       },
       {
         columnKey: 'duplex',
         header: t('duplex'),
-        width: 215,
+        width: 120,
         format: t,
       },
       {
         columnKey: 'speedFormatted',
         header: t('speed'),
-        width: 215,
+        width: 110,
       },
       {
         columnKey: 'connector',
         header: t('connector'),
-        width: 215,
+        width: 150,
       },
     ];
     this.state = {};

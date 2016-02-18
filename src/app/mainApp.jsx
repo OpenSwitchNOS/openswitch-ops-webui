@@ -21,7 +21,7 @@ import './mainApp.scss';
 import React, { PropTypes, Component } from 'react';
 import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { navt } from 'i18n/lookup.js';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -110,7 +110,7 @@ class MainApp extends Component {
       const name = [];
       const parts = linkPath.split('/');
       parts.forEach(p => {
-        if (p) { name.push(t(p)); }
+        if (p) { name.push(navt(p)); }
       });
       return name.join('/');
     }

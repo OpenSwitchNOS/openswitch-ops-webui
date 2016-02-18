@@ -20,7 +20,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { orderForGroup } from './navGroups.js';
-import { t } from 'i18n/lookup.js';
+import { t, navt } from 'i18n/lookup.js';
 
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
@@ -82,7 +82,7 @@ class NavSideBar extends Component {
         if (!navItem.link) {
           items.push(
             <Header pad={{horizontal: 'medium'}} key={navItem.key}>
-              <Title>{t(navItem.key)}</Title>
+              <Title>{navt(navItem.key)}</Title>
             </Header>
           );
           items.concat(NavSideBar.mkNavItems(navItem.items, items));
@@ -93,7 +93,7 @@ class NavSideBar extends Component {
                 to={navItem.route}
                 activeClassName="active"
             >
-              {t(navItem.key)}
+              {navt(navItem.key)}
             </Link>
           );
         }

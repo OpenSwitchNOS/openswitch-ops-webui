@@ -16,15 +16,22 @@
 
 let locale = null;
 let msgs = null;
+let navs = null;
 
 export function setLocale(l) {
   locale = l;
   msgs = locale && locale.MESSAGES;
+  navs = locale && locale.NAVS;
 }
 
 export function getLocale() { return locale; }
 
-export function t(k) { return (msgs && msgs[k]) || `~${k}~`; }
+export function navt(k) { return (navs && navs[k]) || `~${k}~`; }
+
+export function t(k) {
+  if (k === '') { return ''; }
+  return (msgs && msgs[k]) || `~${k}~`;
+}
 
 export function tf(v) { return t(v ? 'true' : 'false'); }
 
