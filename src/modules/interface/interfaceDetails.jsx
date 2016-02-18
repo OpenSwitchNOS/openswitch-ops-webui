@@ -30,6 +30,8 @@ import InterfaceEdit from './interfaceEdit.jsx';
 import _ from 'lodash';
 
 
+const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
+
 class InterfaceDetails extends Component {
 
   static propTypes = {
@@ -89,11 +91,11 @@ class InterfaceDetails extends Component {
     this.props.actions.interface.clearErrorForSet();
   };
 
-  _tr = (td1, td2, style) => {
+  _tr = (td1, td2) => {
     return (
-      <tr style={style}>
-        <td>{td1}:</td>
-        <td>{td2}</td>
+      <tr>
+        <td style={{width: 200}}>{td1}:</td>
+        <td style={{width: 200}}>{td2}</td>
       </tr>
     );
   };
@@ -118,9 +120,16 @@ class InterfaceDetails extends Component {
     const ipV4 = (port.id && port.ipV4) || t('notConfigured');
     const ipV6 = (port.id && port.ipV6) || t('notConfigured');
 
+    const lldpOpsLink = !inf.lldp.sysDesc ||
+      inf.lldp.sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ? null : (
+        <a href={`http://${inf.lldp.ip}`} target="_blank">
+          &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
+        </a>
+      );
+
     // TODO: format the numerical values using 1,000,000 etc.
     return (
-      <Box pad="small" className="min200x400">
+      <Box pad="small" className="details min200x400">
         <Header tag="h4" justify="between">
           <Title>{`${t('interface')}: ${id}`}</Title>
           <Menu direction="row" justify="end" responsive={false}>
@@ -160,7 +169,7 @@ class InterfaceDetails extends Component {
           </tbody>
         </table>
         <br/>
-        <b>{t('lldpNeighborInfo')}</b>
+        <b>{t('lldpNeighborInfo')}{lldpOpsLink}</b>
         <hr/>
         <table style={{tableLayout: 'fixed'}} className="propTable">
           <tbody>

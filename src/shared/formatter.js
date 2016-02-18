@@ -18,16 +18,16 @@ function bpsToString(bitsPerSecond) {
   if (isNaN(bitsPerSecond)) {
     throw new Error('Bits Per Second should be a Number');
   }
-  if (bitsPerSecond>=1000000000) {
+  if (bitsPerSecond >= 1000000000) {
     //Formula : Gigabits per second = bits per second ÷ 1,000,000,000
-    return `${(bitsPerSecond/1000000000)} Gbps`;
-  } else if (bitsPerSecond>=1000000) {
+    return `${(bitsPerSecond / 1000000000)} Gbps`;
+  } else if (bitsPerSecond >= 1000000) {
     //Formula : Megabytes per second = bits per second ÷ 1,000,000
-    return `${(bitsPerSecond/1000000)}  Mbps`;
-  } else if (bitsPerSecond>=1000) {
+    return `${(bitsPerSecond / 1000000)}  Mbps`;
+  } else if (bitsPerSecond >= 1000) {
     //Formula: Kilobytes per second = bits per second ÷ 1,000
     return `${bitsPerSecond} Kbps`;
-  } else if (bitsPerSecond>0) {
+  } else if (bitsPerSecond > 0) {
     // 0 - 999 bps
     return `${bitsPerSecond} bps`;
   }
@@ -39,11 +39,18 @@ function mbpsToString(megaBitsPerSecond) {
   if (isNaN(megaBitsPerSecond)) {
     throw new Error('Bits Per Second should be a Number');
   }
-  const stringToBeReturned = bpsToString(megaBitsPerSecond*1000000);
-  return stringToBeReturned;
+  return bpsToString(megaBitsPerSecond * 1000000);
+}
+
+function toCommaString(x) {
+  if (isNaN(x)) {
+    throw new Error('Should be a Number');
+  }
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export default {
   bpsToString,
   mbpsToString,
+  toCommaString,
 };

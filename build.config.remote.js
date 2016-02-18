@@ -15,12 +15,14 @@
 */
 
 import CollectorDux from 'collector/collectorDux.js';
+import MonitorDux from 'monitor/monitorDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
 
 const modules = [
   CollectorDux,
+  MonitorDux,
   OverviewDux,
   InterfaceDux,
   EcmpDux,
@@ -34,7 +36,7 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: `http://${window.location.hostname}:8091`,
+    prefix: 'http://15.108.30.246:8091',
   }
 };
 

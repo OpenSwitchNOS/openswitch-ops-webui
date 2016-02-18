@@ -96,5 +96,30 @@ describe('formatter', () => {
     }).toThrow();
   });
 
+  it('handles toCommaString XXX,XXX,XXX', () => {
+    expect(Formatter.toCommaString(100000000)).toEqual('100,000,000');
+  });
+
+  it('handles toCommaString 0', () => {
+    expect(Formatter.toCommaString(0)).toEqual('0');
+  });
+
+  it('handles toCommaString 10', () => {
+    expect(Formatter.toCommaString(10)).toEqual('10');
+  });
+
+  it('handles toCommaString 999', () => {
+    expect(Formatter.toCommaString(999)).toEqual('999');
+  });
+
+  it('handles toCommaString 1999', () => {
+    expect(Formatter.toCommaString(1999)).toEqual('1,999');
+  });
+
+  it('handles isNaN for toCommaString', () => {
+    expect(() => {
+      Formatter.toCommaString('abc');
+    }).toThrow();
+  });
 
 });

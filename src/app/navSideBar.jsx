@@ -36,6 +36,9 @@ import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
 
+const API_LINK = `http://${window.location.hostname}:8091/api/index.html`;
+const OPS_LINK = 'http://openswitch.net';
+
 class NavSideBar extends Component {
 
   static propTypes = {
@@ -161,7 +164,8 @@ class NavSideBar extends Component {
           </Box>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<WorldIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+              <a href={API_LINK}>{t('openSwitchApi')}</a>
+              <a href={OPS_LINK}>{t('openSwitchNet')}</a>
             </Menu>
             <span>{t('links')}</span>
           </Box>
