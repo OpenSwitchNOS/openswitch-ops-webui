@@ -135,12 +135,19 @@ class OverviewPage extends Component {
     const trs = [];
     Object.getOwnPropertyNames(fans).sort().forEach(k => {
       const data = fans[k];
+      const spd = <span><b>{t('speed')}:&nbsp;</b>{data.speed}</span>;
+      const rpm = <span><b>{t('rpm')}:&nbsp;</b>{data.rpm}</span>;
+      const dir = t(data.dir);
       trs.push(
         <tr key={data.id}>
-          <td>{data.id}:</td>
+          <td>
+          {`${data.id}:`}
+          </td>
           <td>
             <SpanStatus value={data.status}>
               {t(data.text)}
+              &nbsp;&nbsp;
+              <i>({spd},&nbsp;{rpm},&nbsp;{dir})</i>
             </SpanStatus>
           </td>
         </tr>
@@ -160,13 +167,17 @@ class OverviewPage extends Component {
     const trs = [];
     Object.getOwnPropertyNames(temps).sort().forEach(k => {
       const data = temps[k];
+      const loc = <span><b>{t('location')}:&nbsp;</b>{data.location}</span>;
       trs.push(
         <tr key={data.id}>
-          <td>{data.id}&nbsp;{data.location}:</td>
+          <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
               {`${data.value} ${t('degreesCelsius')}`}
             </SpanStatus>
+          </td>
+          <td>
+            <i>({loc})</i>
           </td>
         </tr>
       );
@@ -279,7 +290,8 @@ class OverviewPage extends Component {
       <StatusLayer
           onClose={this._onToggleTempsLayer}
           title={t('temperatures')}
-          value={coll.tempsRollup.status}>
+          value={coll.tempsRollup.status}
+          box >
           {this._mkTempsProps()}
       </StatusLayer>;
 
@@ -292,7 +304,8 @@ class OverviewPage extends Component {
       <StatusLayer
           onClose={this._onToggleFansLayer}
           title={t('fans')}
-          value={coll.fansRollup.status}>
+          value={coll.fansRollup.status}
+          box >
           {this._mkFansProps()}
       </StatusLayer>;
 

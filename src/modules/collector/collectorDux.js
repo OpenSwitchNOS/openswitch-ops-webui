@@ -189,10 +189,14 @@ function parseOverviewResult(result) {
   fanBody.forEach((elm) => {
     const id = elm.status.name;
     const ps = normalizeFanStatus(elm.status.status);
+    const cfg = elm.configuration;
     fans[id] = {
       id,
       text: ps.text,
       status: ps.status,
+      dir: cfg.direction,
+      speed: cfg.speed,
+      rpm: elm.status.rpm
     };
     if (ps.status === 'critical') {
       critical++;
