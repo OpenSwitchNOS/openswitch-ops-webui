@@ -130,7 +130,7 @@ const ACTIONS = {
         );
       }
 
-      if (detail.port) {
+      if (detail.port.id) {
         const PORT_URL = `${PORTS_URL}/${detail.port.id}`;
         reqs.push(cb => Agent.patch(PORT_URL)
           .send([{op: 'add', path: '/admin', value: userCfg.admin}])
