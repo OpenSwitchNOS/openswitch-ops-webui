@@ -315,12 +315,9 @@ class OverviewPage extends Component {
         const newDate = new Date(m.latestDataPoint().ts()).toLocaleTimeString();
         trafficMetricsCaption = (
           <div>
-            <div style={{textAlign: 'right'}}><small>
-              {`${oldDate} - ${newDate}`}
-            </small></div>
-            <div style={{textAlign: 'right'}}><small>
-              {`(${m.size()} ${t('dataPoints')})`}
-            </small></div>
+            <small>
+              {`${oldDate} - ${newDate} (${m.size()} ${t('dataPoints')})`}
+            </small>
           </div>
         );
       }

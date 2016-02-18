@@ -220,7 +220,7 @@ $slideInColumnMinWidth: 350px;
 // Grommet overrides start here...
 
 // Override the sidebar-width for the navigation pane.
-$navSideBarWidth: 320px;
+$sidebar-width: 320px; // this is used by _objects.sidebar.scss
 
 // Include all the Grommet styles.
 $fontsPath: '../shared/assets';
@@ -228,7 +228,12 @@ $fontsPath: '../shared/assets';
 
 // The original rule throws off vertical centering of the anchors in headers.
 .menu a:not(.button) {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+// Navigation highlight text when selected
+nav.menu--primary > a:not(.button).active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 // Addes animation to the sidebars
@@ -242,7 +247,7 @@ $fontsPath: '../shared/assets';
 }
 @include keyframes(slide-sidebar) {
   0% { width: 0px; }
-  100% { width: $navSideBarWidth; }
+  100% { width: $sidebar-width; }
 }
 
 u {

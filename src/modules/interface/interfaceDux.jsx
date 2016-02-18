@@ -110,12 +110,11 @@ const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 const ACTIONS = {
 
   set(detail, userCfg) {
+    const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
+    const INF_URL = `${INFS_URL}/${detail.inf.id}`;
+
     return (dispatch) => {
-
       const reqs = [];
-
-      const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
-      const INF_URL = `${INFS_URL}/${detail.inf.id}`;
 
       if (Object.keys(PATCH_USER_CFG).length === 0) {
         reqs.push(cb => Agent.patch(INF_URL)
@@ -162,6 +161,7 @@ const ACTIONS = {
   fetchDetails(id) {
     const INF_URL = `${INFS_URL}/${id}`;
     const PORT_URL = `${PORTS_URL}/${id}`;
+
     return (dispatch) => {
       Dux.dispatchRequest(dispatch, DETAIL_AT);
       const gets = {
