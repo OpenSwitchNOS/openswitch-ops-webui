@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t, ud } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
@@ -54,7 +54,7 @@ class InterfacePage extends Component {
         columnKey: 'userCfgAdmin',
         header: t('userCfgAdmin'),
         width: 215,
-        format: ud,
+        format: t,
       },
       {
         columnKey: 'adminStateConnector',

@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t, ud } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import Title from 'grommet/components/Title';
@@ -80,8 +80,8 @@ class InterfaceDetails extends Component {
     this.setState({ editMode });
   };
 
-  _onEditSubmit = (submit) => {
-    this.props.actions.interface.set(submit);
+  _onEditSubmit = (detail, userCfg) => {
+    this.props.actions.interface.set(detail, userCfg);
     this._onEditToggle();
   };
 
@@ -107,14 +107,9 @@ class InterfaceDetails extends Component {
 
     const editLayer = !this.state.editMode ? null :
       <InterfaceEdit
-          actions={this.props.actions}
           onClose={this._onEditToggle}
           onSubmit={this._onEditSubmit}
-          data={{
-            ports: detail.ports,
-            inf: detail.inf,
-            port: detail.port,
-          }}
+          detail={detail}
       />;
 
     const errorLayer = !set.lastError ? null :
@@ -142,7 +137,7 @@ class InterfaceDetails extends Component {
         {errorLayer}
         <table style={{tableLayout: 'fixed'}} className="propTable">
           <tbody>
-          {this._tr(t('userCfgAdmin'), ud(inf.userCfgAdmin))}
+          {this._tr(t('userCfgAdmin'), t(inf.userCfgAdmin))}
           {this._tr(t('adminState'), t(inf.adminStateConnector))}
           {this._tr(t('linkState'), t(inf.linkState))}
           {this._tr(t('duplex'), t(inf.duplex))}

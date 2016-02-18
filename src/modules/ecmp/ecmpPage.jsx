@@ -17,7 +17,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t, ed } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 
 

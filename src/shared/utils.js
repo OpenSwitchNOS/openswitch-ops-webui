@@ -29,7 +29,7 @@ function normalizeUserCfg(userCfg) {
     admin: (userCfg && userCfg.admin) || DEF_USER_CFG.admin,
     duplex: (userCfg && userCfg.duplex) || DEF_USER_CFG.duplex,
     autoNeg: (userCfg && userCfg.autoneg) || DEF_USER_CFG.autoNeg,
-    pause: (userCfg && userCfg.pause) || DEF_USER_CFG.flowCtrl,
+    flowCtrl: (userCfg && userCfg.pause) || DEF_USER_CFG.flowCtrl,
   };
 }
 
@@ -43,7 +43,6 @@ function userCfgForPatch(userCfg) {
   return patchUserCfg;
 }
 
-
 function parseInterface(inf) {
   const cfg = inf.configuration;
   const status = inf.status;
@@ -53,7 +52,7 @@ function parseInterface(inf) {
   const userCfgAdmin = userCfg.admin;
   const userCfgDuplex = userCfg.duplex;
   const userCfgAutoNeg = userCfg.autoNeg;
-  const userCfgFlowCtrl = userCfg.pause;
+  const userCfgFlowCtrl = userCfg.flowCtrl;
 
   const adminState = status.admin_state;
 

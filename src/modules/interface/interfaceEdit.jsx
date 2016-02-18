@@ -33,8 +33,7 @@ import _ from 'lodash';
 class InterfaceEdit extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
-    data: PropTypes.object.isRequired,
+    detail: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
   };
@@ -43,26 +42,28 @@ class InterfaceEdit extends Component {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
     this.fid = _.uniqueId('infEdit_');
-    this.state = { adminUserUp: this.props.data.inf.adminUserUp };
-    this.startState = { ...this.state };
+    const userCfg = { ...this.props.detail.inf.userCfg };
+    this.state = { userCfg };
   }
 
   _isDirty = () => {
-    return !_.isEqual(this.startState, this.state);
+    return !_.isEqual(this.state.userCfg, this.props.detail.inf.userCfg);
   };
 
   _onSubmit = () => {
-    this.props.onSubmit({ data: this.props.data, state: this.state });
+    this.props.onSubmit(this.props.detail, this.state.userCfg);
   };
 
   _id = s => `${this.fid}_${s}`;
 
-  _onChangeAdminConfigUp = () => {
-    this.setState({ adminUserUp: true });
+  _onChangeAdminUp = () => {
+    const userCfg = { ...this.state.userCfg, admin: 'up' };
+    this.setState({ userCfg });
   };
 
-  _onChangeAdminConfigDown = () => {
-    this.setState({ adminUserUp: false });
+  _onChangeAdminDown = () => {
+    const userCfg = { ...this.state.userCfg, admin: 'down' };
+    this.setState({ userCfg });
   };
 
   render() {
@@ -76,27 +77,27 @@ class InterfaceEdit extends Component {
         <Box pad="small" className="flex1">
           <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
             <Title>
-              {`${t('edit')} ${t('interface')}: ${this.props.data.inf.id}`}
+              {`${t('edit')} ${t('interface')}: ${this.props.detail.inf.id}`}
             </Title>
           </Header>
           <hr/>
           <Form>
             <Header>
-              <h3>{t('adminUser')}</h3>
+              <h3>{t('userCfgAdmin')}</h3>
             </Header>
             <FormFields>
               <fieldset>
                 <FormField>
                   <RadioButton
-                      id={this._id('adminConfigUp')}
+                      id={this._id('userCfgAdminUp')}
                       label={t('up')}
-                      checked={this.state.adminUserUp}
-                      onChange={this._onChangeAdminConfigUp} />
+                      checked={this.state.userCfg.admin === 'up'}
+                      onChange={this._onChangeAdminUp} />
                   <RadioButton
-                      id={this._id('adminConfigDown')}
+                      id={this._id('userCfgAdminDown')}
                       label={t('down')}
-                      checked={!this.state.adminUserUp}
-                      onChange={this._onChangeAdminConfigDown} />
+                      checked={this.state.userCfg.admin !== 'up'}
+                      onChange={this._onChangeAdminDown} />
                 </FormField>
               </fieldset>
             </FormFields>

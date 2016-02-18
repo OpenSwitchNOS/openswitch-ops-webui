@@ -87,7 +87,7 @@ function parsePort(port) {
   const cfg = port.body.configuration;
   return {
     etag: port.headers.etag,
-    id: cfg.id,
+    id: cfg.name,
     admin: cfg.admin,
   };
 }
@@ -109,33 +109,33 @@ const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 
 const ACTIONS = {
 
-  set(inf, userCfg, ports, port) {
+  set(detail, userCfg) {
     return (dispatch) => {
 
       const reqs = [];
 
       const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
-      const INF_URL = `${INFS_URL}/${inf.id}`;
+      const INF_URL = `${INFS_URL}/${detail.inf.id}`;
 
       if (Object.keys(PATCH_USER_CFG).length === 0) {
         reqs.push(cb => Agent.patch(INF_URL)
           .send([{op: 'remove', path: '/user_config'}])
-          .set('If-Match', inf.etag)
+          .set('If-Match', detail.inf.etag)
           .end(mkAgentHandler(INF_URL, cb))
         );
       } else {
         reqs.push(cb => Agent.patch(INF_URL)
           .send([{op: 'add', path: '/user_config', value: PATCH_USER_CFG}])
-          .set('If-Match', inf.etag)
+          .set('If-Match', detail.inf.etag)
           .end(mkAgentHandler(INF_URL, cb))
         );
       }
 
-      if (port) {
-        const PORT_URL = `${PORTS_URL}/${port.id}`;
+      if (detail.port) {
+        const PORT_URL = `${PORTS_URL}/${detail.port.id}`;
         reqs.push(cb => Agent.patch(PORT_URL)
           .send([{op: 'add', path: '/admin', value: userCfg.admin}])
-          .set('If-Match', port.etag)
+          .set('If-Match', detail.port.etag)
           .end(mkAgentHandler(PORT_URL, cb))
         );
       } else if (userCfg.admin === 'up') {
@@ -143,17 +143,18 @@ const ACTIONS = {
           .send({
             configuration: {
               admin: 'up',
-              name: inf.id,
+              name: detail.inf.id,
               interfaces: [ INF_URL ],
             },
             'referenced_by': [{uri: BRIDGE_URL}],
           })
-          .set('If-Match', ports.etag)
+          .set('If-Match', detail.ports.etag)
           .end(mkAgentHandler(PORTS_URL, cb))
         );
       }
 
-      const dispatcher = Dux.mkAsyncDispatcher(dispatch, DETAIL_AT);
+      Dux.dispatchRequest(dispatch, SET_AT);
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
       Async.parallel(reqs, dispatcher);
     };
   },
