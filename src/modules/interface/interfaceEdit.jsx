@@ -34,31 +34,36 @@ class InterfaceEdit extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    data: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
     this.fid = _.uniqueId('infEdit_');
-    this.state = { ...props.user };
+    this.state = { adminUserUp: this.props.data.inf.adminUserUp };
+    this.startState = { ...this.state };
   }
 
   _isDirty = () => {
-    return !_.isEqual(this.state, this.props.user);
+    return !_.isEqual(this.startState, this.state);
   };
 
   _onSubmit = () => {
-    this.props.onSubmit({ ...this.state });
+    this.props.onSubmit({ data: this.props.data, state: this.state });
   };
 
   _id = s => `${this.fid}_${s}`;
 
-  _onChangeAdminConfigUp = () => this.setState({ adminUserUp: true });
+  _onChangeAdminConfigUp = () => {
+    this.setState({ adminUserUp: true });
+  };
 
-  _onChangeAdminConfigDown = () => this.setState({ adminUserUp: false });
+  _onChangeAdminConfigDown = () => {
+    this.setState({ adminUserUp: false });
+  };
 
   render() {
     return (
@@ -70,7 +75,9 @@ class InterfaceEdit extends Component {
           align="right">
         <Box pad="small" className="flex1">
           <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-            <Title>{`${t('edit')} ${t('interface')}: ${this.state.id}`}</Title>
+            <Title>
+              {`${t('edit')} ${t('interface')}: ${this.props.data.inf.id}`}
+            </Title>
           </Header>
           <hr/>
           <Form>

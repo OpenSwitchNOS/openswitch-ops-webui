@@ -164,6 +164,9 @@ table.propTable {
     border: 3px solid $brand-color;
   }
 }
+.edit.layer {
+  z-index: 100;
+}
 
 @media screen and (min-width: 45em) {
   .guide {

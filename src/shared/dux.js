@@ -42,7 +42,9 @@ function protectedFn(moduleName, asyncName, fn, result) {
     return fn(result);
   } catch (e) {
     console.log(`DUX failure in: ${moduleName}/${asyncName}`);
-    console.log(`Exception message: ${e.message}`);
+    if (!window.jasmine) {
+      console.log(`Exception message: ${e.message}`, e.stack);
+    }
   }
   return {};
 }

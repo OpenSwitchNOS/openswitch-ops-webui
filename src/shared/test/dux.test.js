@@ -306,8 +306,8 @@ describe('dux', () => {
       error: {
         url: 'https://test.com/e404',
         status: undefined,
-        title: '404',
-        msg: undefined,
+        msg: '404',
+        respMsg: undefined,
       }
     });
   });
@@ -345,8 +345,8 @@ describe('dux', () => {
       error: {
         url: 'https://test.com/e404',
         status: undefined,
-        title: '404',
-        msg: undefined,
+        msg: '404',
+        respMsg: undefined,
       },
     });
   });

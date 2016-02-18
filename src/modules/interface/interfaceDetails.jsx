@@ -80,8 +80,8 @@ class InterfaceDetails extends Component {
     this.setState({ editMode });
   };
 
-  _onEditSubmit = (user) => {
-    this.props.actions.interface.set(user);
+  _onEditSubmit = (submit) => {
+    this.props.actions.interface.set(submit);
     this._onEditToggle();
   };
 
@@ -110,28 +110,15 @@ class InterfaceDetails extends Component {
           actions={this.props.actions}
           onClose={this._onEditToggle}
           onSubmit={this._onEditSubmit}
-          user={{
-            id,
-            adminUserUp: detail.inf.adminUserUp,
+          data={{
+            ports: detail.ports,
+            inf: detail.inf,
+            port: detail.port,
           }}
       />;
 
     const errorLayer = !set.lastError ? null :
       <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
-
-    // TODO: race condition with respect to the etag...
-    // <div>
-    //   <b>collector adminUserUp</b>{ud(this.props.collector.overview.interfaces[id] && this.props.collector.overview.interfaces[id].adminUserUp)}<br/>
-    //   <br/>
-    //   <b>detail.inf.adminUserUp</b>{ud(detail.inf.adminUserUp)}<br/>
-    //   <b>detail.inf.etag</b>{detail.inf.etag}<br/>
-    //   <br/>
-    //   <b>detail.port.adminUserUp</b>{ud(detail.port.adminUserUp)}<br/>
-    //   <b>detail.port.etag</b>{detail.port.etag}<br/>
-    //   <br/>
-    //   <b>page.ports.etag</b>{this.props.interface.page.portRefs.etag}<br/>
-    //   <br/>
-    // </div>
 
     const ipV4 = (port.id && port.ipV4) || t('notConfigured');
     const ipV6 = (port.id && port.ipV6) || t('notConfigured');
@@ -155,7 +142,7 @@ class InterfaceDetails extends Component {
         {errorLayer}
         <table style={{tableLayout: 'fixed'}} className="propTable">
           <tbody>
-          {this._tr(t('adminUser'), ud(inf.adminUserUp))}
+          {this._tr(t('userCfgAdmin'), ud(inf.userCfgAdmin))}
           {this._tr(t('adminState'), t(inf.adminStateConnector))}
           {this._tr(t('linkState'), t(inf.linkState))}
           {this._tr(t('duplex'), t(inf.duplex))}
@@ -163,8 +150,8 @@ class InterfaceDetails extends Component {
           {this._tr(t('connector'), inf.connector)}
           {this._tr(t('mac'), inf.mac)}
           {this._tr(t('mtu'), inf.mtu)}
-          {this._tr(t('autoNeg'), t(inf.autoNeg))}
-          {this._tr(t('flowControl'), t(inf.flowControl))}
+          {this._tr(t('autoNeg'), t(inf.userCfgAutoNeg))}
+          {this._tr(t('flowControl'), t(inf.userCfgFlowCtrl))}
           {this._tr(t('ipV4'), ipV4)}
           {this._tr(t('ipV6'), ipV6)}
           {this._tr(t('rxPackets'), inf.rxPackets)}

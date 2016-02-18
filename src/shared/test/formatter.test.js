@@ -16,7 +16,7 @@
 
 /*global describe, it, expect */
 
-import * as Formatter from '../formatter.js';
+import Formatter from '../formatter.js';
 
 describe('formatter', () => {
 

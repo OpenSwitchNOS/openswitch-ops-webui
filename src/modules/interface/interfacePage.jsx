@@ -51,8 +51,8 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'adminUserUp',
-        header: t('adminUser'),
+        columnKey: 'userCfgAdmin',
+        header: t('userCfgAdmin'),
         width: 215,
         format: ud,
       },
@@ -92,7 +92,6 @@ class InterfacePage extends Component {
     this.props.actions.toolbar.setFetchTB(
       this.props.collector.overview, this._onRefresh
     );
-    this.props.actions.interface.fetchPage();
   }
 
   _onRefresh = () => {
@@ -103,10 +102,6 @@ class InterfacePage extends Component {
     this.props.actions.toolbar.setFetchTB(
       nextProps.collector.overview, this._onRefresh
     );
-    if (nextProps.collector.overview.lastSuccessMillis >
-        this.props.collector.overview.lastSuccessMillis) {
-      this.props.actions.interface.fetchPage();
-    }
   }
 
   componentWillUnmount() {

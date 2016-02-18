@@ -39,8 +39,8 @@ export function parseError(url, error) {
   return {
     url,
     status: error.status,
-    title: error.message,
-    msg: resp && resp.error && resp.error.message,
+    msg: error.message,
+    respMsg: resp && resp.error && resp.error.message,
   };
 }
 

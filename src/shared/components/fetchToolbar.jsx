@@ -15,6 +15,7 @@
 */
 
 import React, { PropTypes, Component } from 'react';
+import { t } from 'i18n/lookup.js';
 import TimeAgo from 'react-timeago';
 import SpanStatus from 'spanStatus.jsx';
 import ErrorLayer from 'errorLayer.jsx';
@@ -28,8 +29,8 @@ export default class FetchToolbar extends Component {
     error: PropTypes.shape({
       url: PropTypes.string.isRequired,
       status: PropTypes.number,
-      title: PropTypes.string.isRequired,
-      msg: PropTypes.string,
+      msg: PropTypes.string.isRequired,
+      respMsg: PropTypes.string,
     }),
     isFetching: PropTypes.bool,
     onRefresh: PropTypes.func,
@@ -50,20 +51,25 @@ export default class FetchToolbar extends Component {
 
   render() {
     const p = this.props;
-    const e = p.error;
 
     let status = null;
     let detail = null;
 
     if (!p.isFetching) {
-      if (e) {
+      if (p.error) {
         status = (
           <SpanStatus onClick={this._onStatusClicked} value="error">
-            {e.title}
+            {t('failedRequest')}
           </SpanStatus>
         );
         if (this.state.showDetail) {
-          detail = <ErrorLayer error={e} onClose={this._onCloseDetail} />;
+          detail = (
+            <ErrorLayer
+                title={t('failedRequest')}
+                error={p.error}
+                onClose={this._onCloseDetail}
+            />
+          );
         }
       } else if (p.date) {
         status = <small><TimeAgo date={p.date}/></small>;

@@ -50,7 +50,6 @@ export const MESSAGES = {
 
   // messages
   adminState: 'Admin State',
-  adminUser: 'Admin User',
   alert: 'Alert',
   all: 'All',
   areYouSure: 'Are you sure?',
@@ -80,6 +79,7 @@ export const MESSAGES = {
   enabled: 'Enabled',
   error: 'Error',
   facility: 'Facility',
+  failedRequest: 'Failed Request',
   false: 'False',
   fans: 'Fans',
   fanFault: 'Fault',
@@ -171,6 +171,7 @@ export const MESSAGES = {
   up: 'Up',
   url: 'URL',
   user: 'User',
+  userCfgAdmin: 'Configured',
   utilization: 'Utilization',
   vendor: 'Vendor',
   vlans: 'VLANs',

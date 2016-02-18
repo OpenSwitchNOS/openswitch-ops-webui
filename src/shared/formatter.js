@@ -14,7 +14,7 @@
     under the License.
 */
 
-export function bpsToString(bitsPerSecond) {
+function bpsToString(bitsPerSecond) {
   if (isNaN(bitsPerSecond)) {
     throw new Error('Bits Per Second should be a Number');
   }
@@ -35,10 +35,15 @@ export function bpsToString(bitsPerSecond) {
 }
 
 
-export function mbpsToString(megaBitsPerSecond) {
+function mbpsToString(megaBitsPerSecond) {
   if (isNaN(megaBitsPerSecond)) {
     throw new Error('Bits Per Second should be a Number');
   }
   const stringToBeReturned = bpsToString(megaBitsPerSecond*1000000);
   return stringToBeReturned;
 }
+
+export default {
+  bpsToString,
+  mbpsToString,
+};

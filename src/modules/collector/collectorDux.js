@@ -17,7 +17,9 @@
 import Dux from 'dux.js';
 import InterfaceCache from './interfaceCache.js';
 import { TX, RX, TX_RX } from './interfaceData.js';
-import * as Formatter from 'formatter.js';
+import Formatter from 'formatter.js';
+import Utils from 'utils.js';
+
 
 const NAME = 'collector';
 
@@ -92,32 +94,10 @@ function parseInterfaces(infBody, now) {
   infBody.forEach((elm) => {
     const cfg = elm.configuration;
     if (cfg.type === 'system') {
-      const id = cfg.name;
-      const stats = elm.statistics.statistics;
-      const adminState = elm.status.admin_state;
-      const hwIntfInfo = elm.status.hw_intf_info;
-      const connector = hwIntfInfo ? hwIntfInfo.connector : 'absent';
-      const mac = hwIntfInfo ? hwIntfInfo.mac_addr.toUpperCase() : '';
-      const adminStateConnector = adminState === 'up' ? 'up'
-          : connector === 'absent' ? 'downAbsent' : 'down';
-      const speed = elm.status.link_speed ? Number(elm.status.link_speed) : 0;
-      const data = {
-        id,
-        adminUserUp: cfg.user_config && cfg.user_config.admin === 'up',
-        adminState,
-        adminStateConnector,
-        duplex: elm.status.duplex,
-        linkState: elm.status.link_state,
-        speed,
-        speedFormatted: Formatter.bpsToString(speed),
-        connector,
-        mac,
-        rxBytes: Number(stats.rx_bytes),
-        txBytes: Number(stats.tx_bytes)
-      };
+      const data = Utils.parseInterface(elm);
       if (data.linkState === 'up') {
         const interfaceData = interfaceCache.getOrCreateInterface(
-          id, data.speed, data.duplex
+          data.id, data.speed, data.duplex
         );
         if (data.duplex === 'half') {
           interfaceData.updateMetric(TX_RX, data.rxBytes + data.txBytes, now);
@@ -126,7 +106,7 @@ function parseInterfaces(infBody, now) {
           interfaceData.updateMetric(RX, data.rxBytes, now);
         }
       }
-      interfaces[id] = data;
+      interfaces[data.id] = data;
     }
   });
   return interfaces;
@@ -145,7 +125,6 @@ function parseOverviewResult(result) {
   const tempBody = result[5].body;
 
   const oi = ssBaseBody.status.other_info;
-  const sysOc = sysBody.configuration.other_config;
 
   // Info
 
@@ -253,6 +232,7 @@ function parseOverviewResult(result) {
 
   // LLDP
 
+  const sysOc = sysBody.configuration.other_config;
   const lldp = {
     enabled: sysOc && sysOc.lldp_enable === 'true',
   };

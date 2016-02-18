@@ -18,7 +18,8 @@ import Dux from 'dux.js';
 import InterfacePage from './interfacePage.jsx';
 import InterfaceDetails from './interfaceDetails.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
-import * as Formatter from 'formatter.js';
+import Async from 'async';
+import Utils from 'utils.js';
 
 
 const NAME = 'interface';
@@ -34,30 +35,18 @@ export const NAVS = [
   }
 ];
 
-const PAGE_ASYNC = 'page';
-const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
-
 const DETAIL_ASYNC = 'detail';
 const DETAIL_AT = Dux.mkAsyncActionTypes(NAME, DETAIL_ASYNC);
 
 const SET_ASYNC = 'set';
 const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
 
-const PORTS_URL = '/rest/v1/system/ports';
-const INFS_URL = '/rest/v1/system/interfaces';
-const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
-
-const PAGE_URLS = [ PORTS_URL ];
-
 const INITIAL_STORE = {
-  page: {
-    ...Dux.mkAsyncStore(),
-    portRefs: {
-      urls: [],
-    },
-  },
   detail: {
     ...Dux.mkAsyncStore(),
+    ports: {
+      urls: [],
+    },
     port: {},
     inf: {
       lldp: {},
@@ -68,194 +57,131 @@ const INITIAL_STORE = {
   }
 };
 
-function parsePageResult(result) {
-  const portRefs = {
-    urls: result[0].body,
-    etag: result[0].headers.etag
+function parseLldp(body) {
+  const ni = body.status.lldp_neighbor_info;
+  const ls = body.statistics.lldp_statistics;
+  return {
+    chassisName: (ni && ni.chassis_name) || '',
+    chassisId: (ni && ni.chassis_id) || '',
+    ip: (ni && ni.mgmt_ip_list) || '',
+    portId: (ni && ni.port_id) || '',
+    sysDesc: (ni && ni.chassis_description) || '',
+    capsSupported: (ni && ni.chassis_capability_available) || '',
+    capsEnabled: (ni && ni.chassis_capability_enabled) || '',
+
+    framesTx: (ls && ls.lldp_tx) || 0,
+    framesRx: (ls && ls.lldp_rx) || 0,
+    framesRxDiscarded: (ls && ls.lldp_rx_discard) || 0,
+    framesRxUnrecog: (ls && ls.lldp_rx_unrecognized) || 0,
   };
-  return { portRefs };
 }
 
-function parseLldp(body) {
-  const stat = body.statistics;
-  const sni = body.status.lldp_neighbor_info;
-  const sls = stat.lldp_statistics;
+function parsePorts(ports) {
   return {
-    chassisName: sni ? sni.chassis_name : '',
-    chassisId: sni ? sni.chassis_id : '',
-    ip: sni ? sni.mgmt_ip_list : '',
-    portId: sni ? sni.port_id : '',
-    sysDesc: sni ? sni.chassis_description : '',
-    capsSupported: sni ? sni.chassis_capability_available : '',
-    capsEnabled: sni ? sni.chassis_capability_enabled : '',
-    framesTx: sls ? sls.lldp_tx : '',
-    framesRx: sls ? sls.lldp_rx : '',
-    framesRxDiscarded: sls ? sls.lldp_rx_discard : '',
-    framesRxUnrecog: sls ? sls.lldp_rx_unrecognized : '',
+    etag: ports.headers.etag,
+    urls: ports.body,
+  };
+}
+
+function parsePort(port) {
+  const cfg = port.body.configuration;
+  return {
+    etag: port.headers.etag,
+    id: cfg.id,
+    admin: cfg.admin,
   };
 }
 
 function parseDetailResult(result) {
-  let cfg = result[0].body.configuration;
-  const cfgUc = cfg.user_config;
-  const adminUserUp = cfgUc && cfgUc.admin === 'up';
-  const status = result[0].body.status;
-  const stats = result[0].body.statistics.statistics;
-  const adminState = status.admin_state;
-  const hwIntfInfo = status.hw_intf_info;
-  const connector = hwIntfInfo ? hwIntfInfo.connector : 'absent';
-  const mac = hwIntfInfo ? hwIntfInfo.mac_addr.toUpperCase() : '';
-  const adminStateConnector = adminState === 'up' ? 'up'
-      : connector === 'absent' ? 'downAbsent' : 'down';
-  const speed = status.link_speed ? Number(status.link_speed) : 0;
-  const inf = {
-    id: cfg.name,
-    adminUserUp,
-    etag: result[0].headers.etag,
-    adminStateConnector,
-    linkState: status.link_state,
-    duplex: status.duplex,
-    speedFormatted: Formatter.bpsToString(speed),
-    connector,
-    mac,
-    mtu: status.mtu,
-    lldp: parseLldp(result[0].body),
-    autoNeg: (cfgUc && cfgUc.autoneg) || 'on',
-    flowControl: (cfgUc && cfgUc.pause) || 'off',
-    rxBytes: Number(stats.rx_bytes),
-    txBytes: Number(stats.tx_bytes),
-    rxPackets: Number(stats.rx_packets),
-    txPackets: Number(stats.tx_packets),
-    rxErrors: Number(stats.rx_errors),
-    txErrors: Number(stats.tx_errors),
-    rxDropped: Number(stats.rx_dropped),
-    txDropped: Number(stats.tx_dropped),
-  };
-  const port = {};
-  if (result.length > 1) {
-    cfg = result[1].body.configuration;
-    port.id = cfg.name;
-    port.adminUserUp = cfg.admin === 'up';
-    port.etag = result[1].headers.etag;
-  }
-  return { inf, port };
+  const ports = parsePorts(result.ports);
+
+  const inf = Utils.parseInterfaceResp(result.inf);
+  inf.lldp = parseLldp(result.inf.body);
+
+  const port = result.port ? parsePort(result.port) : {};
+
+  return { ports, inf, port };
 }
 
-function agentAddPort(id, mStore, cb) {
-  const INF_URL = `${INFS_URL}/${id}`;
-  const PORT_URL = `${PORTS_URL}/${id}`;
-  Agent
-    .post(PORT_URL)
-    .send({
-      configuration: {
-        name: id,
-        interfaces: [ INF_URL ],
-      },
-      'referenced_by': [{
-        uri: BRIDGE_URL,
-      }],
-    })
-    .set('If-Match', mStore.page.portRefs.etag)
-    .end(mkAgentHandler(PORT_URL, cb));
-}
-
-function checkAgentAddPort(id, mStore, cb) {
-  const PORT_URL = `${PORTS_URL}/${id}`;
-  if (mStore.page.portRefs.urls.indexOf(PORT_URL) > 0) {
-    return cb(null, {});
-  }
-  agentAddPort(id, mStore, cb);
-}
-
-function agentSetPortAdmin(id, mStore, up, cb) {
-  const PORT_URL = `${PORTS_URL}/${id}`;
-  Agent
-    .patch(PORT_URL)
-    .send([{
-      op: 'add',
-      path: '/admin',
-      value: up ? 'up' : 'down',
-    }])
-    .set('If-Match', mStore.detail.port.etag)
-    .end(mkAgentHandler(PORT_URL, cb));
-}
-
-function checkAgentSetPortAdmin(id, mStore, up, cb) {
-  if (mStore.detail.port.adminUserUp === up) { return cb(null, {}); }
-  agentSetPortAdmin(id, mStore, up, cb);
-}
-
-function agentSetInfAdmin(id, mStore, up, cb) {
-  const INF_URL = `${INFS_URL}/${id}`;
-  Agent
-    .patch(INF_URL)
-    .send([{
-      op: 'add',
-      path: '/user_config/admin',
-      value: up ? 'up' : 'down',
-    }])
-    .set('If-Match', mStore.detail.inf.etag)
-    .end(mkAgentHandler(INF_URL, cb));
-}
-
-function checkAgentSetInfAdmin(id, mStore, up, cb) {
-  if (mStore.detail.inf.adminUserUp === up) { return cb(null, {}); }
-  agentSetInfAdmin(id, mStore, up, cb);
-}
-
-function enable(dispatch, mStore, id) {
-  Dux.dispatchRequest(dispatch, SET_AT);
-  checkAgentAddPort(id, mStore, (e1) => {
-    if (e1) { return Dux.dispatchFail(dispatch, SET_AT, e1); }
-    checkAgentSetPortAdmin(id, mStore, true, (e2) => {
-      if (e2) { return Dux.dispatchFail(dispatch, SET_AT, e2); }
-      checkAgentSetInfAdmin(id, mStore, true, (e3) => {
-        if (e3) { return Dux.dispatchFail(dispatch, SET_AT, e3); }
-        return Dux.dispatchSuccess(dispatch, SET_AT);
-      });
-    });
-  });
-}
-
-function disable(dispatch, mStore, id) {
-  Dux.dispatchRequest(dispatch, SET_AT);
-  checkAgentSetPortAdmin(id, mStore, false, (e1) => {
-    if (e1) { return Dux.dispatchFail(dispatch, SET_AT, e1); }
-    checkAgentSetInfAdmin(id, mStore, false, (e2) => {
-      if (e2) { return Dux.dispatchFail(dispatch, SET_AT, e2); }
-      return Dux.dispatchSuccess(dispatch, SET_AT);
-    });
-  });
-}
+const PORTS_URL = '/rest/v1/system/ports';
+const INFS_URL = '/rest/v1/system/interfaces';
+const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 
 const ACTIONS = {
 
-  fetchPage() {
+  set(inf, userCfg, ports, port) {
     return (dispatch) => {
-      Dux.get(dispatch, PAGE_AT, PAGE_URLS);
+
+      const reqs = [];
+
+      const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
+      const INF_URL = `${INFS_URL}/${inf.id}`;
+
+      if (Object.keys(PATCH_USER_CFG).length === 0) {
+        reqs.push(cb => Agent.patch(INF_URL)
+          .send([{op: 'remove', path: '/user_config'}])
+          .set('If-Match', inf.etag)
+          .end(mkAgentHandler(INF_URL, cb))
+        );
+      } else {
+        reqs.push(cb => Agent.patch(INF_URL)
+          .send([{op: 'add', path: '/user_config', value: PATCH_USER_CFG}])
+          .set('If-Match', inf.etag)
+          .end(mkAgentHandler(INF_URL, cb))
+        );
+      }
+
+      if (port) {
+        const PORT_URL = `${PORTS_URL}/${port.id}`;
+        reqs.push(cb => Agent.patch(PORT_URL)
+          .send([{op: 'add', path: '/admin', value: userCfg.admin}])
+          .set('If-Match', port.etag)
+          .end(mkAgentHandler(PORT_URL, cb))
+        );
+      } else if (userCfg.admin === 'up') {
+        reqs.push(cb => Agent.post(PORTS_URL)
+          .send({
+            configuration: {
+              admin: 'up',
+              name: inf.id,
+              interfaces: [ INF_URL ],
+            },
+            'referenced_by': [{uri: BRIDGE_URL}],
+          })
+          .set('If-Match', ports.etag)
+          .end(mkAgentHandler(PORTS_URL, cb))
+        );
+      }
+
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, DETAIL_AT);
+      Async.parallel(reqs, dispatcher);
     };
   },
 
   fetchDetails(id) {
     const INF_URL = `${INFS_URL}/${id}`;
     const PORT_URL = `${PORTS_URL}/${id}`;
-    return (dispatch, getStoreFn) => {
-      const mStore = getStoreFn()[NAME];
-      const portExists = mStore.page.portRefs.urls.indexOf(PORT_URL) >= 0;
-      const urls = portExists ? [ INF_URL, PORT_URL ] : [ INF_URL ];
-      Dux.get(dispatch, DETAIL_AT, urls);
-    };
-  },
-
-  set(user) {
-    return (dispatch, getStoreFn) => {
-      const store = getStoreFn();
-      const mStore = store[NAME];
-      if (user.adminUserUp) {
-        enable(dispatch, mStore, user.id);
-      } else {
-        disable(dispatch, mStore, user.id);
-      }
+    return (dispatch) => {
+      Dux.dispatchRequest(dispatch, DETAIL_AT);
+      const gets = {
+        inf: cb => Agent.get(INF_URL).end(mkAgentHandler(INF_URL, cb)),
+        ports: cb => Agent.get(PORTS_URL).end(mkAgentHandler(PORTS_URL, cb)),
+      };
+      Async.parallel(gets, (e1, r1) => {
+        if (e1) {
+          return Dux.dispatchFail(dispatch, DETAIL_AT, e1);
+        }
+        if (r1.ports.body.indexOf(PORT_URL) < 0) {
+          return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
+        }
+        Agent.get(PORT_URL).end(mkAgentHandler(PORT_URL, (e2, r2) => {
+          if (e2) {
+            return Dux.dispatchFail(dispatch, DETAIL_AT, e2);
+          }
+          r1.port = r2;
+          return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
+        }));
+      });
     };
   },
 
@@ -266,7 +192,6 @@ const ACTIONS = {
 };
 
 const REDUCER = Dux.mkReducer(INITIAL_STORE, [
-  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
   Dux.mkAsyncHandler(NAME, DETAIL_ASYNC, DETAIL_AT, parseDetailResult),
   Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
 ]);

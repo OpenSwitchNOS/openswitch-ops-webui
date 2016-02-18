@@ -27,10 +27,11 @@ export default class ErrorLayer extends Component {
     error: PropTypes.shape({
       url: PropTypes.string.isRequired,
       status: PropTypes.number,
-      title: PropTypes.string.isRequired,
       msg: PropTypes.string,
+      respMsg: PropTypes.string,
     }).isRequired,
     onClose: PropTypes.func.isRequired,
+    title: PropTypes.string,
   };
 
   constructor(props) {
@@ -41,14 +42,20 @@ export default class ErrorLayer extends Component {
   render() {
     const p = this.props;
     return (
-      <StatusLayer className="error" value="error" onClose={p.onClose}
-          title={p.error.title} >
+      <StatusLayer
+          className="error"
+          value="error"
+          onClose={p.onClose}
+          title={this.props.title || t('error')} >
         <b>{t('status')}</b><br/>
         {p.error.status || t('none')}
         <p/>
+        <b>{t('message')}</b><br/>
+        {p.error.msg || t('none')}
+        <p/>
         <b>{t('url')}</b><br/>
         {p.error.url}
-        {p.error.msg ? <p><i>"{p.error.msg}"</i></p> : null}
+        {p.error.respMsg ? <p><i>"{p.error.respMsg}"</i></p> : null}
       </StatusLayer>
     );
   }
