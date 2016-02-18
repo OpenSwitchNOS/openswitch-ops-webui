@@ -116,6 +116,19 @@ const ACTIONS = {
     return (dispatch) => {
       const reqs = [];
 
+      // TODO: debug etag changing issue.
+      // console.log('=== SET ===');
+      //
+      // const store = getStoreFn()[NAME];
+      //
+      // console.log('=== detail.ports.etag', detail.ports.etag);
+      // console.log('=== detail.inf.etag', detail.inf.etag);
+      // console.log('=== detail.port.etag', detail.port.etag);
+      //
+      // console.log('=== store.detail.ports.etag', store.detail.ports.etag);
+      // console.log('=== store.detail.inf.etag', store.detail.inf.etag);
+      // console.log('=== store.detail.port.etag', store.detail.port.etag);
+
       if (Object.keys(PATCH_USER_CFG).length === 0) {
         reqs.push(cb => Agent.patch(INF_URL)
           .send([{op: 'remove', path: '/user_config'}])

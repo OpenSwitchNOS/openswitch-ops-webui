@@ -46,6 +46,8 @@ h1, h2, h3, .headline, .title {
   flex: $g $s $b;
   -webkit-flex: $g $s $b;
   -moz-flex: $g $s $b;
+  min-width: 0; //https://code.google.com/p/chromium/issues/detail?id=546034#c6
+  min-height: 0;
 }
 
 .flex0auto { @include flex(0, 0, auto); }
