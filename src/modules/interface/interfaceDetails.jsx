@@ -28,6 +28,7 @@ import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import ErrorLayer from 'errorLayer.jsx';
 import InterfaceEdit from './interfaceEdit.jsx';
 import _ from 'lodash';
+import Formatter from 'formatter.js';
 
 
 const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
@@ -106,7 +107,19 @@ class InterfaceDetails extends Component {
     const inf = detail.inf;
     const port = detail.port;
     const set = this.props.interface.set;
+    //TODO: Fix me
+    if (inf.rxPackets || inf.txPackets || inf.rxBytes || inf.rxErrors ||
+        inf.rxDropped || inf.txBytes || inf.txErrors || inf.txDropped) {
 
+      inf.rxPackets = Formatter.toCommaString(inf.rxPackets);
+      inf.txPackets = Formatter.toCommaString(inf.txPackets);
+      inf.rxBytes = Formatter.toCommaString(inf.rxBytes);
+      inf.txBytes = Formatter.toCommaString(inf.txBytes);
+      inf.rxErrors = Formatter.toCommaString(inf.rxErrors);
+      inf.txErrors = Formatter.toCommaString(inf.txErrors);
+      inf.rxDropped = Formatter.toCommaString(inf.rxDropped);
+      inf.txDropped = Formatter.toCommaString(inf.txDropped);
+    }
     const editLayer = !this.state.editMode ? null :
       <InterfaceEdit
           onClose={this._onEditToggle}
