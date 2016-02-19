@@ -95,7 +95,8 @@ function parsePort(port) {
 function parseDetailResult(result) {
   const ports = parsePorts(result.ports);
 
-  const inf = Utils.parseInterfaceResp(result.inf);
+  const inf = Utils.parseInterface(result.inf.body);
+  inf.etag = result.infCfg.headers.etag;
   inf.lldp = parseLldp(result.inf.body);
 
   const port = result.port ? parsePort(result.port) : {};
@@ -106,49 +107,38 @@ function parseDetailResult(result) {
 const PORTS_URL = '/rest/v1/system/ports';
 const INFS_URL = '/rest/v1/system/interfaces';
 const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
+const QP_CFG_SELECT = '?selector=configuration';
 
 const ACTIONS = {
 
   set(detail, userCfg) {
     const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
     const INF_URL = `${INFS_URL}/${detail.inf.id}`;
+    const INF_CFG_URL = `${INFS_URL}/${detail.inf.id}${QP_CFG_SELECT}`;
 
     return (dispatch) => {
       const reqs = [];
 
-      // TODO: debug etag changing issue.
-      // console.log('=== SET ===');
-      //
-      // const store = getStoreFn()[NAME];
-      //
-      // console.log('=== detail.ports.etag', detail.ports.etag);
-      // console.log('=== detail.inf.etag', detail.inf.etag);
-      // console.log('=== detail.port.etag', detail.port.etag);
-      //
-      // console.log('=== store.detail.ports.etag', store.detail.ports.etag);
-      // console.log('=== store.detail.inf.etag', store.detail.inf.etag);
-      // console.log('=== store.detail.port.etag', store.detail.port.etag);
-
       if (Object.keys(PATCH_USER_CFG).length === 0) {
-        reqs.push(cb => Agent.patch(INF_URL)
+        reqs.push(cb => Agent.patch(INF_CFG_URL)
           .send([{op: 'remove', path: '/user_config'}])
           .set('If-Match', detail.inf.etag)
-          .end(mkAgentHandler(INF_URL, cb))
+          .end(mkAgentHandler(INF_CFG_URL, cb))
         );
       } else {
-        reqs.push(cb => Agent.patch(INF_URL)
+        reqs.push(cb => Agent.patch(INF_CFG_URL)
           .send([{op: 'add', path: '/user_config', value: PATCH_USER_CFG}])
           .set('If-Match', detail.inf.etag)
-          .end(mkAgentHandler(INF_URL, cb))
+          .end(mkAgentHandler(INF_CFG_URL, cb))
         );
       }
 
       if (detail.port.id) {
-        const PORT_URL = `${PORTS_URL}/${detail.port.id}`;
-        reqs.push(cb => Agent.patch(PORT_URL)
+        const PORT_CFG_URL = `${PORTS_URL}/${detail.port.id}${QP_CFG_SELECT}`;
+        reqs.push(cb => Agent.patch(PORT_CFG_URL)
           .send([{op: 'add', path: '/admin', value: userCfg.admin}])
           .set('If-Match', detail.port.etag)
-          .end(mkAgentHandler(PORT_URL, cb))
+          .end(mkAgentHandler(PORT_CFG_URL, cb))
         );
       } else if (userCfg.admin === 'up') {
         reqs.push(cb => Agent.post(PORTS_URL)
@@ -173,13 +163,19 @@ const ACTIONS = {
 
   fetchDetails(id) {
     const INF_URL = `${INFS_URL}/${id}`;
+    const INF_CFG_URL = `${INFS_URL}/${id}${QP_CFG_SELECT}`;
     const PORT_URL = `${PORTS_URL}/${id}`;
+    const PORT_CFG_URL = `${PORTS_URL}/${id}${QP_CFG_SELECT}`;
 
     return (dispatch) => {
       Dux.dispatchRequest(dispatch, DETAIL_AT);
       const gets = {
-        inf: cb => Agent.get(INF_URL).end(mkAgentHandler(INF_URL, cb)),
-        ports: cb => Agent.get(PORTS_URL).end(mkAgentHandler(PORTS_URL, cb)),
+        inf:
+          cb => Agent.get(INF_URL).end(mkAgentHandler(INF_URL, cb)),
+        infCfg:
+          cb => Agent.get(INF_CFG_URL).end(mkAgentHandler(INF_CFG_URL, cb)),
+        ports:
+          cb => Agent.get(PORTS_URL).end(mkAgentHandler(PORTS_URL, cb)),
       };
       Async.parallel(gets, (e1, r1) => {
         if (e1) {
@@ -188,7 +184,7 @@ const ACTIONS = {
         if (r1.ports.body.indexOf(PORT_URL) < 0) {
           return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
         }
-        Agent.get(PORT_URL).end(mkAgentHandler(PORT_URL, (e2, r2) => {
+        Agent.get(PORT_CFG_URL).end(mkAgentHandler(PORT_CFG_URL, (e2, r2) => {
           if (e2) {
             return Dux.dispatchFail(dispatch, DETAIL_AT, e2);
           }

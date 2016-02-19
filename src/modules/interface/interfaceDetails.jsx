@@ -60,13 +60,6 @@ class InterfaceDetails extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO: debug etag changing issue
-    // if (this.props.interface.detail.inf.etag !== nextProps.interface.detail.inf.etag) {
-    //   console.log('ETAG CHANGED: ',
-    //     this.props.interface.detail.inf.etag,
-    //     nextProps.interface.detail.inf.etag
-    //   );
-    // }
     if (nextProps.interface.set.lastSuccessMillis >
         this.props.interface.set.lastSuccessMillis) {
 

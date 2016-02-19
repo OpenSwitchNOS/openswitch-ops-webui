@@ -104,16 +104,9 @@ function parseInterface(inf) {
   };
 }
 
-function parseInterfaceResp(resp) {
-  const inf = parseInterface(resp.body);
-  inf.etag = resp.headers.etag;
-  return inf;
-}
-
 export default {
   DEF_USER_CFG,
   normalizeUserCfg,
   userCfgForPatch,
   parseInterface,
-  parseInterfaceResp,
 };
