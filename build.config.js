@@ -15,12 +15,14 @@
 */
 
 import CollectorDux from 'collector/collectorDux.js';
+import MonitorDux from 'monitor/monitorDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
 
 const modules = [
   CollectorDux,
+  MonitorDux,
   OverviewDux,
   InterfaceDux,
   EcmpDux,
