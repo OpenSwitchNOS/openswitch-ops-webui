@@ -117,9 +117,6 @@ describe('formatter', () => {
   });
 
   it('handles isNaN for toCommaString', () => {
-    expect(() => {
-      Formatter.toCommaString('abc');
-    }).toThrow();
+    expect(Formatter.toCommaString('abc')).toEqual('');
   });
-
 });

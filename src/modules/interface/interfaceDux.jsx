@@ -89,6 +89,8 @@ function parsePort(port) {
     etag: port.headers.etag,
     id: cfg.name,
     admin: cfg.admin,
+    ipV4: cfg.ip4_address,
+    ipV6: cfg.ip6_address,
   };
 }
 
