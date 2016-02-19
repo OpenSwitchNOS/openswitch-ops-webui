@@ -16,6 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import Header from 'grommet/components/Header';
+import Box from 'grommet/components/Box';
 import Form from 'grommet/components/Form';
 import Title from 'grommet/components/Title';
 import Layer from 'grommet/components/Layer';
@@ -26,7 +27,9 @@ import { t } from 'i18n/lookup.js';
 export default class StatusLayer extends Component {
 
   static propTypes = {
+    box: PropTypes.bool,
     children: PropTypes.node,
+    className: PropTypes.string,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string,
     value: PropTypes.string,
@@ -49,19 +52,32 @@ export default class StatusLayer extends Component {
         title = t('information');
       }
     }
+
+    const content = (
+      <div>
+        <Header>
+          <Title>
+            <SpanStatus size="large" space={false} value={value}>
+            {title}
+            </SpanStatus>
+          </Title>
+        </Header>
+        <br/>
+        {this.props.children}
+      </div>
+    );
+
+    const boxOrForm = this.props.box
+      ? <Box pad="medium">{content}</Box> : <Form>{content}</Form>;
+
     return (
-      <Layer onClose={this.props.onClose} closer flush align="top">
-        <Form>
-          <Header>
-            <Title>
-              <SpanStatus size="large" space={false} value={value}>
-              {title}
-              </SpanStatus>
-            </Title>
-          </Header>
-          <br/>
-          {this.props.children}
-        </Form>
+      <Layer
+          className={this.props.className}
+          onClose={this.props.onClose}
+          closer
+          flush
+          align="top">
+        {boxOrForm}
       </Layer>
     );
   }

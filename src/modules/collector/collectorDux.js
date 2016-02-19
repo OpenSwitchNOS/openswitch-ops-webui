@@ -15,43 +15,44 @@
 */
 
 import Dux from 'dux.js';
-import DataPoint from 'dataPoint.js';
-import Metric from 'metric.js';
-import * as Calc from 'calc.js';
+import InterfaceCache from './interfaceCache.js';
+import { TX, RX, TX_RX } from './interfaceData.js';
+import Formatter from 'formatter.js';
+import Utils from 'utils.js';
 
 
 const NAME = 'collector';
+
+const OVERVIEW_ASYNC = 'overview';
+const OVERVIEW_AT = Dux.mkAsyncActionTypes(NAME, OVERVIEW_ASYNC);
 
 const URLS = [
   '/rest/v1/system/subsystems/base',
   '/rest/v1/system',
   '/rest/v1/system/interfaces?depth=1',
-  '/rest/v1/system/ports?depth=1',
   '/rest/v1/system/subsystems/base/power_supplies?depth=1',
   '/rest/v1/system/subsystems/base/fans?depth=1',
   '/rest/v1/system/subsystems/base/temp_sensors?depth=1',
 ];
 
 const AUTO_ACTIONS = {
-  fetch() { return Dux.fetchAction(NAME, URLS); }
+  fetch() {
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      Dux.getIfCooledDown(dispatch, mStore, OVERVIEW_ASYNC, OVERVIEW_AT, URLS);
+    };
+  },
 };
 
-const INITIAL_STORE = {
-  info: {},
-  interfaces: {},
-  interfaceUtlMetrics: {},
-  interfaceUtlMetricsTop: [],
-  ports: {},
-  powerSupplies: {},
-  powerSuppliesRollup: {},
-  fans: {},
-  fansRollup: {},
-  temps: {},
-  tempsRollup: {},
+const ACTIONS = {
+  fetchImmediate() {
+    return (dispatch) => {
+      Dux.get(dispatch, OVERVIEW_AT, URLS);
+    };
+  },
 };
 
-// Stores { txMetric, rxMetric, txRxMetric, prevData } for each entity.
-const interfaceCache = {};
+const interfaceCache = new InterfaceCache();
 
 function normalizePowerStatus(s) {
   if (s === 'ok') {
@@ -88,101 +89,48 @@ function normalizeTempStatus(id, s) {
   };
 }
 
-function getOrCreateCachedInterface(data) {
-  const id = data.id;
-  let cachedInterface = interfaceCache[id];
-
-  if (cachedInterface) {
-    // we have a cached interface make sure it is still valid
-    if (cachedInterface.duplex !== data.duplex ||
-        cachedInterface.speed !== data.speed) {
-      cachedInterface = null;
+function parseInterfaces(infBody, now) {
+  const interfaces = {};
+  infBody.forEach((elm) => {
+    const cfg = elm.configuration;
+    if (cfg.type === 'system') {
+      const data = Utils.parseInterface(elm);
+      if (data.linkState === 'up') {
+        const interfaceData = interfaceCache.getOrCreateInterface(
+          data.id, data.speed, data.duplex
+        );
+        if (data.duplex === 'half') {
+          interfaceData.updateMetric(TX_RX, data.rxBytes + data.txBytes, now);
+        } else if (data.duplex === 'full') {
+          interfaceData.updateMetric(TX, data.txBytes, now);
+          interfaceData.updateMetric(RX, data.rxBytes, now);
+        }
+      }
+      interfaces[data.id] = data;
     }
-  }
-
-  if (!cachedInterface) {
-    if (data.duplex === 'half') {
-      const txRxMetric = new Metric()
-        .setName(`${id}-TxRx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      cachedInterface = { txRxMetric };
-    } else {
-      const txMetric = new Metric()
-        .setName(`${id}-Tx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      const rxMetric = new Metric()
-        .setName(`${id}-Rx`)
-        .setUnits('%')
-        .setColorIndex('graph-3');
-      cachedInterface = { txMetric, rxMetric };
-    }
-
-    interfaceCache[id] = cachedInterface;
-  }
-
-  return cachedInterface;
+  });
+  return interfaces;
 }
 
-function processInterfaceMetric(metric, now, pTs, pBytes, cBytes, spd) {
-  const interval = now - pTs;
-  if (interval > 0) {
-    const rawUtl = Calc.utilization(pBytes, cBytes, spd, interval);
-    const utl = Math.round(rawUtl);
-    metric.addDataPoint(new DataPoint(utl, now));
-    return metric;
-  }
-  return null;
-}
+function parseOverviewResult(result) {
 
-function processInterfaceUtilization(data, modMetrics) {
-  const cachedInterface = getOrCreateCachedInterface(data);
-  const cd = data;            // current data
-  const pd = cachedInterface; // previous data
-  const ts = Date.now();
-  if (cd.linkState === 'up') {
-    if (cd.duplex === 'half') {
-      const metric = cachedInterface.txRxMetric;
-      const pBytes = pd.rxBytes + pd.txBytes;
-      const cBytes = cd.rxBytes + cd.txBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-    } else {
-      let metric = cachedInterface.txMetric;
-      let pBytes = pd.txBytes;
-      let cBytes = cd.txBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-      metric = cachedInterface.rxMetric;
-      pBytes = pd.rxBytes;
-      cBytes = cd.rxBytes;
-      if (processInterfaceMetric(metric, ts, pd.ts, pBytes, cBytes, cd.speed)) {
-        modMetrics[metric.getName()] = metric;
-      }
-    }
-  }
-  // Save the current data (which will be prevData next time).
-  cachedInterface.rxBytes = data.rxBytes;
-  cachedInterface.txBytes = data.txBytes;
-  cachedInterface.speed = data.speed;
-  cachedInterface.duplex = data.duplex;
-  cachedInterface.ts = ts;
-}
+  // Define some useful constants...
 
-function parseResult(result) {
+  const now = Date.now();
   const ssBaseBody = result[0].body;
   const sysBody = result[1].body;
   const infBody = result[2].body;
-  const portBody = result[3].body;
-  const pwrBody = result[4].body;
-  const fanBody = result[5].body;
-  const tempBody = result[6].body;
+  const pwrBody = result[3].body;
+  const fanBody = result[4].body;
+  const tempBody = result[5].body;
 
   const oi = ssBaseBody.status.other_info;
+
+  // Info
+
+  const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
   const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
+
   const info = {
     hostname: sysBody.configuration.hostname,
     version: sysBody.status.switch_version,
@@ -192,48 +140,20 @@ function parseResult(result) {
     baseMac,
     serialNum: oi.serial_number,
     vendor: oi.vendor,
-    maxInterfaceSpeed: oi.max_interface_speed,
+    maxInterfaceSpeed,
     mtu: oi.max_transmission_unit,
     interfaceCount: oi.interface_count,
   };
 
-  const interfaceUtlMetrics = {};
-  const interfaces = {};
-  infBody.forEach((elm) => {
-    const cfg = elm.configuration;
-    if (cfg.type === 'system') {
-      const id = cfg.name;
-      const stats = elm.statistics.statistics;
-      const data = {
-        id,
-        adminState: elm.status.admin_state,
-        linkState: elm.status.link_state,
-        duplex: elm.status.duplex,
-        speed: elm.status.link_speed,
-        connector: elm.status.pm_info.connector,
-        rxBytes: Number(stats.rx_bytes),
-        txBytes: Number(stats.tx_bytes)
-      };
-      processInterfaceUtilization(data, interfaceUtlMetrics);
-      interfaces[id] = data;
-    }
-  });
+  // Interfaces
 
-  const interfaceUtlMetricsTop = [];
-  Object.getOwnPropertyNames(interfaceUtlMetrics).forEach(k => {
-    interfaceUtlMetricsTop.push(interfaceUtlMetrics[k]);
-  });
-  interfaceUtlMetricsTop.sort((m1, m2) => {
-    return m2.latestDataPoint().value() - m1.latestDataPoint().value();
-  });
+  const interfaces = parseInterfaces(infBody, now);
 
-  const ports = {};
-  portBody.forEach((elm) => {
-    const id = elm.configuration.name;
-    ports[id] = {
-      id
-    };
-  });
+  const metrics = interfaceCache.metrics(now);
+  const interfaceMetrics = metrics.all;
+  const interfaceTopMetrics = metrics.top;
+
+  // Power Supplies
 
   const powerSupplies = {};
   let critical = 0;
@@ -258,8 +178,9 @@ function parseResult(result) {
   let status = critical ? 'critical' :
     warning ? 'warning' :
       ok ? 'ok' : 'unknown';
-
   const powerSuppliesRollup = { status, critical, warning, ok };
+
+  // Fans
 
   const fans = {};
   critical = 0;
@@ -268,10 +189,14 @@ function parseResult(result) {
   fanBody.forEach((elm) => {
     const id = elm.status.name;
     const ps = normalizeFanStatus(elm.status.status);
+    const cfg = elm.configuration;
     fans[id] = {
       id,
       text: ps.text,
       status: ps.status,
+      dir: cfg.direction,
+      speed: cfg.speed,
+      rpm: elm.status.rpm
     };
     if (ps.status === 'critical') {
       critical++;
@@ -285,6 +210,8 @@ function parseResult(result) {
     warning ? 'warning' :
       ok ? 'ok' : 'unknown';
   const fansRollup = { status, critical, warning, ok };
+
+  // Temperatures
 
   const temps = {};
   critical = 0;
@@ -307,25 +234,66 @@ function parseResult(result) {
       ok ? 'ok' : 'unknown';
   const tempsRollup = { status, critical, warning, ok };
 
+  // LLDP
+
+  const sysOc = sysBody.configuration.other_config;
+  const lldp = {
+    enabled: sysOc && sysOc.lldp_enable === 'true',
+  };
+
+  // ECMP
+
+  const ecmpCfg = sysBody.configuration.ecmp_config;
+  const ecmp = {
+    enabled: ecmpCfg && ecmpCfg.enabled === 'false' ? 'disabled' : 'enabled',
+    hashDstIp: ecmpCfg && ecmpCfg.hash_dstip_enabled === 'false' ? 'disabled' : 'enabled',
+    hashDstPort: ecmpCfg && ecmpCfg.hash_dstport_enabled === 'false' ? 'disabled' : 'enabled',
+    hashSrcIp: ecmpCfg && ecmpCfg.hash_srcip_enabled === 'false' ? 'disabled' : 'enabled',
+    hashSrcPort: ecmpCfg && ecmpCfg.hash_srcport_enabled === 'false' ? 'disabled' : 'enabled',
+    resilientHash: ecmpCfg && ecmpCfg.resilient_hash_enabled === 'false' ? 'disabled' : 'enabled',
+  };
+
   return {
     info,
     interfaces,
-    interfaceUtlMetrics,
-    interfaceUtlMetricsTop,
-    ports,
+    interfaceMetrics,
+    interfaceTopMetrics,
     powerSupplies,
     powerSuppliesRollup,
     fans,
     fansRollup,
     temps,
     tempsRollup,
+    lldp,
+    ecmp,
   };
 }
 
-const REDUCER = Dux.fetchReducer(NAME, INITIAL_STORE, parseResult);
+const INITIAL_STORE = {
+  overview: {
+    ...Dux.mkAsyncStore(),
+    info: {},
+    interfaces: {},
+    interfaceMetrics: {},
+    interfaceTopMetrics: [],
+    powerSupplies: {},
+    powerSuppliesRollup: { status: 'unknown' },
+    fans: {},
+    fansRollup: { status: 'unknown' },
+    temps: {},
+    tempsRollup: { status: 'unknown' },
+    lldp: {},
+    ecmp: {},
+  }
+};
+
+const REDUCER = Dux.mkReducer(INITIAL_STORE, [
+  Dux.mkAsyncHandler(NAME, OVERVIEW_ASYNC, OVERVIEW_AT, parseOverviewResult),
+]);
 
 export default {
   NAME,
   AUTO_ACTIONS,
+  ACTIONS,
   REDUCER,
 };

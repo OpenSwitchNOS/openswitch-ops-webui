@@ -139,7 +139,10 @@ class SyslogPage extends Component {
 
   componentDidMount() {
     this.props.actions.syslog.fetch(this._buildFilter());
-    this.props.actions.toolbar.setFetchTB(this.props.syslog, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      this.props.syslog.page,
+      this._onRefresh
+    );
   }
 
   _onRefresh = () => {
@@ -147,7 +150,10 @@ class SyslogPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.syslog, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.syslog.page,
+      this._onRefresh
+    );
   }
 
   componentWillUnmount() {
@@ -209,7 +215,7 @@ class SyslogPage extends Component {
   };
 
   render() {
-    const syslogProps = this.props.syslog;
+    const syslogProps = this.props.syslog.page;
     return (
       <Box className="flex1">
         <Box className="pageBox flex0auto">

@@ -77,37 +77,37 @@ describe('agent', () => {
   it('parses errors with various responses', () => {
     const error = {
       status: '201',
-      message: 'title',
+      message: 'abc',
     };
     expect(parseError('https://test.com/data1', error)).toEqual({
       url: 'https://test.com/data1',
       status: '201',
-      title: 'title',
-      msg: undefined,
+      msg: 'abc',
+      respMsg: undefined,
     });
 
     error.response = {};
     expect(parseError('https://test.com/data1', error)).toEqual({
       url: 'https://test.com/data1',
       status: '201',
-      title: 'title',
-      msg: undefined,
+      msg: 'abc',
+      respMsg: undefined,
     });
 
     error.response = { error: {} };
     expect(parseError('https://test.com/data1', error)).toEqual({
       url: 'https://test.com/data1',
       status: '201',
-      title: 'title',
-      msg: undefined,
+      msg: 'abc',
+      respMsg: undefined,
     });
 
     error.response = { error: { message: 'msg' } };
     expect(parseError('https://test.com/data1', error)).toEqual({
       url: 'https://test.com/data1',
       status: '201',
-      title: 'title',
-      msg: 'msg',
+      msg: 'abc',
+      respMsg: 'msg',
     });
 
   });
@@ -144,8 +144,8 @@ describe('agent', () => {
       expect(err).toEqual({
         url: `${getPrefix()}/e404`,
         status: undefined,
-        title: '404',
-        msg: undefined,
+        msg: '404',
+        respMsg: undefined,
       });
     }));
   });
@@ -187,8 +187,8 @@ describe('agent', () => {
         expect(err).toEqual({
           url: `${getPrefix()}/e404`,
           status: undefined,
-          title: '404',
-          msg: undefined,
+          msg: '404',
+          respMsg: undefined,
         });
       }
     );

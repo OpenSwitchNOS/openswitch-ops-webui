@@ -16,11 +16,12 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, ed } from 'i18n/lookup.js';
+
 import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
-import FetchToolbar from 'fetchToolbar.jsx';
+
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
@@ -47,29 +48,21 @@ class OverviewPage extends Component {
     };
   }
 
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
-  };
-
-  componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(this.props.collector, this._onRefresh);
-  }
-
   _onRefresh = () => {
     this.props.autoActions.collector.fetch();
   };
 
+  componentDidMount() {
+    this.props.autoActions.collector.fetch();
+    this.props.actions.toolbar.setFetchTB(
+      this.props.collector.overview, this._onRefresh
+    );
+  }
+
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.overview, this._onRefresh
+    );
   }
 
   componentWillUnmount() {
@@ -77,15 +70,15 @@ class OverviewPage extends Component {
   }
 
   _mkSystemProps = () => {
-    const info = this.props.collector.info;
+    const info = this.props.collector.overview.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
             <td style={{width: '140px', verticalAlign: 'top'}}>
-              {t('productName')}:
+              {t('partNumber')}:
             </td>
-            <td>{info.product}</td>
+            <td>{info.partNum}</td>
           </tr>
           <tr>
             <td>{t('serialNumber')}:</td>
@@ -113,16 +106,16 @@ class OverviewPage extends Component {
   };
 
   _mkPowerSuppliesProps = () => {
-    const ps = this.props.collector.powerSupplies;
+    const ps = this.props.collector.overview.powerSupplies;
     const trs = [];
-    Object.getOwnPropertyNames(ps).forEach(k => {
+    Object.getOwnPropertyNames(ps).sort().forEach(k => {
       const data = ps[k];
       trs.push(
         <tr key={data.id}>
           <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
-            {t(data.text)}
+              {t(data.text)}
             </SpanStatus>
           </td>
         </tr>
@@ -138,16 +131,23 @@ class OverviewPage extends Component {
   };
 
   _mkFansProps = () => {
-    const fans = this.props.collector.fans;
+    const fans = this.props.collector.overview.fans;
     const trs = [];
-    Object.getOwnPropertyNames(fans).forEach(k => {
+    Object.getOwnPropertyNames(fans).sort().forEach(k => {
       const data = fans[k];
+      const spd = <span><b>{t('speed')}:&nbsp;</b>{data.speed}</span>;
+      const rpm = <span><b>{t('rpm')}:&nbsp;</b>{data.rpm}</span>;
+      const dir = t(data.dir);
       trs.push(
         <tr key={data.id}>
-          <td>{data.id}:</td>
+          <td>
+          {`${data.id}:`}
+          </td>
           <td>
             <SpanStatus value={data.status}>
-            {t(data.text)}
+              {t(data.text)}
+              &nbsp;&nbsp;
+              <i>({spd},&nbsp;{rpm},&nbsp;{dir})</i>
             </SpanStatus>
           </td>
         </tr>
@@ -163,17 +163,21 @@ class OverviewPage extends Component {
   };
 
   _mkTempsProps = () => {
-    const temps = this.props.collector.temps;
+    const temps = this.props.collector.overview.temps;
     const trs = [];
-    Object.getOwnPropertyNames(temps).forEach(k => {
+    Object.getOwnPropertyNames(temps).sort().forEach(k => {
       const data = temps[k];
+      const loc = <span><b>{t('location')}:&nbsp;</b>{data.location}</span>;
       trs.push(
         <tr key={data.id}>
-          <td>{data.id}&nbsp;{data.location}:</td>
+          <td>{data.id}:</td>
           <td>
             <SpanStatus value={data.status}>
               {`${data.value} ${t('degreesCelsius')}`}
             </SpanStatus>
+          </td>
+          <td>
+            <i>({loc})</i>
           </td>
         </tr>
       );
@@ -218,36 +222,36 @@ class OverviewPage extends Component {
   };
 
   _mkFeatureProps = () => {
+    const data = this.props.collector.overview;
+    const info = data.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
           <tr>
-            <td style={{width: '180px'}}>{t('Protocol#1')}:</td>
-            <td>{t('disabled')}</td>
+            <td style={{width: '180px'}}>{t('lldp')}:</td>
+            <td>{ed(data.lldp.enabled)}</td>
           </tr>
+
           <tr>
-            <td>{t('Protocol#2')}:</td>
-            <td>{t('enabled')}</td>
+            <td style={{width: '180px'}}>{t('ecmp')}:</td>
+            <td>{t(data.ecmp.enabled)}</td>
           </tr>
-          <tr>
-            <td>{t('Protocol#3')}:</td>
-            <td>{t('enabled')}</td>
-          </tr>
+
           <tr>
             <td>{t('vlans')}:</td>
             <td>TBD</td>
           </tr>
           <tr>
             <td>{t('interfaces')}:</td>
-            <td>{this.props.collector.info.interfaceCount}</td>
+            <td>{info.interfaceCount}</td>
           </tr>
           <tr>
             <td>{t('mtu')}:</td>
-            <td>{this.props.collector.info.mtu}</td>
+            <td>{info.mtu}</td>
           </tr>
           <tr>
             <td>{t('maxInterfaceSpeed')}:</td>
-            <td>{this.props.collector.info.maxInterfaceSpeed}</td>
+            <td>{info.maxInterfaceSpeed}</td>
           </tr>
         </tbody>
       </table>
@@ -255,13 +259,14 @@ class OverviewPage extends Component {
   };
 
   _onSelectInterface = (metric) => {
-    this.props.history.pushState(null,
-      `/monitorInterface/${metric.getName()}`
+    this.props.history.pushState(
+      null,
+      `/monitorInterface/${metric.getGroup()}`
     );
   };
 
   render() {
-    const coll = this.props.collector;
+    const coll = this.props.collector.overview;
 
     const psRollup = this._mkRollup(
       'powerSupplies',
@@ -285,7 +290,8 @@ class OverviewPage extends Component {
       <StatusLayer
           onClose={this._onToggleTempsLayer}
           title={t('temperatures')}
-          value={coll.tempsRollup.status}>
+          value={coll.tempsRollup.status}
+          box >
           {this._mkTempsProps()}
       </StatusLayer>;
 
@@ -298,12 +304,13 @@ class OverviewPage extends Component {
       <StatusLayer
           onClose={this._onToggleFansLayer}
           title={t('fans')}
-          value={coll.fansRollup.status}>
+          value={coll.fansRollup.status}
+          box >
           {this._mkFansProps()}
       </StatusLayer>;
 
     let trafficMetricsCaption = null;
-    const trafficMetrics = coll.interfaceUtlMetricsTop.slice(
+    const trafficMetrics = coll.interfaceTopMetrics.slice(
       0, NUM_TRAFFIC_METRICS
     );
 
@@ -321,31 +328,30 @@ class OverviewPage extends Component {
         const newDate = new Date(m.latestDataPoint().ts()).toLocaleTimeString();
         trafficMetricsCaption = (
           <div>
-            <div style={{textAlign: 'right'}}><small>
-              {`${oldDate} - ${newDate}`}
-            </small></div>
-            <div style={{textAlign: 'right'}}><small>
-              {`(${m.size()} ${t('dataPoints')})`}
-            </small></div>
+            <small>
+              {`${oldDate} - ${newDate} (${m.size()} ${t('dataPoints')})`}
+            </small>
           </div>
         );
       }
     }
 
+    // TODO: Warning: validateDOMNesting(...): <span> cannot appear as a child of <tbody>. See OverviewPage > tbody > StatusLayer > Layer > span.
+
     return (
       <Box className="flex1">
         <Box direction="row" className="flex0auto flexWrap">
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('system')}</b>
             <hr/>
             {this._mkSystemProps()}
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('features')}</b>
             <hr/>
             {this._mkFeatureProps()}
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('hardware')}</b>
             <hr/>
             <table className="propTable">
@@ -359,19 +365,19 @@ class OverviewPage extends Component {
               </tbody>
             </table>
           </Box>
-          <Box pad={this.pad} className="flex1 pageBox min200x200">
-            <b>{t('traffic')}</b>
+          <Box pad={this.pad} className="flex1 pageBox min300x300">
+            <b>{t('topInterfaceUtilization')}</b>
             <hr/>
             <MetricTable
                 simple
                 onSelect={this._onSelectInterface}
-                widths={{label: '70px', value: '70px'}}
+                widths={{label: '90px', value: '70px'}}
                 metrics={trafficMetrics}
             />
             {trafficMetricsCaption}
           </Box>
         </Box>
-        <Box pad={this.pad} className="flex1 pageBox min200x400">
+        <Box pad={this.pad} className="flex1 pageBox min300x400">
           <span><b>{t('log')}&nbsp;&nbsp;</b><small>start-time to end-time</small></span>
           <hr/>
           <Table>

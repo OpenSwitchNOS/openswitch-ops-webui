@@ -15,25 +15,25 @@
 */
 
 import CollectorDux from 'collector/collectorDux.js';
-import SyslogDux from 'syslog/syslogDux.jsx';
+import MonitorDux from 'monitor/monitorDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
-import VlanDux from 'vlan/vlanDux.jsx';
-
+import EcmpDux from 'ecmp/ecmpDux.jsx';
 
 const modules = [
   CollectorDux,
+  MonitorDux,
   OverviewDux,
   InterfaceDux,
-  VlanDux,
-  SyslogDux,
+  EcmpDux,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
-
+import As5712 from 'boxGraphics/as5712.jsx';
 
 const settings = {
   i18nLocale,
+  boxGraphic: As5712,
   reduxLogger: true,
   agent: {
     prefix: `http://${window.location.hostname}:8091`,

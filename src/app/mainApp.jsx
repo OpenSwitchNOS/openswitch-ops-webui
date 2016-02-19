@@ -21,7 +21,7 @@ import './mainApp.scss';
 import React, { PropTypes, Component } from 'react';
 import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { navt } from 'i18n/lookup.js';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -33,6 +33,7 @@ import NotificationIcon from 'grommet/components/icons/base/Notification';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import NextIcon from 'grommet/components/icons/base/Next';
 
 import LoginLayer from 'loginLayer.jsx';
 
@@ -109,7 +110,7 @@ class MainApp extends Component {
       const name = [];
       const parts = linkPath.split('/');
       parts.forEach(p => {
-        if (p) { name.push(t(p)); }
+        if (p) { name.push(navt(p)); }
       });
       return name.join('/');
     }
@@ -135,19 +136,20 @@ class MainApp extends Component {
     const pageHdr = (
       <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
           justify="between">
-        <Menu direction="row" align="center" responsive={false}>
-          {!this.props.nav.paneActive ?
-            <Title onClick={this._onPageNavClicked}>{'>>>'}</Title>
-            : null
+        <Box direction="row" align="center" responsive={false}>
+          {this.props.nav.paneActive ? null :
+            <Anchor onClick={this._onPageNavClicked}>
+              <NextIcon />
+            </Anchor>
           }
           <Title>{this._linkPathName()}</Title>
-        </Menu>
-        <Menu direction="row" align="center" responsive={false}>
+        </Box>
+        <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar.component}
           <a href="#/syslog">
             <NotificationIcon/><small>{numSyslog}</small>
           </a>
-        </Menu>
+        </Box>
       </Header>
     );
 
@@ -204,11 +206,11 @@ class MainApp extends Component {
     const splitContent = (
       <Split flex="right" onResponsive={this._onNavSplitResponsive}
           priority="left">
-        <Box direction="row">
+        <Box responsive={false} direction="row">
           {guide}
           {nav}
         </Box>
-        <Box direction="row">
+        <Box responsive={false} direction="row">
           <Box id="page" className="flex1">
             {pageHdr}
             {page}

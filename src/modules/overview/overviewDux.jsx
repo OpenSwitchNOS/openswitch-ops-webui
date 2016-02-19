@@ -16,7 +16,6 @@
 
 import OverviewPage from './overviewPage.jsx';
 
-
 const NAME = 'overview';
 
 const NAVS = [

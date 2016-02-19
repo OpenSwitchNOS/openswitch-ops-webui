@@ -20,7 +20,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { orderForGroup } from './navGroups.js';
-import { t } from 'i18n/lookup.js';
+import { t, navt } from 'i18n/lookup.js';
 
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
@@ -35,6 +35,9 @@ import HelpIcon from 'grommet/components/icons/base/Help';
 import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
+
+const API_LINK = `http://${window.location.hostname}:8091/api/index.html`;
+const OPS_LINK = 'http://openswitch.net';
 
 class NavSideBar extends Component {
 
@@ -79,7 +82,7 @@ class NavSideBar extends Component {
         if (!navItem.link) {
           items.push(
             <Header pad={{horizontal: 'medium'}} key={navItem.key}>
-              <Title>{t(navItem.key)}</Title>
+              <Title>{navt(navItem.key)}</Title>
             </Header>
           );
           items.concat(NavSideBar.mkNavItems(navItem.items, items));
@@ -90,7 +93,7 @@ class NavSideBar extends Component {
                 to={navItem.route}
                 activeClassName="active"
             >
-              {t(navItem.key)}
+              {navt(navItem.key)}
             </Link>
           );
         }
@@ -109,7 +112,7 @@ class NavSideBar extends Component {
     this.items = [];
     NavSideBar.mkNavItems(tree.items, this.items);
 
-    // TODO: this will come from the build config
+    // TODO: Guides net to be implemented - this will come from the build config
     this.guide = [
       { menuKey: 'configMgmtInterface', component: <div>ConfigMgmtIntf</div> },
       { menuKey: 'configVlan', component: <div>ConfigVLAN</div> },
@@ -141,10 +144,10 @@ class NavSideBar extends Component {
         <Box>
           <Box pad={{horizontal: 'medium', vertical: 'small'}}>
             <div><b>{t('hostname')}</b></div>
-            <div>{this.props.collector.info.hostname}</div>
+            <div>{this.props.collector.overview.info.hostname}</div>
             <br/>
-            <div><b>{t('model')}</b></div>
-            <div>{this.props.collector.info.partNum}</div>
+            <div><b>{t('product')}</b></div>
+            <div>{this.props.collector.overview.info.product}</div>
           </Box>
           <br/>
           <Menu primary>
@@ -161,7 +164,8 @@ class NavSideBar extends Component {
           </Box>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<WorldIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+              <a href={API_LINK}>{t('openSwitchApi')}</a>
+              <a href={OPS_LINK}>{t('openSwitchNet')}</a>
             </Menu>
             <span>{t('links')}</span>
           </Box>

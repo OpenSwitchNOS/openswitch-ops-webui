@@ -60,12 +60,12 @@ class DemoDataGridPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const demo = nextProps.demo;
+    const fetch = nextProps.demo.page;
     this.props.actions.toolbar.set(
       <FetchToolbar
-          isFetching={demo.isFetching}
-          error={demo.lastError}
-          date={demo.lastUpdate}
+          isFetching={fetch.inProgress}
+          error={fetch.lastError}
+          date={fetch.lastSuccessMillis}
           onRefresh={this._onRefresh}/>
     );
   }
@@ -97,7 +97,7 @@ class DemoDataGridPage extends Component {
         <p/>
         <ResponsiveBox>
           <DataGrid width={300} height={400}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               noSelect
           />

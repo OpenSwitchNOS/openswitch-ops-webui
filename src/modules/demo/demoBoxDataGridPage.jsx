@@ -67,12 +67,12 @@ class DemoBoxPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const demo = nextProps.demo;
+    const fetch = nextProps.demo.page;
     this.props.actions.toolbar.set(
       <FetchToolbar
-          isFetching={demo.isFetching}
-          error={demo.lastError}
-          date={demo.lastUpdate}
+          isFetching={fetch.inProgress}
+          error={fetch.lastError}
+          date={fetch.lastSuccessMillis}
           onRefresh={this._onRefresh}/>
     );
   }
@@ -100,7 +100,7 @@ class DemoBoxPage extends Component {
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
-                  data={this.props.demo.entities}
+                  data={this.props.demo.page.entities}
                   columns={this.cols}
                   noSelect
               />

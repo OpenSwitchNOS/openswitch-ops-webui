@@ -14,42 +14,32 @@
     under the License.
 */
 
+
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
+import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
-import FetchToolbar from 'fetchToolbar.jsx';
 
 
-class MonitorInterfacePage extends Component {
+class ECMPPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
-    children: PropTypes.node,
     collector: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
+    this.state = {};
     this.pad = {horizontal: 'small', vertical: 'small'};
   }
-
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
-  };
 
   componentDidMount() {
     this.props.autoActions.collector.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview, this._onRefresh
+      this.props.collector.overview,
+      this._onRefresh
     );
   }
 
@@ -59,7 +49,8 @@ class MonitorInterfacePage extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview, this._onRefresh
+      nextProps.collector.overview,
+      this._onRefresh
     );
   }
 
@@ -68,9 +59,44 @@ class MonitorInterfacePage extends Component {
   }
 
   render() {
+    const ecmp = this.props.collector.overview.ecmp;
     return (
       <Box className="flex1">
-        {this.props.children}
+        <Box pad={this.pad} className="flex1 pageBox min200x400">
+          <span><b>{t('ecmp')}: </b>{t(ecmp.enabled)}</span>
+          <br/>
+          <br/>
+          <b>{t('ecmp')} {t('loadBalance')}</b>
+          <hr/>
+          <table style={{tableLayout: 'fixed'}} className="propTable">
+            <tbody>
+              <tr>
+                <td style={{width: '180px'}}>{t('srcIp')}:</td>
+                <td>{t(ecmp.hashSrcIp)}</td>
+              </tr>
+
+              <tr>
+                <td>{t('srcPort')}:</td>
+                <td>{t(ecmp.hashSrcPort)}</td>
+              </tr>
+
+              <tr>
+                <td>{t('dstIp')}:</td>
+                <td>{t(ecmp.hashDstIp)}</td>
+              </tr>
+
+              <tr>
+                <td>{t('dstPort')}:</td>
+                <td>{t(ecmp.hashDstPort)}</td>
+              </tr>
+
+              <tr>
+                <td>{t('resilientHash')}:</td>
+                <td>{t(ecmp.resilientHash)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </Box>
       </Box>
     );
   }
@@ -83,4 +109,4 @@ function select(store) {
   };
 }
 
-export default connect(select)(MonitorInterfacePage);
+export default connect(select)(ECMPPage);

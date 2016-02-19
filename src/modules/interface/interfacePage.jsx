@@ -20,6 +20,10 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
+import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
+
+// TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
+// TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
 
 
 class InterfacePage extends Component {
@@ -27,9 +31,11 @@ class InterfacePage extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
+    boxGraphic: PropTypes.object.isRequired,
     children: PropTypes.node,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
+    interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
     }),
@@ -45,38 +51,46 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'adminState',
+        columnKey: 'userCfgAdmin',
+        header: t('userCfgAdmin'),
+        width: 150,
+        format: t,
+      },
+      {
+        columnKey: 'adminStateConnector',
         header: t('adminState'),
-        width: 215,
+        width: 160,
+        format: t,
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
-        width: 215,
+        width: 150,
+        format: t,
       },
       {
         columnKey: 'duplex',
         header: t('duplex'),
-        width: 215,
+        width: 120,
+        format: t,
       },
       {
-        columnKey: 'speed',
+        columnKey: 'speedFormatted',
         header: t('speed'),
-        width: 215,
+        width: 110,
       },
       {
         columnKey: 'connector',
         header: t('connector'),
-        width: 215,
+        width: 150,
       },
     ];
     this.state = {};
   }
 
   componentDidMount() {
-    this.props.autoActions.collector.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.collector, this._onRefresh
+      this.props.collector.overview, this._onRefresh
     );
   }
 
@@ -85,7 +99,9 @@ class InterfacePage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+    this.props.actions.toolbar.setFetchTB(
+      nextProps.collector.overview, this._onRefresh
+    );
   }
 
   componentWillUnmount() {
@@ -97,11 +113,10 @@ class InterfacePage extends Component {
   };
 
   render() {
-    const interfaces = this.props.collector.interfaces;
+    const infs = this.props.collector.overview.interfaces;
+    const sel = this.props.params.id;
 
-    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
-    const details = !this.props.params.id ? null : (
+    const details = !sel ? null : (
       <Box className="pageBox">
         {this.props.children}
       </Box>
@@ -110,15 +125,21 @@ class InterfacePage extends Component {
     return (
       <Box direction="row" className="flex1">
         <Box className="flex1">
-          <Box className="pageBox min200x200">
-          ...BoxGraphic goes here...
+          <Box className="mtop mLeft pTop">
+            <BoxGraphic
+                spec={this.props.boxGraphic}
+                interfaces={infs}
+                select={sel && [sel]}
+                onSelectChange={this._onSelect}
+            />
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
-                  data={interfaces}
+                  data={infs}
                   columns={this.cols}
                   singleSelect
+                  select={[ sel ]}
                   onSelectChange={this._onSelect}
               />
             </ResponsiveBox>
@@ -134,6 +155,8 @@ class InterfacePage extends Component {
 function select(store) {
   return {
     collector: store.collector,
+    interface: store.interface,
+    boxGraphic: store.boxGraphic,
   };
 }
 

@@ -19,86 +19,126 @@
 import Agent, { mkAgentHandler } from 'agent.js';
 import Async from 'async';
 
+const ASYNC_TYPES = [ 'REQUEST', 'SUCCESS', 'FAILURE', 'CLEAR_ERROR' ];
 
-const FETCH_INITIAL_STORE = {
-  isFetching: false,
-  lastUpdate: 0,
-  lastError: null,
-};
-
-function fetchActionTypes(moduleName) {
+function mkAsyncStore() {
   return {
-    REQUEST: `${moduleName}/FETCH_REQUEST`,
-    SUCCESS: `${moduleName}/FETCH_SUCCESS`,
-    FAILURE: `${moduleName}/FETCH_FAILURE`,
+    inProgress: false,
+    lastSuccessMillis: 0,
+    lastError: null,
   };
 }
 
-function protectedParse(moduleName, moduleParseFn, result) {
+function mkAsyncActionTypes(moduleName, asyncName) {
+  const at = {};
+  ASYNC_TYPES.forEach(t => {
+    at[t] = `${moduleName}/${asyncName}/${t}`;
+  });
+  return at;
+}
+
+function protectedFn(moduleName, asyncName, fn, result) {
   try {
-    return moduleParseFn(result);
+    return fn(result);
   } catch (e) {
-    console.log(`DUX parsing failure in: ${moduleName}`);
-    console.log(`Exception message: ${e.message}`);
+    console.log(`DUX failure in: ${moduleName}/${asyncName}`);
+    if (!window.jasmine) {
+      console.log(`Exception message: ${e.message}`, e.stack);
+    }
   }
   return {};
 }
 
-function fetchReducer(moduleName, moduleInitialStore, moduleParseFn) {
-  const ACTION_TYPES = fetchActionTypes(moduleName);
-  const INITIAL_STORE = { ...FETCH_INITIAL_STORE, ...moduleInitialStore };
-
-  return (moduleStore = INITIAL_STORE, action) => {
+function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
+  return (moduleStore, action) => {
     switch (action.type) {
 
-      case ACTION_TYPES.REQUEST:
-        return {
-          ...moduleStore,
-          isFetching: true
+      case asyncAts.REQUEST: {
+        const asyncStore = {
+          ...moduleStore[asyncName], inProgress: true };
+        return { ...moduleStore, [asyncName]: asyncStore };
+      }
+
+      case asyncAts.CLEAR_ERROR: {
+        const asyncStore = { ...moduleStore[asyncName], lastError: null };
+        return { ...moduleStore, [asyncName]: asyncStore };
+      }
+
+      case asyncAts.FAILURE: {
+        const asyncStore = {
+          ...moduleStore[asyncName],
+          inProgress: false,
+          lastError: action.error,
         };
+        return { ...moduleStore, [asyncName]: asyncStore };
+      }
 
-      case ACTION_TYPES.FAILURE:
-        return {
-          ...moduleStore,
-          isFetching: false,
-          lastError: action.error
-        };
-
-      case ACTION_TYPES.SUCCESS:
-        const fetchedStore =
-          protectedParse(moduleName, moduleParseFn, action.result);
-
-        return {
-          ...moduleStore,
-          isFetching: false,
+      case asyncAts.SUCCESS: {
+        const newAsyncStore = parseFn
+          ? protectedFn(moduleName, asyncName, parseFn, action.result)
+          : {};
+        const asyncStore = {
+          ...moduleStore[asyncName],
+          inProgress: false,
           lastError: null,
-          lastUpdate: Date.now(),
-          ...fetchedStore,
+          lastSuccessMillis: Date.now(),
+          ...newAsyncStore,
         };
-
-      default:
-        return moduleStore;
+        return { ...moduleStore, [asyncName]: asyncStore };
+      }
     }
+    return null;
   };
 }
 
-const DEBOUNCE_INTERVAL = 3000;
-
-function isReadyToFetch(store, now) {
-  return !store.isFetching && (now - store.lastUpdate) > DEBOUNCE_INTERVAL;
+function mkReducer(initialStore, asyncHandlers) {
+  return (moduleStore = initialStore, action) => {
+    for (let i=0; i<asyncHandlers.length; i++) {
+      const newModuleStore = asyncHandlers[i](moduleStore, action);
+      if (newModuleStore) {
+        return newModuleStore;
+      }
+    }
+    return moduleStore;
+  };
 }
 
-function performFetch(actionTypes, dispatch, urls) {
-  dispatch({ type: actionTypes.REQUEST });
+function actionRequest(at) { return { type: at.REQUEST }; }
+function actionFail(at, error) { return { type: at.FAILURE, error }; }
+function actionSuccess(at, result) { return { type: at.SUCCESS, result }; }
+function actionClearError(at) { return { type: at.CLEAR_ERROR }; }
 
-  function dispatcher(error, result) {
+function dispatchRequest(dispatch, at) {
+  dispatch(actionRequest(at));
+}
+
+function dispatchFail(dispatch, at, error) {
+  dispatch(actionFail(at, error));
+}
+
+function dispatchSuccess(dispatch, at, result) {
+  dispatch(actionSuccess(at, result));
+}
+
+function mkAsyncDispatcher(dispatch, at) {
+  return (error, result) => {
     if (error) {
-      dispatch({ type: actionTypes.FAILURE, error });
-    } else {
-      dispatch({ type: actionTypes.SUCCESS, result });
+      return dispatchFail(dispatch, at, error);
     }
-  }
+    dispatchSuccess(dispatch, at, result);
+  };
+}
 
+const ASYNC_COOLDOWN_MILLIS = 5000;
+
+function waitForCooldown(moduleStore, asyncName, now) {
+  const { inProgress, lastSuccessMillis } = moduleStore[asyncName];
+  return !inProgress && (now - lastSuccessMillis) > ASYNC_COOLDOWN_MILLIS;
+}
+
+function get(dispatch, at, urls) {
+  dispatchRequest(dispatch, at);
+  const dispatcher = mkAsyncDispatcher(dispatch, at);
   if (Array.isArray(urls)) {
     const gets = [];
     urls.forEach(url => {
@@ -112,23 +152,27 @@ function performFetch(actionTypes, dispatch, urls) {
   }
 }
 
-function fetchAction(moduleName, urls) {
-  const ACTION_TYPES = fetchActionTypes(moduleName);
-
-  return (dispatch, getStoreFn) => {
-    const store = getStoreFn()[moduleName];
-    if (isReadyToFetch(store, Date.now())) {
-      performFetch(ACTION_TYPES, dispatch, urls);
-    }
-  };
+function getIfCooledDown(dispatch, moduleStore, asyncName, at, urls) {
+  if (waitForCooldown(moduleStore, asyncName, Date.now())) {
+    get(dispatch, at, urls);
+  }
 }
 
 export default {
-  fetchActionTypes,
-  fetchAction,
-  fetchReducer,
-
-  isReadyToFetch,
-  protectedParse,
-  performFetch,
+  mkAsyncStore,
+  mkAsyncActionTypes,
+  protectedFn,
+  mkAsyncHandler,
+  mkReducer,
+  actionRequest,
+  actionFail,
+  actionSuccess,
+  actionClearError,
+  dispatchRequest,
+  dispatchFail,
+  dispatchSuccess,
+  mkAsyncDispatcher,
+  waitForCooldown,
+  get,
+  getIfCooledDown,
 };

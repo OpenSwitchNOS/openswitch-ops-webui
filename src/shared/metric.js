@@ -21,6 +21,7 @@ export default class Metric {
   constructor(cacheSize) {
     this._cacheSize = cacheSize || Metric.CACHE_SIZE;
     this._colorIndex = '';
+    this._group = '';
     this._name = '';
     this._units = '';
     this._dataPoints = [];
@@ -37,6 +38,9 @@ export default class Metric {
 
   setName(name) { this._name = name; return this; }
   getName() { return this._name; }
+
+  setGroup(group) { this._group = group; return this; }
+  getGroup() { return this._group; }
 
   setUnits(units) { this._units = units; return this; }
   getUnits() { return this._units; }

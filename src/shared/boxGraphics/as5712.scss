@@ -1,0 +1,63 @@
+/*
+ (C) Copyright 2015 Hewlett Packard Enterprise Development LP
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+*/
+
+@import "_boxGraphic.scss";
+
+
+$as5712_cssIds: (
+  ( bxGfx_mgmt, bxGfx_s_mgmt ),
+  ( bxGfx_console, bxGfx_s_console )
+);
+
+@for $i from 1 through 54 {
+  $ids: ( bxGfx_#{$i}, bxGfx_s_#{$i} );
+  $as5712_cssIds: append($as5712_cssIds, $ids);
+}
+
+@include bxGfx(#as5712, $as5712_cssIds);
+
+#as5712 {
+
+  background-color: lighten(black, 20%);
+  min-width: 400px;
+
+  #bxGfx_labels {
+    fill: white;
+  }
+
+  #bxGfx_middleSeparators {
+    fill: silver;
+    stroke: silver;
+    stroke-width: 3px;
+  }
+
+  #bxGfx_interfaces {
+    rect {
+      stroke: silver;
+      stroke-width: 3px;
+    }
+    polygon {
+      display: none;
+      pointer-events:none;
+      &#bxGfx_s_mgmt, &#bxGfx_s_console {
+        display: block;
+        stroke: lighten(black, 30%);
+        stroke-width: 3px;
+      }
+    }
+  }
+
+}

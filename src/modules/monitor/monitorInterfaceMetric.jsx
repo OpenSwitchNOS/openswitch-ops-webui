@@ -41,17 +41,31 @@ class MonitorInterfaceMetric extends Component {
 
   render() {
     const id = this.props.params.id;
-    const metric = this.props.collector.interfaceUtlMetrics[id];
-    const content = !metric
-      ? <div style={{textAlign: 'center'}}>
+    const metrics = this.props.collector.overview.interfaceMetrics[id];
+
+    let content = null;
+    if (!metrics || metrics.length === 0) {
+      content = (
+        <div style={{textAlign: 'center'}}>
           <RefreshIcon className="spin"/>
           {t('loading')}
         </div>
-      : <MetricChart points size="large" metric={metric}/>;
+      );
+    } else {
+      content = metrics.map(m => {
+        return (
+          <div key={m.getName()}>
+            <b>{m.getName()}</b>
+            <MetricChart points size="large" metric={m}/>
+            <br/>
+          </div>
+        );
+      });
+    }
 
     return (
       <Box pad={this.pad} className="pageBox">
-        <large><b>{`${t('interface')}: `}</b>{id}</large>
+        <large><b>{`${t('interfaceUtiization')}: `}</b>{id}</large>
         <br/>
         {content}
       </Box>

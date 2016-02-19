@@ -18,7 +18,7 @@ import React, { PropTypes, Component } from 'react';
 import { t } from 'i18n/lookup.js';
 import TimeAgo from 'react-timeago';
 import SpanStatus from 'spanStatus.jsx';
-import StatusLayer from 'statusLayer.jsx';
+import ErrorLayer from 'errorLayer.jsx';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
 
 
@@ -28,9 +28,9 @@ export default class FetchToolbar extends Component {
     date: PropTypes.number,
     error: PropTypes.shape({
       url: PropTypes.string.isRequired,
-      status: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      msg: PropTypes.string,
+      status: PropTypes.number,
+      msg: PropTypes.string.isRequired,
+      respMsg: PropTypes.string,
     }),
     isFetching: PropTypes.bool,
     onRefresh: PropTypes.func,
@@ -51,29 +51,24 @@ export default class FetchToolbar extends Component {
 
   render() {
     const p = this.props;
-    const e = p.error;
 
     let status = null;
     let detail = null;
 
     if (!p.isFetching) {
-      if (e) {
+      if (p.error) {
         status = (
           <SpanStatus onClick={this._onStatusClicked} value="error">
-            {e.title}
+            {t('failedRequest')}
           </SpanStatus>
         );
         if (this.state.showDetail) {
           detail = (
-            <StatusLayer value="error" onClose={this._onCloseDetail}
-                title={e.title} >
-              <b>{t('status')}</b><br/>
-              {e.status}
-              <p/>
-              <b>{t('url')}</b><br/>
-              {e.url}
-              {e.msg ? <p><i>"{e.msg}"</i></p> : null}
-            </StatusLayer>
+            <ErrorLayer
+                title={t('failedRequest')}
+                error={p.error}
+                onClose={this._onCloseDetail}
+            />
           );
         }
       } else if (p.date) {

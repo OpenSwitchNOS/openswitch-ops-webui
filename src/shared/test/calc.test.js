@@ -30,6 +30,14 @@ describe('calc', () => {
       resultToFixed: '19.59'
     },
     {
+      name: 'handles another basic case',
+      prev: 100,
+      curr: 10000,
+      speed: 10000000,
+      interval: 10,
+      resultToFixed: '79.20'
+    },
+    {
       name: 'handles a prev of 0',
       prev: 0,
       curr: 3451234,

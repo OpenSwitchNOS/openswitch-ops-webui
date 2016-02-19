@@ -14,27 +14,30 @@
     under the License.
 */
 
-let locale = null;
-let msgs = null;
-let navs = null;
+import CollectorDux from 'collector/collectorDux.js';
+import MonitorDux from 'monitor/monitorDux.jsx';
+import OverviewDux from 'overview/overviewDux.jsx';
+import InterfaceDux from 'interface/interfaceDux.jsx';
+import EcmpDux from 'ecmp/ecmpDux.jsx';
 
-export function setLocale(l) {
-  locale = l;
-  msgs = locale && locale.MESSAGES;
-  navs = locale && locale.NAVS;
-}
+const modules = [
+  CollectorDux,
+  MonitorDux,
+  OverviewDux,
+  InterfaceDux,
+  EcmpDux,
+];
 
-export function getLocale() { return locale; }
+import * as i18nLocale from 'i18n/en-US.js';
+import As5712 from 'boxGraphics/as5712.jsx';
 
-export function navt(k) { return (navs && navs[k]) || `~${k}~`; }
+const settings = {
+  i18nLocale,
+  boxGraphic: As5712,
+  reduxLogger: true,
+  agent: {
+    prefix: 'http://15.108.30.246:8091',
+  }
+};
 
-export function t(k) {
-  if (k === '') { return ''; }
-  return (msgs && msgs[k]) || `~${k}~`;
-}
-
-export function tf(v) { return t(v ? 'true' : 'false'); }
-
-export function ed(v) { return t(v ? 'enabled' : 'disabled'); }
-
-export function ud(v) { return t(v ? 'up' : 'down'); }
+export default { modules, settings };

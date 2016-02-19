@@ -20,6 +20,8 @@ import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
+import Button from 'grommet/components/Button';
+
 
 class DemoDataGridSmallPage extends Component {
 
@@ -42,6 +44,9 @@ class DemoDataGridSmallPage extends Component {
         width: 300,
       },
     ];
+    this.state = {
+      externalSelect: 2,
+    };
   }
 
   componentDidMount() {
@@ -53,12 +58,12 @@ class DemoDataGridSmallPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const demo = nextProps.demo;
+    const fetch = nextProps.demo.page;
     this.props.actions.toolbar.set(
       <FetchToolbar
-          isFetching={demo.isFetching}
-          error={demo.lastError}
-          date={demo.lastUpdate}
+          isFetching={fetch.inProgress}
+          error={fetch.lastError}
+          date={fetch.lastSuccessMillis}
           onRefresh={this._onRefresh}/>
     );
   }
@@ -75,30 +80,41 @@ class DemoDataGridSmallPage extends Component {
     alert(selection);
   };
 
+  _onForceSelect = () => {
+    const size = Object.keys(this.props.demo.page.entities).length;
+    const externalSelect = (this.state.externalSelect + 1) % size;
+    this.setState({ externalSelect });
+  };
+
   render() {
     const demoProps = this.props.demo;
     return (
       <div className="mLeft">
         <Section>
           <DataGrid title="Full Toolbar" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               onEdit={this._onEdit}
           />
         </Section>
         <Section>
           <DataGrid title="Select / No Edit" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               onSelectChange={this._onSelectChange}
           />
         </Section>
         <Section>
           <DataGrid title="No Filter / Single Select" width={500} height={200}
-              data={demoProps.entities}
+              data={demoProps.page.entities}
               columns={this.cols}
               noFilter
               singleSelect
+              select={[ this.state.externalSelect.toString() ]}
+          />
+          <Button
+              label={`Select ID ${this.state.externalSelect + 1}`}
+              onClick={this._onForceSelect}
           />
         </Section>
       </div>

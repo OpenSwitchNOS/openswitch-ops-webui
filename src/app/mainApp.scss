@@ -46,6 +46,8 @@ h1, h2, h3, .headline, .title {
   flex: $g $s $b;
   -webkit-flex: $g $s $b;
   -moz-flex: $g $s $b;
+  min-width: 0; //https://code.google.com/p/chromium/issues/detail?id=546034#c6
+  min-height: 0;
 }
 
 .flex0auto { @include flex(0, 0, auto); }
@@ -68,6 +70,9 @@ h1, h2, h3, .headline, .title {
 
 .min200x200 { @include minHxW(); }
 .min200x400 { @include minHxW(200px, 400px); }
+.min100x200 { @include minHxW(100px, 200px); }
+.min300x300 { @include minHxW(300px, 300px); }
+.min300x300 { @include minHxW(300px, 300px); }
 
 // Single line for the 'hr' plain html element
 hr {
@@ -83,11 +88,14 @@ table th {
 
 // Property styles for plain html tables
 table.propTable {
+  tbody {
+    vertical-align: top;
+  }
   td:first-child {
     font-weight: bold;
-    padding-right: 16px;
   }
   td {
+    padding-right: 16px;
     padding-bottom: 16px;
   }
   margin-bottom: 0px;
@@ -96,7 +104,7 @@ table.propTable {
 @mixin pageBox($marginTop: $space, $marginLeft: $space) {
   background-color: white;
   border-radius: 5px;
-  box-shadow: 0px 0px 3px lightgrey;
+  box-shadow: 0px 0px 3px lightgray;
   box-sizing: border-box;
   margin-top: $marginTop;
   margin-left: $marginLeft;
@@ -161,6 +169,9 @@ table.propTable {
     border: 3px solid $brand-color;
   }
 }
+.edit.layer {
+  z-index: 100;
+}
 
 @media screen and (min-width: 45em) {
   .guide {
@@ -214,7 +225,7 @@ $slideInColumnMinWidth: 350px;
 // Grommet overrides start here...
 
 // Override the sidebar-width for the navigation pane.
-$navSideBarWidth: 320px;
+$sidebar-width: 320px; // this is used by _objects.sidebar.scss
 
 // Include all the Grommet styles.
 $fontsPath: '../shared/assets';
@@ -222,7 +233,12 @@ $fontsPath: '../shared/assets';
 
 // The original rule throws off vertical centering of the anchors in headers.
 .menu a:not(.button) {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+// Navigation highlight text when selected
+nav.menu--primary > a:not(.button).active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 // Addes animation to the sidebars
@@ -236,7 +252,7 @@ $fontsPath: '../shared/assets';
 }
 @include keyframes(slide-sidebar) {
   0% { width: 0px; }
-  100% { width: $navSideBarWidth; }
+  100% { width: $sidebar-width; }
 }
 
 u {

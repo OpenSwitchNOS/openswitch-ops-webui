@@ -123,6 +123,7 @@ export default class DataGrid extends Component {
     onEdit: PropTypes.func,
     onSelectChange: PropTypes.func,
     rowHeight: PropTypes.number,
+    select: PropTypes.arrayOf(PropTypes.string),
     singleSelect: PropTypes.bool,
     title: PropTypes.string,
     width: PropTypes.number.isRequired,
@@ -203,7 +204,7 @@ export default class DataGrid extends Component {
     this.selectCbId = _.uniqueId('dataGridSelCkBx_');
 
     this.state = {
-      activeDataKeys: [],
+      activeDataKeys: this.props.select || [],
       filterText: null,
       sortingSpecs: [],
       defaultDataMap,
@@ -212,7 +213,7 @@ export default class DataGrid extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data !== this.props.data) {
+    if (!_.isEqual(newProps.data, this.props.data)) {
       const defaultDataMap = new DataMap(newProps.data);
 
       let dataKeyArray = defaultDataMap.cloneDataKeyArray();
@@ -224,6 +225,9 @@ export default class DataGrid extends Component {
 
       const dataMap = new DataMap(newProps.data, dataKeyArray);
       this.setState({ defaultDataMap, dataMap });
+    }
+    if (!_.isEqual(newProps.select, this.props.select)) {
+      this.setState({ activeDataKeys: newProps.select });
     }
   }
 
@@ -299,7 +303,10 @@ export default class DataGrid extends Component {
 
   _mkCell = (cellProps, colProps) => {
     const rowData = this.state.dataMap.getDataAt(cellProps.rowIndex);
-    const cellData = rowData && rowData[cellProps.columnKey];
+    let cellData = rowData && rowData[cellProps.columnKey];
+    if (colProps.format) {
+      cellData = colProps.format(cellData);
+    }
     if (!colProps.cell) {
       return ( <Cell {...cellProps}>{cellData}</Cell> );
     }
