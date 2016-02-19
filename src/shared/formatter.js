@@ -44,7 +44,7 @@ function mbpsToString(megaBitsPerSecond) {
 
 function toCommaString(x) {
   if (isNaN(x)) {
-    throw new Error('Should be a Number');
+    return '';
   }
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
