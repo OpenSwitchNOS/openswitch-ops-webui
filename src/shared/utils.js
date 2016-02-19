@@ -93,14 +93,14 @@ function parseInterface(inf) {
     linkState: status.link_state,
     mtu: status.mtu,
 
-    rxBytes: Number(stats.rx_bytes),
-    txBytes: Number(stats.tx_bytes),
-    rxPackets: Number(stats.rx_packets),
-    txPackets: Number(stats.tx_packets),
-    rxErrors: Number(stats.rx_errors),
-    txErrors: Number(stats.tx_errors),
-    rxDropped: Number(stats.rx_dropped),
-    txDropped: Number(stats.tx_dropped),
+    rxBytes: Number(stats.rx_bytes) || 0,
+    txBytes: Number(stats.tx_bytes) || 0,
+    rxPackets: Number(stats.rx_packets) || 0,
+    txPackets: Number(stats.tx_packets) || 0,
+    rxErrors: Number(stats.rx_errors) || 0,
+    txErrors: Number(stats.tx_errors) || 0,
+    rxDropped: Number(stats.rx_dropped) || 0,
+    txDropped: Number(stats.tx_dropped) || 0,
   };
 }
 

@@ -28,7 +28,7 @@ import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import ErrorLayer from 'errorLayer.jsx';
 import InterfaceEdit from './interfaceEdit.jsx';
 import _ from 'lodash';
-
+import Formatter from 'formatter.js';
 
 const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
 
@@ -106,7 +106,6 @@ class InterfaceDetails extends Component {
     const inf = detail.inf;
     const port = detail.port;
     const set = this.props.interface.set;
-
     const editLayer = !this.state.editMode ? null :
       <InterfaceEdit
           onClose={this._onEditToggle}
@@ -119,7 +118,6 @@ class InterfaceDetails extends Component {
 
     const ipV4 = (port.id && port.ipV4) || t('notConfigured');
     const ipV6 = (port.id && port.ipV6) || t('notConfigured');
-
     const lldpOpsLink = !inf.lldp.sysDesc ||
       inf.lldp.sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ? null : (
         <a href={`http://${inf.lldp.ip}`} target="_blank">
@@ -158,14 +156,14 @@ class InterfaceDetails extends Component {
           {this._tr(t('flowControl'), t(inf.userCfgFlowCtrl))}
           {this._tr(t('ipV4'), ipV4)}
           {this._tr(t('ipV6'), ipV6)}
-          {this._tr(t('rxPackets'), inf.rxPackets)}
-          {this._tr(t('rxBytes'), inf.rxBytes)}
-          {this._tr(t('rxErrors'), inf.rxErrors)}
-          {this._tr(t('rxDropped'), inf.rxDropped)}
-          {this._tr(t('txPackets'), inf.txPackets)}
-          {this._tr(t('txBytes'), inf.txBytes)}
-          {this._tr(t('txErrors'), inf.txErrors)}
-          {this._tr(t('txDropped'), inf.txDropped)}
+          {this._tr(t('rxPackets'), Formatter.toCommaString(inf.rxPackets))}
+          {this._tr(t('rxBytes'), Formatter.toCommaString(inf.rxBytes))}
+          {this._tr(t('rxErrors'), Formatter.toCommaString(inf.rxErrors))}
+          {this._tr(t('rxDropped'), Formatter.toCommaString(inf.rxDropped))}
+          {this._tr(t('txPackets'), Formatter.toCommaString(inf.txPackets))}
+          {this._tr(t('txBytes'), Formatter.toCommaString(inf.txBytes))}
+          {this._tr(t('txErrors'), Formatter.toCommaString(inf.txErrors))}
+          {this._tr(t('txDropped'), Formatter.toCommaString(inf.txDropped))}
           </tbody>
         </table>
         <br/>
