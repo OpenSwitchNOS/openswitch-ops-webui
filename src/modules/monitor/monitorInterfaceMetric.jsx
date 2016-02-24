@@ -56,7 +56,7 @@ class MonitorInterfaceMetric extends Component {
         return (
           <div key={m.getName()}>
             <b>{m.getName()}</b>
-            <MetricChart points size="large" metric={m}/>
+            <MetricChart size="large" metric={m}/>
             <br/>
           </div>
         );

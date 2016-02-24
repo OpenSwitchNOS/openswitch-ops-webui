@@ -16,7 +16,7 @@
 
 export default class Metric {
 
-  static CACHE_SIZE = 60;
+  static CACHE_SIZE = 6;
 
   constructor(cacheSize) {
     this._cacheSize = cacheSize || Metric.CACHE_SIZE;

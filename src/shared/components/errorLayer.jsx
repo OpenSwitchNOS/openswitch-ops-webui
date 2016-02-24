@@ -43,6 +43,7 @@ export default class ErrorLayer extends Component {
     const p = this.props;
     return (
       <StatusLayer
+          box
           className="error"
           value="error"
           onClose={p.onClose}

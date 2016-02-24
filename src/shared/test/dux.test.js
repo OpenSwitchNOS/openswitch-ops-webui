@@ -351,7 +351,6 @@ describe('dux', () => {
     });
   });
 
-
   it('get if cooled down', () => {
     expect(dispatchedActions.length).toBe(0);
 
