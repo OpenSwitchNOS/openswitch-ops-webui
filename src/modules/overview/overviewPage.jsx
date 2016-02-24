@@ -371,7 +371,7 @@ class OverviewPage extends Component {
             <MetricTable
                 simple
                 onSelect={this._onSelectInterface}
-                widths={{label: '90px', value: '70px'}}
+                widths={{label: '70px', value: '70px'}}
                 metrics={trafficMetrics}
             />
             {trafficMetricsCaption}
