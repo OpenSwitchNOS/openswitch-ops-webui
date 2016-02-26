@@ -28,7 +28,10 @@ export default class BoxGraphic extends Component {
   static propTypes = {
     interfaces: PropTypes.object.isRequired,
     onSelectChange: PropTypes.func,
-    select: PropTypes.arrayOf(PropTypes.string),
+    select: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string,
+    ]),
     spec: PropTypes.shape({
       onClick: PropTypes.func.isRequired,
       toExternalInterfaceId: PropTypes.func.isRequired,

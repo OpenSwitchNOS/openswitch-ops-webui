@@ -104,13 +104,12 @@ class VlanPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (selections) => {
-    const selectedVlan = selections[0];
-    this.props.history.pushState(null, `/vlan/${selectedVlan}`);
+  _onSelect = (sel) => {
+    this.props.history.pushState(null, `/vlan/${sel}`);
   };
 
-  _onEdit = (selection) => {
-    alert(`Edit: ${selection}`);
+  _onEdit = (sel) => {
+    alert(`Edit: ${sel}`);
   };
 
   render() {
