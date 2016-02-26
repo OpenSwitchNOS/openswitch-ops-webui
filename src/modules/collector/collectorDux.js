@@ -89,6 +89,20 @@ function normalizeTempStatus(id, s) {
   };
 }
 
+function parseEcmp(ecmpCfg) {
+  function norm(key) {
+    return ecmpCfg && ecmpCfg[key] === 'false' ? 'disabled' : 'enabled';
+  }
+  return {
+    enabled: norm('enabled'),
+    hashDstIp: norm('hash_dstip_enabled'),
+    hashDstPort: norm('hash_dstport_enabled'),
+    hashSrcIp: norm('hash_srcip_enabled'),
+    hashSrcPort: norm('hash_srcport_enabled'),
+    resilientHash: norm('resilient_hash_enabled'),
+  };
+}
+
 function parseInterfaces(infBody, now) {
   const interfaces = {};
   infBody.forEach((elm) => {
@@ -243,15 +257,7 @@ function parseOverviewResult(result) {
 
   // ECMP
 
-  const ecmpCfg = sysBody.configuration.ecmp_config;
-  const ecmp = {
-    enabled: ecmpCfg && ecmpCfg.enabled === 'false' ? 'disabled' : 'enabled',
-    hashDstIp: ecmpCfg && ecmpCfg.hash_dstip_enabled === 'false' ? 'disabled' : 'enabled',
-    hashDstPort: ecmpCfg && ecmpCfg.hash_dstport_enabled === 'false' ? 'disabled' : 'enabled',
-    hashSrcIp: ecmpCfg && ecmpCfg.hash_srcip_enabled === 'false' ? 'disabled' : 'enabled',
-    hashSrcPort: ecmpCfg && ecmpCfg.hash_srcport_enabled === 'false' ? 'disabled' : 'enabled',
-    resilientHash: ecmpCfg && ecmpCfg.resilient_hash_enabled === 'false' ? 'disabled' : 'enabled',
-  };
+  const ecmp = parseEcmp(sysBody.configuration.ecmp_config);
 
   return {
     info,
