@@ -336,8 +336,6 @@ class OverviewPage extends Component {
       }
     }
 
-    // TODO: Warning: validateDOMNesting(...): <span> cannot appear as a child of <tbody>. See OverviewPage > tbody > StatusLayer > Layer > span.
-
     return (
       <Box className="flex1">
         <Box direction="row" className="flex0auto flexWrap">

@@ -18,6 +18,7 @@ import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
 import VlanDetails from './vlanDetails.jsx';
 
+
 const NAME = 'vlan';
 
 const PAGE_ASYNC = 'page';
@@ -34,43 +35,63 @@ const NAVS = [
   },
 ];
 
-const URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
+const VLANS_URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
+const PORTS_URL = '/rest/v1/system/ports?depth=1';
+const URLS = [ VLANS_URL, PORTS_URL ];
 
 const ACTIONS = {
   fetch() {
     return (dispatch, getStoreFn) => {
       const mStore = getStoreFn()[NAME];
-      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, URL);
+      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, URLS);
     };
   }
 };
 
 function parsePageResult(result) {
-  const body = result.body;
+  const vlans = {};
+  result[0].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const status = elm.status;
+    const id = cfg.id;
+    vlans[id] = {
+      id,
+      name: cfg.name,
+      admin: cfg.admin,
+      operState: status.oper_state,
+      operStateReason: status.oper_state_reason,
+      interfaces: {},
+    };
+  });
 
-  let length = 0;
-  const entities = {};
-
-  // TODO: incorrectly assumes an object is an array.
-  Object.getOwnPropertyNames(body).forEach(k => {
-    const data = body[k];
-    if (k !== 'length') {
-      entities[k] = {
-        id: k,
-        name: data.configuration.name,
+  const interfaces = {};
+  result[1].body.forEach(elm => {
+    const cfg = elm.configuration;
+    if (cfg.vlan_mode) {
+      const id = cfg.name;
+      const data = {
+        id,
+        tag: cfg.tag,
+        trunks: cfg.trunks,
+        mode: cfg.vlan_mode,
       };
-    } else {
-      length = data;
+      interfaces[id] = data;
+      if (data.tag) {
+        vlans[data.tag].interfaces[id] = data;
+      }
+      if (data.trunks) {
+        data.trunks.forEach(vid => vlans[vid].interfaces[id] = data);
+      }
     }
   });
-  return { length, entities };
+
+  return { vlans, interfaces };
 }
 
 const INITIAL_STORE = {
   page: {
     ...Dux.mkAsyncStore(),
-    entities: {},
-    length: 0,
+    vlans: {},
   },
 };
 

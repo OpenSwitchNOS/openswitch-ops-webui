@@ -15,6 +15,7 @@
 */
 
 import React, { PropTypes, Component } from 'react';
+import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
@@ -108,7 +109,8 @@ class InterfacePage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (id) => {
+  _onSelect = (selections) => {
+    const id = selections[0];
     this.props.history.pushState(null, `/interface/${id}`);
   };
 
@@ -116,16 +118,24 @@ class InterfacePage extends Component {
     const infs = this.props.collector.overview.interfaces;
     const sel = this.props.params.id;
 
+    // TODO: This check is not needed - see the vlan page
     const details = !sel ? null : (
-      <Box className="pageBox">
-        {this.props.children}
-      </Box>
+      <ReactCSSTG
+          transitionName="slideInColumn"
+          transitionAppear
+          transitionAppearTimeout={500}
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}>
+        <Box className="pageBox">
+          {this.props.children}
+        </Box>
+      </ReactCSSTG>
     );
 
     return (
       <Box direction="row" className="flex1">
         <Box className="flex1">
-          <Box className="mtop mLeft pTop">
+          <Box className="mTop mLeft">
             <BoxGraphic
                 spec={this.props.boxGraphic}
                 interfaces={infs}
