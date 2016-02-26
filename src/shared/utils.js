@@ -21,7 +21,7 @@ const DEF_USER_CFG = {
   autoNeg: 'on',
   duplex: 'full',
   admin: 'down',
-  flowCtrl: 'off',
+  flowCtrl: 'none',
 };
 
 function normalizeUserCfg(userCfg) {
@@ -47,7 +47,6 @@ function parseInterface(inf) {
   const cfg = inf.configuration;
   const status = inf.status;
   const stats = inf.statistics.statistics;
-
   const userCfg = normalizeUserCfg(cfg.user_config);
   const userCfgAdmin = userCfg.admin;
   const userCfgDuplex = userCfg.duplex;
