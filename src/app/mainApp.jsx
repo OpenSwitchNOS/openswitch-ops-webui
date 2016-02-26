@@ -53,9 +53,9 @@ class MainApp extends Component {
     guide: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
-    params: PropTypes.object.isReqired,
+    params: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
-    routes: PropTypes.object.isRequired,
+    routes: PropTypes.array.isRequired,
     toolbar: PropTypes.object.isRequired,
   };
 
@@ -118,7 +118,7 @@ class MainApp extends Component {
 
     // FIXME: this.props.syslog.numUnread;
     // data retieved from this.props.collector.?
-    const numSyslog = 99;
+    const numSyslog = this.props.collector.overview.log.numAdded;
 
     // When we assign the name to the route we do a 'navt' lookup, so '/' gets
     // converted to '~/~'.
@@ -142,7 +142,7 @@ class MainApp extends Component {
         </Box>
         <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar.component}
-          <a href="#/syslog">
+          <a href="#/log">
             <NotificationIcon/><small>{numSyslog}</small>
           </a>
         </Box>

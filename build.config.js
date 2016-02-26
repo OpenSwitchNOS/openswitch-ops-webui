@@ -19,6 +19,7 @@ import MonitorDux from 'monitor/monitorDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
+import LogDux from 'log/logDux.jsx';
 
 const modules = [
   CollectorDux,
@@ -26,6 +27,7 @@ const modules = [
   OverviewDux,
   InterfaceDux,
   EcmpDux,
+  LogDux,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
