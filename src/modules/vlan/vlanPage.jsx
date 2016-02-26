@@ -105,7 +105,8 @@ class VlanPage extends Component {
   }
 
   _onSelect = (sel) => {
-    this.props.history.pushState(null, `/vlan/${sel}`);
+    const url = sel ? `/vlan/${sel}` : '/vlan';
+    this.props.history.pushState(null, url);
   };
 
   _onEdit = (sel) => {

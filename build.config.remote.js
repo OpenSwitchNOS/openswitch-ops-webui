@@ -16,8 +16,10 @@
 
 import CollectorDux from 'collector/collectorDux.js';
 import MonitorDux from 'monitor/monitorDux.jsx';
+import LogDux from 'log/logDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
+import VlanDux from 'vlan/vlanDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
 
 const modules = [
@@ -25,6 +27,8 @@ const modules = [
   MonitorDux,
   OverviewDux,
   InterfaceDux,
+  VlanDux,
+  LogDux,
   EcmpDux,
 ];
 
@@ -36,7 +40,7 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: 'http://16.93.60.244/:8091',
+    prefix: 'http://15.108.30.248:8091',
   }
 };
 
