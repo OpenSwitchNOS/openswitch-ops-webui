@@ -123,7 +123,10 @@ export default class DataGrid extends Component {
     onEdit: PropTypes.func,
     onSelectChange: PropTypes.func,
     rowHeight: PropTypes.number,
-    select: PropTypes.arrayOf(PropTypes.string),
+    select: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string,
+    ]),
     singleSelect: PropTypes.bool,
     title: PropTypes.string,
     width: PropTypes.number.isRequired,
@@ -203,8 +206,11 @@ export default class DataGrid extends Component {
 
     this.selectCbId = _.uniqueId('dataGridSelCkBx_');
 
+    const sel = this.props.select;
+    const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
+
     this.state = {
-      activeDataKeys: this.props.select || [],
+      activeDataKeys,
       filterText: null,
       sortingSpecs: [],
       defaultDataMap,
@@ -231,6 +237,14 @@ export default class DataGrid extends Component {
     }
   }
 
+  _normalizeSelect = (activeDataKeys) => {
+    let sel = activeDataKeys.slice();
+    if (this.props.singleSelect) {
+      sel = (sel.length > 0) ? sel[0] : null;
+    }
+    return sel;
+  };
+
   _onRowClick = (e, rowIdx) => {
     if (!this.props.noSelect) {
       let activeDataKeys = this.state.activeDataKeys.slice();
@@ -248,7 +262,7 @@ export default class DataGrid extends Component {
       this.setState({ activeDataKeys });
 
       if (this.props.onSelectChange) {
-        this.props.onSelectChange(activeDataKeys.slice());
+        this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
       }
     }
   };
@@ -265,7 +279,7 @@ export default class DataGrid extends Component {
     this.setState({ activeDataKeys });
 
     if (this.props.onSelectChange) {
-      this.props.onSelectChange(activeDataKeys.slice());
+      this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
     }
   };
 
@@ -298,7 +312,7 @@ export default class DataGrid extends Component {
   };
 
   _onEditClicked = () => {
-    this.props.onEdit(this.state.activeDataKeys.slice());
+    this.props.onEdit(this._normalizeSelect(this.state.activeDataKeys));
   };
 
   _mkCell = (cellProps, colProps) => {

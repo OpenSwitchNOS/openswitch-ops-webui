@@ -109,9 +109,8 @@ class InterfacePage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (selections) => {
-    const id = selections[0];
-    this.props.history.pushState(null, `/interface/${id}`);
+  _onSelect = (sel) => {
+    this.props.history.pushState(null, `/interface/${sel}`);
   };
 
   render() {
