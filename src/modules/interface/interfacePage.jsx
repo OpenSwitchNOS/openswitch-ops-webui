@@ -110,7 +110,8 @@ class InterfacePage extends Component {
   }
 
   _onSelect = (sel) => {
-    this.props.history.pushState(null, `/interface/${sel}`);
+    const url = sel ? `/interface/${sel}` : '/interface';
+    this.props.history.pushState(null, url);
   };
 
   render() {
