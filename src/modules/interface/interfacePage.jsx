@@ -120,16 +120,18 @@ class InterfacePage extends Component {
 
     // TODO: This check is not needed - see the vlan page
     const details = !sel ? null : (
-      <ReactCSSTG
-          transitionName="slideInColumn"
-          transitionAppear
-          transitionAppearTimeout={500}
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}>
-        <Box className="pageBox">
-          {this.props.children}
-        </Box>
-      </ReactCSSTG>
+      <Box className="pageBox">
+        <ReactCSSTG
+            transitionName="slideInColumn"
+            transitionAppear
+            transitionAppearTimeout={500}
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+          <div>
+            {this.props.children}
+          </div>
+        </ReactCSSTG>
+      </Box>
     );
 
     return (
