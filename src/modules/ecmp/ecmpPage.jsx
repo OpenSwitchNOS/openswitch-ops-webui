@@ -65,6 +65,8 @@ class ECMPPage extends Component {
         <Box pad={this.pad} className="flex1 pageBox min200x400">
           <span><b>{t('ecmp')}: </b>{t(ecmp.enabled)}</span>
           <br/>
+          <span><b>{t('resilientHash')}: </b>{t(ecmp.resilientHash)}</span>
+          <br/>
           <br/>
           <b>{t('ecmp')} {t('loadBalance')}</b>
           <hr/>
@@ -88,11 +90,6 @@ class ECMPPage extends Component {
               <tr>
                 <td>{t('dstPort')}:</td>
                 <td>{t(ecmp.hashDstPort)}</td>
-              </tr>
-
-              <tr>
-                <td>{t('resilientHash')}:</td>
-                <td>{t(ecmp.resilientHash)}</td>
               </tr>
             </tbody>
           </table>
