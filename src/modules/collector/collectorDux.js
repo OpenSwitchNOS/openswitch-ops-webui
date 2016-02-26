@@ -259,6 +259,10 @@ function parseOverviewResult(result) {
 
   const ecmp = parseEcmp(sysBody.configuration.ecmp_config);
 
+  // log
+
+  const log = Utils.parseLogOverview(); // TODO: mocked log data for now
+
   return {
     info,
     interfaces,
@@ -272,6 +276,7 @@ function parseOverviewResult(result) {
     tempsRollup,
     lldp,
     ecmp,
+    log,
   };
 }
 
@@ -290,6 +295,7 @@ const INITIAL_STORE = {
     tempsRollup: { status: 'unknown' },
     lldp: {},
     ecmp: {},
+    log: { entries: {} },
   }
 };
 

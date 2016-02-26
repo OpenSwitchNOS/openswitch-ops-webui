@@ -14,32 +14,19 @@
     under the License.
 */
 
-import CollectorDux from 'collector/collectorDux.js';
-import MonitorDux from 'monitor/monitorDux.jsx';
-import OverviewDux from 'overview/overviewDux.jsx';
-import InterfaceDux from 'interface/interfaceDux.jsx';
-import EcmpDux from 'ecmp/ecmpDux.jsx';
-import LogDux from 'log/logDux.jsx';
+import LogPage from './logPage.jsx';
 
-const modules = [
-  CollectorDux,
-  MonitorDux,
-  OverviewDux,
-  InterfaceDux,
-  EcmpDux,
-  LogDux,
+
+const NAME = 'log';
+
+const NAVS = [
+  {
+    route: { path: '/log', component: LogPage },
+    link: { path: '/log', order: 450 }
+  },
 ];
 
-import * as i18nLocale from 'i18n/en-US.js';
-import As5712 from 'boxGraphics/as5712.jsx';
-
-const settings = {
-  i18nLocale,
-  boxGraphic: As5712,
-  reduxLogger: true,
-  agent: {
-    prefix: ``,
-  }
+export default {
+  NAME,
+  NAVS,
 };
-
-export default { modules, settings };

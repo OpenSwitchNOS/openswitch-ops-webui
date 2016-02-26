@@ -103,9 +103,79 @@ function parseInterface(inf) {
   };
 }
 
+// TODO: mock log data
+let mockLogDataNextId = 0;
+const mockLogData = {};
+
+function parseLogOverview() {
+
+  function rnd(n) {
+    return Math.floor((Math.random() * n) + 1);
+  }
+
+  function nextId() {
+    mockLogDataNextId++;
+    if (mockLogDataNextId > 20) { mockLogDataNextId = 1; }
+    return mockLogDataNextId;
+  }
+
+  function warn() {
+    return {
+      id: nextId(),
+      ts: Date.now(),
+      sev: 'warning',
+      msg: `High utilization (${rnd(15)+80}%) on interface ${rnd(45)}`,
+    };
+  }
+
+  function crit() {
+    return {
+      id: nextId(),
+      ts: Date.now(),
+      sev: 'critical',
+      msg: `High temperature (${rnd(5)+30} C) detected on base-${rnd(3)}`,
+    };
+  }
+
+  function info() {
+    return {
+      id: nextId(),
+      ts: Date.now(),
+      sev: 'ok',
+      msg: `User 'jpowell' authenticated from from 10.0.0.${rnd(255)}`,
+    };
+  }
+
+  const numAdded = 1;
+  for (let i=0; i<numAdded; i++) {
+    const type = rnd(3);
+    const log = (type === 1) ? warn() : (type === 2) ? crit() : info();
+    mockLogData[log.id] = log;
+  }
+
+  let startTs = Date.now();
+  let endTs = 0;
+  Object.getOwnPropertyNames(mockLogData).forEach(k => {
+    const entry = mockLogData[k];
+    if (startTs > entry.ts) { startTs = entry.ts; }
+    if (endTs < entry.ts) { endTs = entry.ts; }
+  });
+
+  const entries = {};
+  Object.assign(entries, mockLogData);
+
+  return {
+    startTs,
+    endTs,
+    numAdded,
+    entries,
+  };
+}
+
 export default {
   DEF_USER_CFG,
   normalizeUserCfg,
   userCfgForPatch,
   parseInterface,
+  parseLogOverview,
 };

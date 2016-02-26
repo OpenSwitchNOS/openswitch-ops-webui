@@ -19,8 +19,6 @@ import { connect } from 'react-redux';
 import { t, ed } from 'i18n/lookup.js';
 
 import Box from 'grommet/components/Box';
-import Table from 'grommet/components/Table';
-import RefreshIcon from 'grommet/components/icons/base/Refresh';
 
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
@@ -258,6 +256,32 @@ class OverviewPage extends Component {
     );
   };
 
+  _mkLog = () => {
+    function tr(elm) {
+      return (
+        <tr key={elm.id}>
+          <td>{new Date(elm.ts).toLocaleTimeString()}</td>
+          <td><SpanStatus value={elm.sev}>{t(elm.sev)}</SpanStatus></td>
+          <td>{elm.msg}</td>
+        </tr>
+      );
+    }
+    const logs = [];
+    const entries = this.props.collector.overview.log.entries;
+    Object.getOwnPropertyNames(entries).forEach(k => {
+      logs.push(entries[k]);
+    });
+    logs.sort((l1, l2) => l1.ts < l2.ts);
+    const rows = logs.map(e => tr(e));
+    return (
+      <table className="logTable">
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
+    );
+  };
+
   _onSelectInterface = (metric) => {
     this.props.history.pushState(
       null,
@@ -317,8 +341,7 @@ class OverviewPage extends Component {
     if (trafficMetrics.length === 0) {
       trafficMetricsCaption = (
         <div style={{textAlign: 'center'}}>
-          <RefreshIcon className="spin"/>
-          {t('loading')}
+          <i>{t('noTopInterfaces')}</i>
         </div>
       );
     } else {
@@ -335,6 +358,10 @@ class OverviewPage extends Component {
         );
       }
     }
+
+    const log = this.props.collector.overview.log;
+    const logStart = new Date(log.startTs).toLocaleTimeString();
+    const logEnd = new Date(log.endTs).toLocaleTimeString();
 
     return (
       <Box className="flex1">
@@ -376,27 +403,15 @@ class OverviewPage extends Component {
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min300x400">
-          <span><b>{t('log')}&nbsp;&nbsp;</b><small>start-time to end-time</small></span>
+          <span><b>{t('log')}&nbsp;&nbsp;</b>
+            <small>
+            {`${logStart} - ${logEnd} (${log.numAdded} ${t('new')})`}
+            </small>
+          </span>
           <hr/>
-          <Table>
-            <tbody>
-              <tr>
-                <td>4:22:59 PM</td>
-                <td>Critical</td>
-                <td>This is syslog message text for #1 This is syslog message text for #1 This is syslog message text for #1</td>
-              </tr>
-              <tr>
-                <td>4:22:53 PM</td>
-                <td>Critical</td>
-                <td>This is syslog message text for #2 This is syslog message text for #2 This is syslog message text for #2</td>
-              </tr>
-              <tr>
-                <td>4:22:50 PM</td>
-                <td>Critical</td>
-                <td>This is syslog message text for #3 This is syslog message text for #3 This is syslog message text for #3</td>
-              </tr>
-            </tbody>
-          </Table>
+          <div style={{overflow: 'auto'}}>
+            {this._mkLog()}
+          </div>
         </Box>
       </Box>
     );

@@ -16,7 +16,7 @@
 
 import CollectorDux from 'collector/collectorDux.js';
 import MonitorDux from 'monitor/monitorDux.jsx';
-import SyslogDux from 'syslog/syslogDux.jsx';
+import LogDux from 'log/logDux.jsx';
 import DemoDux from 'demo/demoDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
@@ -30,7 +30,7 @@ const modules = [
   OverviewDux,
   InterfaceDux,
   VlanDux,
-  SyslogDux,
+  LogDux,
   EcmpDux,
 ];
 

@@ -86,13 +86,25 @@ table th {
   font-weight: bold;
 }
 
-// Property styles for plain html tables
+// Property styles for 'propTable' plain html tables
 table.propTable {
   tbody {
     vertical-align: top;
   }
   td:first-child {
     font-weight: bold;
+  }
+  td {
+    padding-right: 16px;
+    padding-bottom: 16px;
+  }
+  margin-bottom: 0px;
+}
+
+// Property styles for 'logTable' plain html tables
+table.logTable {
+  tbody {
+    vertical-align: top;
   }
   td {
     padding-right: 16px;
