@@ -15,19 +15,20 @@
 */
 
 import React, { PropTypes, Component } from 'react';
-import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
-import DataGrid from 'dataGrid.jsx';
+import DataGrid, { CustomCell } from 'dataGrid.jsx';
 
 
 class VlanPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
+    collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
@@ -37,7 +38,7 @@ class VlanPage extends Component {
 
   constructor(props) {
     super(props);
-    this.cols = [
+    this.vlanCols = [
       {
         columnKey: 'id',
         header: t('id'),
@@ -47,12 +48,37 @@ class VlanPage extends Component {
       {
         columnKey: 'name',
         header: t('name'),
-        flexGrow: 1,
         width: 200,
+      },
+      {
+        columnKey: 'operState',
+        header: t('status'),
+        width: 140,
+      },
+      {
+        columnKey: 'operStateReason',
+        header: t('reason'),
+        width: 140,
+      },
+      {
+        columnKey: 'interfaces',
+        header: t('interfaces'),
+        cell: this._onCustomCell,
+        flexGrow: 1,
+        width: 140,
       },
     ];
     this.state = {};
   }
+
+  _onCustomCell = (cellData, cellProps) => {
+    const ids = Object.keys(cellData).sort().join(', ');
+    return (
+      <CustomCell {...cellProps}>
+        {ids}
+      </CustomCell>
+    );
+  };
 
   componentDidMount() {
     this.props.actions.vlan.fetch();
@@ -64,6 +90,7 @@ class VlanPage extends Component {
 
   _onRefresh = () => {
     this.props.actions.vlan.fetch();
+    this.props.autoActions.collector.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
@@ -77,46 +104,34 @@ class VlanPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (id) => {
-    this.props.history.pushState(null, `/vlan/${id}`);
+  _onSelect = (selections) => {
+    const selectedVlan = selections[0];
+    this.props.history.pushState(null, `/vlan/${selectedVlan}`);
+  };
+
+  _onEdit = (selection) => {
+    alert(`Edit: ${selection}`);
   };
 
   render() {
-    const vlans = this.props.vlan.page.entities;
+    const vlans = this.props.vlan.page.vlans;
 
-    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
-    const details = !this.props.params.id ? null : (
-        <Box className="pageBox">
-          <ReactCSSTG
-              transitionName="slideInColumn"
-              transitionAppear
-              transitionAppearTimeout={500}
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={500}>
-            {this.props.children}
-          </ReactCSSTG>
-        </Box>
-    );
+    // TODO: put this in the collector so we have it for the overview?
+    const numVlans = Object.getOwnPropertyNames(vlans).length;
 
     return (
-      <Box direction="row" className="flex1">
-        <Box className="flex1">
-          <Box className="pageBox min200x200">
-            ...BoxGraphic goes here...
-          </Box>
-          <Box className="flex1 mTopHalf mLeft">
-            <ResponsiveBox>
-              <DataGrid width={300} height={400}
-                  data={vlans}
-                  columns={this.cols}
-                  singleSelect
-                  onSelectChange={this._onSelect}
-              />
-            </ResponsiveBox>
-          </Box>
-        </Box>
-        {details}
+      <Box className="flex1 mTopHalf mLeft">
+        <ResponsiveBox>
+          <DataGrid width={400} height={400}
+              title={`(${numVlans})`}
+              data={vlans}
+              columns={this.vlanCols}
+              singleSelect
+              onSelectChange={this._onSelect}
+              select={[ this.props.params.id ]}
+              onEdit={this._onEdit}
+          />
+        </ResponsiveBox>
       </Box>
     );
   }
@@ -125,6 +140,7 @@ class VlanPage extends Component {
 
 function select(store) {
   return {
+    collector: store.collector,
     vlan: store.vlan,
   };
 }

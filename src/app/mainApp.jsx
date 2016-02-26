@@ -19,6 +19,7 @@
 import './mainApp.scss';
 
 import React, { PropTypes, Component } from 'react';
+import Breadcrumbs from 'react-breadcrumbs';
 import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { navt } from 'i18n/lookup.js';
@@ -53,7 +54,9 @@ class MainApp extends Component {
     guide: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
+    params: PropTypes.object.isReqired,
     routeToLink: PropTypes.object.isRequired,
+    routes: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired,
   };
 
@@ -142,7 +145,7 @@ class MainApp extends Component {
               <NextIcon />
             </Anchor>
           }
-          <Title>{this._linkPathName()}</Title>
+          <Breadcrumbs routes={this.props.routes} params={this.props.params} />
         </Box>
         <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar.component}

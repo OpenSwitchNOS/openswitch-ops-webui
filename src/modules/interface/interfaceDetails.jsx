@@ -125,7 +125,6 @@ class InterfaceDetails extends Component {
         </a>
       );
 
-    // TODO: format the numerical values using 1,000,000 etc.
     return (
       <Box pad="small" className="details min200x400">
         <Header tag="h4" justify="between">

@@ -37,8 +37,10 @@ function processRouteDesc(navModelRoutes, routeDesc) {
   const path = routeDesc.path;
   const p = path && path.charAt(0) === '/' ? path.substr(1) : path;
   const pathArray = p.split('/');
-  const key = pathArray.pop();
-
+  let key = pathArray[0];
+  if (pathArray.length > 1) {
+    key = pathArray.slice(1).join('/');
+  }
   let parent = navModelRoutes;
   pathArray.forEach(pathPart => parent = parent[pathPart] || parent);
   parent[key] = mkRouteDescNode(routeDesc.component);
