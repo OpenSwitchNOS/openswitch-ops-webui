@@ -19,7 +19,11 @@
 // created here.
 
 import React from 'react';
-import { Route } from 'react-router';
+import { Route, IndexRoute } from 'react-router';
+import { navt } from 'i18n/lookup.js';
+
+
+const DEFAULT_ROUTE = 'overview';
 
 function mkRouteDescNode(component) {
   return { component };
@@ -93,10 +97,13 @@ function mkChildRouteElements(subModel, key) {
   Object.getOwnPropertyNames(subModel).forEach(k => {
     if (k !== 'component') {
       children.push(mkChildRouteElements(subModel[k], k));
+      if (k === DEFAULT_ROUTE) {
+        children.push(<IndexRoute component={subModel[k].component} />);
+      }
     }
   });
   const props = { key, path: key, component: subModel.component, children };
-  return <Route { ...props }/>;
+  return <Route { ...props } name={navt(key)} />;
 }
 
 export function createRouteElements(navModel) {

@@ -22,7 +22,6 @@ import React, { PropTypes, Component } from 'react';
 import Breadcrumbs from 'react-breadcrumbs';
 import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
-import { navt } from 'i18n/lookup.js';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -105,21 +104,6 @@ class MainApp extends Component {
     this.props.actions.nav.showPane();
   };
 
-  // FIXME: this is broken with /vlan/:id - use a "breadcrumb" plug in?
-  _linkPathName = () => {
-    const loc = this.props.location.pathname;
-    const linkPath = this.props.routeToLink[loc];
-    if (linkPath) {
-      const name = [];
-      const parts = linkPath.split('/');
-      parts.forEach(p => {
-        if (p) { name.push(navt(p)); }
-      });
-      return name.join('/');
-    }
-    return '/';
-  };
-
   _onLoginSubmit = () => {
     this.props.actions.auth.login();
   };
@@ -136,6 +120,15 @@ class MainApp extends Component {
     // data retieved from this.props.collector.?
     const numSyslog = 99;
 
+    // When we assign the name to the route we do a 'navt' lookup, so '/' gets
+    // converted to '~/~'.
+    const breadcrumbs = (
+      <Breadcrumbs
+          excludes={['~/~']}
+          routes={this.props.routes}
+          params={this.props.params} />
+    );
+
     const pageHdr = (
       <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
           justify="between">
@@ -145,7 +138,7 @@ class MainApp extends Component {
               <NextIcon />
             </Anchor>
           }
-          <Breadcrumbs routes={this.props.routes} params={this.props.params} />
+          {breadcrumbs}
         </Box>
         <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar.component}
