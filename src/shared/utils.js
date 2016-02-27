@@ -34,12 +34,18 @@ function normalizeUserCfg(userCfg) {
 }
 
 function userCfgForPatch(userCfg) {
-  const patchUserCfg = { ...userCfg };
+  const minUserCfg = { ...userCfg };
   Object.getOwnPropertyNames(DEF_USER_CFG).forEach(k => {
-    if (DEF_USER_CFG[k] === patchUserCfg[k]) {
-      delete patchUserCfg[k];
+    if (DEF_USER_CFG[k] === minUserCfg[k]) {
+      delete minUserCfg[k];
     }
   });
+  // TODO: revisit this for a better way
+  const patchUserCfg = {};
+  if (minUserCfg.admin) { patchUserCfg.admin = minUserCfg.admin; }
+  if (minUserCfg.duplex) { patchUserCfg.duplex = minUserCfg.duplex; }
+  if (minUserCfg.autoNeg) { patchUserCfg.autoneg = minUserCfg.autoNeg; }
+  if (minUserCfg.flowCtrl) { patchUserCfg.pause = minUserCfg.flowCtrl; }
   return patchUserCfg;
 }
 

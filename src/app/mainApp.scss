@@ -236,6 +236,12 @@ $slideInColumnMinWidth: 350px;
 
 // Grommet overrides start here...
 
+// Form legend text is too big.
+.edit .form fieldset > legend {
+  font-size: 1rem;
+  margin-bottom: 0px;
+}
+
 // Override the sidebar-width for the navigation pane.
 $sidebar-width: 320px; // this is used by _objects.sidebar.scss
 
