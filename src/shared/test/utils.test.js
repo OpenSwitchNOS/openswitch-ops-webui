@@ -145,6 +145,7 @@ describe('utils', () => {
     const result = Utils.userCfgForPatch(userConfigWithOneNonDefault);
     expect(result).toEqual(expectedResult);
   });
+
   it('handles basic case for userCfgForPatch method', () => {
     const basicUserConfig = {
       autoNeg: 'off',

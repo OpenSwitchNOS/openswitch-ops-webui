@@ -28,6 +28,8 @@ import EditIcon from 'grommet/components/icons/base/Edit';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import Toolbar from 'toolbar.jsx';
+import Utils from 'utils.js';
+
 
 const ASC = 'asc';
 const DESC = 'desc';
@@ -186,12 +188,7 @@ export default class DataGrid extends Component {
     return (rowDataA, rowDataB) => {
       const a = rowDataA[k];
       const b = rowDataB[k];
-      let result = 0;
-      if (a > b) {
-        result = 1;
-      } else if (a < b) {
-        result = -1;
-      }
+      let result = Utils.naturalSort(a, b);
       if (result !== 0 && sortDirection === ASC) {
         result = result * -1;
       }
