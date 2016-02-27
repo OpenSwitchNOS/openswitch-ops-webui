@@ -140,7 +140,7 @@ describe('utils', () => {
       flowCtrl: 'tx'
     };
     const expectedResult = {
-      flowCtrl: 'tx',
+      pause: 'tx',
     };
     const result = Utils.userCfgForPatch(userConfigWithOneNonDefault);
     expect(result).toEqual(expectedResult);
@@ -153,10 +153,10 @@ describe('utils', () => {
       flowCtrl: 'rxtx'
     };
     const expectedResult = {
-      autoNeg: 'off',
+      autoneg: 'off',
       duplex: 'half',
       admin: 'up',
-      flowCtrl: 'rxtx'
+      pause: 'rxtx'
     };
     const result = Utils.userCfgForPatch(basicUserConfig);
     expect(result).toEqual(expectedResult);

@@ -114,14 +114,14 @@ const QP_CFG_SELECT = '?selector=configuration';
 const ACTIONS = {
 
   set(detail, userCfg) {
-    const PATCH_USER_CFG = Utils.userCfgForPatch(userCfg);
+    const patchUserCfg = Utils.userCfgForPatch(userCfg);
     const INF_URL = `${INFS_URL}/${detail.inf.id}`;
     const INF_CFG_URL = `${INFS_URL}/${detail.inf.id}${QP_CFG_SELECT}`;
 
     return (dispatch) => {
       const reqs = [];
 
-      if (Object.keys(PATCH_USER_CFG).length === 0) {
+      if (Object.keys(patchUserCfg).length === 0) {
         reqs.push(cb => Agent.patch(INF_CFG_URL)
           .send([{op: 'remove', path: '/user_config'}])
           .set('If-Match', detail.inf.etag)
@@ -129,7 +129,7 @@ const ACTIONS = {
         );
       } else {
         reqs.push(cb => Agent.patch(INF_CFG_URL)
-          .send([{op: 'add', path: '/user_config', value: PATCH_USER_CFG}])
+          .send([{op: 'add', path: '/user_config', value: patchUserCfg}])
           .set('If-Match', detail.inf.etag)
           .end(mkAgentHandler(INF_CFG_URL, cb))
         );

@@ -66,6 +66,46 @@ class InterfaceEdit extends Component {
     this.setState({ userCfg });
   };
 
+  _onChangeAutoNegOn = () => {
+    const userCfg = { ...this.state.userCfg, autoNeg: 'on' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeAutoNegOff = () => {
+    const userCfg = { ...this.state.userCfg, autoNeg: 'off' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeDuplexFull = () => {
+    const userCfg = { ...this.state.userCfg, duplex: 'full' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeDuplexHalf = () => {
+    const userCfg = { ...this.state.userCfg, duplex: 'half' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeFcNone = () => {
+    const userCfg = { ...this.state.userCfg, flowCtrl: 'none' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeFcTx = () => {
+    const userCfg = { ...this.state.userCfg, flowCtrl: 'tx' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeFcRx = () => {
+    const userCfg = { ...this.state.userCfg, flowCtrl: 'rx' };
+    this.setState({ userCfg });
+  };
+
+  _onChangeFcRxTx = () => {
+    const userCfg = { ...this.state.userCfg, flowCtrl: 'rxtx' };
+    this.setState({ userCfg });
+  };
+
   render() {
     return (
       <Layer
@@ -77,16 +117,14 @@ class InterfaceEdit extends Component {
         <Box pad="small" className="flex1">
           <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
             <Title>
-              {`${t('edit')} ${t('interface')}: ${this.props.detail.inf.id}`}
+            {`${t('edit')} ${t('interface')}: ${this.props.detail.inf.id}`}
             </Title>
           </Header>
           <hr/>
           <Form>
-            <Header>
-              <h3>{t('userCfgAdmin')}</h3>
-            </Header>
             <FormFields>
               <fieldset>
+                <legend>{t('userCfgAdmin')}</legend>
                 <FormField>
                   <RadioButton
                       id={this._id('userCfgAdminUp')}
@@ -98,6 +136,55 @@ class InterfaceEdit extends Component {
                       label={t('down')}
                       checked={this.state.userCfg.admin !== 'up'}
                       onChange={this._onChangeAdminDown} />
+                </FormField>
+                <legend>{t('autoNeg')}</legend>
+                <FormField>
+                  <RadioButton
+                      id={this._id('userCfgAutoNegOn')}
+                      label={t('on')}
+                      checked={this.state.userCfg.autoNeg === 'on'}
+                      onChange={this._onChangeAutoNegOn} />
+                  <RadioButton
+                      id={this._id('userCfgAutoNegOff')}
+                      label={t('off')}
+                      checked={this.state.userCfg.autoNeg !== 'on'}
+                      onChange={this._onChangeAutoNegOff} />
+                </FormField>
+                <legend>{t('duplex')}</legend>
+                <FormField>
+                  <RadioButton
+                      id={this._id('userCfgDuplexFull')}
+                      label={t('full')}
+                      checked={this.state.userCfg.duplex !== 'half'}
+                      onChange={this._onChangeDuplexFull} />
+                  <RadioButton
+                      id={this._id('userCfgDuplexHalf')}
+                      label={t('half')}
+                      checked={this.state.userCfg.duplex === 'half'}
+                      onChange={this._onChangeDuplexHalf} />
+                </FormField>
+                <legend>{t('flowControl')}</legend>
+                <FormField>
+                  <RadioButton
+                      id={this._id('userCfgFcNone')}
+                      label={t('none')}
+                      checked={this.state.userCfg.flowCtrl === 'none'}
+                      onChange={this._onChangeFcNone} />
+                  <RadioButton
+                      id={this._id('userCfgFcTx')}
+                      label={t('rx')}
+                      checked={this.state.userCfg.flowCtrl === 'tx'}
+                      onChange={this._onChangeFcTx} />
+                  <RadioButton
+                      id={this._id('userCfgFcRx')}
+                      label={t('tx')}
+                      checked={this.state.userCfg.flowCtrl === 'rx'}
+                      onChange={this._onChangeFcRx} />
+                  <RadioButton
+                      id={this._id('userCfgFcTxRx')}
+                      label={t('rxtx')}
+                      checked={this.state.userCfg.flowCtrl === 'rxtx'}
+                      onChange={this._onChangeFcRxTx} />
                 </FormField>
               </fieldset>
             </FormFields>
