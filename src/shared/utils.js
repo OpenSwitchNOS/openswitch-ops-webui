@@ -109,6 +109,7 @@ function parseInterface(inf) {
   };
 }
 
+
 // TODO: mock log data
 let mockLogDataNextId = 0;
 const mockLogData = {};
@@ -178,10 +179,32 @@ function parseLogOverview() {
   };
 }
 
+// TODO: need unit test
+
+const NUMBER_GROUPS = /(-?\d*\.?\d+)/g;
+
+function naturalSort(a, b) {
+  const aa = String(a).split(NUMBER_GROUPS);
+  const bb = String(b).split(NUMBER_GROUPS);
+  const min = Math.min(aa.length, bb.length);
+
+  for (let i = 0; i < min; i++) {
+    const x = parseFloat(aa[i]) || aa[i].toLowerCase();
+    const y = parseFloat(bb[i]) || bb[i].toLowerCase();
+    if (x < y) {
+      return -1;
+    } else if (x > y) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 export default {
   DEF_USER_CFG,
   normalizeUserCfg,
   userCfgForPatch,
   parseInterface,
   parseLogOverview,
+  naturalSort,
 };
