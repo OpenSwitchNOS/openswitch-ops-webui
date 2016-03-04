@@ -18,6 +18,7 @@ Repository Structure
  * `index.html` - contains the main application _div_
  * `bundle.js` - all compiled javascript and style
  * _images, icons, & fonts_
+- errors/ - static error pages
 * node\_modules/ - all 3rd party npm modules are install here
  * react/
  * grommet/

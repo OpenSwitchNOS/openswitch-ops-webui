@@ -1,0 +1,80 @@
+@font-face {
+  font-family: Exo;
+  src: url("exo-semibold.woff") format("woff");
+  font-weight: 600;
+}
+@font-face {
+  font-family: Exo;
+  src: url("exo-light.woff") format("woff");
+  font-weight: 100;
+}
+
+svg:not(:root)  {
+  overflow:  hidden;
+}
+
+h1, h2, h3  {
+  margin:  0px;
+  margin-bottom:  1.5rem;
+
+  padding:  0px;
+  font-weight:  100;
+  max-width:  100%;
+}
+
+h1  {
+  font-weight:  600;
+  font-size:  3rem;
+  line-height:  1;
+}
+
+h2  {
+  font-size:  2.25rem;
+  line-height:  1.33333;
+}
+
+h3  {
+  font-size:  1.5rem;
+  line-height:  28px;
+}
+
+.box  {
+  position:  relative;
+
+  padding:  0px;
+  margin:  0 auto;
+
+  width:  480px;
+  padding:  24px 24px 48px;
+  text-align:  center;
+  animation-name:  fadein;
+  animation-duration:  0.5s;
+}
+
+html {
+  color: #333;
+  overflow-y: scroll;
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  background-image: radial-gradient(circle at top,#fff,#fff 20%,hsla(0,0%,50%,.6));
+  margin: 0;
+  font-family:  Exo,  Arial,  sans-serif;
+}
+
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.openswitch-logo {
+  margin: 0 auto;
+  width: 96px;
+  height: 96px;
+}

@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "title": "OpenSwitch"
+  },
+  "plugins": {
+    "metalsmith-markdown": {},
+    "metalsmith-layouts": {
+      "engine": "handlebars",
+      "partials": "compiled"
+    }
+  }
+}
