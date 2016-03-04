@@ -30,6 +30,7 @@ import DemoButtonPage from './demoButtonPage.jsx';
 import DemoFormPage from './demoFormPage.jsx';
 import DemoLayerPage from './demoLayerPage.jsx';
 import DemoMetricPage from './demoMetricPage.jsx';
+import DemoTables from './demoTables.jsx';
 
 const NAME = 'demo';
 
@@ -92,6 +93,10 @@ const NAVS = [
     route: { path: '/demoMetric', component: DemoMetricPage },
     link: { path: '/demo/metric', order: order++ }
   },
+  {
+    route: { path: '/demoTables', component: DemoTables },
+    link: { path: '/demo/tables', order: order++ }
+  },
 ];
 
 const PAGE_ASYNC = 'page';
@@ -114,7 +119,7 @@ const INITIAL_STORE = {
 
 function parsePageResult() {
   const entities = {};
-  for (let i=1; i<=30; i++) {
+  for (let i=1; i<=15; i++) {
     entities[`${i}`] = { id: i, text: `This is item ${i}` };
   }
   return { entities };

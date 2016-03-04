@@ -41,6 +41,7 @@ export const NAVS = {
   overview: 'Overview',
   syslog: 'Syslog',
   table: 'Table',
+  tables: 'Row Swapping between Tables',
   vlan: 'VLANs',
 };
 
