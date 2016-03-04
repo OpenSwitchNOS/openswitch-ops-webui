@@ -22,6 +22,7 @@ import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import VlanDux from 'vlan/vlanDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
+import LagDux from 'lag/lagDux.jsx';
 
 const modules = [
   CollectorDux,
@@ -32,6 +33,7 @@ const modules = [
   VlanDux,
   LogDux,
   EcmpDux,
+  LagDux,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
@@ -42,7 +44,7 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.30.248:8091',
+    prefix: 'http://15.108.28.79:8091',
   }
 };
 
