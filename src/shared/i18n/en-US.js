@@ -35,7 +35,7 @@ export const NAVS = {
   info: 'Info',
   interface: 'Interfaces',
   log: 'Log',
-  lag: 'LAGs',
+  lag: 'LAG',
   layer: 'Layer',
   metric: 'Metrics',
   overview: 'Overview',
@@ -46,6 +46,10 @@ export const NAVS = {
 
 export const MESSAGES = {
   adminState: 'Admin State',
+  aggregateName: 'Aggregate Name',
+  aggregatedInterfaces: 'Aggregated Interfaces',
+  aggregationKey: 'Aggregation Key',
+  aggregateMode: 'Aggregate Mode',
   alert: 'Alert',
   all: 'All',
   areYouSure: 'Are you sure?',
@@ -192,6 +196,7 @@ export const MESSAGES = {
   vendor: 'Vendor',
   vlanMode: 'VLAN Mode',
   vlans: 'VLANs',
+  vlan: 'Vlan',
   version: 'Version',
   warning: 'Warning',
   yes: 'Yes'
