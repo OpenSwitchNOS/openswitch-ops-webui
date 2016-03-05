@@ -21,6 +21,7 @@ import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import ReactCSSTG from 'react-addons-css-transition-group';
+import LagEdit from './lagEdit.jsx';
 
 class LagPage extends Component {
 
@@ -73,7 +74,9 @@ class LagPage extends Component {
         width: 140,
       },
     ];
-    this.state = {};
+    this.state = {
+      edit: false,
+    };
   }
 
   _onCustomCell = (cellData, cellProps) => {
@@ -108,8 +111,9 @@ class LagPage extends Component {
      this.props.history.pushState(null, url);
    };
 
-  _onEdit = (sel) => {
-    alert(sel);  //TODO: Lag EDIT
+  _onEdit = () => {
+    const edit = !this.state.edit;
+    this.setState({edit});
   };
 
   _tr = (td1, td2) => {
@@ -128,6 +132,13 @@ class LagPage extends Component {
     // TODO: put this in the collector so we have it for the overview?
     const numLags = Object.getOwnPropertyNames(lags).length;
     const sel = this.props.params.id;
+    const edit = !this.state.edit ? null :
+      <LagEdit
+          onClose={this._onEdit}
+          params={this.props.params}
+          lag={lags}
+      />;
+
 
     // TODO: This check is not needed - see the vlan page
     const details = !sel ? null : (
@@ -159,6 +170,7 @@ class LagPage extends Component {
           />
         </ResponsiveBox>
         {details}
+        {edit}
       </Box>
     );
   }

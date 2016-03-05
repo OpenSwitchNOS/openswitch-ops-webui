@@ -17,8 +17,6 @@
 import Dux from 'dux.js';
 import LagPage from './lagPage.jsx';
 import LagDetails from './lagDetails.jsx';
-import Async from 'async';
-import Agent, {mkAgentHandler} from 'agent.js';
 
 
 const NAME = 'lag';
@@ -40,28 +38,10 @@ const NAVS = [
 const VLANS_URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
 const PORTS_URL = '/rest/v1/system/ports?depth=1';
 const INTERFACES_URL = '/rest/v1/system/interfaces?depth=1';
-const PORT_URL = '/rest/v1/system/ports/';
 
-const URLS = [ VLANS_URL, PORTS_URL, INTERFACES_URL, PORT_URL ];
+const URLS = [ VLANS_URL, PORTS_URL, INTERFACES_URL ];
 
 const ACTIONS = {
-
-  fetchDetails(id) {
-    const LAG_URL = `${PORT_URL}/${id}`;
-
-    return (dispatch) => {
-      Dux.dispatchRequest(dispatch, PAGE_AT);
-      const gets = {
-        inf:
-          cb => Agent.get(LAG_URL).end(mkAgentHandler(LAG_URL, cb)),
-      };
-      Async.parallel(gets, (e1) => {
-        if (e1) {
-          return Dux.dispatchFail(dispatch, PAGE_AT, e1);
-        }
-      });
-    };
-  },
 
   fetch() {
     return (dispatch, getStoreFn) => {
@@ -87,6 +67,8 @@ function parsePageResult(result) {
         vlanMode: cfg.vlan_mode || '',
         interfaces: cfg.interfaces || '',
         vlans: {},
+        lagInterfaces: {},
+        availableInterfacesForLag: {},
       };
       for (const i in elm.configuration.interfaces) {
         lags[idModified].interfaces[i] = elm.configuration.interfaces[i].substring(27);
@@ -94,6 +76,46 @@ function parsePageResult(result) {
       lags[idModified].interfaces = lags[idModified].interfaces.join(',');
     }
   });
+
+  const lagInterfaces = {};
+  result[2].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const id = cfg.name;
+    const otherConfig = cfg.other_config;
+    if (otherConfig && otherConfig['lacp-aggregation-key']) {
+      const data = {
+        id,
+        rxBytes: elm.statistics.statistics.rx_bytes || 0,
+        rxPackets: elm.statistics.statistics.rx_packets || 0,
+        rxErrors: elm.statistics.statistics.rx_errors || 0,
+        rxDropped: elm.statistics.statistics.rx_dropped || 0,
+        txBytes: elm.statistics.statistics.tx_bytes || 0,
+        txPackets: elm.statistics.statistics.tx_packets || 0,
+        txErrors: elm.statistics.statistics.tx_errors || 0,
+        txDropped: elm.statistics.statistics.tx_dropped || 0,
+        speed: elm.status.link_speed || 0,
+        lacpKey: otherConfig['lacp-aggregation-key'],
+      };
+      lagInterfaces[id] = data;
+      if (data.lacpKey) {
+        lags[data.lacpKey].lagInterfaces[id] = data;
+      }
+    }
+  });
+
+  const availableInterfacesForLag = {};
+  result[2].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const id = cfg.name;
+    const otherConfig = cfg.other_config;
+    if (!(otherConfig && otherConfig['lacp-aggregation-key'])) {
+      const data = {
+        id,
+      };
+      availableInterfacesForLag[id] = data;
+    }
+  });
+
 
   const vlans = {};
   result[1].body.forEach(elm => {
@@ -120,8 +142,7 @@ function parsePageResult(result) {
     }
   });
 
-
-  return {lags};
+  return {lags, availableInterfacesForLag};
 }
 
 const INITIAL_STORE = {
