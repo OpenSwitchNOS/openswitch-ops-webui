@@ -17,6 +17,8 @@
 import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
 import VlanDetails from './vlanDetails.jsx';
+import VlanPage2 from './vlanPage2.jsx';
+import { MultiRange as Range } from 'multi-integer-range';
 
 
 const NAME = 'vlan';
@@ -28,6 +30,10 @@ const NAVS = [
   {
     route: { path: '/vlan', component: VlanPage },
     link: { path: '/vlan', order: 300 }
+  },
+  {
+    route: { path: '/vlan2', component: VlanPage2 },
+    link: { path: '/vlan2', order: 600 }
   },
   {
     route: { path: '/vlan/:id', component: VlanDetails },
@@ -85,13 +91,34 @@ function parsePageResult(result) {
     }
   });
 
-  return { vlans, interfaces };
+  //TODO: Should rename...
+  const vlans2 = {};
+  result[1].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const id = cfg.name;
+    if (cfg.vlan_mode) {
+      const data = {
+        id,
+        tag: cfg.tag,
+        trunks: cfg.trunks,
+        mode: cfg.vlan_mode,
+      };
+      vlans2[id] = data;
+      if (data.trunks) {
+        const range = new Range(data.trunks);
+        vlans2[id].trunks = range.toString();
+      }
+    }
+  });
+
+  return { vlans, interfaces, vlans2 };
 }
 
 const INITIAL_STORE = {
   page: {
     ...Dux.mkAsyncStore(),
     vlans: {},
+    vlans2: {},
   },
 };
 

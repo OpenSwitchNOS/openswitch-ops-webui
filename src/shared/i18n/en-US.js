@@ -43,6 +43,7 @@ export const NAVS = {
   table: 'Table',
   tables: 'Row Swapping between Tables',
   vlan: 'VLANs',
+  vlan2: 'VLAN By Interface',
 };
 
 export const MESSAGES = {
@@ -178,11 +179,13 @@ export const MESSAGES = {
   sysDesc: 'System Desc',
   system: 'System',
   systemMac: 'System MAC',
+  tag: 'VLAN Tag',
   temperatures: 'Temperatures',
   text: 'Text',
   time: 'Time',
   total: 'Total',
   true: 'True',
+  trunks: 'VLAN Trunks',
   tx: 'Tx',
   txPackets: 'Tx Packets',
   txBytes: 'Tx Bytes',
@@ -197,7 +200,7 @@ export const MESSAGES = {
   vendor: 'Vendor',
   vlanMode: 'VLAN Mode',
   vlans: 'VLANs',
-  vlan: 'Vlan',
+  vlan: 'VLAN',
   version: 'Version',
   warning: 'Warning',
   yes: 'Yes'
