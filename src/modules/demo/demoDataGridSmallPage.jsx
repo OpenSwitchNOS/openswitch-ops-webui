@@ -20,6 +20,7 @@ import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
 import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
+import ActionsIcon from 'grommet/components/icons/base/Actions';
 import Button from 'grommet/components/Button';
 
 
@@ -73,11 +74,24 @@ class DemoDataGridSmallPage extends Component {
   }
 
   _onEdit = (selection) => {
-    alert(selection);
+    alert(`edit ${selection}`);
+  };
+
+  _onDelete = (selection) => {
+    alert(`delete ${selection}`);
+  };
+
+  _onAdd = () => {
+    alert('add');
+  };
+
+  _onAction = () => {
+    alert(`action ${this.state.externalSelect}`);
   };
 
   _onSelectChange = (selection) => {
     alert(selection);
+    this.setState({ externalSelect: selection });
   };
 
   _onForceSelect = () => {
@@ -91,29 +105,38 @@ class DemoDataGridSmallPage extends Component {
     return (
       <div className="mLeft">
         <Section>
-          <DataGrid title="Full Toolbar" width={500} height={200}
+          <DataGrid title="Full Toolbar" width={600} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
               onEdit={this._onEdit}
+              onAdd={this._onAdd}
+              onDelete={this._onDelete}
           />
         </Section>
         <Section>
-          <DataGrid title="Select / No Edit" width={500} height={200}
+          <DataGrid title="Select / No Edit" width={600} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
               onSelectChange={this._onSelectChange}
           />
         </Section>
         <Section>
-          <DataGrid title="No Filter / Single Select" width={500} height={200}
+          <DataGrid title="No Filter / Single Select" width={600} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
               noFilter
               singleSelect
-              select={[ this.state.externalSelect.toString() ]}
+              onSelectChange={this._onSelectChange}
+              select={this.state.externalSelect.toString()}
+              toolbar={[
+                <a onClick={this._onAction}>Act1</a>,
+                <a className="control-icon" onClick={this._onAction}>
+                  <ActionsIcon/>
+                </a>
+              ]}
           />
           <Button
-              label={`Select ID ${this.state.externalSelect + 1}`}
+              label={`Select ID ${Number(this.state.externalSelect) + 1}`}
               onClick={this._onForceSelect}
           />
         </Section>

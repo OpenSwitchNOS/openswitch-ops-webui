@@ -176,16 +176,6 @@ table.logTable {
 }
 
 @media screen and (min-width: 45em) {
-  .edit .layer__container {
-    margin: 8px;
-    border: 3px solid $brand-color;
-  }
-}
-.edit.layer {
-  z-index: 100;
-}
-
-@media screen and (min-width: 45em) {
   .guide {
     margin: 8px;
     border-radius: 5px;
@@ -240,6 +230,16 @@ $slideInColumnMinWidth: 350px;
 .edit .form fieldset > legend {
   font-size: 1rem;
   margin-bottom: 0px;
+}
+
+@media screen and (min-width: 45em) {
+  .edit .layer__container {
+    margin: 8px;
+    border: 3px solid $brand-color;
+  }
+}
+.edit.layer {
+  z-index: 100;
 }
 
 // Override the sidebar-width for the navigation pane.
