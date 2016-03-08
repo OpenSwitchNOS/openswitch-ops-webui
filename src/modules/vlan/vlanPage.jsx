@@ -22,6 +22,7 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import { MultiRange as Range } from 'multi-integer-range';
 import VlanAdd from './vlanAdd.jsx';
+import VlanEdit from './vlanEdit.jsx';
 import ErrorLayer from 'errorLayer.jsx';
 
 
@@ -53,16 +54,16 @@ class VlanPage extends Component {
         header: t('name'),
         width: 200,
       },
-      {
-        columnKey: 'operState',
-        header: t('status'),
-        width: 140,
-      },
-      {
-        columnKey: 'operStateReason',
-        header: t('reason'),
-        width: 140,
-      },
+      // {
+      //   columnKey: 'operState',
+      //   header: t('status'),
+      //   width: 140,
+      // },
+      // {
+      //   columnKey: 'operStateReason',
+      //   header: t('reason'),
+      //   width: 140,
+      // },
       {
         columnKey: 'interfaces',
         header: t('interfaces'),
@@ -73,6 +74,7 @@ class VlanPage extends Component {
     ];
     this.state = {
       addMode: false,
+      editMode: false,
     };
   }
 
@@ -132,8 +134,19 @@ class VlanPage extends Component {
     this.props.history.pushState(null, url);
   };
 
-  _onEdit = (sel) => {
-    alert(`Edit: ${sel}`);
+  _onEditOpen = () => {
+    this.setState({ editMode: true });
+  };
+
+  // TODO: decide on OK vs Deploy (Apply and OK, is better then Apply and Deploy)
+  _onEditOk = (cfg) => {
+    this.props.actions.vlan.editVlan(this.props.vlan.page, cfg);
+    // TODO: this should wait until success or failure
+    this.setState({ editMode: false });
+  };
+
+  _onEditClose = () => {
+    this.setState({ editMode: false });
   };
 
   _onAddOpen = () => {
@@ -176,6 +189,16 @@ class VlanPage extends Component {
           vlans={vlans}
       />;
 
+    // TODO: How do we want to standardize passing config to an edit component
+    // TODO: How do we want to standardize passing data to a component
+    const editLayer = !this.state.editMode ? null :
+      <VlanEdit
+          onClose={this._onEditClose}
+          onOk={this._onEditOk}
+          vlanId={this.props.params.id}
+          data={this.props.vlan.page}
+      />;
+
     const set = this.props.vlan.set;
     const errorLayer = !set.lastError ? null :
       <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
@@ -183,6 +206,7 @@ class VlanPage extends Component {
     return (
       <Box className="flex1 mTopHalf mLeft">
         {addLayer}
+        {editLayer}
         {errorLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
@@ -192,7 +216,7 @@ class VlanPage extends Component {
               singleSelect
               onSelectChange={this._onSelect}
               select={[ this.props.params.id ]}
-              onEdit={this._onEdit}
+              onEdit={this._onEditOpen}
               onAdd={this._onAddOpen}
               onDelete={this._onDelete}
           />

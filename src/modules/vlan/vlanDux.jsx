@@ -16,7 +16,7 @@
 
 import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
-import VlanDetails from './vlanDetails.jsx';
+import VlanEdit from './vlanEdit.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
 
 
@@ -35,7 +35,7 @@ const NAVS = [
     link: { path: '/vlan', order: 300 }
   },
   {
-    route: { path: '/vlan/:id', component: VlanDetails },
+    route: { path: '/vlan/:id', component: VlanEdit },
     link: { path: '/vlan', hidden: true }
   },
 ];
@@ -70,7 +70,11 @@ const ACTIONS = {
         .set('If-Match', data.vlanEtag)
         .end(mkAgentHandler(VLANS_CFG_URL, dispatcher));
     };
-  }
+  },
+
+  clearErrorForSet() {
+    return { type: SET_AT.CLEAR_ERROR };
+  },
 
 };
 

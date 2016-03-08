@@ -23,6 +23,8 @@ import Box from 'grommet/components/Box';
 import _ from 'lodash';
 
 
+// TODO: Currently not used.
+
 class VlanDetails extends Component {
 
   static propTypes = {
