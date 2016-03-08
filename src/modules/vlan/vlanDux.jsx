@@ -17,12 +17,17 @@
 import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
 import VlanDetails from './vlanDetails.jsx';
+import Agent, { mkAgentHandler } from 'agent.js';
 
 
 const NAME = 'vlan';
 
 const PAGE_ASYNC = 'page';
 const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
+
+const SET_ASYNC = 'set';
+const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
+
 
 const NAVS = [
   {
@@ -35,36 +40,59 @@ const NAVS = [
   },
 ];
 
-const VLANS_URL = '/rest/v1/system/bridges/bridge_normal/vlans?depth=1';
-const PORTS_URL = '/rest/v1/system/ports?depth=1';
-const URLS = [ VLANS_URL, PORTS_URL ];
+const QP_CFG_SELECT = 'selector=configuration';
+const VLANS_URL = '/rest/v1/system/bridges/bridge_normal/vlans';
+const VLANS_DEPTH1_CFG_URL = `${VLANS_URL}?depth=1&${QP_CFG_SELECT}`;
+const VLANS_CFG_URL = `${VLANS_URL}?${QP_CFG_SELECT}`;
+const PORTS_DEPTH1_URL = '/rest/v1/system/ports?depth=1';
+const FETCH_URLS = [ VLANS_DEPTH1_CFG_URL, PORTS_DEPTH1_URL ];
 
 const ACTIONS = {
+
   fetch() {
     return (dispatch, getStoreFn) => {
       const mStore = getStoreFn()[NAME];
-      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, URLS);
+      Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, FETCH_URLS);
+    };
+  },
+
+  addVlan(data, cfg) {
+    return (dispatch) => {
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
+      Agent.post(VLANS_URL)
+        .send({
+          configuration: {
+            admin: 'down',
+            id: Number(cfg.id),
+            name: `VLAN${cfg.id}`,
+          },
+        })
+        .set('If-Match', data.vlanEtag)
+        .end(mkAgentHandler(VLANS_CFG_URL, dispatcher));
     };
   }
+
 };
 
 function parsePageResult(result) {
   const vlans = {};
   result[0].body.forEach(elm => {
     const cfg = elm.configuration;
-    const status = elm.status;
+    // const status = elm.status;
     const id = cfg.id;
     vlans[id] = {
       id,
       name: cfg.name,
       admin: cfg.admin,
-      operState: status.oper_state,
-      operStateReason: status.oper_state_reason,
+      // operState: status.oper_state,
+      // operStateReason: status.oper_state_reason,
       interfaces: {},
     };
   });
+  // TODO: We need a consistent way to store the etag and entities (interfaces, lags, vlans, etc.)
+  const vlansEtag = result[0].headers.etag;
 
-  const interfaces = {};
+  const interfaces = {}; // TODO: Should we call this ports?
   result[1].body.forEach(elm => {
     const cfg = elm.configuration;
     if (cfg.vlan_mode) {
@@ -84,19 +112,25 @@ function parsePageResult(result) {
       }
     }
   });
+  const portsEtag = result[1].headers.etag;
 
-  return { vlans, interfaces };
+  return { vlans, vlansEtag, interfaces, portsEtag };
 }
 
 const INITIAL_STORE = {
   page: {
     ...Dux.mkAsyncStore(),
     vlans: {},
+    interfaces: {},
   },
+  set: {
+    ...Dux.mkAsyncStore(),
+  }
 };
 
 const REDUCER = Dux.mkReducer(INITIAL_STORE, [
   Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+  Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
 ]);
 
 export default {

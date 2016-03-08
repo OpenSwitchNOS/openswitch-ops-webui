@@ -25,6 +25,8 @@ import DownIcon from 'grommet/components/icons/base/CaretDown';
 import UpIcon from 'grommet/components/icons/base/CaretUp';
 import CheckBox from 'grommet/components/CheckBox';
 import EditIcon from 'grommet/components/icons/base/Edit';
+import AddIcon from 'grommet/components/icons/base/Add';
+import SubtractIcon from 'grommet/components/icons/base/Subtract';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import Toolbar from 'toolbar.jsx';
@@ -109,6 +111,8 @@ class DataMap {
 }
 
 
+// FIXME: There is a problem with the deselect on the VLAN page.
+
 export default class DataGrid extends Component {
 
   static propTypes = {
@@ -122,6 +126,8 @@ export default class DataGrid extends Component {
     height: PropTypes.number.isRequired,
     noFilter: PropTypes.bool,
     noSelect: PropTypes.bool,
+    onAdd: PropTypes.func,
+    onDelete: PropTypes.func,
     onEdit: PropTypes.func,
     onSelectChange: PropTypes.func,
     rowHeight: PropTypes.number,
@@ -131,6 +137,7 @@ export default class DataGrid extends Component {
     ]),
     singleSelect: PropTypes.bool,
     title: PropTypes.string,
+    toolbar: PropTypes.arrayOf(PropTypes.node),
     width: PropTypes.number.isRequired,
   };
 
@@ -312,6 +319,10 @@ export default class DataGrid extends Component {
     this.props.onEdit(this._normalizeSelect(this.state.activeDataKeys));
   };
 
+  _onDeleteClicked = () => {
+    this.props.onDelete(this._normalizeSelect(this.state.activeDataKeys));
+  };
+
   _mkCell = (cellProps, colProps) => {
     const rowData = this.state.dataMap.getDataAt(cellProps.rowIndex);
     let cellData = rowData && rowData[cellProps.columnKey];
@@ -366,13 +377,26 @@ export default class DataGrid extends Component {
     const selectTool = this.props.singleSelect || this.props.noSelect ? null :
       <CheckBox id={this.selectCbId} label="" onChange={this._onSelectToggle}/>;
 
+    const haveSel = this.state.activeDataKeys.length > 0;
+
     let editTool = null;
     const editCb = this.props.onEdit ? this._onEditClicked : null;
     if (editCb) {
-      editTool = this.state.activeDataKeys.length > 0 ?
-        <a onClick={editCb}><EditIcon/></a> :
+      editTool = haveSel ?
+        <a className="control-icon" onClick={editCb}><EditIcon/></a> :
         <EditIcon className="disabled"/>;
     }
+
+    let delTool = null;
+    const delCb = this.props.onDelete ? this._onDeleteClicked : null;
+    if (delCb) {
+      delTool = haveSel ?
+        <a className="control-icon" onClick={delCb}><SubtractIcon/></a> :
+        <SubtractIcon className="disabled"/>;
+    }
+
+    const addTool = !this.props.onAdd ? null :
+      <a className="control-icon" onClick={this.props.onAdd}><AddIcon/></a>;
 
     const searchTool = this.props.noFilter ? null :
       <SearchInput
@@ -385,11 +409,16 @@ export default class DataGrid extends Component {
     const tb = (
       <Toolbar width={gridWidth}>
         <Menu direction="row" align="center" responsive={false}>
-          {selectTool}
-          {searchTool}
+        {selectTool}
+        {searchTool}
           <Title>{this.props.title}</Title>
         </Menu>
-        {editTool}
+        <Menu direction="row" align="center" responsive={false}>
+          {this.props.toolbar}
+          {addTool}
+          {delTool}
+          {editTool}
+        </Menu>
       </Toolbar>
     );
 

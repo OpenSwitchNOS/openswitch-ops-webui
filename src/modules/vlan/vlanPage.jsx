@@ -20,6 +20,9 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
+import { MultiRange as Range } from 'multi-integer-range';
+import VlanAdd from './vlanAdd.jsx';
+import ErrorLayer from 'errorLayer.jsx';
 
 
 class VlanPage extends Component {
@@ -68,14 +71,27 @@ class VlanPage extends Component {
         width: 140,
       },
     ];
-    this.state = {};
+    this.state = {
+      addMode: false,
+    };
   }
 
   _onCustomCell = (cellData, cellProps) => {
-    const ids = Object.keys(cellData).sort().join(', ');
+    // TOOD: this should be moved into Utils.
+    const idKeys = [];
+    const lagKeys = [];
+    Object.keys(cellData).forEach( k => {
+      if (isNaN(k)) {
+        lagKeys.push(k);
+      } else {
+        idKeys.push(Number(k));
+      }
+    });
+    const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+    const idStr = new Range(idKeys).toString().split(',').join(', ');
     return (
       <CustomCell {...cellProps}>
-        {ids}
+        {`${idStr}${lagStr}`}
       </CustomCell>
     );
   };
@@ -94,6 +110,13 @@ class VlanPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
+    // TODO: this is same code all over now.
+    if (nextProps.vlan.set.lastSuccessMillis >
+        this.props.vlan.set.lastSuccessMillis) {
+      this.props.actions.vlan.fetch(); // TODO: need to bypass cooldown
+    }
+
+    // TODO: should we check an nop if the vlan.page is already the toolbar?
     this.props.actions.toolbar.setFetchTB(
       nextProps.vlan.page,
       this._onRefresh
@@ -113,23 +136,65 @@ class VlanPage extends Component {
     alert(`Edit: ${sel}`);
   };
 
+  _onAddOpen = () => {
+    this.setState({ addMode: true });
+  };
+
+  _onAddApply = (cfg) => {
+    // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
+    this.props.actions.vlan.addVlan(this.props.vlan.page, cfg);
+  };
+
+  _onAddOk = (data) => {
+    this._onAddApply(data);
+    this.setState({ addMode: false });
+  };
+
+  _onAddClose = () => {
+    this.setState({ addMode: false });
+  };
+
+  _onDelete = (sel) => {
+    alert(`Delete: ${sel}`);
+  };
+
+  _onCloseError = () => {
+    this.props.actions.vlan.clearErrorForSet();
+  };
+
   render() {
     const vlans = this.props.vlan.page.vlans;
 
     // TODO: put this in the collector so we have it for the overview?
     const numVlans = Object.getOwnPropertyNames(vlans).length;
 
+    const addLayer = !this.state.addMode ? null :
+      <VlanAdd
+          onClose={this._onAddClose}
+          onOk={this._onAddOk}
+          onApply={this._onAddApply}
+          vlans={vlans}
+      />;
+
+    const set = this.props.vlan.set;
+    const errorLayer = !set.lastError ? null :
+      <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
+
     return (
       <Box className="flex1 mTopHalf mLeft">
+        {addLayer}
+        {errorLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
-              title={`(${numVlans})`}
+              title={`(${t('count')}: ${numVlans})`}
               data={vlans}
               columns={this.vlanCols}
               singleSelect
               onSelectChange={this._onSelect}
               select={[ this.props.params.id ]}
               onEdit={this._onEdit}
+              onAdd={this._onAddOpen}
+              onDelete={this._onDelete}
           />
         </ResponsiveBox>
       </Box>

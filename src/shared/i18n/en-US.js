@@ -46,6 +46,7 @@ export const NAVS = {
 };
 
 export const MESSAGES = {
+  add: 'Add',
   adminState: 'Admin State',
   aggregateName: 'Aggregate Name',
   aggregatedInterfaces: 'Aggregated Interfaces',
@@ -53,7 +54,9 @@ export const MESSAGES = {
   aggregateMode: 'Aggregate Mode',
   alert: 'Alert',
   all: 'All',
+  apply: 'Apply',
   areYouSure: 'Are you sure?',
+  available: 'Available',
   autoNeg: 'Auto Negotiation',
   b2f: 'Back-to-Front',
   baseMac: 'Base MAC',
@@ -65,6 +68,7 @@ export const MESSAGES = {
   configVlan: 'How To - Configure a VLAN...',
   confirmation: 'Confirmation',
   connector: 'Connector',
+  count: 'Count',
   cpuLoad: 'CPU Load',
   critical: 'Critical',
   date: 'Date',
@@ -84,6 +88,7 @@ export const MESSAGES = {
   emerg: 'Emerg',
   enabled: 'Enabled',
   error: 'Error',
+  existing: 'Existing',
   f2b: 'Front-to-Back',
   facility: 'Facility',
   failedRequest: 'Failed Request',
@@ -108,6 +113,7 @@ export const MESSAGES = {
   interface: 'Interface',
   interfaces: 'Interfaces',
   interfaceUtiization: 'Interface Utilization',
+  invalid: 'Invalid',
   topInterfaceUtilization: 'Top Interface Utilization',
   ip: 'IP',
   ipV4: 'IPv4',
@@ -197,7 +203,7 @@ export const MESSAGES = {
   vendor: 'Vendor',
   vlanMode: 'VLAN Mode',
   vlans: 'VLANs',
-  vlan: 'Vlan',
+  vlan: 'VLAN',
   version: 'Version',
   warning: 'Warning',
   yes: 'Yes'
