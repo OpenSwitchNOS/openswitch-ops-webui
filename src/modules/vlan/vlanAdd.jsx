@@ -64,6 +64,11 @@ class VlanAdd extends Component {
     return !_.isEqual(this.state, {});
   };
 
+  _isValid = (range) => {
+    range.subtract(Object.keys(this.props.vlans).map( k => Number(k) ));
+    return this.state.id && range.has(this.state.id);
+  };
+
   _onOk = () => {
     this.props.onOk(this.state);
   };
@@ -82,8 +87,9 @@ class VlanAdd extends Component {
     // TOOD: Move to BL.
     const range = new Range('1-2048');
     range.subtract(Object.keys(this.props.vlans).map( k => Number(k) ));
-    const err = this.state.id && !range.has(this.state.id)
-      ? t('invalid') : null;
+    const isValid = this._isValid(range);
+    const err = isValid ? null : t('invalid');
+    const allowSet = this._isDirty() && isValid;
 
     return (
       <Layer
@@ -118,11 +124,11 @@ class VlanAdd extends Component {
                 <Button
                     label={t('apply')}
                     primary
-                    onClick={this._isDirty() ? this._onApply : null}/>
+                    onClick={allowSet ? this._onApply : null}/>
                 <Button
                     label={t('ok')}
                     primary
-                    onClick={this._isDirty() ? this._onOk : null}/>
+                    onClick={allowSet ? this._onOk : null}/>
               </Menu>
             </Footer>
           </Form>
