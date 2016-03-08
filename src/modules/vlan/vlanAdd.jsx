@@ -88,7 +88,7 @@ class VlanAdd extends Component {
     const range = new Range('1-2048');
     range.subtract(Object.keys(this.props.vlans).map( k => Number(k) ));
     const isValid = this._isValid(range);
-    const err = isValid ? null : t('invalid');
+    const err = isValid || !this.state.id ? null : t('invalid');
     const allowSet = this._isDirty() && isValid;
 
     return (
