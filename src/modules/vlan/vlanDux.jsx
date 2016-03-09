@@ -16,6 +16,7 @@
 
 import Dux from 'dux.js';
 import VlanPage from './vlanPage.jsx';
+import VlanPage2 from './vlanPage2.jsx';
 import VlanEdit from './vlanEdit.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
 
@@ -35,6 +36,10 @@ const NAVS = [
     link: { path: '/vlan', order: 300 }
   },
   {
+    route: { path: '/vlan2', component: VlanPage2 },
+    link: { path: '/vlan2', order: 305 }
+  },
+  {
     route: { path: '/vlan/:id', component: VlanEdit },
     link: { path: '/vlan', hidden: true }
   },
@@ -44,7 +49,10 @@ const QP_CFG_SELECT = 'selector=configuration';
 const VLANS_URL = '/rest/v1/system/bridges/bridge_normal/vlans';
 const VLANS_DEPTH1_CFG_URL = `${VLANS_URL}?depth=1&${QP_CFG_SELECT}`;
 const VLANS_CFG_URL = `${VLANS_URL}?${QP_CFG_SELECT}`;
-const PORTS_DEPTH1_URL = '/rest/v1/system/ports?depth=1';
+const PORTS_URL = '/rest/v1/system/ports';
+const PORTS_DEPTH1_URL = `${PORTS_URL}?depth=1`;
+const INFS_URL = '/rest/v1/system/interfaces';
+const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 const FETCH_URLS = [ VLANS_DEPTH1_CFG_URL, PORTS_DEPTH1_URL ];
 
 const ACTIONS = {
@@ -69,6 +77,37 @@ const ACTIONS = {
         })
         .set('If-Match', data.vlanEtag)
         .end(mkAgentHandler(VLANS_CFG_URL, dispatcher));
+    };
+  },
+
+  editVlanInterface(data, cfg) {
+    return (dispatch) => {
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
+      const port = data.interfaces[cfg.id];
+      const URL = `${PORTS_URL}/${cfg.id}`;
+      if (port) {
+        Agent.patch(URL)
+          .send([
+            {op: 'add', path: '/tag', value: Number(cfg.tag)},
+            {op: 'add', path: '/vlan_mode', value: 'access'},
+          ])
+          // .set('If-Match', detail.port.etag) // FIXME: etag
+          .end(mkAgentHandler(URL, dispatcher));
+      } else {
+        const INF_URL = `${INFS_URL}/${cfg.id}`;
+        Agent.post(PORTS_URL)
+          .send({
+            configuration: {
+              name: cfg.id,
+              interfaces: [ INF_URL ],
+              tag: Number(cfg.tag),
+              'vlan_mode': 'access',
+            },
+            'referenced_by': [{uri: BRIDGE_URL}],
+          })
+          // .set('If-Match', detail.ports.etag)
+          .end(mkAgentHandler(PORTS_URL, dispatcher));
+      }
     };
   },
 
