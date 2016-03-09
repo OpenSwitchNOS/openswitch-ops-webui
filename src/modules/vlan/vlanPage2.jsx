@@ -21,12 +21,10 @@ import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import { MultiRange as Range } from 'multi-integer-range';
-import VlanAdd from './vlanAdd.jsx';
-import VlanEdit from './vlanEdit.jsx';
-import ErrorLayer from 'errorLayer.jsx';
+import VlanInterfaceEdit from './vlanInterfaceEdit.jsx';
 
 
-class VlanPage extends Component {
+class VlanPage2 extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -42,57 +40,43 @@ class VlanPage extends Component {
 
   constructor(props) {
     super(props);
-    this.vlanCols = [
+    this.portCols = [
       {
         columnKey: 'id',
-        header: t('id'),
+        header: t('interface'),
+        width: 160,
+      },
+      {
+        columnKey: 'mode',
+        header: t('vlanMode'),
+        width: 160,
+      },
+      {
+        columnKey: 'tag',
+        header: t('tag'), // TODO: do we want to change the data to access/native?
         width: 100,
       },
       {
-        columnKey: 'name',
-        header: t('name'),
+        columnKey: 'trunks',
+        header: t('trunks'),
         width: 200,
-      },
-      // {
-      //   columnKey: 'operState',
-      //   header: t('status'),
-      //   width: 140,
-      // },
-      // {
-      //   columnKey: 'operStateReason',
-      //   header: t('reason'),
-      //   width: 140,
-      // },
-      {
-        columnKey: 'interfaces',
-        header: t('interfaces'),
         cell: this._onCustomCell,
         flexGrow: 1,
-        width: 140,
       },
     ];
     this.state = {
-      addMode: false,
+      id: null,
       editMode: false,
     };
   }
 
   _onCustomCell = (cellData, cellProps) => {
     // TOOD: this should be moved into Utils.
-    const idKeys = [];
-    const lagKeys = [];
-    Object.keys(cellData).forEach( k => {
-      if (isNaN(k)) {
-        lagKeys.push(k);
-      } else {
-        idKeys.push(Number(k));
-      }
-    });
-    const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
-    const idStr = new Range(idKeys).toString().split(',').join(', ');
+    const range = new Range(cellData);
+    const vlanIdStr = range.toString().split(',').join(', ');
     return (
       <CustomCell {...cellProps}>
-        {`${idStr}${lagStr}`}
+        {vlanIdStr}
       </CustomCell>
     );
   };
@@ -116,8 +100,6 @@ class VlanPage extends Component {
         this.props.vlan.set.lastSuccessMillis) {
       this.props.actions.vlan.fetch(); // TODO: need to bypass cooldown
     }
-
-    // TODO: should we check an nop if the vlan.page is already the toolbar?
     this.props.actions.toolbar.setFetchTB(
       nextProps.vlan.page,
       this._onRefresh
@@ -128,96 +110,72 @@ class VlanPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (sel) => {
-    const url = sel ? `/vlan/${sel}` : '/vlan';
-    this.props.history.pushState(null, url);
-  };
-
   _onEditOpen = () => {
     this.setState({ editMode: true });
   };
 
   // TODO: decide on OK vs Deploy (Apply and OK, is better then Apply and Deploy)
-  _onEditOk = (cfg) => {
-    this.props.actions.vlan.editVlan(this.props.vlan.page, cfg);
+  _onEditOk = (data, cfg) => {
+    this.props.actions.vlan.editVlanInterface(data, cfg);
     // TODO: this should wait until success or failure
     this.setState({ editMode: false });
+  };
+
+  _onAddVlan = (vlans, cfg) => {
+    // TODO: this should wait until success or failure
+    this.props.actions.vlan.addVlan(vlans, cfg);
   };
 
   _onEditClose = () => {
     this.setState({ editMode: false });
   };
 
-  _onAddOpen = () => {
-    this.setState({ addMode: true });
-  };
-
-  _onAddApply = (cfg) => {
-    // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
-    this.props.actions.vlan.addVlan(this.props.vlan.page, cfg);
-  };
-
-  _onAddOk = (data) => {
-    this._onAddApply(data);
-    this.setState({ addMode: false });
-  };
-
-  _onAddClose = () => {
-    this.setState({ addMode: false });
-  };
-
-  _onDelete = (sel) => {
-    alert(`Delete: ${sel}`);
-  };
-
-  _onCloseError = () => {
-    this.props.actions.vlan.clearErrorForSet();
+  _onSelect = (sel) => {
+    this.setState({ id: sel });
   };
 
   render() {
-    const vlans = this.props.vlan.page.vlans;
+    const ports = { ...this.props.vlan.page.interfaces }; // FIXME: naming confusing
+    // TODO: This is a big time hack but I don't have time right now
+    const infs = this.props.collector.overview.interfaces;
+    Object.getOwnPropertyNames(infs).forEach( id => {
+      if (!ports[id]) {
+        ports[id] = {
+          id,
+          tag: null,
+          trunks: [],
+          mode: '',
+        };
+      }
+    });
 
     // TODO: put this in the collector so we have it for the overview?
-    const numVlans = Object.getOwnPropertyNames(vlans).length;
-
-    const addLayer = !this.state.addMode ? null :
-      <VlanAdd
-          onClose={this._onAddClose}
-          onOk={this._onAddOk}
-          onApply={this._onAddApply}
-          vlans={vlans}
-      />;
+    const numPorts = Object.getOwnPropertyNames(ports).length;
 
     // TODO: How do we want to standardize passing config to an edit component
     // TODO: How do we want to standardize passing data to a component
-    const editLayer = !this.state.editMode ? null :
-      <VlanEdit
+    const editLayer = !this.state.editMode || !this.state.id ? null :
+      <VlanInterfaceEdit
           onClose={this._onEditClose}
           onOk={this._onEditOk}
-          vlanId={this.props.params.id}
+          onAddVlan={this._onAddVlan}
+          interfaceId={this.state.id}
           data={this.props.vlan.page}
+          ports={ports}
       />;
-
-    const set = this.props.vlan.set;
-    const errorLayer = !set.lastError ? null :
-      <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
 
     return (
       <Box className="flex1 mTopHalf mLeft">
-        {addLayer}
-        {editLayer}
-        {errorLayer}
+      {editLayer}
         <ResponsiveBox>
-          <DataGrid width={400} height={400}
-              title={`(${t('count')}: ${numVlans})`}
-              data={vlans}
-              columns={this.vlanCols}
+          <DataGrid width={200} height={400}
+              title={`(${t('interfaces')}: ${numPorts})`}
+              data={ports}
+              columns={this.portCols}
               singleSelect
+              select={this.state.id}
               onSelectChange={this._onSelect}
-              select={[ this.props.params.id ]}
               onEdit={this._onEditOpen}
-              onAdd={this._onAddOpen}
-              onDelete={this._onDelete}
           />
         </ResponsiveBox>
       </Box>
@@ -233,4 +191,4 @@ function select(store) {
   };
 }
 
-export default connect(select)(VlanPage);
+export default connect(select)(VlanPage2);

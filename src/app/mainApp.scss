@@ -240,6 +240,12 @@ $slideInColumnMinWidth: 350px;
 }
 .edit.layer {
   z-index: 100;
+  &.second {
+    z-index: 101;
+  }
+  &.third {
+    z-index: 102;
+  }
 }
 
 // Override the sidebar-width for the navigation pane.

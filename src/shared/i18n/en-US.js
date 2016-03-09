@@ -43,10 +43,13 @@ export const NAVS = {
   table: 'Table',
   tables: 'Row Swapping between Tables',
   vlan: 'VLANs',
+  vlan2: 'VLANs by Interface',
 };
 
 export const MESSAGES = {
+  accessVlanId: 'Access (tag) VLAN ID',
   add: 'Add',
+  addVlan: 'Add VLAN',
   adminState: 'Admin State',
   aggregateName: 'Aggregate Name',
   aggregatedInterfaces: 'Aggregated Interfaces',
@@ -184,11 +187,13 @@ export const MESSAGES = {
   sysDesc: 'System Desc',
   system: 'System',
   systemMac: 'System MAC',
+  tag: 'Tag',
   temperatures: 'Temperatures',
   text: 'Text',
   time: 'Time',
   total: 'Total',
   true: 'True',
+  trunks: 'Trunks',
   tx: 'Tx',
   txPackets: 'Tx Packets',
   txBytes: 'Tx Bytes',

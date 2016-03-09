@@ -237,7 +237,9 @@ export default class DataGrid extends Component {
       this.setState({ defaultDataMap, dataMap });
     }
     if (!_.isEqual(newProps.select, this.props.select)) {
-      this.setState({ activeDataKeys: newProps.select });
+      const sel = newProps.select;
+      const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
+      this.setState({ activeDataKeys });
     }
   }
 
