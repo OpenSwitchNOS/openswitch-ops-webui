@@ -23,12 +23,12 @@ import { Table, Column, Cell } from 'fixed-data-table';
 import SearchInput from 'grommet/components/SearchInput';
 import DownIcon from 'grommet/components/icons/base/CaretDown';
 import UpIcon from 'grommet/components/icons/base/CaretUp';
-import CheckBox from 'grommet/components/CheckBox';
 import EditIcon from 'grommet/components/icons/base/Edit';
 import AddIcon from 'grommet/components/icons/base/Add';
+import CbIcon from 'grommet/components/icons/base/Checkbox';
+import CbSelIcon from 'grommet/components/icons/base/CheckboxSelected';
 import SubtractIcon from 'grommet/components/icons/base/Subtract';
-import Title from 'grommet/components/Title';
-import Menu from 'grommet/components/Menu';
+import Box from 'grommet/components/Box';
 import Toolbar from 'toolbar.jsx';
 import Utils from 'utils.js';
 
@@ -278,10 +278,17 @@ export default class DataGrid extends Component {
     return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
   };
 
-  _onSelectToggle = (e) => {
-    const activeDataKeys = e.target.checked ?
-      this.state.dataMap.cloneDataKeyArray() : [];
+  _onSelectAll = () => {
+    const activeDataKeys = this.state.dataMap.cloneDataKeyArray();
+    this.setState({ activeDataKeys });
 
+    if (this.props.onSelectChange) {
+      this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
+    }
+  };
+
+  _onSelectNone = () => {
+    const activeDataKeys = [];
     this.setState({ activeDataKeys });
 
     if (this.props.onSelectChange) {
@@ -376,8 +383,15 @@ export default class DataGrid extends Component {
 
     // Determine which tools are avialable.
 
-    const selectTool = this.props.singleSelect || this.props.noSelect ? null :
-      <CheckBox id={this.selectCbId} label="" onChange={this._onSelectToggle}/>;
+    const selectAllTool = this.props.singleSelect || this.props.noSelect
+      ? null : (
+        <a onClick={this._onSelectAll}><CbSelIcon/></a>
+      );
+
+    const selectNoneTool = !selectAllTool
+      ? null : (
+        <a onClick={this._onSelectNone}><CbIcon/></a>
+      );
 
     const haveSel = this.state.activeDataKeys.length > 0;
 
@@ -385,7 +399,7 @@ export default class DataGrid extends Component {
     const editCb = this.props.onEdit ? this._onEditClicked : null;
     if (editCb) {
       editTool = haveSel ?
-        <a className="control-icon" onClick={editCb}><EditIcon/></a> :
+        <a onClick={editCb}><EditIcon/></a> :
         <EditIcon className="disabled"/>;
     }
 
@@ -393,12 +407,12 @@ export default class DataGrid extends Component {
     const delCb = this.props.onDelete ? this._onDeleteClicked : null;
     if (delCb) {
       delTool = haveSel ?
-        <a className="control-icon" onClick={delCb}><SubtractIcon/></a> :
+        <a onClick={delCb}><SubtractIcon/></a> :
         <SubtractIcon className="disabled"/>;
     }
 
     const addTool = !this.props.onAdd ? null :
-      <a className="control-icon" onClick={this.props.onAdd}><AddIcon/></a>;
+      <a onClick={this.props.onAdd}><AddIcon/></a>;
 
     const searchTool = this.props.noFilter ? null :
       <SearchInput
@@ -410,17 +424,18 @@ export default class DataGrid extends Component {
 
     const tb = (
       <Toolbar width={gridWidth}>
-        <Menu direction="row" align="center" responsive={false}>
-        {selectTool}
-        {searchTool}
-          <Title>{this.props.title}</Title>
-        </Menu>
-        <Menu direction="row" align="center" responsive={false}>
+        <Box direction="row" align="center" responsive={false}>
+          {searchTool}
+          <b>{this.props.title}</b>
+        </Box>
+        <Box direction="row" align="center" responsive={false}>
           {this.props.toolbar}
+          {selectAllTool}
+          {selectNoneTool}
           {addTool}
           {delTool}
           {editTool}
-        </Menu>
+        </Box>
       </Toolbar>
     );
 

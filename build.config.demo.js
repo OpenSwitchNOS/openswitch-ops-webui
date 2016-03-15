@@ -44,7 +44,7 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.28.79:8091',
+    prefix: 'http://15.108.30.248:8091',
   }
 };
 

@@ -22,6 +22,7 @@ import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
 import ActionsIcon from 'grommet/components/icons/base/Actions';
 import Button from 'grommet/components/Button';
+import CheckBox from 'grommet/components/CheckBox';
 
 
 class DemoDataGridSmallPage extends Component {
@@ -128,8 +129,12 @@ class DemoDataGridSmallPage extends Component {
               singleSelect
               onSelectChange={this._onSelectChange}
               select={this.state.externalSelect.toString()}
+              onDelete={this._onDelete}
               toolbar={[
+                <CheckBox id="item2" name="item2" label="Details"/>,
+                <span>&nbsp;&nbsp;</span>,
                 <a onClick={this._onAction}>Act1</a>,
+                <span>&nbsp;&nbsp;</span>,
                 <a className="control-icon" onClick={this._onAction}>
                   <ActionsIcon/>
                 </a>
