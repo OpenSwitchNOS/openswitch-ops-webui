@@ -148,6 +148,8 @@ const ACTIONS = {
             configuration: {
               admin: 'up',
               name: detail.inf.id,
+              tag: 1,
+              'vlan_mode': 'access',
               interfaces: [ INF_URL ],
             },
             'referenced_by': [{uri: BRIDGE_URL}],
