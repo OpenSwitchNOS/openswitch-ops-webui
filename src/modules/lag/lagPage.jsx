@@ -22,6 +22,8 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import ReactCSSTG from 'react-addons-css-transition-group';
 import LagEdit from './lagEdit.jsx';
+import LagCreation from './lagCreation.jsx';
+import Button from 'grommet/components/Button';
 
 class LagPage extends Component {
 
@@ -76,104 +78,154 @@ class LagPage extends Component {
     ];
     this.state = {
       edit: false,
+      newLag: false,
+      deleteLag: false,
     };
   }
 
-  _onCustomCell = (cellData, cellProps) => {
-    const ids = Object.keys(cellData).sort().join(', ');
-    return (
-      <CustomCell {...cellProps}>
-        {ids}
-      </CustomCell>
-    );
-  };
+_onCustomCell = (cellData, cellProps) => {
+  const ids = Object.keys(cellData).sort().join(', ');
+  return (
+    <CustomCell {...cellProps}>
+      {ids}
+    </CustomCell>
+  );
+};
 
 
-  componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.lag.fetch();
-  }
+componentDidMount() {
+  this.props.autoActions.collector.fetch();
+  this.props.actions.lag.fetch();
+}
 
- _onRefresh = () => {
-   this.props.autoActions.collector.fetch();
+_onRefresh = () => {
+  this.props.autoActions.collector.fetch();
+};
+
+componentWillReceiveProps(nextProps) {
+  this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
+}
+
+componentWillUnmount() {
+  this.props.actions.toolbar.clear();
+}
+
+ _onSelect = (sel) => {
+   const url = sel ? `/lag/${sel}` : '/lag';
+   this.props.history.pushState(null, url);
  };
 
- componentWillReceiveProps(nextProps) {
-   this.props.actions.toolbar.setFetchTB(nextProps.collector, this._onRefresh);
- }
+_onEdit = () => {
+  const edit = !this.state.edit;
+  this.setState({edit});
+};
 
- componentWillUnmount() {
-   this.props.actions.toolbar.clear();
- }
+_onEditSubmit = (lag) => {
+  this.props.actions.lag.addLag(lag);
+  this._onCreateNewLag();
+};
 
-   _onSelect = (sel) => {
-     const url = sel ? `/lag/${sel}` : '/lag';
-     this.props.history.pushState(null, url);
-   };
-
-  _onEdit = () => {
-    const edit = !this.state.edit;
-    this.setState({edit});
-  };
-
-  _tr = (td1, td2) => {
-    return (
-      <tr>
-        <td style={{width: 200}}>{td1}:</td>
-        <td style={{width: 200}}>{td2}</td>
-      </tr>
-    );
-  };
-
-
-  render() {
-    const lags = this.props.lag.page.lags;
-
-    // TODO: put this in the collector so we have it for the overview?
-    const numLags = Object.getOwnPropertyNames(lags).length;
-    const sel = this.props.params.id;
-    const edit = !this.state.edit ? null :
-      <LagEdit
-          onClose={this._onEdit}
-          params={this.props.params}
-          lag={lags}
-      />;
-
-
-    // TODO: This check is not needed - see the vlan page
-    const details = !sel ? null : (
-      <Box className="pageBox">
-        <ReactCSSTG
-            transitionName="slideInColumn"
-            transitionAppear
-            transitionAppearTimeout={500}
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
-          <div>
-            {this.props.children}
-          </div>
-        </ReactCSSTG>
-      </Box>
-    );
-
-    return (
-      <Box className="flex1 mTopHalf mLeft" direction="row">
-        <ResponsiveBox>
-          <DataGrid width={400} height={400}
-              title={`(${numLags})`}
-              data={lags}
-              columns={this.lagCols}
-              singleSelect
-              onSelectChange={this._onSelect}
-              select={[ sel ]}
-              onEdit={this._onEdit}
-          />
-        </ResponsiveBox>
-        {details}
-        {edit}
-      </Box>
-    );
+_onSubmitLagEdit = (lag, lagPorts, lagId, lagInterfacesToRemove) => {
+  if (Object.getOwnPropertyNames(lagInterfacesToRemove).length > 0 ) {
+    this.props.actions.lag.removeInterfaceFromLag(lagInterfacesToRemove);
   }
+  this.props.actions.lag.editLag(lag, lagPorts, lagId, lagInterfacesToRemove);
+  this._onEdit();
+};
+
+_tr = (td1, td2) => {
+  return (
+    <tr>
+      <td style={{width: 200}}>{td1}:</td>
+      <td style={{width: 200}}>{td2}</td>
+    </tr>
+  );
+};
+
+_onCreateNewLag = () => {
+  const newLag = !this.state.newLag;
+  this.setState({newLag});
+};
+
+_onClose = () => {
+  this.setState({newLag: false});
+};
+
+_onDeleteLagToggle = () => {
+  const deleteLag = !this.state.deleteLag;
+  this.setState({deleteLag});
+};
+_onDeleteLag = (sel) => {
+  this.props.actions.lag.deletingLag(sel, this.props.lag.page.lags[sel].lagInterfaces);
+  this._onDeleteLagToggle();
+};
+
+render() {
+  const lags = this.props.lag.page.lags;
+
+  // TODO: put this in the collector so we have it for the overview?
+  const numLags = Object.getOwnPropertyNames(lags).length;
+  const sel = this.props.params.id;
+  const edit = !this.state.edit ? null :
+    <LagEdit
+        lag={lags}
+        onClose={this._onEdit}
+        onSubmit={this._onSubmitLagEdit}
+        params={this.props.params}
+      />;
+  // TODO: This check is not needed - see the vlan page
+  const details = !sel ? null : (
+    <Box className="pageBox">
+      <ReactCSSTG
+          transitionName="slideInColumn"
+          transitionAppear
+          transitionAppearTimeout={500}
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}>
+        <div>
+          {this.props.children}
+        </div>
+      </ReactCSSTG>
+    </Box>
+  );
+
+  return (
+    <Box className="flex1 mTopHalf mLeft" direction="row">
+
+      <ResponsiveBox>
+        <DataGrid width={400} height={400}
+            title={`(${numLags})`}
+            data={lags}
+            columns={this.lagCols}
+            singleSelect
+            onSelectChange={this._onSelect}
+            select={[ sel ]}
+            onEdit={this._onEdit}
+        />
+      </ResponsiveBox>
+      {details}
+      {edit}
+      <center>
+        <Button label="Create New LAG" primary onClick={this._onCreateNewLag}/>
+      </center>
+      { //TODO: Should be localized
+        this.state.newLag ?
+        <LagCreation
+            onClose={this._onCreateNewLag}
+            onSubmit={this._onEditSubmit}
+        /> : null
+    }
+    <br/>
+    <center>
+      <Button label="Delete LAG" primary onClick={this._onDeleteLagToggle}/>
+      {
+        this.state.deleteLag ? this._onDeleteLag(sel) : null
+      }
+
+    </center>
+    </Box>
+  );
+}
 
 }
 

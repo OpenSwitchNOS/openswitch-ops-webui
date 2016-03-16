@@ -26,9 +26,9 @@ import Section from 'grommet/components/Section';
 class LagEdit extends Component {
 
   static propTypes = {
-    history: PropTypes.object,
     lag: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string.isRequired,
     }).isRequired,
@@ -36,6 +36,11 @@ class LagEdit extends Component {
 
   constructor(props) {
     super(props);
+    let lagInterfacesData = {};
+    const id = this.props.params.id;
+    if (id) {
+      lagInterfacesData = {...this.props.lag.page.lags[id].lagInterfaces};
+    }
     this.cols = [
       {
         columnKey: 'id',
@@ -45,14 +50,16 @@ class LagEdit extends Component {
       }
     ];
     this.state = {
-      entitiesData: {},
-      externalSelect: 2,
-      selection: 0,
+      lagInterfacesData,
+      sel: 0,
       editMode: false,
+      lagInterfacesToBeRemoved: {},
     };
     this.add = false;
     this.remove = false;
-    this.entities = {};
+    this.lagInterfacesRemoved = {};
+    this.availableInterfaces = {...this.props.lag.page.availableInterfaces};
+    this.lagInterfaces = this.props.lag.page.lags[id].lagInterfaces;
     this.fid = _.uniqueId('lagEditForm_');
   }
 
@@ -65,25 +72,84 @@ class LagEdit extends Component {
   };
 
   _onEditSubmit = () => {
-    //TODO this.props.actions.lag.set(detail, userCfg);
+    const lagInterfaces = this.state.lagInterfacesData;
+    const ports = this.props.lag.page.ports;
+    const id = this.props.params.id;
+    const interfacesToBeRemoved = this.state.lagInterfacesToBeRemoved;
+    this.props.onSubmit(lagInterfaces, ports, id, interfacesToBeRemoved);
     this._onEditToggle();
   };
 
-  _onClose = () => {
-    this.props.history.pushState(null, `/lag`);
+
+searchSelection = (sel) => {
+  for (const i in this.props.lag.page.availableInterfaces[`${sel}`]) {
+    const lagInterface = this.lagInterfaces[i];
+    const availableInterface = this.props.lag.page.availableInterfaces[`${sel}`];
+    if (lagInterface === availableInterface) {
+      return true;
+    }
+    return false;
+  }
+};
+
+table2data = (sel) => {
+  if (sel !== null) {
+    if (this.add === true) {
+      if (Object.keys(this.lagInterfaces).length < 8) {
+        const elementExists =this.searchSelection(sel);
+        if (!elementExists) {
+          this.lagInterfaces[`${sel}`] = this.availableInterfaces[`${sel}`];
+          delete this.availableInterfaces[`${sel}`];
+        } else {
+          alert('This interface already is already present in the LAG');
+        }
+      } else {
+        alert('Should be 8!!!');
+      }
+      this.add = false;
+    }
+
+
+    if (this.remove === true) {
+      if (this.lagInterfaces[`${sel}`]) {
+        this.availableInterfaces[`${sel}`] = this.lagInterfaces[`${sel}`];
+      } else {
+        alert('Contents of Available Interface Cannot be Removed.');
+      }
+      delete this.lagInterfaces[`${sel}`];
+      this.remove = false;
+    }
+    this.setState({lagInterfacesData: this.lagInterfaces});
+  }
+
+};
+
+
+  _addToLag = () => {
+    this.add = true;
+    const sel = this.state.sel;
+    this.table2data(sel);
+
   };
 
-  _onSelectChange() {}
+  _onSelectChange = (sel) => {
+    this.setState({sel});
+  };
 
-  _addToLag() {}
+  _removeFromLag = () => {
+    this.remove = true;
+    const sel = this.state.sel;
+    this.lagInterfacesRemoved[`${sel}`] = sel;
+    this.setState({lagInterfacesToBeRemoved: this.lagInterfacesRemoved });
+    this.table2data(sel);
+  };
 
-  _removeFromLag() {}
 
   render() {
     const id = this.props.params.id;
-    const lags = this.props.lag.page.lags[id].lagInterfaces;
-    const availableInterfacesForLag = {...this.props.lag.page.availableInterfacesForLag};
-    const lagInterfaces = {...lags};
+    const availableInterfacesForLag = {...this.availableInterfaces};
+    const lags = {...this.state.lagInterfacesData};
+
 
     return (
       <Layer
@@ -96,7 +162,7 @@ class LagEdit extends Component {
           <center>
           <Box direction="row">
           <Box>
-            <DataGrid title="Available Interfaces" width={600} height={850}
+            <DataGrid title="Available Interfaces" width={300} height={750}
                 data={availableInterfacesForLag}
                 columns={this.cols}
                 singleSelect
@@ -118,14 +184,17 @@ class LagEdit extends Component {
             </span>
             </Section>
             <Box>
-            <DataGrid title={`LAG${id}`} width={600} height={850}
-                data={lagInterfaces}
+            <DataGrid title={`LAG${id}`} width={300} height={750}
+                data={lags}
                 columns={this.cols}
                 singleSelect
                 onSelectChange={this._onSelectChange}
             />
             </Box>
-
+            <Button
+                label="Deploy"
+                onClick={this._onEditSubmit}
+            />
             </Box>
               </center>
           </div>
