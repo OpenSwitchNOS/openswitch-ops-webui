@@ -86,7 +86,7 @@ class LagDetails extends Component {
     );
   };
 
-
+  //TODO: Move to utils
   lagSpeedCalculator(lags) {
     const lagInterfaces = lags.lagInterfaces;
     let speed;
@@ -96,7 +96,7 @@ class LagDetails extends Component {
     return speed;
   }
 
-
+  //TODO: move to utils
   lagStatsCalculator(lags) {
     const lagInterfaces = lags.lagInterfaces;
     const stats = {
@@ -126,6 +126,7 @@ class LagDetails extends Component {
   render() {
     const id = this.props.params.id;
     const lags = this.props.lag.page.lags[id];
+
     //TODO: Move lagSpeedCalculator and lagStatsCalculator method from here
     const speed = this.lagSpeedCalculator(lags);
     const stats = this.lagStatsCalculator(lags);
@@ -149,6 +150,7 @@ class LagDetails extends Component {
           {this._tr(t('aggregationKey'), lags.idModified)}
           {this._tr(t('aggregateMode'), lags.lacp)}
           {this._tr(t('speed'), speed)}
+          {this._tr(t('bondStatus'), lags.bondStatus)}
           {this._tr(t('rxPackets'), Formatter.toCommaString(stats.rxPackets))}
           {this._tr(t('rxBytes'), Formatter.toCommaString(stats.rxBytes))}
           {this._tr(t('rxErrors'), Formatter.toCommaString(stats.rxErrors))}
