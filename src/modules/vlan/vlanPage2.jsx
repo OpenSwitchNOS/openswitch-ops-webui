@@ -20,7 +20,7 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
-import { MultiRange as Range } from 'multi-integer-range';
+import Range from 'range.js';
 import VlanInterfaceEdit from './vlanInterfaceEdit.jsx';
 
 

@@ -144,9 +144,11 @@ function createElement(RouteComponent, props) {
 export default class Main extends Component {
   render() {
     return (
-      <Provider store={store}>
-        <Router routes={routes} createElement={createElement}/>
-      </Provider>
+      <div>
+        <Provider store={store}>
+          <Router routes={routes} createElement={createElement}/>
+        </Provider>
+      </div>
     );
   }
 }
