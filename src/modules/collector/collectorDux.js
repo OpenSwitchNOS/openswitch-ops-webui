@@ -282,7 +282,7 @@ function parseOverviewResult(result) {
 
 const INITIAL_STORE = {
   overview: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
     info: {},
     interfaces: {},
     interfaceMetrics: {},

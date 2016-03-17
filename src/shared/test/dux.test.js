@@ -59,16 +59,20 @@ describe('dux', () => {
     dispatchedActions.push(action);
   }
 
-  it('makes async stores', () => {
-    const s = Dux.mkAsyncStore();
-    expect(s).toEqual({
+  const DEF_ASYNC_STATUS = {
+    asyncStatus: {
       inProgress: false,
       lastSuccessMillis: 0,
       lastError: null,
       numSteps: 0,
       currStep: 0,
       currStepMsg: '',
-    });
+    }
+  };
+
+  it('makes async status', () => {
+    const s = Dux.mkAsyncStatus();
+    expect(s).toEqual(DEF_ASYNC_STATUS);
   });
 
   it('makes action types', () => {
@@ -95,7 +99,7 @@ describe('dux', () => {
     function parseFn(result) { return { b: result.body.b }; }
     const handler = Dux.mkAsyncHandler('m', 'abc', at, parseFn);
 
-    const s1 = { abc: Dux.mkAsyncStore(), a: 'a' };
+    const s1 = { abc: Dux.mkAsyncStatus(), a: 'a' };
 
     let s2 = handler(s1, {type: 'bogos'});
     expect(s2).toBeNull();
@@ -103,12 +107,14 @@ describe('dux', () => {
     s2 = handler(s1, {type: 'm/abc/REQUEST'});
     expect(s2).toEqual({
       abc: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       a: 'a'
     });
@@ -116,12 +122,14 @@ describe('dux', () => {
     s2 = handler(s1, {type: 'm/abc/FAILURE', error: 'E1'});
     expect(s2).toEqual({
       abc: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: 'E1',
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: false,
+          lastSuccessMillis: 0,
+          lastError: 'E1',
+          numSteps: 0,
+          currStep: 0,
+          currStepMsg: '',
+        }
       },
       a: 'a'
     });
@@ -129,16 +137,11 @@ describe('dux', () => {
     const result = { body: {b: 'rb', c: 'rc'} };
 
     s2 = handler(s1, { type: 'm/abc/SUCCESS', result });
-    expect(s2.abc.lastSuccessMillis).toBeGreaterThan(0);
-    s2.abc.lastSuccessMillis = 0;
+    expect(s2.abc.asyncStatus.lastSuccessMillis).toBeGreaterThan(0);
+    s2.abc.asyncStatus.lastSuccessMillis = 0;
     expect(s2).toEqual({
       abc: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        ...DEF_ASYNC_STATUS,
         b: 'rb',
       },
       a: 'a',
@@ -147,24 +150,21 @@ describe('dux', () => {
     s2 = handler(s1, {type: 'm/abc/FAILURE', error: 'E2'});
     expect(s2).toEqual({
       abc: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: 'E2',
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: false,
+          lastSuccessMillis: 0,
+          lastError: 'E2',
+          numSteps: 0,
+          currStep: 0,
+          currStepMsg: '',
+        }
       },
       a: 'a'
     });
     s2 = handler(s2, {type: 'm/abc/CLEAR_ERROR' });
     expect(s2).toEqual({
       abc: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        ...DEF_ASYNC_STATUS,
       },
       a: 'a',
     });
@@ -178,7 +178,7 @@ describe('dux', () => {
     const handlerA = Dux.mkAsyncHandler('m', 'a', atA, parseFnA);
     const handlerB = Dux.mkAsyncHandler('m', 'b', atB, parseFnB);
 
-    const s1 = {a: Dux.mkAsyncStore(), b: Dux.mkAsyncStore(), z: 'z'};
+    const s1 = {a: Dux.mkAsyncStatus(), b: Dux.mkAsyncStatus(), z: 'z'};
 
     const reducer = Dux.mkReducer(s1, [handlerA, handlerB]);
 
@@ -188,20 +188,17 @@ describe('dux', () => {
     s2 = reducer(s2, {type: 'm/a/REQUEST'});
     expect(s2).toEqual({
       a: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       b: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        ...DEF_ASYNC_STATUS,
       },
       z: 'z',
     });
@@ -209,20 +206,24 @@ describe('dux', () => {
     s2 = reducer(s2, {type: 'm/b/REQUEST'});
     expect(s2).toEqual({
       a: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       b: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       z: 'z',
     });
@@ -230,25 +231,109 @@ describe('dux', () => {
     const result = { body: { a: 'aaa', b: 'bbb'} };
 
     s2 = reducer(s2, { type: 'm/b/SUCCESS', result });
-    expect(s2.b.lastSuccessMillis).toBeGreaterThan(0);
-    s2.b.lastSuccessMillis = 0;
+    expect(s2.b.asyncStatus.lastSuccessMillis).toBeGreaterThan(0);
+    s2.b.asyncStatus.lastSuccessMillis = 0;
     expect(s2).toEqual({
       a: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       b: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        ...DEF_ASYNC_STATUS,
         bb: 'bbb',
+      },
+      z: 'z',
+    });
+  });
+
+  it('reducer hanlds steps', () => {
+    const atA = Dux.mkAsyncActionTypes('m', 'a');
+    const atB = Dux.mkAsyncActionTypes('m', 'b');
+    function parseFnA(result) { return { aa: result.body.a }; }
+    function parseFnB(result) { return { bb: result.body.b }; }
+    const handlerA = Dux.mkAsyncHandler('m', 'a', atA, parseFnA);
+    const handlerB = Dux.mkAsyncHandler('m', 'b', atB, parseFnB);
+
+    let s1 = {a: Dux.mkAsyncStatus(), b: Dux.mkAsyncStatus(), z: 'z'};
+
+    const reducer = Dux.mkReducer(s1, [handlerA, handlerB]);
+
+    s1 = reducer(s1, {type: 'm/a/REQUEST', numSteps: 3, currStepMsg: 'M1' });
+    expect(s1).toEqual({
+      a: {
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 3,
+          currStep: 1,
+          currStepMsg: 'M1',
+        }
+      },
+      b: {
+        ...DEF_ASYNC_STATUS,
+      },
+      z: 'z',
+    });
+
+    s1 = reducer(s1, {
+      type: 'm/a/REQUEST_STEP', currStep: 2, currStepMsg: 'M2'
+    });
+    expect(s1).toEqual({
+      a: {
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 3,
+          currStep: 2,
+          currStepMsg: 'M2',
+        }
+      },
+      b: {
+        ...DEF_ASYNC_STATUS,
+      },
+      z: 'z',
+    });
+
+    s1 = reducer(s1, {
+      type: 'm/a/REQUEST_STEP', currStep: 3, currStepMsg: 'M3'
+    });
+    expect(s1).toEqual({
+      a: {
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 3,
+          currStep: 3,
+          currStepMsg: 'M3',
+        }
+      },
+      b: {
+        ...DEF_ASYNC_STATUS,
+      },
+      z: 'z',
+    });
+
+    const result = { body: { a: 'aaa', b: 'bbb'} };
+
+    s1 = reducer(s1, { type: 'm/a/SUCCESS', result });
+    expect(s1.a.asyncStatus.lastSuccessMillis).toBeGreaterThan(0);
+    s1.a.asyncStatus.lastSuccessMillis = 0;
+    expect(s1).toEqual({
+      a: {
+        ...DEF_ASYNC_STATUS,
+        aa: 'aaa',
+      },
+      b: {
+        ...DEF_ASYNC_STATUS,
       },
       z: 'z',
     });
@@ -258,7 +343,7 @@ describe('dux', () => {
     const atA = Dux.mkAsyncActionTypes('m', 'a');
     const handlerA = Dux.mkAsyncHandler('m', 'a', atA);
 
-    const s1 = {a: Dux.mkAsyncStore(), z: 'z'};
+    const s1 = {a: Dux.mkAsyncStatus(), z: 'z'};
 
     const reducer = Dux.mkReducer(s1, [handlerA]);
 
@@ -268,12 +353,14 @@ describe('dux', () => {
     s2 = reducer(s2, {type: 'm/a/REQUEST'});
     expect(s2).toEqual({
       a: {
-        inProgress: true,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 1,
-        currStep: 1,
-        currStepMsg: '',
+        asyncStatus: {
+          inProgress: true,
+          lastSuccessMillis: 0,
+          lastError: null,
+          numSteps: 1,
+          currStep: 1,
+          currStepMsg: '',
+        }
       },
       z: 'z',
     });
@@ -281,16 +368,11 @@ describe('dux', () => {
     const result = { body: { a: 'aaa', b: 'bbb'} };
 
     s2 = reducer(s2, { type: 'm/a/SUCCESS', result });
-    expect(s2.a.lastSuccessMillis).toBeGreaterThan(0);
-    s2.a.lastSuccessMillis = 0;
+    expect(s2.a.asyncStatus.lastSuccessMillis).toBeGreaterThan(0);
+    s2.a.asyncStatus.lastSuccessMillis = 0;
     expect(s2).toEqual({
       a: {
-        inProgress: false,
-        lastSuccessMillis: 0,
-        lastError: null,
-        numSteps: 0,
-        currStep: 0,
-        currStepMsg: '',
+        ...DEF_ASYNC_STATUS,
       },
       z: 'z',
     });
@@ -346,7 +428,7 @@ describe('dux', () => {
   });
 
   it('wait for cooldown', () => {
-    const s1 = {a: Dux.mkAsyncStore(), b: Dux.mkAsyncStore(), z: 'z'};
+    const s1 = {a: Dux.mkAsyncStatus(), b: Dux.mkAsyncStatus(), z: 'z'};
 
     expect(Dux.waitForCooldown(s1, 'a', 0)).toBeFalsy();
     expect(Dux.waitForCooldown(s1, 'b', 0)).toBeFalsy();
@@ -354,7 +436,7 @@ describe('dux', () => {
     expect(Dux.waitForCooldown(s1, 'a', 30000)).toBeTruthy();
     expect(Dux.waitForCooldown(s1, 'b', 0)).toBeFalsy();
 
-    s1.a.inProgress = true;
+    s1.a.asyncStatus.inProgress = true;
 
     expect(Dux.waitForCooldown(s1, 'a', 30000)).toBeFalsy();
     expect(Dux.waitForCooldown(s1, 'b', 60000)).toBeTruthy();
@@ -436,7 +518,7 @@ describe('dux', () => {
   it('get if cooled down', () => {
     expect(dispatchedActions.length).toBe(0);
 
-    const s1 = {z: Dux.mkAsyncStore()};
+    const s1 = {z: Dux.mkAsyncStatus()};
     const at = Dux.mkAsyncActionTypes('m', 'z');
     const result = { body: 'DATA1' };
 
@@ -445,12 +527,12 @@ describe('dux', () => {
     expect(dispatchedActions[0]).toEqual({ type: 'm/z/REQUEST' });
     expect(dispatchedActions[1]).toEqual({ type: 'm/z/SUCCESS', result });
 
-    s1.z.lastSuccessMillis = Date.now();
+    s1.z.asyncStatus.lastSuccessMillis = Date.now();
 
     Dux.getIfCooledDown(dispatch, s1, 'z', at, 'https://test.com/data1');
     expect(dispatchedActions.length).toBe(2);
 
-    s1.z.lastSuccessMillis = 0;
+    s1.z.asyncStatus.lastSuccessMillis = 0;
 
     Dux.getIfCooledDown(dispatch, s1, 'z', at, 'https://test.com/data1');
     expect(dispatchedActions.length).toBe(4);
