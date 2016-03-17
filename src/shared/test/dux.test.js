@@ -65,6 +65,9 @@ describe('dux', () => {
       inProgress: false,
       lastSuccessMillis: 0,
       lastError: null,
+      numSteps: 0,
+      currStep: 0,
+      currStepMsg: '',
     });
   });
 
@@ -72,6 +75,7 @@ describe('dux', () => {
     const at = Dux.mkAsyncActionTypes('m', 'abc');
     expect(at).toEqual({
       REQUEST: 'm/abc/REQUEST',
+      REQUEST_STEP: 'm/abc/REQUEST_STEP',
       SUCCESS: 'm/abc/SUCCESS',
       FAILURE: 'm/abc/FAILURE',
       CLEAR_ERROR: 'm/abc/CLEAR_ERROR',
@@ -101,7 +105,10 @@ describe('dux', () => {
       abc: {
         inProgress: true,
         lastSuccessMillis: 0,
-        lastError: null
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
       },
       a: 'a'
     });
@@ -112,6 +119,9 @@ describe('dux', () => {
         inProgress: false,
         lastSuccessMillis: 0,
         lastError: 'E1',
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
       },
       a: 'a'
     });
@@ -126,6 +136,9 @@ describe('dux', () => {
         inProgress: false,
         lastSuccessMillis: 0,
         lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
         b: 'rb',
       },
       a: 'a',
@@ -137,6 +150,9 @@ describe('dux', () => {
         inProgress: false,
         lastSuccessMillis: 0,
         lastError: 'E2',
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
       },
       a: 'a'
     });
@@ -146,6 +162,9 @@ describe('dux', () => {
         inProgress: false,
         lastSuccessMillis: 0,
         lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
       },
       a: 'a',
     });
@@ -168,15 +187,43 @@ describe('dux', () => {
 
     s2 = reducer(s2, {type: 'm/a/REQUEST'});
     expect(s2).toEqual({
-      a: { inProgress: true, lastSuccessMillis: 0, lastError: null },
-      b: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: {
+        inProgress: true,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
+      },
+      b: {
+        inProgress: false,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
+      },
       z: 'z',
     });
 
     s2 = reducer(s2, {type: 'm/b/REQUEST'});
     expect(s2).toEqual({
-      a: { inProgress: true, lastSuccessMillis: 0, lastError: null },
-      b: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      a: {
+        inProgress: true,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
+      },
+      b: {
+        inProgress: true,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
+      },
       z: 'z',
     });
 
@@ -186,11 +233,21 @@ describe('dux', () => {
     expect(s2.b.lastSuccessMillis).toBeGreaterThan(0);
     s2.b.lastSuccessMillis = 0;
     expect(s2).toEqual({
-      a: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      a: {
+        inProgress: true,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
+      },
       b: {
         inProgress: false,
         lastSuccessMillis: 0,
         lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
         bb: 'bbb',
       },
       z: 'z',
@@ -210,7 +267,14 @@ describe('dux', () => {
 
     s2 = reducer(s2, {type: 'm/a/REQUEST'});
     expect(s2).toEqual({
-      a: { inProgress: true, lastSuccessMillis: 0, lastError: null },
+      a: {
+        inProgress: true,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 1,
+        currStep: 1,
+        currStepMsg: '',
+      },
       z: 'z',
     });
 
@@ -220,7 +284,14 @@ describe('dux', () => {
     expect(s2.a.lastSuccessMillis).toBeGreaterThan(0);
     s2.a.lastSuccessMillis = 0;
     expect(s2).toEqual({
-      a: { inProgress: false, lastSuccessMillis: 0, lastError: null },
+      a: {
+        inProgress: false,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
+      },
       z: 'z',
     });
   });
@@ -232,6 +303,17 @@ describe('dux', () => {
     const result = 'R1';
 
     expect(Dux.actionRequest(at)).toEqual({type: 'm/z/REQUEST'});
+
+    expect(Dux.actionRequest(at, 3, 'S1')).toEqual({
+      type: 'm/z/REQUEST',
+      action: { numSteps: 3, currStepMsg: 'S1' }
+    });
+
+    expect(Dux.actionRequestStep(at, 2, 'S2')).toEqual({
+      type: 'm/z/REQUEST_STEP',
+      action: { currStep: 2, currStepMsg: 'S2' }
+    });
+
     expect(Dux.actionFail(at, 'E1')).toEqual({type: 'm/z/FAILURE', error});
     expect(Dux.actionSuccess(at, 'R1')).toEqual({type: 'm/z/SUCCESS', result});
     expect(Dux.actionClearError(at)).toEqual({type: 'm/z/CLEAR_ERROR'});

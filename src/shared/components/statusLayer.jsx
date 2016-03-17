@@ -46,7 +46,7 @@ export default class StatusLayer extends Component {
     if (!title) {
       if (value === 'warning') {
         title = t('warning');
-      } else if (value === 'error') {
+      } else if (value === 'critical') {
         title = t('error');
       } else {
         title = t('information');

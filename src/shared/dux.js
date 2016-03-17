@@ -19,13 +19,22 @@
 import Agent, { mkAgentHandler } from 'agent.js';
 import Async from 'async';
 
-const ASYNC_TYPES = [ 'REQUEST', 'SUCCESS', 'FAILURE', 'CLEAR_ERROR' ];
+const ASYNC_TYPES = [
+  'REQUEST',
+  'REQUEST_STEP',
+  'SUCCESS',
+  'FAILURE',
+  'CLEAR_ERROR'
+];
 
 function mkAsyncStore() {
   return {
     inProgress: false,
     lastSuccessMillis: 0,
     lastError: null,
+    numSteps: 0,
+    currStep: 0,
+    currStepMsg: '',
   };
 }
 
@@ -54,21 +63,45 @@ function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
     switch (action.type) {
 
       case asyncAts.REQUEST: {
+        const numSteps = action && action.numSteps || 1;
+        const currStepMsg = action && action.currStepMsg || '';
         const asyncStore = {
-          ...moduleStore[asyncName], inProgress: true };
+          ...moduleStore[asyncName],
+          inProgress: true,
+          numSteps,
+          currStep: 1,
+          currStepMsg,
+        };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
 
-      case asyncAts.CLEAR_ERROR: {
-        const asyncStore = { ...moduleStore[asyncName], lastError: null };
+      case asyncAts.REQUEST_STEP: {
+        const currStep = action.currStep;
+        const currStepMsg = action.currStepMsg || '';
+        const asyncStore = {
+          ...moduleStore[asyncName],
+          currStep,
+          currStepMsg,
+        };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
 
       case asyncAts.FAILURE: {
         const asyncStore = {
           ...moduleStore[asyncName],
-          inProgress: false,
           lastError: action.error,
+          inProgress: false,
+          numSteps: 0,
+          currStep: 0,
+          currStepMsg: '',
+        };
+        return { ...moduleStore, [asyncName]: asyncStore };
+      }
+
+      case asyncAts.CLEAR_ERROR: {
+        const asyncStore = {
+          ...moduleStore[asyncName],
+          lastError: null
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
@@ -82,6 +115,9 @@ function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
           inProgress: false,
           lastError: null,
           lastSuccessMillis: Date.now(),
+          numSteps: 0,
+          currStep: 0,
+          currStepMsg: '',
           ...newAsyncStore,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
@@ -103,7 +139,22 @@ function mkReducer(initialStore, asyncHandlers) {
   };
 }
 
-function actionRequest(at) { return { type: at.REQUEST }; }
+function actionRequest(at, numSteps, currStepMsg) {
+  const obj = { type: at.REQUEST };
+  if (numSteps) {
+    const action = { numSteps };
+    if (currStepMsg) { action.currStepMsg = currStepMsg; }
+    obj.action = action;
+  }
+  return obj;
+}
+
+function actionRequestStep(at, currStep, currStepMsg) {
+  const action = { currStep };
+  if (currStepMsg) { action.currStepMsg = currStepMsg; }
+  return { type: at.REQUEST_STEP, action };
+}
+
 function actionFail(at, error) { return { type: at.FAILURE, error }; }
 function actionSuccess(at, result) { return { type: at.SUCCESS, result }; }
 function actionClearError(at) { return { type: at.CLEAR_ERROR }; }
@@ -165,6 +216,7 @@ export default {
   mkAsyncHandler,
   mkReducer,
   actionRequest,
+  actionRequestStep,
   actionFail,
   actionSuccess,
   actionClearError,

@@ -45,7 +45,7 @@ export default class ErrorLayer extends Component {
       <StatusLayer
           box
           className="error"
-          value="error"
+          value="critical"
           onClose={p.onClose}
           title={this.props.title || t('error')} >
         <b>{t('status')}</b><br/>
