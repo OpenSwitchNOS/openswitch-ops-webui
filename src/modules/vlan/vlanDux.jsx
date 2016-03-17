@@ -164,12 +164,12 @@ function parsePageResult(result) {
 
 const INITIAL_STORE = {
   page: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
     vlans: {},
     interfaces: {},
   },
   set: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
   }
 };
 

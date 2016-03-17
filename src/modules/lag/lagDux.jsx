@@ -30,7 +30,7 @@ const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
 
 const INITIAL_STORE = {
   page: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
     lags: {},
   },
 };

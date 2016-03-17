@@ -27,14 +27,16 @@ const ASYNC_TYPES = [
   'CLEAR_ERROR'
 ];
 
-function mkAsyncStore() {
+function mkAsyncStatus() {
   return {
-    inProgress: false,
-    lastSuccessMillis: 0,
-    lastError: null,
-    numSteps: 0,
-    currStep: 0,
-    currStepMsg: '',
+    asyncStatus: {
+      inProgress: false,
+      lastSuccessMillis: 0,
+      lastError: null,
+      numSteps: 0,
+      currStep: 0,
+      currStepMsg: '',
+    }
   };
 }
 
@@ -63,45 +65,49 @@ function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
     switch (action.type) {
 
       case asyncAts.REQUEST: {
-        const numSteps = action && action.numSteps || 1;
-        const currStepMsg = action && action.currStepMsg || '';
+        const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.inProgress = true;
+        asyncStatus.numSteps = action.numSteps || 1;
+        asyncStatus.currStep = 1;
+        asyncStatus.currStepMsg = action.currStepMsg || '';
         const asyncStore = {
           ...moduleStore[asyncName],
-          inProgress: true,
-          numSteps,
-          currStep: 1,
-          currStepMsg,
+          asyncStatus,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
 
       case asyncAts.REQUEST_STEP: {
-        const currStep = action.currStep;
-        const currStepMsg = action.currStepMsg || '';
+        const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.currStep = action.currStep;
+        asyncStatus.currStepMsg = action.currStepMsg || '';
         const asyncStore = {
           ...moduleStore[asyncName],
-          currStep,
-          currStepMsg,
+          asyncStatus,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
 
       case asyncAts.FAILURE: {
+        const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.lastError = action.error;
+        asyncStatus.inProgress = false;
+        asyncStatus.numSteps = 0;
+        asyncStatus.currStep = 0;
+        asyncStatus.currStepMsg = '';
         const asyncStore = {
           ...moduleStore[asyncName],
-          lastError: action.error,
-          inProgress: false,
-          numSteps: 0,
-          currStep: 0,
-          currStepMsg: '',
+          asyncStatus,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
 
       case asyncAts.CLEAR_ERROR: {
+        const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.lastError = null;
         const asyncStore = {
           ...moduleStore[asyncName],
-          lastError: null
+          asyncStatus,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
@@ -110,15 +116,17 @@ function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
         const newAsyncStore = parseFn
           ? protectedFn(moduleName, asyncName, parseFn, action.result)
           : {};
+        const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.inProgress = false;
+        asyncStatus.lastError = null;
+        asyncStatus.lastSuccessMillis = Date.now();
+        asyncStatus.numSteps = 0;
+        asyncStatus.currStep = 0;
+        asyncStatus.currStepMsg = '';
         const asyncStore = {
           ...moduleStore[asyncName],
-          inProgress: false,
-          lastError: null,
-          lastSuccessMillis: Date.now(),
-          numSteps: 0,
-          currStep: 0,
-          currStepMsg: '',
           ...newAsyncStore,
+          asyncStatus,
         };
         return { ...moduleStore, [asyncName]: asyncStore };
       }
@@ -183,7 +191,8 @@ function mkAsyncDispatcher(dispatch, at) {
 const ASYNC_COOLDOWN_MILLIS = 5000;
 
 function waitForCooldown(moduleStore, asyncName, now) {
-  const { inProgress, lastSuccessMillis } = moduleStore[asyncName];
+  const { inProgress, lastSuccessMillis } =
+    moduleStore[asyncName].asyncStatus;
   return !inProgress && (now - lastSuccessMillis) > ASYNC_COOLDOWN_MILLIS;
 }
 
@@ -210,7 +219,7 @@ function getIfCooledDown(dispatch, moduleStore, asyncName, at, urls) {
 }
 
 export default {
-  mkAsyncStore,
+  mkAsyncStatus,
   mkAsyncActionTypes,
   protectedFn,
   mkAsyncHandler,

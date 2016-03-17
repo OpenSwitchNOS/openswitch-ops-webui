@@ -43,7 +43,7 @@ const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
 
 const INITIAL_STORE = {
   detail: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
     ports: {
       urls: [],
     },
@@ -53,7 +53,7 @@ const INITIAL_STORE = {
     },
   },
   set: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
   }
 };
 

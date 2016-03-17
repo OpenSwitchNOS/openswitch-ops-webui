@@ -69,7 +69,7 @@ function parsePageResult(result) {
 
 const INITIAL_STORE = {
   page: {
-    ...Dux.mkAsyncStore(),
+    ...Dux.mkAsyncStatus(),
     entities: {},
     lastRead: 0,
     length: 0,
