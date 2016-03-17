@@ -160,6 +160,8 @@ function parsePageResult(result) {
   return { vlans, vlansEtag, interfaces, portsEtag };
 }
 
+// TODO: more correct to use the constants for the INITIAL_STORE everyone
+
 const INITIAL_STORE = {
   page: {
     ...Dux.mkAsyncStore(),

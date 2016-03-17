@@ -28,7 +28,7 @@ import FormFields from 'grommet/components/FormFields';
 import Button from 'grommet/components/Button';
 import _ from 'lodash';
 import DataGrid from 'dataGrid.jsx';
-import { MultiRange as Range } from 'multi-integer-range';
+import Range from 'range.js';
 
 
 class VlanAdd extends Component {

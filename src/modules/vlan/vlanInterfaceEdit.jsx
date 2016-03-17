@@ -25,7 +25,7 @@ import Layer from 'grommet/components/Layer';
 import Form from 'grommet/components/Form';
 import FormField from 'grommet/components/FormField';
 import FormFields from 'grommet/components/FormFields';
-import { MultiRange as Range } from 'multi-integer-range';
+import Range from 'range.js';
 import Button from 'grommet/components/Button';
 import _ from 'lodash';
 import VlanAdd from './vlanAdd.jsx';

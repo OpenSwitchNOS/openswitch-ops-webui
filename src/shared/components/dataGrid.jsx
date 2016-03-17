@@ -17,10 +17,11 @@
 import './dataGrid.scss';
 
 import React, { PropTypes, Component } from 'react';
-import { t } from 'i18n/lookup.js';
+// import { t } from 'i18n/lookup.js';
 import _ from 'lodash';
 import { Table, Column, Cell } from 'fixed-data-table';
-import SearchInput from 'grommet/components/SearchInput';
+// TODO: waiting for Grommet SearchInput fix for DataGrid
+// import SearchInput from 'grommet/components/SearchInput';
 import DownIcon from 'grommet/components/icons/base/CaretDown';
 import UpIcon from 'grommet/components/icons/base/CaretUp';
 import EditIcon from 'grommet/components/icons/base/Edit';
@@ -414,18 +415,18 @@ export default class DataGrid extends Component {
     const addTool = !this.props.onAdd ? null :
       <a onClick={this.props.onAdd}><AddIcon/></a>;
 
-    const searchTool = this.props.noFilter ? null :
-      <SearchInput
-          value={this.state.filterText}
-          onChange={this._onFilterChange}
-          placeHolder={t('search')} />;
+    // const searchTool = this.props.noFilter ? null :
+    //   <SearchInput
+    //       value={this.state.filterText}
+    //       onChange={this._onFilterChange}
+    //       placeHolder={t('search')} />;
 
     // Create the toolbar based on the current props/state.
 
     const tb = (
       <Toolbar width={gridWidth}>
         <Box direction="row" align="center" responsive={false}>
-          {searchTool}
+          {/*{searchTool}*/}
           <b>{this.props.title}</b>
         </Box>
         <Box direction="row" align="center" responsive={false}>
