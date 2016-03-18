@@ -27,12 +27,6 @@ h1, h2, h3, .headline, .title {
 }
 
 .control-icon {
-  &.tiny {
-    width: 32px;
-    height: 32px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
   &.noColor {
     stroke: none;
     fill: none;
@@ -132,6 +126,8 @@ table.logTable {
   .mRight { margin-right: $space; }
   .mBottom { margin-bottom: $space; }
   .mLeft { margin-left: $space; }
+
+  .mTopBottomAuto { margin-top: auto; margin-bottom: auto; }
 
   .pTop { padding-top: $space; }
   .pRight { padding-right: $space; }
@@ -238,6 +234,7 @@ $slideInColumnMinWidth: 350px;
     border: 3px solid $brand-color;
   }
 }
+
 .edit.layer {
   z-index: 100;
   &.second {
@@ -246,6 +243,10 @@ $slideInColumnMinWidth: 350px;
   &.third {
     z-index: 102;
   }
+}
+
+.error.layer {
+  z-index: 1000;
 }
 
 // Override the sidebar-width for the navigation pane.

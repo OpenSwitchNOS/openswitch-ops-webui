@@ -72,7 +72,7 @@ export default class FetchToolbar extends Component {
           );
         }
       } else if (p.date) {
-        status = <small><TimeAgo date={p.date}/></small>;
+        status = <small><TimeAgo date={p.date}/>&nbsp;</small>;
       }
     }
 

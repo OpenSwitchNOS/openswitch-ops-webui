@@ -17,20 +17,19 @@
 import './dataGrid.scss';
 
 import React, { PropTypes, Component } from 'react';
-// import { t } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 import _ from 'lodash';
 import { Table, Column, Cell } from 'fixed-data-table';
-// TODO: waiting for Grommet SearchInput fix for DataGrid
-// import SearchInput from 'grommet/components/SearchInput';
-import DownIcon from 'grommet/components/icons/base/CaretDown';
-import UpIcon from 'grommet/components/icons/base/CaretUp';
-import EditIcon from 'grommet/components/icons/base/Edit';
+import Search from 'grommet/components/Search';
+import DownIcon from 'grommet/components/icons/base/LinkDown';
+import UpIcon from 'grommet/components/icons/base/LinkUp';
+import EditIcon from 'grommet/components/icons/base/Configuration';
 import AddIcon from 'grommet/components/icons/base/Add';
 import CbIcon from 'grommet/components/icons/base/Checkbox';
 import CbSelIcon from 'grommet/components/icons/base/CheckboxSelected';
 import SubtractIcon from 'grommet/components/icons/base/Subtract';
-import Box from 'grommet/components/Box';
 import Toolbar from 'toolbar.jsx';
+import Anchor from 'grommet/components/Anchor';
 import Utils from 'utils.js';
 
 
@@ -57,9 +56,9 @@ class SortHeaderCell extends Component {
     sortDirection: null,
   };
 
-  static UP = <UpIcon className="tiny" />;
-  static DOWN = <DownIcon className="tiny" />;
-  static NONE = <UpIcon className="tiny noColor"/>;
+  static UP = <UpIcon />;
+  static DOWN = <DownIcon />;
+  static NONE = <UpIcon className="noColor"/>;
 
   static toggleSortDir(ds) { return ds === DESC ? ASC : DESC; }
 
@@ -111,8 +110,6 @@ class DataMap {
   cloneDataKeyArray() { return this.dataKeyArray.slice(); }
 }
 
-
-// FIXME: There is a problem with the deselect on the VLAN page.
 
 export default class DataGrid extends Component {
 
@@ -386,12 +383,12 @@ export default class DataGrid extends Component {
 
     const selectAllTool = this.props.singleSelect || this.props.noSelect
       ? null : (
-        <a onClick={this._onSelectAll}><CbSelIcon/></a>
+        <Anchor onClick={this._onSelectAll}><CbSelIcon/></Anchor>
       );
 
     const selectNoneTool = !selectAllTool
       ? null : (
-        <a onClick={this._onSelectNone}><CbIcon/></a>
+        <Anchor onClick={this._onSelectNone}><CbIcon/></Anchor>
       );
 
     const haveSel = this.state.activeDataKeys.length > 0;
@@ -399,44 +396,47 @@ export default class DataGrid extends Component {
     let editTool = null;
     const editCb = this.props.onEdit ? this._onEditClicked : null;
     if (editCb) {
-      editTool = haveSel ?
-        <a onClick={editCb}><EditIcon/></a> :
-        <EditIcon className="disabled"/>;
+      editTool = (
+        <Anchor disabled={!haveSel} onClick={haveSel ? editCb : null}>
+          <EditIcon/>
+        </Anchor>
+      );
     }
 
     let delTool = null;
     const delCb = this.props.onDelete ? this._onDeleteClicked : null;
     if (delCb) {
-      delTool = haveSel ?
-        <a onClick={delCb}><SubtractIcon/></a> :
-        <SubtractIcon className="disabled"/>;
+      delTool = (
+        <Anchor disabled={!haveSel} onClick={haveSel ? delCb : null}>
+          <SubtractIcon/>
+        </Anchor>
+      );
     }
 
     const addTool = !this.props.onAdd ? null :
-      <a onClick={this.props.onAdd}><AddIcon/></a>;
+      <Anchor onClick={this.props.onAdd}><AddIcon/></Anchor>;
 
-    // const searchTool = this.props.noFilter ? null :
-    //   <SearchInput
-    //       value={this.state.filterText}
-    //       onChange={this._onFilterChange}
-    //       placeHolder={t('search')} />;
+    const searchTool = this.props.noFilter ? null :
+      <Search
+          inline
+          value={this.state.filterText || ''}
+          onChange={this._onFilterChange}
+          placeHolder={t('search')} />;
 
     // Create the toolbar based on the current props/state.
 
     const tb = (
       <Toolbar width={gridWidth}>
-        <Box direction="row" align="center" responsive={false}>
-          {/*{searchTool}*/}
-          <b>{this.props.title}</b>
-        </Box>
-        <Box direction="row" align="center" responsive={false}>
-          {this.props.toolbar}
-          {selectAllTool}
-          {selectNoneTool}
+        <div>
+          {editTool}
           {addTool}
           {delTool}
-          {editTool}
-        </Box>
+          {selectAllTool}
+          {selectNoneTool}
+          {this.props.toolbar}
+        </div>
+        <b className="mTopBottomAuto">{this.props.title}</b>
+        {searchTool}
       </Toolbar>
     );
 

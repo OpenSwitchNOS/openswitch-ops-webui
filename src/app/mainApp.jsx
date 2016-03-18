@@ -130,22 +130,19 @@ class MainApp extends Component {
     );
 
     const pageHdr = (
-      <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
-          justify="between">
-        <Box direction="row" align="center" responsive={false}>
+      <Header justify="between" pad={{horizontal: 'medium'}}>
+        <Title>
           {this.props.nav.paneActive ? null :
-            <Anchor onClick={this._onPageNavClicked}>
-              <NextIcon />
-            </Anchor>
+            <a onClick={this._onPageNavClicked}><NextIcon /></a>
           }
           {breadcrumbs}
-        </Box>
-        <Box direction="row" align="center" responsive={false}>
+        </Title>
+        <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
           <a href="#/log">
-            <NotificationIcon/><small>{numSyslog}</small>
+            <NotificationIcon/><small>&nbsp;{numSyslog}</small>
           </a>
-        </Box>
+        </Menu>
       </Header>
     );
 

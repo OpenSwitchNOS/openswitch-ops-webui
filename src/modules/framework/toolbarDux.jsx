@@ -25,17 +25,17 @@ const SET = `${NAME}/SET`;
 const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
-  setFetchTB(async, onRefresh) {
-    if (!async) {
+  setFetchTB(asyncStatus, onRefresh) {
+    if (!asyncStatus) {
       throw new Error('invalid async object set on toolbar');
     }
     return {
       type: SET,
       component: (
         <FetchToolbar
-            isFetching={async.inProgress}
-            error={async.lastError}
-            date={async.lastSuccessMillis}
+            isFetching={asyncStatus.inProgress}
+            error={asyncStatus.lastError}
+            date={asyncStatus.lastSuccessMillis}
             onRefresh={onRefresh}/>
       )
     };

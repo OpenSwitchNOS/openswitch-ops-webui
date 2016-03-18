@@ -53,13 +53,13 @@ class OverviewPage extends Component {
   componentDidMount() {
     this.props.autoActions.collector.fetch();
     this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview, this._onRefresh
+      this.props.collector.overview.asyncStatus, this._onRefresh
     );
   }
 
   componentWillReceiveProps(nextProps) {
     this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview, this._onRefresh
+      nextProps.collector.overview.asyncStatus, this._onRefresh
     );
   }
 

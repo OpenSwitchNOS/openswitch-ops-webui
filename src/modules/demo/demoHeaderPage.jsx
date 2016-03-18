@@ -77,7 +77,7 @@ class DemoHeaderPage extends Component {
         <Header justify="between" colorIndex="neutral-3"
             pad={{horizontal: 'medium'}}>
           <Title><BrandLogo/>{t('openSwitch')}</Title>
-          <Menu inline responsive={false} direction="row">
+          <Menu responsive={false} direction="row">
             <Menu direction="row" align="center" responsive={false}>
               {links}
             </Menu>
