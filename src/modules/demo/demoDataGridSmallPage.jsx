@@ -23,6 +23,8 @@ import Section from 'grommet/components/Section';
 import ActionsIcon from 'grommet/components/icons/base/Actions';
 import Button from 'grommet/components/Button';
 import CheckBox from 'grommet/components/CheckBox';
+import Anchor from 'grommet/components/Anchor';
+import Menu from 'grommet/components/Menu';
 
 
 class DemoDataGridSmallPage extends Component {
@@ -87,7 +89,7 @@ class DemoDataGridSmallPage extends Component {
   };
 
   _onAction = () => {
-    alert(`action ${this.state.externalSelect}`);
+    alert(`action - bottom grid selection: ${this.state.externalSelect}`);
   };
 
   _onSelectChange = (selection) => {
@@ -106,7 +108,7 @@ class DemoDataGridSmallPage extends Component {
     return (
       <div className="mLeft">
         <Section>
-          <DataGrid title="Full Toolbar" width={600} height={200}
+          <DataGrid title="Full Toolbar" width={700} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
               onEdit={this._onEdit}
@@ -115,29 +117,48 @@ class DemoDataGridSmallPage extends Component {
           />
         </Section>
         <Section>
-          <DataGrid title="Select / No Edit" width={600} height={200}
+          <DataGrid title="Select / No Edit" width={700} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
               onSelectChange={this._onSelectChange}
+              toolbar={[
+                <Menu key="k1" label="Actions">
+                  <Anchor
+                      onClick={this._onAction}>
+                      Text1
+                  </Anchor>
+                  <Anchor
+                      onClick={this._onAction}>
+                      Text2
+                  </Anchor>
+                </Menu>,
+                <Menu key="k2" icon={<ActionsIcon/>}>
+                  <Anchor
+                      onClick={this._onAction}>
+                      Text1
+                  </Anchor>
+                  <Anchor
+                      onClick={this._onAction}>
+                      Text2
+                  </Anchor>
+                </Menu>
+              ]}
           />
         </Section>
         <Section>
-          <DataGrid title="No Filter / Single Select" width={600} height={200}
+          <DataGrid title="Single Select" width={700} height={200}
               data={demoProps.page.entities}
               columns={this.cols}
-              noFilter
               singleSelect
               onSelectChange={this._onSelectChange}
               select={this.state.externalSelect.toString()}
-              onDelete={this._onDelete}
+              onEdit={this._onEdit}
               toolbar={[
-                <CheckBox id="item2" name="item2" label="Details"/>,
-                <span>&nbsp;&nbsp;</span>,
-                <a onClick={this._onAction}>Act1</a>,
-                <span>&nbsp;&nbsp;</span>,
-                <a className="control-icon" onClick={this._onAction}>
-                  <ActionsIcon/>
-                </a>
+                <CheckBox className="mLeft mTopBottomAuto"
+                    key="cb1"
+                    id="cb1"
+                    name="cb1"
+                    label="Details"/>
               ]}
           />
           <Button

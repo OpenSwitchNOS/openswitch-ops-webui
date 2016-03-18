@@ -14,8 +14,6 @@
     under the License.
 */
 
-import './errorLayer.scss';
-
 import React, { PropTypes, Component } from 'react';
 import { t } from 'i18n/lookup.js';
 import StatusLayer from 'statusLayer.jsx';
