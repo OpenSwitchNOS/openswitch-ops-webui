@@ -20,7 +20,6 @@ import './mainApp.scss';
 
 import React, { PropTypes, Component } from 'react';
 import Breadcrumbs from 'react-breadcrumbs';
-import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 
 import App from 'grommet/components/App';
@@ -32,7 +31,6 @@ import Menu from 'grommet/components/Menu';
 import NotificationIcon from 'grommet/components/icons/base/Notification';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
-import EditIcon from 'grommet/components/icons/base/Edit';
 import NextIcon from 'grommet/components/icons/base/Next';
 
 import LoginLayer from 'loginLayer.jsx';
@@ -108,36 +106,62 @@ class MainApp extends Component {
     this.props.actions.auth.login();
   };
 
-  render() {
-    // FIXME: this.props.syslog.numUnread;
-    // data retieved from this.props.collector.?
-    const numSyslog = this.props.collector.overview.log.numAdded;
+  _mkPageHdr = () => {
+    // For the breadcrumb, when we assign the name to the route we do a 'navt'
+    // lookup, so '/' gets converted to '~/~'.
+    const openNav = this.props.nav.paneActive ? null :
+      <a onClick={this._onPageNavClicked}><NextIcon /></a>;
 
-    // When we assign the name to the route we do a 'navt' lookup, so '/' gets
-    // converted to '~/~'.
-    const breadcrumbs = (
-      <Breadcrumbs
-          excludes={['~/~']}
-          routes={this.props.routes}
-          params={this.props.params} />
-    );
+    const notifLink = '#/log';
+    const notifCount = 3; // TODO: implement me
 
-    const pageHdr = (
+    return (
       <Header justify="between" pad={{horizontal: 'medium'}}>
         <Title>
-          {this.props.nav.paneActive ? null :
-            <a onClick={this._onPageNavClicked}><NextIcon /></a>
-          }
-          {breadcrumbs}
+          {openNav}
+          <Breadcrumbs excludes={['~/~']}
+              routes={this.props.routes}
+              params={this.props.params} />
         </Title>
         <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
-          <a href="#/log">
-            <NotificationIcon/><small>&nbsp;{numSyslog}</small>
+          <a href={notifLink}>
+            <NotificationIcon/><small>&nbsp;{notifCount}</small>
           </a>
         </Menu>
       </Header>
     );
+  };
+
+  _mkGuide = () => {
+    return (
+      <Box className="guide">
+        <Header
+            tag="h4"
+            direction="row"
+            pad={{horizontal: 'small'}}
+            justify="between">
+          <Menu direction="row" responsive={false}>
+            <Title>Quick Guide</Title>
+          </Menu>
+          <Menu direction="row" responsive={false}>
+            <Anchor onClick={this.props.actions.guide.hide}>
+              <CloseIcon />
+            </Anchor>
+          </Menu>
+        </Header>
+        {this.props.guide.component}
+      </Box>
+    );
+  };
+
+  render() {
+
+    // The only reason we pass in the location to the NavSideBar is so that
+    // it will rerender when we select a navigation item (and show the new
+    // active item).
+    const nav = !this.props.nav.paneActive ? null :
+      <NavSideBar location={this.props.location} actions={this.props.actions}/>;
 
     const page = (
       <Box id="pageContent" className="flex1 pLeft pRight pBottom">
@@ -145,55 +169,8 @@ class MainApp extends Component {
       </Box>
     );
 
-    const guide = !this.props.guide.component ? null : (
-      <Box key="guideKey" className="guide">
-
-        <ReactCSSTG
-            transitionName="slideInColumn"
-            transitionAppear
-            transitionAppearTimeout={500}
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
-
-          <div key="guideContentKey">
-            <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
-                justify="between">
-              <Menu direction="row" responsive={false}>
-                <Title>Quick Guide</Title>
-              </Menu>
-              <Menu direction="row" responsive={false}>
-                <Anchor onClick={this.props.actions.guide.hide}>
-                  <CloseIcon />
-                </Anchor>
-              </Menu>
-            </Header>
-            <Box pad={{horizontal: 'small'}}>
-              <b>Setup the Management Interface</b>
-              <br/>
-              <ul>
-                <li>Navigate to the page:</li>
-                <Anchor primary href="#/interface">interface</Anchor>
-                <li>Select the interface in the table.</li>
-                <li>Click the edit icon:</li>
-                <EditIcon/>
-                <li>Configure the IP from within the <b>Edit</b> slide-in pane</li>
-                <li><b>Deploy</b> the modification.</li>
-                <li>Click the <b>Restart</b> from within the confirmation dialog.</li>
-                <li><i>Switch will need to be restarted.</i></li>
-              </ul>
-            </Box>
-          </div>
-
-        </ReactCSSTG>
-
-      </Box>
-    );
-
-    // The only reason we pass in the location to the NavSideBar is so that
-    // it will rerender when we select a navigation item (and show the new
-    // active item).
-    const nav = !this.props.nav.paneActive ? null :
-      <NavSideBar location={this.props.location} actions={this.props.actions}/>;
+    // Show the "quick guide" if one has been set.
+    const guide = !this.props.guide.component ? null : this._mkGuide();
 
     // Split will only show the priority column on small screens, we make this
     // the first (left) column because we want to be able to show the navigation
@@ -211,7 +188,7 @@ class MainApp extends Component {
 
         <Box responsive={false} direction="row">
           <Box id="page" className="flex1">
-            {pageHdr}
+            {this._mkPageHdr()}
             {guide}
             {page}
           </Box>

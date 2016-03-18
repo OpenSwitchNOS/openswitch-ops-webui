@@ -36,6 +36,14 @@ const modules = [
   LagDux,
 ];
 
+import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
+import ConfigLagGuide from 'guides/configLagGuide.jsx';
+
+const guides = [
+  ConfigInterfaceGuide,
+  ConfigLagGuide,
+];
+
 import * as i18nLocale from 'i18n/en-US.js';
 import As5712 from 'boxGraphics/as5712.jsx';
 
@@ -45,7 +53,17 @@ const settings = {
   reduxLogger: true,
   agent: {
     prefix: 'http://15.108.30.248:8091',
-  }
+  },
+  extLinks: [
+    {
+      key: 'osApi',
+      href: `http://15.108.30.248:8091/api/index.html`
+    },
+    {
+      key: 'osNet',
+      href: 'http://openswitch.net'
+    },
+  ]
 };
 
-export default { modules, settings };
+export default { modules, guides, settings };

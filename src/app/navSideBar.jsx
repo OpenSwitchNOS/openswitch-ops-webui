@@ -36,15 +36,14 @@ import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
 
-const API_LINK = `http://${window.location.hostname}:8091/api/index.html`;
-const OPS_LINK = 'http://openswitch.net';
 
 class NavSideBar extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
-    guide: PropTypes.object.isRequired,
+    extLinks: PropTypes.array.isRequired,
+    guides: PropTypes.array.isRequired,
     links: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
   };
@@ -111,23 +110,28 @@ class NavSideBar extends Component {
     const tree = NavSideBar.mkOrderedNavItemTree(this.props.links, {});
     this.items = [];
     NavSideBar.mkNavItems(tree.items, this.items);
-
-    // TODO: Guides net to be implemented - this will come from the build config
-    this.guide = [
-      { menuKey: 'configMgmtInterface', component: <div>ConfigMgmtIntf</div> },
-      { menuKey: 'configVlan', component: <div>ConfigVLAN</div> },
-    ];
   }
 
   _onClose = () => {
     this.props.actions.nav.hidePane();
   };
 
-  _onClickGuide = (index) => {
-    this.props.actions.guide.show(this.guide[index].component);
+  _mkExtLinks = () => {
+    return this.props.extLinks.map( lnk => {
+      return <a key={lnk.key} href={lnk.href}>{t(lnk.key)}</a>;
+    });
+  };
+
+  _mkGuides = () => {
+    return this.props.guides.map( (g, i) => {
+      const clk = () => this.props.actions.guide.show(g.COMPONENT);
+      return <a key={`guide${i}`} onClick={clk}>{g.MENU_TEXT}</a>;
+    });
   };
 
   render() {
+    const user = 'jpowell';
+
     return (
       <Sidebar colorIndex="neutral-3" fixed separator="right">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
@@ -157,15 +161,13 @@ class NavSideBar extends Component {
         <Footer pad={{vertical: 'small'}} direction="column" align="start">
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<HelpIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this._onClickGuide.bind(this, 0)}>{t(this.guide[0].menuKey)}</a>
-              <a onClick={this._onClickGuide.bind(this, 1)}>{t(this.guide[1].menuKey)}</a>
+              {this._mkGuides()}
             </Menu>
             <span>{t('guides')}</span>
           </Box>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<WorldIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a href={API_LINK}>{t('openSwitchApi')}</a>
-              <a href={OPS_LINK}>{t('openSwitchNet')}</a>
+              {this._mkExtLinks()}
             </Menu>
             <span>{t('links')}</span>
           </Box>
@@ -174,7 +176,7 @@ class NavSideBar extends Component {
             <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
               <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
             </Menu>
-            <span>jpowell</span>
+            <span>{user}</span>
           </Box>
         </Footer>
       </Sidebar>
@@ -186,8 +188,9 @@ class NavSideBar extends Component {
 const select = (store) => ({
   links: store.links,
   nav: store.nav,
-  guide: store.guide,
+  guides: store.guides,
   collector: store.collector,
+  extLinks: store.extLinks,
 });
 
 export default connect(select)(NavSideBar);

@@ -54,6 +54,8 @@ function createReducers(BuildConfig) {
     links: (moduleStore = {}) => { return moduleStore; },
     routeToLink: (moduleStore = {}) => { return moduleStore; },
     boxGraphic: (moduleStore = {}) => { return moduleStore; },
+    guides: (moduleStore = {}) => { return moduleStore; },
+    extLinks: (moduleStore = {}) => { return moduleStore; },
   };
   modules.forEach(i => reducers[i.NAME] = i.REDUCER);
   return combineReducers(reducers);
@@ -123,6 +125,8 @@ export function mainInit(BuildConfig) {
     links: navModel.links,
     routeToLink: navModel.routeToLink,
     boxGraphic: BuildConfig.settings.boxGraphic,
+    extLinks: BuildConfig.settings.extLinks,
+    guides: BuildConfig.guides || [],
   };
 
   store = createReducersAndStore(BuildConfig, initStore);
