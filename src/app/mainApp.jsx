@@ -109,13 +109,6 @@ class MainApp extends Component {
   };
 
   render() {
-    // The only reason we pass in the location to the NavSideBar is so that
-    // it will rerender when we select a navigation item (and show the new
-    // active item).
-    const nav = this.props.nav.paneActive ?
-      <NavSideBar location={this.props.location} actions={this.props.actions}/>
-      : null;
-
     // FIXME: this.props.syslog.numUnread;
     // data retieved from this.props.collector.?
     const numSyslog = this.props.collector.overview.log.numAdded;
@@ -196,19 +189,34 @@ class MainApp extends Component {
       </Box>
     );
 
+    // The only reason we pass in the location to the NavSideBar is so that
+    // it will rerender when we select a navigation item (and show the new
+    // active item).
+    const nav = !this.props.nav.paneActive ? null :
+      <NavSideBar location={this.props.location} actions={this.props.actions}/>;
+
+    // Split will only show the priority column on small screens, we make this
+    // the first (left) column because we want to be able to show the navigation
+    // column on small screens. When we remove the first (left) column, the
+    // page column will be the "new" left column and it will be shown. make
+    // sure to completely toggle the first (left) column.
+
     const splitContent = (
-      <Split flex="right" onResponsive={this._onNavSplitResponsive}
+      <Split
+          flex="right"
+          onResponsive={this._onNavSplitResponsive}
           priority="left">
-        <Box responsive={false} direction="row">
-          {guide}
-          {nav}
-        </Box>
+
+        {nav}
+
         <Box responsive={false} direction="row">
           <Box id="page" className="flex1">
             {pageHdr}
+            {guide}
             {page}
           </Box>
         </Box>
+
       </Split>
     );
 
