@@ -21,6 +21,7 @@ import './mainApp.scss';
 import React, { PropTypes, Component } from 'react';
 import Breadcrumbs from 'react-breadcrumbs';
 import { connect } from 'react-redux';
+import { t } from 'i18n/lookup.js';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -85,11 +86,18 @@ class MainApp extends Component {
         );
       }
     }
+    if (this.props.nav.autoHide) {
+      if (newProps.location !== this.props.location ||
+          newProps.guide.component !== this.props.guide.component) {
+        this.props.actions.nav.hidePane();
+      }
+    }
   }
 
   // Called when a responsive change happens on the main Split component.
   // This will result in 'single' or 'multiple' mode.
   _onNavSplitResponsive = (mode) => {
+    this.props.actions.nav.autoHide(mode === 'single');
     const act = this.props.nav.paneActive;
     if (act && mode === 'single') {
       this.props.actions.nav.hidePane();
@@ -135,14 +143,14 @@ class MainApp extends Component {
 
   _mkGuide = () => {
     return (
-      <Box className="guide">
+      <Box className="guide mLeft mRight mBottom">
         <Header
             tag="h4"
             direction="row"
             pad={{horizontal: 'small'}}
             justify="between">
           <Menu direction="row" responsive={false}>
-            <Title>Quick Guide</Title>
+            <Title>{t('quickGuide')}</Title>
           </Menu>
           <Menu direction="row" responsive={false}>
             <Anchor onClick={this.props.actions.guide.hide}>

@@ -168,6 +168,7 @@ export const MESSAGES = {
   powerAbsent: 'Absent',
   product: 'Product',
   productName: 'Product Name',
+  quickGuide: 'Quick Guide',
   readAll: 'Read All',
   reason: 'Reason',
   resilientHash: 'Resilience Hashing',

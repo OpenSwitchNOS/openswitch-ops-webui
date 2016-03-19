@@ -118,14 +118,14 @@ class NavSideBar extends Component {
 
   _mkExtLinks = () => {
     return this.props.extLinks.map( lnk => {
-      return <a key={lnk.key} href={lnk.href}>{t(lnk.key)}</a>;
+      return <Anchor key={lnk.key} href={lnk.href}>{t(lnk.key)}</Anchor>;
     });
   };
 
   _mkGuides = () => {
     return this.props.guides.map( (g, i) => {
       const clk = () => this.props.actions.guide.show(g.COMPONENT);
-      return <a key={`guide${i}`} onClick={clk}>{g.MENU_TEXT}</a>;
+      return <Anchor key={`guide${i}`} onClick={clk}>{g.MENU_TEXT}</Anchor>;
     });
   };
 
