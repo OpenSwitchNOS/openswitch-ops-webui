@@ -51,8 +51,12 @@ class LagCreation extends Component {
       validation: {errors: {}},
     };
   }
-
-
+//TODO: isDirty should be moved to a new component for checking stuff.
+isDirty = () => {
+  if (this.state.validation.valid) {
+    return !_.isEqual(this.state.lag.lagId, '');
+  }
+};
   _validate = () => {
     const lag = this.state.lag;
     const rules = [
@@ -117,70 +121,76 @@ render() {
   const errors = validation.errors;
   const lag = this.state.lag;
   return (
-    <Layer onClose={this.props.onClose} closer flush align="right">
-      <Box pad="small" className="details min200x400">
-     <Form className="mLeft" onSubmit={this._onSubmit}>
-      <Header>
-        <Title>Add a LAG</Title>
-      </Header>
-      <hr/>
-      <FormFields>
-        <fieldset>
-        <h4><b>{t('id')}</b></h4>
-          <FormField label="LagID" htmlFor={this._id('lagId')}
-              error={errors.lagId}>
-            <input id={this._id('lagId')} name="lagId" type="text"
-                value={lag.lagId} onChange={this._onChange} />
-          </FormField>
-        </fieldset>
-        </FormFields>
-        <br/>
+    <Layer
+        className="edit"
+        onClose={this.props.onClose}
+        closer
+        flush
+        align="right"
+        >
+    <Box pad="small" className="details min200x400">
+    <Form className="mLeft" onSubmit={this._onSubmit}>
+    <Header>
+      <Title>Add a LAG</Title>
+    </Header>
+    <hr/>
+    <FormFields>
+    <fieldset>
+    <h4><b>{t('id')}</b></h4>
+    <FormField label="LagID" htmlFor={this._id('lagId')}
+        error={errors.lagId}>
+    <input id={this._id('lagId')} name="lagId" type="text"
+        value={lag.lagId} onChange={this._onChange} />
+    </FormField>
+    </fieldset>
+    </FormFields>
+    <br/>
     <FormFields>
     <fieldset>
     <h4><b>{t('aggregationMode')}</b></h4>
-      <FormField label="Aggregation Mode" htmlFor={this._id('aggregationMode')}
-          error={errors.mode}>
-        <select id={this._id('aggregationMode')} name="aggregationMode"
-            value={lag.aggregationMode} onChange={this._onChange} >
-            <option value="static">static</option>
-            <option value="active">active</option>
-            <option value="passive">passive</option>
-      </select>
+  <FormField label="Aggregation Mode" htmlFor={this._id('aggregationMode')}
+      error={errors.mode}>
+    <select id={this._id('aggregationMode')} name="aggregationMode"
+        value={lag.aggregationMode} onChange={this._onChange} >
+        <option value="static">static</option>
+        <option value="active">active</option>
+        <option value="passive">passive</option>
+  </select>
+  </FormField>
+  </fieldset>
+  </FormFields>
+  <br/>
+  <FormFields>
+  <fieldset>
+  <h4><b>{t('speed')}</b></h4>
+    <FormField label="Speed" htmlFor={this._id('speed')}
+        error={errors.speed}>
+      <input id={this._id('lagSpeed')} name="lagSpeed" type="text"
+          value={lag.lagSpeed} onChange={this._onChange} />
+    </FormField>
+  </fieldset>
+  </FormFields>
+  <br/>
+  <FormFields>
+    <fieldset>
+    <h4><b>{t('fallBack')}</b></h4>
+      <FormField label="FallBack" htmlFor={this._id('fallBack')}
+          error={errors.speed}>
+        <input id={this._id('lagFallBack')} name="lagFallBack" type="text"
+            value={lag.lagFallBack} onChange={this._onChange} />
       </FormField>
-      </fieldset>
-      </FormFields>
-      <br/>
-    <FormFields>
-      <fieldset>
-      <h4><b>{t('speed')}</b></h4>
-        <FormField label="Speed" htmlFor={this._id('speed')}
-            error={errors.speed}>
-          <input id={this._id('lagSpeed')} name="lagSpeed" type="text"
-              value={lag.lagSpeed} onChange={this._onChange} />
-        </FormField>
-      </fieldset>
-      </FormFields>
-      <br/>
-      <FormFields>
-        <fieldset>
-        <h4><b>{t('fallBack')}</b></h4>
-          <FormField label="FallBack" htmlFor={this._id('fallBack')}
-              error={errors.speed}>
-            <input id={this._id('lagFallBack')} name="lagFallBack" type="text"
-                value={lag.lagFallBack} onChange={this._onChange} />
-          </FormField>
-        </fieldset>
-        </FormFields>
-      <br/>
-      <Footer pad={{vertical: 'medium'}}>
-        <Menu>
-          <Button label="Add" primary
-              onClick={this._onSubmit} />
-        </Menu>
-      </Footer>
-    </Form>
-    </Box>
-    </Layer>
+    </fieldset>
+  </FormFields>
+  <br/>
+  <Footer pad={{vertical: 'medium'}}>
+    <Menu>
+      <Button label="Add" primary
+          onClick={this.isDirty() ? this._onSubmit : null} />
+    </Menu>
+  </Footer>
+  </Form>
+  </Box>
+  </Layer>
   );
 }
 }

@@ -64,6 +64,7 @@ const settings = {
       href: 'http://openswitch.net'
     },
   ]
+
 };
 
 export default { modules, guides, settings };

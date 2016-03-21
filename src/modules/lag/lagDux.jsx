@@ -19,6 +19,7 @@ import LagPage from './lagPage.jsx';
 import LagDetails from './lagDetails.jsx';
 import Agent, { mkAgentHandler } from 'agent.js';
 import Async from 'async';
+import LagEdit from './lagEdit.jsx';
 
 
 
@@ -27,12 +28,17 @@ const NAME = 'lag';
 const PAGE_ASYNC = 'page';
 const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
 
+const SET_ASYNC = 'set';
+const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
 
 const INITIAL_STORE = {
   page: {
     ...Dux.mkAsyncStatus(),
     lags: {},
   },
+  set: {
+    ...Dux.mkAsyncStatus(),
+  }
 };
 
 
@@ -45,6 +51,11 @@ const NAVS = [
     route: { path: '/lag/:id', component: LagDetails },
     link: { path: '/lag', hidden: true }
   },
+  {
+    route: { path: '/lag/:id', component: LagEdit },
+    link: { path: '/lag', hidden: true }
+  },
+
 ];
 
 const PORTS_URL_WITH_DEPTH = '/rest/v1/system/ports?depth=1';
@@ -65,7 +76,8 @@ const ACTIONS = {
     const PORTS_URL = '/rest/v1/system/ports/';
     const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
     if (lag.lagId) {
-      return (dispatcher) => {
+      return (dispatch) => {
+        const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
         Agent.post(PORTS_URL)
         .send({
           configuration: {
@@ -114,8 +126,8 @@ const ACTIONS = {
         .end(mkAgentHandler(PORTS_URL_APPENDED, cb)));
 
 
-      Dux.dispatchRequest(dispatch, PAGE_AT);
-      const dispatcher = Dux.mkAsyncDispatcher(dispatch, PAGE_AT);
+      Dux.dispatchRequest(dispatch, SET_AT);
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
       Async.series(reqs, dispatcher);
     };
   },
@@ -124,10 +136,11 @@ const ACTIONS = {
   removeInterfaceFromLag(lagInterfaces) {
     const INTERFACES_URL = '/rest/v1/system/interfaces/';
     return (dispatch) => {
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
       Object.keys(lagInterfaces).forEach(i => {
         Agent.patch(`${INTERFACES_URL}${lagInterfaces[i]}`)
         .send([{op: 'remove', path: '/other_config'}])
-        .end(mkAgentHandler(INTERFACES_URL, dispatch));
+        .end(mkAgentHandler(INTERFACES_URL, dispatcher));
       });
     };
   },
@@ -150,11 +163,17 @@ const ACTIONS = {
         .end(mkAgentHandler(INTERFACES_URL, cb)));
       });
 
-      Dux.dispatchRequest(dispatch, PAGE_AT);
-      const dispatcher = Dux.mkAsyncDispatcher(dispatch, PAGE_AT);
+      Dux.dispatchRequest(dispatch, SET_AT);
+      const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
       Async.series(reqs, dispatcher);
     };
   },
+
+  clearErrorForSet() {
+    return { type: SET_AT.CLEAR_ERROR };
+  },
+
+
 
 };
 
@@ -175,19 +194,11 @@ function parsePageResult(result) {
         lacp: cfg.lacp || '',
         status: cfg.admin || 'down',
         vlanMode: cfg.vlan_mode || '',
-        interfaces: cfg.interfaces || '',
         bondStatus,
         vlans: {},
         lagInterfaces: {},
         availableInterfacesForLag: {},
       };
-      if (elm.configuration.interfaces) {
-        for (const i in elm.configuration.interfaces) {
-          const interfaceId = elm.configuration.interfaces[i].substring(27);
-          lags[idModified].interfaces[i] = interfaceId;
-        }
-        lags[idModified].interfaces = lags[idModified].interfaces.join(',');
-      }
     }
   });
 
@@ -275,6 +286,7 @@ function parsePageResult(result) {
 
 const REDUCER = Dux.mkReducer(INITIAL_STORE, [
   Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
+  Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
 ]);
 
 export default {

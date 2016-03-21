@@ -22,10 +22,13 @@ import _ from 'lodash';
 import Layer from 'grommet/components/Layer';
 import Button from 'grommet/components/Button';
 import Section from 'grommet/components/Section';
+import Footer from 'grommet/components/Footer';
+import { t } from 'i18n/lookup.js';
 
 class LagEdit extends Component {
 
   static propTypes = {
+    actions: PropTypes.object.isRequired,
     lag: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -34,58 +37,96 @@ class LagEdit extends Component {
     }).isRequired,
   };
 
-  constructor(props) {
-    super(props);
-    let lagInterfacesData = {};
-    const id = this.props.params.id;
-    if (id) {
-      lagInterfacesData = {...this.props.lag.page.lags[id].lagInterfaces};
-    }
-    this.cols = [
-      {
-        columnKey: 'id',
-        header: 'Interface ID',
-        flexGrow: 1,
-        width: 200,
-      }
-    ];
-    this.state = {
-      lagInterfacesData,
-      sel: 0,
-      editMode: false,
-      lagInterfacesToBeRemoved: {},
-    };
-    this.add = false;
-    this.remove = false;
-    this.lagInterfacesRemoved = {};
-    this.availableInterfaces = {...this.props.lag.page.availableInterfaces};
-    this.lagInterfaces = this.props.lag.page.lags[id].lagInterfaces;
-    this.fid = _.uniqueId('lagEditForm_');
+constructor(props) {
+  super(props);
+  let lagInterfacesData = {};
+  this.check = {};
+  const id = this.props.params.id;
+  if (id) {
+    lagInterfacesData = this.loadLagInterfaces();
+    this.lagInterfaces = lagInterfacesData;
+    this.check = lagInterfacesData;
   }
+
+  const availableInterfaces = {...this.props.lag.page.availableInterfaces};
+  this.cols = [
+    {
+      columnKey: 'id',
+      header: 'Interface ID',
+      flexGrow: 1,
+      width: 200,
+    }
+  ];
+  this.state = {
+    lagInterfacesData,
+    sel: 0,
+    editMode: false,
+    lagInterfacesToBeRemoved: {},
+    availableInterfaces,
+  };
+  this.add = false;
+  this.remove = false;
+  this.lagInterfacesRemoved = {};
+  this.availableInterfaces = {...this.props.lag.page.availableInterfaces};
+  this.fid = _.uniqueId('lagEditForm_');
+}
+
+  componentDidMount() {
+    this.props.actions.lag.fetch();
+
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.props.actions.lag.fetch(nextProps.params.id);
+  }
+
+  loadLagInterfaces = () => {
+    const id = this.props.params.id;
+    const lagInterfaces = this.props.lag.page.lags[id].lagInterfaces;
+    const lagInterfacesToBePassed = {};
+    for (const i in lagInterfaces) {
+      lagInterfacesToBePassed[i] = {
+        id: lagInterfaces[i].id,
+      };
+    }
+    return lagInterfacesToBePassed;
+  };
 
   _id = s => `${this.fid}_${s}`;
 
+  //TODO: Should move to its own component
+_isDirty = () => {
+  const lagInterfaces = this.state.lagInterfacesData;
+  return !_.isEqual(lagInterfaces, this.loadLagInterfaces());
+};
 
-  _onEditToggle = () => {
-    const editMode = !this.state.editMode;
-    this.setState({ editMode });
-  };
+_onEditToggle = () => {
+  const editMode = !this.state.editMode;
+  this.setState({ editMode });
+};
 
-  _onEditSubmit = () => {
-    const lagInterfaces = this.state.lagInterfacesData;
-    const ports = this.props.lag.page.ports;
-    const id = this.props.params.id;
-    const interfacesToBeRemoved = this.state.lagInterfacesToBeRemoved;
-    this.props.onSubmit(lagInterfaces, ports, id, interfacesToBeRemoved);
-    this._onEditToggle();
-  };
+//TODO: Find a better way to do this. ( Removal stuff mainly )
+//TODO: Have to Rename variables
+_onEditSubmit = () => {
+  const lag = this.state.lagInterfacesData;
+  const lagPorts = this.props.lag.page.ports;
+  const lagId = this.props.params.id;
+  const lagInterfacesToRemove = this.state.lagInterfacesToBeRemoved;
+  if (Object.getOwnPropertyNames(lagInterfacesToRemove).length > 0 ) {
+    this.props.actions.lag.removeInterfaceFromLag(lagInterfacesToRemove);
+  }
+  const lagEdit = this.props.actions.lag;
+  lagEdit.editLag(lag, lagPorts, lagId, lagInterfacesToRemove);
+  this.props.onClose();
+  this._onEditToggle();
+};
 
 
 searchSelection = (sel) => {
-  for (const i in this.props.lag.page.availableInterfaces[`${sel}`]) {
-    const lagInterface = this.lagInterfaces[i];
-    const availableInterface = this.props.lag.page.availableInterfaces[`${sel}`];
-    if (lagInterface === availableInterface) {
+  for (const i in this.availableInterfaces) {
+    const lagInterfaces = this.state.lagInterfacesData[i];
+    const availableInterfaces = this.availableInterfaces[`${sel}`];
+    if (lagInterfaces === availableInterfaces) {
       return true;
     }
     return false;
@@ -120,6 +161,7 @@ table2data = (sel) => {
       this.remove = false;
     }
     this.setState({lagInterfacesData: this.lagInterfaces});
+    this.setState({availableInterfaces: this.availableInterfaces});
   }
 
 };
@@ -140,16 +182,15 @@ table2data = (sel) => {
     this.remove = true;
     const sel = this.state.sel;
     this.lagInterfacesRemoved[`${sel}`] = sel;
-    this.setState({lagInterfacesToBeRemoved: this.lagInterfacesRemoved });
+    this.setState({lagInterfacesToBeRemoved: this.lagInterfacesRemoved});
     this.table2data(sel);
   };
 
 
   render() {
     const id = this.props.params.id;
-    const availableInterfacesForLag = {...this.availableInterfaces};
+    const availableInterfacesForLag = {...this.state.availableInterfaces};
     const lags = {...this.state.lagInterfacesData};
-
 
     return (
       <Layer
@@ -191,12 +232,18 @@ table2data = (sel) => {
                 onSelectChange={this._onSelectChange}
             />
             </Box>
-            <Button
-                label="Deploy"
-                onClick={this._onEditSubmit}
-            />
-            </Box>
-              </center>
+          <Footer pad={{vertical: 'medium'}}>
+          <center> &nbsp; &nbsp;
+          <span>
+              <Button
+                  label={t('deploy')}
+                  primary
+                  onClick={this._isDirty() ? this._onEditSubmit : null}/>
+          </span>
+          </center>
+          </Footer>
+          </Box>
+          </center>
           </div>
       </Layer>
     );
@@ -206,7 +253,6 @@ table2data = (sel) => {
 
 function select(store) {
   return {
-    collector: store.collector,
     lag: store.lag,
   };
 }

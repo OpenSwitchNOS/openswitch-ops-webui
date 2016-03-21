@@ -88,40 +88,43 @@ class LagDetails extends Component {
 
   //TODO: Move to utils
   lagSpeedCalculator(lags) {
-    const lagInterfaces = lags.lagInterfaces;
-    let speed;
-    for (const i in lagInterfaces) {
-      speed =+ lagInterfaces[i].speed;
+    if (isNaN(lags.lagInterfaces)) {
+      const lagInterfaces = lags.lagInterfaces;
+      let speed;
+      for (const i in lagInterfaces) {
+        speed =+ lagInterfaces[i].speed;
+      }
+      return speed;
     }
-    return speed;
   }
 
   //TODO: move to utils
   lagStatsCalculator(lags) {
-    const lagInterfaces = lags.lagInterfaces;
-    const stats = {
-      rxBytes: 0,
-      rxPackets: 0,
-      rxErrors: 0,
-      rxDropped: 0,
-      txBytes: 0,
-      txPackets: 0,
-      txErrors: 0,
-      txDropped: 0,
-    };
-    for (const i in lagInterfaces) {
-      stats.rxBytes =+ lagInterfaces[i].rxBytes;
-      stats.txBytes =+ lagInterfaces[i].txBytes;
-      stats.rxPackets =+ lagInterfaces[i].rxPackets;
-      stats.txPackets =+ lagInterfaces[i].txPackets;
-      stats.rxErrors =+ lagInterfaces[i].rxErrors;
-      stats.txErrors =+ lagInterfaces[i].txErrors;
-      stats.rxDropped =+ lagInterfaces[i].rxDropped;
-      stats.txDropped =+ lagInterfaces[i].txDropped;
+    if (isNaN(lags.lagInterfaces)) {
+      const lagInterfaces = lags.lagInterfaces;
+      const stats = {
+        rxBytes: 0,
+        rxPackets: 0,
+        rxErrors: 0,
+        rxDropped: 0,
+        txBytes: 0,
+        txPackets: 0,
+        txErrors: 0,
+        txDropped: 0,
+      };
+      for (const i in lagInterfaces) {
+        stats.rxBytes =+ lagInterfaces[i].rxBytes;
+        stats.txBytes =+ lagInterfaces[i].txBytes;
+        stats.rxPackets =+ lagInterfaces[i].rxPackets;
+        stats.txPackets =+ lagInterfaces[i].txPackets;
+        stats.rxErrors =+ lagInterfaces[i].rxErrors;
+        stats.txErrors =+ lagInterfaces[i].txErrors;
+        stats.rxDropped =+ lagInterfaces[i].rxDropped;
+        stats.txDropped =+ lagInterfaces[i].txDropped;
+      }
+      return stats;
     }
-    return stats;
   }
-
 
   render() {
     const id = this.props.params.id;
@@ -132,38 +135,38 @@ class LagDetails extends Component {
     const stats = this.lagStatsCalculator(lags);
 
     return (
-      <Box pad="small" className="details min200x400">
-        <Header tag="h4" justify="between">
-          <Title>{`${t('lag')}: ${id}`}</Title>
-          <Menu direction="row" justify="end" responsive={false}>
-            <Anchor onClick={this._onClose}>
-              <CloseIcon/>
-            </Anchor>
-          </Menu>
-        </Header>
-        <hr/>
+  <Box pad="small" className="details min200x400">
+    <Header tag="h4" justify="between">
+      <Title>{`${t('lag')}: ${id}`}</Title>
+      <Menu direction="row" justify="end" responsive={false}>
+        <Anchor onClick={this._onClose}>
+          <CloseIcon/>
+        </Anchor>
+      </Menu>
+    </Header>
+    <hr/>
 
-        <table style={{tableLayout: 'fixed'}} className="propTable">
-          <tbody>
-          {this._tr(t('aggregateName'), id)}
-          {this._tr(t('aggregatedInterfaces'), lags.interfaces)}
-          {this._tr(t('aggregationKey'), lags.idModified)}
-          {this._tr(t('aggregateMode'), lags.lacp)}
-          {this._tr(t('speed'), speed)}
-          {this._tr(t('bondStatus'), lags.bondStatus)}
-          {this._tr(t('rxPackets'), Formatter.toCommaString(stats.rxPackets))}
-          {this._tr(t('rxBytes'), Formatter.toCommaString(stats.rxBytes))}
-          {this._tr(t('rxErrors'), Formatter.toCommaString(stats.rxErrors))}
-          {this._tr(t('rxDropped'), Formatter.toCommaString(stats.rxDropped))}
-          {this._tr(t('txPackets'), Formatter.toCommaString(stats.txPackets))}
-          {this._tr(t('txBytes'), Formatter.toCommaString(stats.txBytes))}
-          {this._tr(t('txErrors'), Formatter.toCommaString(stats.txErrors))}
-          {this._tr(t('txDropped'), Formatter.toCommaString(stats.txDropped))}
-          </tbody>
-        </table>
-        <br/>
-      </Box>
-    );
+    <table style={{tableLayout: 'fixed'}} className="propTable">
+      <tbody>
+      {this._tr(t('aggregateName'), id)}
+      {this._tr(t('aggregatedInterfaces'), lags.interfaces)}
+      {this._tr(t('aggregationKey'), lags.idModified)}
+      {this._tr(t('aggregateMode'), lags.lacp)}
+      {this._tr(t('speed'), speed)}
+      {this._tr(t('bondStatus'), lags.bondStatus)}
+      {this._tr(t('rxPackets'), Formatter.toCommaString(stats.rxPackets))}
+      {this._tr(t('rxBytes'), Formatter.toCommaString(stats.rxBytes))}
+      {this._tr(t('rxErrors'), Formatter.toCommaString(stats.rxErrors))}
+      {this._tr(t('rxDropped'), Formatter.toCommaString(stats.rxDropped))}
+      {this._tr(t('txPackets'), Formatter.toCommaString(stats.txPackets))}
+      {this._tr(t('txBytes'), Formatter.toCommaString(stats.txBytes))}
+      {this._tr(t('txErrors'), Formatter.toCommaString(stats.txErrors))}
+      {this._tr(t('txDropped'), Formatter.toCommaString(stats.txDropped))}
+      </tbody>
+    </table>
+    <br/>
+  </Box>
+  );
   }
 }
 

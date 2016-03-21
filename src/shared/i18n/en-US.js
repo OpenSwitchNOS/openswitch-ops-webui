@@ -64,7 +64,7 @@ export const MESSAGES = {
   autoNeg: 'Auto Negotiation',
   b2f: 'Back-to-Front',
   baseMac: 'Base MAC',
-  bondStatus: 'bondStatus',
+  bondStatus: 'Bond Status',
   capsEnabled: 'Caps Enabled',
   capsSupported: 'Caps Supported',
   chassisId: 'Chassis ID',
