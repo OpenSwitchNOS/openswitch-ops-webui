@@ -15,35 +15,33 @@
 */
 
 import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import Menu from 'grommet/components/Menu';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
-import FormField from 'grommet/components/FormField';
-import FormFields from 'grommet/components/FormFields';
+import NumberInput from 'grommet/components/NumberInput';
 import Button from 'grommet/components/Button';
-import _ from 'lodash';
 import DataGrid from 'dataGrid.jsx';
 import Range from 'range.js';
+import _ from 'lodash';
 
 
 class VlanAdd extends Component {
 
   static propTypes = {
-    onApply: PropTypes.func.isRequired,
+    actions: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
-    onOk: PropTypes.func.isRequired,
-    vlans: PropTypes.object.isRequired,
+    vlan: PropTypes.object.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.pad = {horizontal: 'small', vertical: 'small'};
     this.fid = _.uniqueId('vlanAdd_');
+    this.niVlanId = `${this.fid}_niVlanId`;
     this.vlanCols = [
       {
         columnKey: 'id',
@@ -54,100 +52,86 @@ class VlanAdd extends Component {
       {
         columnKey: 'name',
         header: t('name'),
-        width: 200,
+        width: 300,
       },
     ];
-    this.state = {};
+    const availVlanIdRange = this._calcAvailVlanIdRange(this.props);
+    this.state = {
+      availVlanIdRange,
+      newVlanId: availVlanIdRange.firstItem(),
+    };
   }
 
-  _isDirty = () => {
-    return !_.isEqual(this.state, {});
+  componentWillReceiveProps(nextProps) {
+    const availVlanIdRange = this._calcAvailVlanIdRange(nextProps);
+    this.setState({
+      availVlanIdRange,
+      newVlanId: availVlanIdRange.firstItem(),
+    });
+  }
+
+  _calcAvailVlanIdRange = (props) => {
+    const range = new Range(props.constants.VLAN_ID_RANGE);
+    const used = Object.keys(props.vlan.page.vlans).map( k => Number(k) );
+    range.subtract(used);
+    return range;
   };
 
-  _isValid = (range) => {
-    range.subtract(Object.keys(this.props.vlans).map( k => Number(k) ));
-    return this.state.id && range.has(this.state.id);
+  _onAddVlan = () => {
+    this.props.actions.vlan.addVlan(this.state.newVlanId);
   };
 
-  _onOk = () => {
-    this.props.onOk(this.state);
-  };
-
-  _onApply = () => {
-    this.props.onApply(this.state);
-  };
-
-  _id = s => `${this.fid}_${s}`;
-
-  _onChangeId = (evt) => {
-    this.setState({ id: evt.target.value });
+  _onChangeNewVlanId = (evt) => {
+    this.setState({ newVlanId: Number(evt.target.value) });
   };
 
   render() {
-    // TOOD: Move to BL.
-    const range = new Range('1-2048');
-    range.subtract(Object.keys(this.props.vlans).map( k => Number(k) ));
-    const isValid = this._isValid(range);
-    const err = isValid || !this.state.id ? null : t('invalid');
-    const allowSet = this._isDirty() && isValid;
-
-    // TODO: edit2?
+    const isValid = this.state.availVlanIdRange.has(this.state.newVlanId);
     return (
       <Layer
-          className="edit second"
+          className="edit"
           onClose={this.props.onClose}
           closer
           flush
           align="right">
         <Box pad="small" className="flex1">
-          <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-            <Title>
-            {`${t('add')} ${t('vlan')}`}
-            </Title>
-          </Header>
+          <Title>{t('addVlan')}</Title>
+          <br/>
+          <b>{t('vlanIdsAvailable')}</b>
+          <span>{this.state.availVlanIdRange.toString()}</span>
+          <NumberInput
+              className={isValid ? null : 'error'}
+              id={this.niVlanId}
+              name={this.niVlanId}
+              label={this.niVlanId}
+              value={this.state.newVlanId}
+              onChange={this._onChangeNewVlanId} />
+          <Footer pad={{vertical: 'medium'}}>
+            <Menu direction="row" justify="end">
+              <Button
+                  label={t('addVlan')}
+                  primary
+                  onClick={isValid ? this._onAddVlan : null}/>
+            </Menu>
+          </Footer>
           <hr/>
-          <Form>
-            <FormFields>
-              <fieldset>
-                <legend>{`${t('new')} ${t('id')}`}</legend>
-                <FormField
-                    label={`${t('available')}: ${range.toString()}`}
-                    error={err}>
-                  <input
-                      id={this._id('vlanId')}
-                      onChange={this._onChangeId}
-                      type="number"/>
-                </FormField>
-              </fieldset>
-            </FormFields>
-            <Footer pad={{vertical: 'medium'}}>
-              <Menu direction="row" justify="end">
-                <Button
-                    label={t('apply')}
-                    primary
-                    onClick={allowSet ? this._onApply : null}/>
-                <Button
-                    label={t('ok')}
-                    primary
-                    onClick={allowSet ? this._onOk : null}/>
-              </Menu>
-            </Footer>
-          </Form>
-          <hr/>
-          <Form>
-            <fieldset>
-              <legend>{`${t('existing')} ${t('vlans')}`}</legend>
-              <DataGrid width={300} height={300}
-                  data={this.props.vlans}
-                  columns={this.vlanCols}
-                  noSelect
-              />
-            </fieldset>
-          </Form>
+          <DataGrid width={420} height={400}
+              title={t('currentVlans')}
+              data={this.props.vlan.page.vlans}
+              columns={this.vlanCols}
+              noSelect
+          />
         </Box>
       </Layer>
     );
   }
 }
 
-export default VlanAdd;
+function select(store) {
+  return {
+    constants: store.constants,
+    vlan: store.vlan,
+  };
+}
+
+export default connect(select)(VlanAdd);

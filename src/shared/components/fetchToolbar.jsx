@@ -58,7 +58,7 @@ export default class FetchToolbar extends Component {
     if (!p.isFetching) {
       if (p.error) {
         status = (
-          <SpanStatus onClick={this._onStatusClicked} value="error">
+          <SpanStatus onClick={this._onStatusClicked} value="critical">
             {t('failedRequest')}
           </SpanStatus>
         );
@@ -78,7 +78,7 @@ export default class FetchToolbar extends Component {
 
     const refresh = (
       <a onClick={this.props.onRefresh}>
-        <RefreshIcon className={p.isFetching ? 'spin' : null}/>
+        <RefreshIcon className={p.isFetching ? 'spin mHalf' : 'mHalf'}/>
       </a>
     );
 

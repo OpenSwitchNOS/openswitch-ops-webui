@@ -63,8 +63,10 @@ const settings = {
       key: 'osNet',
       href: 'http://openswitch.net'
     },
-  ]
-
+  ],
+  constants: {
+    VLAN_ID_RANGE: '1-4094'
+  }
 };
 
 export default { modules, guides, settings };

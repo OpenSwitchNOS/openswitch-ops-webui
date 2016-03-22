@@ -200,8 +200,18 @@ function naturalSort(a, b) {
   return 0;
 }
 
+// TODO: need unit test
+
+export function txlate(val, mapping, notFoundVal) {
+  const mapVal = mapping[val];
+  return mapVal || notFoundVal || 'unknown';
+}
+
+// TODO: use 'non-export' default way to export
+
 export default {
   DEF_USER_CFG,
+  txlate,
   normalizeUserCfg,
   userCfgForPatch,
   parseInterface,

@@ -22,8 +22,8 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import Range from 'range.js';
 import VlanAdd from './vlanAdd.jsx';
-import VlanEdit from './vlanEdit.jsx';
-import ErrorLayer from 'errorLayer.jsx';
+// import VlanEdit from './vlanEdit.jsx';
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
 
 
 class VlanPage extends Component {
@@ -32,7 +32,6 @@ class VlanPage extends Component {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
-    collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
@@ -42,42 +41,63 @@ class VlanPage extends Component {
 
   constructor(props) {
     super(props);
-    this.vlanCols = [
+    this.byVlanCols = [
       {
         columnKey: 'id',
-        header: t('id'),
-        width: 100,
+        header: t('vlanId'),
+        width: 130,
       },
       {
         columnKey: 'name',
-        header: t('name'),
+        header: t('vlanName'),
         width: 200,
       },
-      // {
-      //   columnKey: 'operState',
-      //   header: t('status'),
-      //   width: 140,
-      // },
-      // {
-      //   columnKey: 'operStateReason',
-      //   header: t('reason'),
-      //   width: 140,
-      // },
+      {
+        columnKey: 'operState',
+        header: t('status'),
+        width: 140,
+      },
+      {
+        columnKey: 'operStateReason',
+        header: t('reason'),
+        width: 140,
+      },
       {
         columnKey: 'interfaces',
         header: t('interfaces'),
-        cell: this._onCustomCell,
+        cell: this._onInterfacesCell,
         flexGrow: 1,
         width: 140,
       },
     ];
-    this.state = {
-      addMode: false,
-      editMode: false,
-    };
+    this.byInterfaceCols = [
+      {
+        columnKey: 'id',
+        header: t('interface'),
+        width: 130,
+      },
+      {
+        columnKey: 'mode',
+        header: t('vlanMode'),
+        width: 160,
+      },
+      {
+        columnKey: 'tag',
+        header: t('tag'),
+        width: 100,
+      },
+      {
+        columnKey: 'trunks',
+        header: t('trunks'),
+        width: 200,
+        cell: this._onTrunksCell,
+        flexGrow: 1,
+      },
+    ];
+    this.state = {};
   }
 
-  _onCustomCell = (cellData, cellProps) => {
+  _onInterfacesCell = (cellData, cellProps) => {
     // TOOD: this should be moved into Utils.
     const idKeys = [];
     const lagKeys = [];
@@ -97,31 +117,39 @@ class VlanPage extends Component {
     );
   };
 
-  componentDidMount() {
-    this.props.actions.vlan.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.vlan.page,
-      this._onRefresh
+  _onTrunksCell = (cellData, cellProps) => {
+    // TOOD: this should be moved into Utils.
+    // const idKeys = [];
+    // const lagKeys = [];
+    // Object.keys(cellData).forEach( k => {
+    //   if (isNaN(k)) {
+    //     lagKeys.push(k);
+    //   } else {
+    //     idKeys.push(Number(k));
+    //   }
+    // });
+    // const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+    // const idStr = new Range(idKeys).toString().split(',').join(', ');
+    return (
+      <CustomCell {...cellProps}>
+        {cellData}
+      </CustomCell>
     );
+  };
+
+  componentDidMount() {
+    const p = this.props;
+    p.actions.vlan.fetch();
+    p.actions.toolbar.setFetchTB(p.vlan.page.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
     this.props.actions.vlan.fetch();
-    this.props.autoActions.collector.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
-    // TODO: this is same code all over now.
-    if (nextProps.vlan.set.lastSuccessMillis >
-        this.props.vlan.set.lastSuccessMillis) {
-      this.props.actions.vlan.fetch(); // TODO: need to bypass cooldown
-    }
-
-    // TODO: should we check an nop if the vlan.page is already the toolbar?
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.vlan.page,
-      this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.vlan.page.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -170,54 +198,63 @@ class VlanPage extends Component {
     alert(`Delete: ${sel}`);
   };
 
-  _onCloseError = () => {
-    this.props.actions.vlan.clearErrorForSet();
-  };
-
   render() {
-    const vlans = this.props.vlan.page.vlans;
+    const pv = this.props.vlan;
 
-    // TODO: put this in the collector so we have it for the overview?
-    const numVlans = Object.getOwnPropertyNames(vlans).length;
+    const numVlans = Object.getOwnPropertyNames(pv.page.vlans).length;
+    const numInterfaces = Object.getOwnPropertyNames(pv.page.interfaces).length;
 
-    const addLayer = !this.state.addMode ? null :
+    const addVlanLayer = !this.state.addVlanLayer ? null :
       <VlanAdd
-          onClose={this._onAddClose}
-          onOk={this._onAddOk}
-          onApply={this._onAddApply}
-          vlans={vlans}
+          actions={this.props.actions}
+          onClose={() => this.setState({addVlanLayer: false})}
       />;
 
-    // TODO: How do we want to standardize passing config to an edit component
-    // TODO: How do we want to standardize passing data to a component
-    const editLayer = !this.state.editMode ? null :
-      <VlanEdit
-          onClose={this._onEditClose}
-          onOk={this._onEditOk}
-          vlanId={this.props.params.id}
-          data={this.props.vlan.page}
-      />;
+    //
+    // // TODO: How do we want to standardize passing config to an edit component
+    // // TODO: How do we want to standardize passing data to a component
+    // const editLayer = !this.state.editMode ? null :
+    //   <VlanEdit
+    //       onClose={this._onEditClose}
+    //       onOk={this._onEditOk}
+    //       vlanId={this.props.params.id}
+    //       data={this.props.vlan.page}
+    //   />;
+    //
+    // const set = this.props.vlan.set;
 
-    const set = this.props.vlan.set;
-    const errorLayer = !set.lastError ? null :
-      <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
+    const async = pv.page.asyncStatus;
+
+    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
+      <AsyncStatusLayer
+          data={async}
+          onClose={this.props.actions.vlan.clearErrorForSet} />;
 
     return (
       <Box className="flex1 mTopHalf mLeft">
-        {addLayer}
-        {editLayer}
-        {errorLayer}
+        {/*{addLayer}
+        {editLayer}*/}
+        {addVlanLayer}
+        {asyncStatusLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
-              title={`(${t('count')}: ${numVlans})`}
-              data={vlans}
-              columns={this.vlanCols}
+              title={`${t('totalVlans')}: ${numVlans}`}
+              data={pv.page.vlans}
+              columns={this.byVlanCols}
               singleSelect
               onSelectChange={this._onSelect}
-              select={[ this.props.params.id ]}
+              select={this.props.params.id}
               onEdit={this._onEditOpen}
-              onAdd={this._onAddOpen}
+              onAdd={() => this.setState({addVlanLayer: true})}
               onDelete={this._onDelete}
+          />
+        </ResponsiveBox>
+        <br/>
+        <ResponsiveBox>
+          <DataGrid width={400} height={400}
+              title={`${t('totalInterfaces')}: ${numInterfaces}`}
+              columns={this.byInterfaceCols}
+              data={pv.page.interfaces}
           />
         </ResponsiveBox>
       </Box>
@@ -228,7 +265,6 @@ class VlanPage extends Component {
 
 function select(store) {
   return {
-    collector: store.collector,
     vlan: store.vlan,
   };
 }

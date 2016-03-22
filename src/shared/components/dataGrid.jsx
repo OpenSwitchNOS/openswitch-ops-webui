@@ -375,8 +375,10 @@ export default class DataGrid extends Component {
 
     // Compute the grid dimensions. If are parent in a responsive box then
     // we will be passed the computed dimensions.
-    const gridWidth = this.props.computedAvailableWidth || this.props.width;
-    const height = this.props.computedAvailableHeight || this.props.height;
+    const gridWidth = Math.floor(this.props.computedAvailableWidth)
+      || this.props.width;
+    const height = Math.floor(this.props.computedAvailableHeight)
+      || this.props.height;
     const gridHeight = height - Toolbar.height();
 
     // Determine which tools are avialable.
@@ -427,16 +429,17 @@ export default class DataGrid extends Component {
 
     const tb = (
       <Toolbar width={gridWidth}>
+        <b className="mTopBottomAuto">{this.props.title}</b>
         <div>
+          {this.props.toolbar}
           {editTool}
           {addTool}
           {delTool}
           {selectAllTool}
           {selectNoneTool}
-          {this.props.toolbar}
+          &nbsp;
+          {searchTool}
         </div>
-        <b className="mTopBottomAuto">{this.props.title}</b>
-        {searchTool}
       </Toolbar>
     );
 

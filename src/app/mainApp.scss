@@ -118,7 +118,6 @@ table.logTable {
 }
 
 #page {
-  background-color: $pageBgColor;
   height: 100vh;
 
   .mTop { margin-top: $space; }
@@ -127,19 +126,17 @@ table.logTable {
   .mBottom { margin-bottom: $space; }
   .mLeft { margin-left: $space; }
 
-  .mTopBottomAuto { margin-top: auto; margin-bottom: auto; }
-
   .pTop { padding-top: $space; }
   .pRight { padding-right: $space; }
   .pBottom { padding-bottom: $space; }
   .pLeft { padding-left: $space; }
 
   #pageContent {
+    background-color: $pageBgColor;
     overflow: auto;
-    // The following margin top/left (along with the .pageBox space, provides
+    // The following margin top/left (along with the .pageBox space) provides
     // spacing between pageBox items if the items are on the same row only,
     // when pageBox items wrap, the margin is not added.
-    margin-top: -$space;
     margin-left: -$space;
 
     .pageBox {
@@ -148,15 +145,17 @@ table.logTable {
   }
 }
 
+.mTopBottomAuto { margin-top: auto; margin-bottom: auto; }
+
 // Adds a continuous spin to an element (i.e. refresh icon).
 .spin {
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
   -ms-transform-origin: 50% 50%; /* IE 9 */
-  -webkit-animation: spin 1s infinite linear;
-  -moz-animation: spin 1s infinite linear;
-  -o-animation: spin 1s infinite linear;
-  animation: spin 1s infinite linear;
+  -webkit-animation: spin 3s infinite linear;
+  -moz-animation: spin 3s infinite linear;
+  -o-animation: spin 3s infinite linear;
+  animation: spin 3s infinite linear;
 }
 @-moz-keyframes spin {
   from { -moz-transform: rotate(0deg); }
@@ -169,6 +168,10 @@ table.logTable {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.mHalf {
+  margin: $space/2;
 }
 
 .guide {
@@ -237,6 +240,15 @@ $slideInColumnMinWidth: 350px;
   }
   &.third {
     z-index: 102;
+  }
+}
+
+.asyncStatus.layer {
+  z-index: 200;
+  .layer__container {
+    .meter__graphic:focus {
+      outline-width: 0px;
+    }
   }
 }
 

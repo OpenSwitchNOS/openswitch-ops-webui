@@ -16,8 +16,7 @@
 
 /*eslint no-console:0*/
 
-import Agent, { mkAgentHandler } from 'agent.js';
-import Async from 'async';
+import { getParallel } from 'agent.js';
 
 const ASYNC_TYPES = [
   'REQUEST',
@@ -30,6 +29,7 @@ const ASYNC_TYPES = [
 function mkAsyncStatus() {
   return {
     asyncStatus: {
+      title: '',
       inProgress: false,
       lastSuccessMillis: 0,
       lastError: null,
@@ -66,6 +66,7 @@ function mkAsyncHandler(moduleName, asyncName, asyncAts, parseFn) {
 
       case asyncAts.REQUEST: {
         const asyncStatus = { ...moduleStore[asyncName].asyncStatus };
+        asyncStatus.title = action.title || '';
         asyncStatus.inProgress = true;
         asyncStatus.numSteps = action.numSteps || 1;
         asyncStatus.currStep = 1;
@@ -147,28 +148,36 @@ function mkReducer(initialStore, asyncHandlers) {
   };
 }
 
-function actionRequest(at, numSteps, currStepMsg) {
-  const obj = { type: at.REQUEST };
-  if (numSteps) {
-    const action = { numSteps };
-    if (currStepMsg) { action.currStepMsg = currStepMsg; }
-    obj.action = action;
+function actionRequest(at, title, numSteps, currStepMsg) {
+  const action = { type: at.REQUEST };
+  if (title) {
+    action.title = title;
+    if (numSteps) {
+      action.numSteps = numSteps;
+      if (currStepMsg) {
+        action.currStepMsg = currStepMsg;
+      }
+    }
   }
-  return obj;
+  return action;
 }
 
 function actionRequestStep(at, currStep, currStepMsg) {
-  const action = { currStep };
+  const action = { type: at.REQUEST_STEP, currStep };
   if (currStepMsg) { action.currStepMsg = currStepMsg; }
-  return { type: at.REQUEST_STEP, action };
+  return action;
 }
 
 function actionFail(at, error) { return { type: at.FAILURE, error }; }
 function actionSuccess(at, result) { return { type: at.SUCCESS, result }; }
 function actionClearError(at) { return { type: at.CLEAR_ERROR }; }
 
-function dispatchRequest(dispatch, at) {
-  dispatch(actionRequest(at));
+function dispatchRequest(dispatch, at, title, numSteps, currStepMsg) {
+  dispatch(actionRequest(at, title, numSteps, currStepMsg));
+}
+
+function dispatchRequestStep(dispatch, at, currStep, currStepMsg) {
+  dispatch(actionRequestStep(at, currStep, currStepMsg));
 }
 
 function dispatchFail(dispatch, at, error) {
@@ -199,17 +208,7 @@ function waitForCooldown(moduleStore, asyncName, now) {
 function get(dispatch, at, urls) {
   dispatchRequest(dispatch, at);
   const dispatcher = mkAsyncDispatcher(dispatch, at);
-  if (Array.isArray(urls)) {
-    const gets = [];
-    urls.forEach(url => {
-      gets.push(cb => Agent.get(url).end(mkAgentHandler(url, cb)));
-    });
-    Async.parallel(gets, dispatcher);
-
-  } else {
-    const url = urls;
-    Agent.get(url).end(mkAgentHandler(url, dispatcher));
-  }
+  getParallel(urls, dispatcher);
 }
 
 function getIfCooledDown(dispatch, moduleStore, asyncName, at, urls) {
@@ -230,6 +229,7 @@ export default {
   actionSuccess,
   actionClearError,
   dispatchRequest,
+  dispatchRequestStep,
   dispatchFail,
   dispatchSuccess,
   mkAsyncDispatcher,

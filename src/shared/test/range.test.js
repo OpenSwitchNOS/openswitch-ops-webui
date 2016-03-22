@@ -31,6 +31,7 @@ describe('range', () => {
       toString: '1, 3-15',
       toArray: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
       toRanges: [[1, 1], [3, 15]],
+      firstItem: 1,
       continuous: false,
     },
     {
@@ -43,6 +44,7 @@ describe('range', () => {
       toString: '1-17',
       toArray: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
       toRanges: [[1, 17]],
+      firstItem: 1,
       continuous: true,
     },
   ];
@@ -57,6 +59,7 @@ describe('range', () => {
       expect(rng.toString()).toEqual(s.toString);
       expect(rng.toArray()).toEqual(s.toArray);
       expect(rng.getRanges()).toEqual(s.toRanges);
+      expect(rng.firstItem()).toEqual(s.firstItem);
       if (s.continuous) {
         expect(rng.isContinuous()).toBeTruthy();
       } else {
@@ -139,6 +142,7 @@ describe('range', () => {
     rng2[0][1] = 7;
     rng2[1][0] = 14;
     expect(rng.toString()).toEqual('5, 12-15, 100');
+    expect(rng.firstItem()).toEqual(5);
   });
 
   it('handle equals', () => {

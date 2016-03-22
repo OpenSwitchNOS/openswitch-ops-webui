@@ -30,6 +30,8 @@ import Footer from 'grommet/components/Footer';
 
 import ConfirmLayer from 'confirmLayer.jsx';
 import StatusLayer from 'statusLayer.jsx';
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+
 
 class DemoLayerPage extends Component {
 
@@ -40,8 +42,66 @@ class DemoLayerPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      asyncStatusData: {
+        title: t('loading'),
+        inProgress: false,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
+      }
+    };
   }
+
+  _onOpenAsyncStatus = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.inProgress = true;
+    asyncStatusData.currStep = 1;
+    asyncStatusData.numSteps = 3;
+    asyncStatusData.currStepMsg = 'Step #1';
+    this.setState({ asyncStatusData });
+    setTimeout(() => {
+      asyncStatusData.currStep = 2;
+      asyncStatusData.currStepMsg = 'Step #2';
+      this.setState({ asyncStatusData });
+      setTimeout(() => {
+        asyncStatusData.currStep = 3;
+        asyncStatusData.currStepMsg = 'Step #3';
+        this.setState({ asyncStatusData });
+        setTimeout(() => {
+          asyncStatusData.inProgress = false;
+          asyncStatusData.lastSuccessMillis = Date.now();
+          this.setState({ asyncStatusData });
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  };
+
+  _onOpenAsyncStatusErr = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.lastError = {
+      url: '/rest/v1/blah/bogus',
+      status: 123,
+      msg: 'Some message',
+      respMsg: 'Some response message',
+    };
+    this.setState({ asyncStatusData });
+  };
+
+  _onOpenAsyncStatus1 = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.inProgress = true;
+    asyncStatusData.currStep = 1;
+    asyncStatusData.numSteps = 1;
+    this.setState({ asyncStatusData });
+    setTimeout(() => {
+      asyncStatusData.inProgress = false;
+      asyncStatusData.lastSuccessMillis = Date.now();
+      this.setState({ asyncStatusData });
+    }, 3000);
+  };
 
   _onOpenInfo = () => {
     this.setState({ info: true });
@@ -68,12 +128,17 @@ class DemoLayerPage extends Component {
   };
 
   _onClose = () => {
-    this.setState({ info: false });
-    this.setState({ error: false });
-    this.setState({ warning: false });
-    this.setState({ dialog1: false });
-    this.setState({ dialog2: false });
-    this.setState({ edit: false });
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.lastError = null;
+    this.setState({
+      asyncStatusData,
+      info: false,
+      error: false,
+      warning: false,
+      dialog1: false,
+      dialog2: false,
+      edit: false,
+    });
   };
 
   _onSubmit = () => {
@@ -82,8 +147,25 @@ class DemoLayerPage extends Component {
   };
 
   render() {
+    const asyncData = this.state.asyncStatusData;
     return (
       <div className="mLeft">
+
+        <p>
+          <Button label="Async Status" onClick={this._onOpenAsyncStatus}/>
+          &nbsp;
+          <Button label="Error" onClick={this._onOpenAsyncStatusErr}/>
+          &nbsp;
+          <Button label="1 Step" onClick={this._onOpenAsyncStatus1}/>
+        </p>
+        {asyncData.inProgress || asyncData.lastError ?
+          <AsyncStatusLayer
+              onClose={this._onClose}
+              title="Some Workflow"
+              data={asyncData}
+          />
+          : null
+        }
 
         <p>
           <Button label="Info" onClick={this._onOpenInfo}/>

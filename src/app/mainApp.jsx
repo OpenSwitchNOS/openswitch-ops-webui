@@ -39,7 +39,7 @@ import LoginLayer from 'loginLayer.jsx';
 import NavSideBar from './navSideBar.jsx';
 
 
-const AUTO_ACTIONS_INTERVAL = 10000;
+const AUTO_ACTIONS_INTERVAL = 1000000;
 
 class MainApp extends Component {
 
@@ -124,7 +124,11 @@ class MainApp extends Component {
     const notifCount = 3; // TODO: implement me
 
     return (
-      <Header justify="between" pad={{horizontal: 'medium'}}>
+      <Header
+          justify="between"
+          pad={{horizontal: 'medium'}}
+          separator="bottom"
+      >
         <Title>
           {openNav}
           <Breadcrumbs excludes={['~/~']}
@@ -134,7 +138,8 @@ class MainApp extends Component {
         <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
           <a href={notifLink}>
-            <NotificationIcon/><small>&nbsp;{notifCount}</small>
+            <NotificationIcon className="mHalf"/>
+            <small>{notifCount}</small>
           </a>
         </Menu>
       </Header>

@@ -18,7 +18,7 @@
 /*eslint no-undefined:0*/
 
 import Agent, {
-  agentInit, getPrefix, parseError, mkAgentHandler
+  agentInit, getPrefix, parseError, mkAgentHandler, getParallel,
 } from '../agent.js';
 
 import AgentMock from 'superagent-mock';
@@ -112,21 +112,28 @@ describe('agent', () => {
 
   });
 
-  it('allows requests in parallel using Async', () => {
+  it('allows requests in getParallel', () => {
     agentInit({ prefix: 'https://test.com' });
-    Async.parallel(
-      {
-        data1: (cb) => { Agent.get('/data1').end(cb); },
-        data2: (cb) => { Agent.get('/data2').end(cb); },
-      },
-      (err, results) => {
-        expect(err).toBeNull();
-        expect(results).toEqual({
-          data1: { body: 'DATA1' },
-          data2: { body: 'DATA2' },
-        });
-      }
-    );
+    getParallel([
+      '/data1',
+      '/data2',
+    ], (err, results) => {
+      expect(err).toBeNull();
+      expect(results).toEqual([
+        { body: 'DATA1' },
+        { body: 'DATA2' },
+      ]);
+    });
+  });
+
+  it('allows single request when using getParallel', () => {
+    agentInit({ prefix: 'https://test.com' });
+    getParallel('/data1', (err, results) => {
+      expect(err).toBeNull();
+      expect(results).toEqual(
+        { body: 'DATA1' },
+      );
+    });
   });
 
   it('provides a handler to inject the URL in the error', () => {
@@ -171,27 +178,33 @@ describe('agent', () => {
     );
   });
 
-  it('handler works in parallel requests with errors', () => {
+  it('handler works in getParallel requests with errors', () => {
     agentInit({ prefix: 'https://test.com' });
-    Async.parallel(
-      {
-        data1: (cb) => {
-          Agent.get('/data1').end(mkAgentHandler('/data1', cb));
-        },
-        data2: (cb) => {
-          Agent.get('/e404').end(mkAgentHandler('/e404', cb));
-        },
-      },
-      (err, results) => {
-        expect(results).toBeDefined();
-        expect(err).toEqual({
-          url: `${getPrefix()}/e404`,
-          status: undefined,
-          msg: '404',
-          respMsg: undefined,
-        });
-      }
-    );
+    getParallel([
+      '/data1',
+      '/e404',
+    ], (err, results) => {
+      expect(results).toBeDefined();
+      expect(err).toEqual({
+        url: `${getPrefix()}/e404`,
+        status: undefined,
+        msg: '404',
+        respMsg: undefined,
+      });
+    });
+  });
+
+  it('handler works in getParallel single request with error', () => {
+    agentInit({ prefix: 'https://test.com' });
+    getParallel('/e404', (err, results) => {
+      expect(results).toBeDefined();
+      expect(err).toEqual({
+        url: `${getPrefix()}/e404`,
+        status: undefined,
+        msg: '404',
+        respMsg: undefined,
+      });
+    });
   });
 
 });

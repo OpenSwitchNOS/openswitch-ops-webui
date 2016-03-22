@@ -61,6 +61,7 @@ describe('dux', () => {
 
   const DEF_ASYNC_STATUS = {
     asyncStatus: {
+      title: '',
       inProgress: false,
       lastSuccessMillis: 0,
       lastError: null,
@@ -104,10 +105,11 @@ describe('dux', () => {
     let s2 = handler(s1, {type: 'bogos'});
     expect(s2).toBeNull();
 
-    s2 = handler(s1, {type: 'm/abc/REQUEST'});
+    s2 = handler(s1, {type: 'm/abc/REQUEST', title: 'T'});
     expect(s2).toEqual({
       abc: {
         asyncStatus: {
+          title: 'T',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -123,6 +125,7 @@ describe('dux', () => {
     expect(s2).toEqual({
       abc: {
         asyncStatus: {
+          title: '',
           inProgress: false,
           lastSuccessMillis: 0,
           lastError: 'E1',
@@ -151,6 +154,7 @@ describe('dux', () => {
     expect(s2).toEqual({
       abc: {
         asyncStatus: {
+          title: '',
           inProgress: false,
           lastSuccessMillis: 0,
           lastError: 'E2',
@@ -185,10 +189,11 @@ describe('dux', () => {
     let s2 = reducer(undefined, {type: 'bogos'});
     expect(s2).toEqual(s1);
 
-    s2 = reducer(s2, {type: 'm/a/REQUEST'});
+    s2 = reducer(s2, {type: 'm/a/REQUEST', title: 'A'});
     expect(s2).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -207,6 +212,7 @@ describe('dux', () => {
     expect(s2).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -217,6 +223,7 @@ describe('dux', () => {
       },
       b: {
         asyncStatus: {
+          title: '',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -236,6 +243,7 @@ describe('dux', () => {
     expect(s2).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -264,10 +272,13 @@ describe('dux', () => {
 
     const reducer = Dux.mkReducer(s1, [handlerA, handlerB]);
 
-    s1 = reducer(s1, {type: 'm/a/REQUEST', numSteps: 3, currStepMsg: 'M1' });
+    s1 = reducer(s1, {
+      type: 'm/a/REQUEST', title: 'A', numSteps: 3, currStepMsg: 'M1'
+    });
     expect(s1).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -288,6 +299,7 @@ describe('dux', () => {
     expect(s1).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -308,6 +320,7 @@ describe('dux', () => {
     expect(s1).toEqual({
       a: {
         asyncStatus: {
+          title: 'A',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -326,7 +339,9 @@ describe('dux', () => {
 
     s1 = reducer(s1, { type: 'm/a/SUCCESS', result });
     expect(s1.a.asyncStatus.lastSuccessMillis).toBeGreaterThan(0);
+    expect(s1.a.asyncStatus.title).toEqual('A');
     s1.a.asyncStatus.lastSuccessMillis = 0;
+    s1.a.asyncStatus.title = '';
     expect(s1).toEqual({
       a: {
         ...DEF_ASYNC_STATUS,
@@ -354,6 +369,7 @@ describe('dux', () => {
     expect(s2).toEqual({
       a: {
         asyncStatus: {
+          title: '',
           inProgress: true,
           lastSuccessMillis: 0,
           lastError: null,
@@ -386,29 +402,38 @@ describe('dux', () => {
 
     expect(Dux.actionRequest(at)).toEqual({type: 'm/z/REQUEST'});
 
-    expect(Dux.actionRequest(at, 3, 'S1')).toEqual({
+    expect(Dux.actionRequest(at, 'T1', 3, 'S1')).toEqual({
       type: 'm/z/REQUEST',
-      action: { numSteps: 3, currStepMsg: 'S1' }
+      title: 'T1',
+      numSteps: 3,
+      currStepMsg: 'S1'
     });
 
     expect(Dux.actionRequestStep(at, 2, 'S2')).toEqual({
       type: 'm/z/REQUEST_STEP',
-      action: { currStep: 2, currStepMsg: 'S2' }
+      currStep: 2,
+      currStepMsg: 'S2'
     });
 
     expect(Dux.actionFail(at, 'E1')).toEqual({type: 'm/z/FAILURE', error});
     expect(Dux.actionSuccess(at, 'R1')).toEqual({type: 'm/z/SUCCESS', result});
     expect(Dux.actionClearError(at)).toEqual({type: 'm/z/CLEAR_ERROR'});
 
-    Dux.dispatchRequest(dispatch, at);
+    Dux.dispatchRequest(dispatch, at, 'T2', 3, 'S1');
+    Dux.dispatchRequestStep(dispatch, at, 2, 'S2');
     Dux.dispatchFail(dispatch, at, error);
     Dux.dispatchSuccess(dispatch, at, result);
 
     const da = dispatchedActions;
-    expect(da.length).toBe(3);
-    expect(da[0]).toEqual({ type: 'm/z/REQUEST' });
-    expect(da[1]).toEqual({ type: 'm/z/FAILURE', error });
-    expect(da[2]).toEqual({ type: 'm/z/SUCCESS', result });
+    expect(da.length).toBe(4);
+    expect(da[0]).toEqual(
+      { type: 'm/z/REQUEST', title: 'T2', numSteps: 3, currStepMsg: 'S1' }
+    );
+    expect(da[1]).toEqual(
+      { type: 'm/z/REQUEST_STEP', currStep: 2, currStepMsg: 'S2' }
+    );
+    expect(da[2]).toEqual({ type: 'm/z/FAILURE', error });
+    expect(da[3]).toEqual({ type: 'm/z/SUCCESS', result });
   });
 
   it('async dispatcher', () => {

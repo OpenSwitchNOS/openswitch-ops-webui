@@ -223,6 +223,11 @@ export default class Range {
     return result;
   }
 
+  firstItem() {
+    const ranges = this.getRanges();
+    return ranges.length > 0 ? ranges[0][0] : 1;
+  }
+
   has(value) {
     if (value === undefined) {
       throw new TypeError(BAD_INPUT);
