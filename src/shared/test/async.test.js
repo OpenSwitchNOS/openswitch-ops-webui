@@ -20,7 +20,7 @@ import Async from 'async';
 
 describe('async', () => {
 
-  it('handles series', () => {
+  it('handles series', (done) => {
     Async.series([
       cb => cb(null, 'one'),
       cb => cb(null, 'two'),
@@ -28,10 +28,11 @@ describe('async', () => {
     (err, result) => {
       expect(err).toBeNull();
       expect(result).toEqual(['one', 'two']);
+      done();
     });
   });
 
-  it('handles series error 1', () => {
+  it('handles series error 1', (done) => {
     Async.series([
       cb => cb('errone', 'one'),
       cb => cb(null, 'two'),
@@ -39,10 +40,11 @@ describe('async', () => {
     (err, result) => {
       expect(err).toEqual('errone');
       expect(result).toEqual(['one']);
+      done();
     });
   });
 
-  it('handles series error 2', () => {
+  it('handles series error 2', (done) => {
     Async.series([
       cb => cb(null, 'one'),
       cb => cb('errtwo', 'two'),
@@ -50,10 +52,11 @@ describe('async', () => {
     (err, result) => {
       expect(err).toEqual('errtwo');
       expect(result).toEqual(['one', 'two']);
+      done();
     });
   });
 
-  it('handles waterfall', () => {
+  it('handles waterfall', (done) => {
     Async.waterfall([
       cb => cb(null, '1', '2'),
       (one, two, cb) => cb(null, '3'),
@@ -62,10 +65,11 @@ describe('async', () => {
     (err, result) => {
       expect(err).toBeNull();
       expect(result).toEqual('done');
+      done();
     });
   });
 
-  it('handles waterfall error', () => {
+  it('handles waterfall error', (done) => {
     Async.waterfall([
       cb => cb(null, '1', '2'),
       (one, two, cb) => cb('err', '3'),
@@ -74,6 +78,7 @@ describe('async', () => {
     (err, result) => {
       expect(err).toEqual('err');
       expect(result).toEqual('3');
+      done();
     });
   });
 

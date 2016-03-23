@@ -72,7 +72,7 @@ class VlanAdd extends Component {
 
   _calcAvailVlanIdRange = (props) => {
     const range = new Range(props.constants.VLAN_ID_RANGE);
-    const used = Object.keys(props.vlan.page.vlans).map( k => Number(k) );
+    const used = Object.keys(props.vlan.vlans).map( k => Number(k) );
     range.subtract(used);
     return range;
   };
@@ -117,7 +117,7 @@ class VlanAdd extends Component {
           <hr/>
           <DataGrid width={420} height={400}
               title={t('currentVlans')}
-              data={this.props.vlan.page.vlans}
+              data={this.props.vlan.vlans}
               columns={this.vlanCols}
               noSelect
           />

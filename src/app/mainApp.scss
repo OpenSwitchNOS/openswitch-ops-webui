@@ -36,6 +36,10 @@ h1, h2, h3, .headline, .title {
   }
 }
 
+.toolbar .box {
+  height: 100%;
+}
+
 @mixin flex($g, $s, $b) {
   flex: $g $s $b;
   -webkit-flex: $g $s $b;

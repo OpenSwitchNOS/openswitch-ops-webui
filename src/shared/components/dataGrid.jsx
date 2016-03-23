@@ -30,7 +30,7 @@ import CbSelIcon from 'grommet/components/icons/base/CheckboxSelected';
 import SubtractIcon from 'grommet/components/icons/base/Subtract';
 import Toolbar from 'toolbar.jsx';
 import Anchor from 'grommet/components/Anchor';
-import Utils from 'utils.js';
+import { naturalSort } from 'sorts.js';
 
 
 const ASC = 'asc';
@@ -193,7 +193,7 @@ export default class DataGrid extends Component {
     return (rowDataA, rowDataB) => {
       const a = rowDataA[k];
       const b = rowDataB[k];
-      let result = Utils.naturalSort(a, b);
+      let result = naturalSort(a, b);
       if (result !== 0 && sortDirection === ASC) {
         result = result * -1;
       }

@@ -31,10 +31,9 @@ export default class AsyncStatusLayer extends Component {
       inProgress: PropTypes.bool.isRequired,
       lastSuccessMillis: PropTypes.number.isRequired,
       lastError: PropTypes.shape({
-        url: PropTypes.string.isRequired,
+        url: PropTypes.string,
         status: PropTypes.number,
-        msg: PropTypes.string,
-        respMsg: PropTypes.string,
+        message: PropTypes.string,
       }),
       numSteps: PropTypes.number.isRequired,
       currStep: PropTypes.number.isRequired,
@@ -51,28 +50,32 @@ export default class AsyncStatusLayer extends Component {
 
   render() {
     const data = this.props.data;
-    const errData = data.lastError;
+    let error = null;
 
-    const error = !errData ? null : (
-      <div className="error">
-        <p/>
-        <Title>
-          <SpanStatus space={false} size="large" value="critical">
-            {t('failedRequest')}
-          </SpanStatus>
-        </Title>
-        <p/>
-        <b>{t('status')}</b><br/>
-        {errData.status || t('none')}
-        <p/>
-        <b>{t('message')}</b><br/>
-        {errData.msg || t('none')}
-        <p/>
-        <b>{t('url')}</b><br/>
-        {errData.url}
-        {errData.respMsg ? <p><i>"{errData.respMsg}"</i></p> : null}
-      </div>
-    );
+    if (data.lastError) {
+      const e = data.lastError;
+      const msg = e.message ? e.message.split('\n').join('. ') : null;
+
+      error = (
+        <div className="error">
+          <p/>
+          <Title>
+            <SpanStatus space={false} size="large" value="critical">
+              {t('failedRequest')}
+            </SpanStatus>
+          </Title>
+          <p/>
+          <b>{t('status')}</b><br/>
+          {e.status || t('none')}
+          <p/>
+          <b>{t('message')}</b><br/>
+          {msg || t('none')}
+          <p/>
+          <b>{t('url')}</b><br/>
+          {e.url || t('none')}
+        </div>
+      );
+    }
 
     const steps = data.numSteps <= 1 ? null : (
       <div className={`mHalf ${error ? 'disabled' : ''}`}>

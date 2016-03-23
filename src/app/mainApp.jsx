@@ -39,6 +39,7 @@ import LoginLayer from 'loginLayer.jsx';
 import NavSideBar from './navSideBar.jsx';
 
 
+// FIXME: large auto actions for debugging.
 const AUTO_ACTIONS_INTERVAL = 1000000;
 
 class MainApp extends Component {
@@ -129,12 +130,12 @@ class MainApp extends Component {
           pad={{horizontal: 'medium'}}
           separator="bottom"
       >
-        <Title>
+        <div>
           {openNav}
           <Breadcrumbs excludes={['~/~']}
               routes={this.props.routes}
               params={this.props.params} />
-        </Title>
+        </div>
         <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
           <a href={notifLink}>

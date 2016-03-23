@@ -140,7 +140,7 @@ class VlanPage extends Component {
   componentDidMount() {
     const p = this.props;
     p.actions.vlan.fetch();
-    p.actions.toolbar.setFetchTB(p.vlan.page.asyncStatus, this._onRefresh);
+    p.actions.toolbar.setFetchTB(p.vlan.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
@@ -149,7 +149,7 @@ class VlanPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     const p = nextProps;
-    p.actions.toolbar.setFetchTB(p.vlan.page.asyncStatus, this._onRefresh);
+    p.actions.toolbar.setFetchTB(p.vlan.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -167,7 +167,7 @@ class VlanPage extends Component {
 
   // TODO: decide on OK vs Deploy (Apply and OK, is better then Apply and Deploy)
   _onEditOk = (cfg) => {
-    this.props.actions.vlan.editVlan(this.props.vlan.page, cfg);
+    this.props.actions.vlan.editVlan(this.props.vlan, cfg);
     // TODO: this should wait until success or failure
     this.setState({ editMode: false });
   };
@@ -182,7 +182,7 @@ class VlanPage extends Component {
 
   _onAddApply = (cfg) => {
     // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
-    this.props.actions.vlan.addVlan(this.props.vlan.page, cfg);
+    this.props.actions.vlan.addVlan(this.props.vlan, cfg);
   };
 
   _onAddOk = (data) => {
@@ -199,10 +199,10 @@ class VlanPage extends Component {
   };
 
   render() {
-    const pv = this.props.vlan;
+    const data = this.props.vlan;
 
-    const numVlans = Object.getOwnPropertyNames(pv.page.vlans).length;
-    const numInterfaces = Object.getOwnPropertyNames(pv.page.interfaces).length;
+    const numVlans = Object.getOwnPropertyNames(data.vlans).length;
+    const numInterfaces = Object.getOwnPropertyNames(data.interfaces).length;
 
     const addVlanLayer = !this.state.addVlanLayer ? null :
       <VlanAdd
@@ -223,12 +223,12 @@ class VlanPage extends Component {
     //
     // const set = this.props.vlan.set;
 
-    const async = pv.page.asyncStatus;
+    const async = data.asyncStatus;
 
     const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
       <AsyncStatusLayer
           data={async}
-          onClose={this.props.actions.vlan.clearErrorForSet} />;
+          onClose={this.props.actions.vlan.clearError} />;
 
     return (
       <Box className="flex1 mTopHalf mLeft">
@@ -239,7 +239,7 @@ class VlanPage extends Component {
         <ResponsiveBox>
           <DataGrid width={400} height={400}
               title={`${t('totalVlans')}: ${numVlans}`}
-              data={pv.page.vlans}
+              data={data.vlans}
               columns={this.byVlanCols}
               singleSelect
               onSelectChange={this._onSelect}
@@ -254,7 +254,7 @@ class VlanPage extends Component {
           <DataGrid width={400} height={400}
               title={`${t('totalInterfaces')}: ${numInterfaces}`}
               columns={this.byInterfaceCols}
-              data={pv.page.interfaces}
+              data={data.interfaces}
           />
         </ResponsiveBox>
       </Box>

@@ -19,7 +19,6 @@ import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 
 import DataGrid from 'dataGrid.jsx';
-import FetchToolbar from 'fetchToolbar.jsx';
 import ResponsiveBox from 'responsiveBox.jsx';
 import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button';
@@ -67,14 +66,12 @@ class DemoBoxPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    const fetch = nextProps.demo.page;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={fetch.inProgress}
-          error={fetch.lastError}
-          date={fetch.lastSuccessMillis}
-          onRefresh={this._onRefresh}/>
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.demo.asyncStatus, this._onRefresh);
+  }
+
+  componentWillUnmount() {
+    this.props.actions.toolbar.clear();
   }
 
   render() {
@@ -100,7 +97,7 @@ class DemoBoxPage extends Component {
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
-                  data={this.props.demo.page.entities}
+                  data={this.props.demo.entities}
                   columns={this.cols}
                   noSelect
               />

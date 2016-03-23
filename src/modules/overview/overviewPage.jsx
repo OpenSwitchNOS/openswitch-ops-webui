@@ -34,6 +34,7 @@ class OverviewPage extends Component {
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
+    overview: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -48,19 +49,18 @@ class OverviewPage extends Component {
 
   _onRefresh = () => {
     this.props.autoActions.collector.fetch();
+    this.props.actions.overview.fetch();
   };
 
   componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview.asyncStatus, this._onRefresh
-    );
+    const p = this.props;
+    this._onRefresh();
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview.asyncStatus, this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -68,7 +68,7 @@ class OverviewPage extends Component {
   }
 
   _mkSystemProps = () => {
-    const info = this.props.collector.overview.info;
+    const info = this.props.overview.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
@@ -104,7 +104,7 @@ class OverviewPage extends Component {
   };
 
   _mkPowerSuppliesProps = () => {
-    const ps = this.props.collector.overview.powerSupplies;
+    const ps = this.props.overview.powerSupplies;
     const trs = [];
     Object.getOwnPropertyNames(ps).sort().forEach(k => {
       const data = ps[k];
@@ -129,7 +129,7 @@ class OverviewPage extends Component {
   };
 
   _mkFansProps = () => {
-    const fans = this.props.collector.overview.fans;
+    const fans = this.props.overview.fans;
     const trs = [];
     Object.getOwnPropertyNames(fans).sort().forEach(k => {
       const data = fans[k];
@@ -139,20 +139,20 @@ class OverviewPage extends Component {
       trs.push(
         <tr key={data.id}>
           <td>
-          {`${data.id}:`}
+            {`${data.id}:`}
           </td>
           <td>
             <SpanStatus value={data.status}>
               {t(data.text)}
-              &nbsp;&nbsp;
-              <i>({spd},&nbsp;{rpm},&nbsp;{dir})</i>
             </SpanStatus>
           </td>
+          <td>-</td>
+          <td><i>{spd},&nbsp;{rpm},&nbsp;{dir}</i></td>
         </tr>
       );
     });
     return (
-      <table className="propTable">
+      <table style={{width: '500px'}} className="propTable">
         <tbody>
           {trs}
         </tbody>
@@ -161,7 +161,7 @@ class OverviewPage extends Component {
   };
 
   _mkTempsProps = () => {
-    const temps = this.props.collector.overview.temps;
+    const temps = this.props.overview.temps;
     const trs = [];
     Object.getOwnPropertyNames(temps).sort().forEach(k => {
       const data = temps[k];
@@ -174,9 +174,8 @@ class OverviewPage extends Component {
               {`${data.value} ${t('degreesCelsius')}`}
             </SpanStatus>
           </td>
-          <td>
-            <i>({loc})</i>
-          </td>
+          <td>-</td>
+          <td><i>{loc}</i></td>
         </tr>
       );
     });
@@ -220,7 +219,7 @@ class OverviewPage extends Component {
   };
 
   _mkFeatureProps = () => {
-    const data = this.props.collector.overview;
+    const data = this.props.overview;
     const info = data.info;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
@@ -229,15 +228,13 @@ class OverviewPage extends Component {
             <td style={{width: '180px'}}>{t('lldp')}:</td>
             <td>{ed(data.lldp.enabled)}</td>
           </tr>
-
           <tr>
             <td style={{width: '180px'}}>{t('ecmp')}:</td>
             <td>{t(data.ecmp.enabled)}</td>
           </tr>
-
           <tr>
             <td>{t('vlans')}:</td>
-            <td>TBD</td>
+            <td>{info.numVlans}</td>
           </tr>
           <tr>
             <td>{t('interfaces')}:</td>
@@ -256,6 +253,7 @@ class OverviewPage extends Component {
     );
   };
 
+  // TODO: Not implemented
   _mkLog = () => {
     function tr(elm) {
       return (
@@ -267,7 +265,8 @@ class OverviewPage extends Component {
       );
     }
     const logs = [];
-    const entries = this.props.collector.overview.log.entries;
+    // TODO: No log info yet.
+    const entries = {};
     Object.getOwnPropertyNames(entries).forEach(k => {
       logs.push(entries[k]);
     });
@@ -289,67 +288,23 @@ class OverviewPage extends Component {
     );
   };
 
-  render() {
-    const coll = this.props.collector.overview;
+  _mkUtilization = () => {
+    const data = this.props.collector;
+    const metrics = data.interfaceTopMetrics.slice(0, NUM_TRAFFIC_METRICS);
+    let caption = null;
 
-    const psRollup = this._mkRollup(
-      'powerSupplies',
-      coll.powerSuppliesRollup,
-      this._onTogglePowerSuppliesLayer
-    );
-    const psLayer = !this.state.showPowerSuppliesLayer ? null :
-      <StatusLayer
-          onClose={this._onTogglePowerSuppliesLayer}
-          title={t('powerSupplies')}
-          value={coll.powerSuppliesRollup.status}>
-          {this._mkPowerSuppliesProps()}
-      </StatusLayer>;
-
-    const tempsRollup = this._mkRollup(
-      'temperatures',
-      coll.tempsRollup,
-      this._onToggleTempsLayer
-    );
-    const tempsLayer = !this.state.showTempsLayer ? null :
-      <StatusLayer
-          onClose={this._onToggleTempsLayer}
-          title={t('temperatures')}
-          value={coll.tempsRollup.status}
-          box >
-          {this._mkTempsProps()}
-      </StatusLayer>;
-
-    const fansRollup = this._mkRollup(
-      'fans',
-      coll.fansRollup,
-      this._onToggleFansLayer
-    );
-    const fansLayer = !this.state.showFansLayer ? null :
-      <StatusLayer
-          onClose={this._onToggleFansLayer}
-          title={t('fans')}
-          value={coll.fansRollup.status}
-          box >
-          {this._mkFansProps()}
-      </StatusLayer>;
-
-    let trafficMetricsCaption = null;
-    const trafficMetrics = coll.interfaceTopMetrics.slice(
-      0, NUM_TRAFFIC_METRICS
-    );
-
-    if (trafficMetrics.length === 0) {
-      trafficMetricsCaption = (
+    if (metrics.length === 0) {
+      caption = (
         <div style={{textAlign: 'center'}}>
           <i>{t('noTopInterfaces')}</i>
         </div>
       );
     } else {
-      const m = trafficMetrics[0];
+      const m = metrics[0];
       if (m.size() > 1) {
         const oldDate = new Date(m.getDataPoint(0).ts()).toLocaleTimeString();
         const newDate = new Date(m.latestDataPoint().ts()).toLocaleTimeString();
-        trafficMetricsCaption = (
+        caption = (
           <div>
             <small>
               {`${oldDate} - ${newDate} (${m.size()} ${t('dataPoints')})`}
@@ -359,12 +314,66 @@ class OverviewPage extends Component {
       }
     }
 
-    const log = this.props.collector.overview.log;
-    const logStart = new Date(log.startTs).toLocaleTimeString();
-    const logEnd = new Date(log.endTs).toLocaleTimeString();
+    return { metrics, caption };
+  };
+
+  render() {
+    const ovData = this.props.overview;
+
+    const psRollup = this._mkRollup(
+      'powerSupplies',
+      ovData.powerSuppliesRollup,
+      this._onTogglePowerSuppliesLayer
+    );
+    const psLayer = !this.state.showPowerSuppliesLayer ? null :
+      <StatusLayer
+          onClose={this._onTogglePowerSuppliesLayer}
+          title={t('powerSupplies')}
+          value={ovData.powerSuppliesRollup.status}
+      >
+          {this._mkPowerSuppliesProps()}
+      </StatusLayer>;
+
+    const tempsRollup = this._mkRollup(
+      'temperatures',
+      ovData.tempsRollup,
+      this._onToggleTempsLayer
+    );
+    const tempsLayer = !this.state.showTempsLayer ? null :
+      <StatusLayer
+          onClose={this._onToggleTempsLayer}
+          title={t('temperatures')}
+          value={ovData.tempsRollup.status}
+      >
+          {this._mkTempsProps()}
+      </StatusLayer>;
+
+    const fansRollup = this._mkRollup(
+      'fans',
+      ovData.fansRollup,
+      this._onToggleFansLayer
+    );
+    const fansLayer = !this.state.showFansLayer ? null :
+      <StatusLayer
+          onClose={this._onToggleFansLayer}
+          title={t('fans')}
+          value={ovData.fansRollup.status}
+      >
+          {this._mkFansProps()}
+      </StatusLayer>;
+
+    const utl = this._mkUtilization();
+
+    // TODO: get log start/end time and number added
+    const logStart = new Date().toLocaleTimeString();
+    const logEnd = new Date().toLocaleTimeString();
+    const logNumAdded = 3;
 
     return (
       <Box className="flex1">
+        {psLayer}
+        {tempsLayer}
+        {fansLayer}
         <Box direction="row" className="flex0auto flexWrap">
           <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('system')}</b>
@@ -381,12 +390,9 @@ class OverviewPage extends Component {
             <hr/>
             <table className="propTable">
               <tbody>
-              {psRollup}
-              {psLayer}
-              {tempsRollup}
-              {tempsLayer}
-              {fansRollup}
-              {fansLayer}
+                {psRollup}
+                {tempsRollup}
+                {fansRollup}
               </tbody>
             </table>
           </Box>
@@ -397,15 +403,15 @@ class OverviewPage extends Component {
                 simple
                 onSelect={this._onSelectInterface}
                 widths={{label: '70px', value: '70px'}}
-                metrics={trafficMetrics}
+                metrics={utl.metrics}
             />
-            {trafficMetricsCaption}
+            {utl.caption}
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min300x400">
           <span><b>{t('log')}&nbsp;&nbsp;</b>
             <small>
-            {`${logStart} - ${logEnd} (${log.numAdded} ${t('new')})`}
+              {`${logStart} - ${logEnd} (${logNumAdded} ${t('new')})`}
             </small>
           </span>
           <hr/>
@@ -422,6 +428,7 @@ class OverviewPage extends Component {
 function select(store) {
   return {
     collector: store.collector,
+    overview: store.overview,
   };
 }
 

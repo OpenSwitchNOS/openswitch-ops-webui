@@ -148,10 +148,10 @@ class NavSideBar extends Component {
         <Box>
           <Box pad={{horizontal: 'medium', vertical: 'small'}}>
             <div><b>{t('hostname')}</b></div>
-            <div>{this.props.collector.overview.info.hostname}</div>
+            <div>{this.props.collector.hostname}</div>
             <br/>
             <div><b>{t('product')}</b></div>
-            <div>{this.props.collector.overview.info.product}</div>
+            <div>{this.props.collector.product}</div>
           </Box>
           <br/>
           <Menu primary>

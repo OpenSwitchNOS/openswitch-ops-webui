@@ -14,298 +14,97 @@
     under the License.
 */
 
-import Dux from 'dux.js';
+import Async from 'async';
+import AsyncDux from 'asyncDux.js';
+import Agent from 'agent.js';
+import Translater from 'translater.js';
 import InterfaceCache from './interfaceCache.js';
 import { TX, RX, TX_RX } from './interfaceData.js';
-import Formatter from 'formatter.js';
-import Utils from 'utils.js';
 
 
 const NAME = 'collector';
 
-const OVERVIEW_ASYNC = 'overview';
-const OVERVIEW_AT = Dux.mkAsyncActionTypes(NAME, OVERVIEW_ASYNC);
-
-const URLS = [
-  '/rest/v1/system/subsystems/base',
-  '/rest/v1/system',
-  '/rest/v1/system/interfaces?depth=1',
-  '/rest/v1/system/subsystems/base/power_supplies?depth=1',
-  '/rest/v1/system/subsystems/base/fans?depth=1',
-  '/rest/v1/system/subsystems/base/temp_sensors?depth=1',
-];
-
-const AUTO_ACTIONS = {
-  fetch() {
-    return (dispatch, getStoreFn) => {
-      const mStore = getStoreFn()[NAME];
-      Dux.getIfCooledDown(dispatch, mStore, OVERVIEW_ASYNC, OVERVIEW_AT, URLS);
-    };
-  },
+const INITIAL_STORE = {
+  interfaces: {},
+  interfaceMetrics: {},
+  interfaceTopMetrics: [],
 };
 
-const ACTIONS = {
-  fetchImmediate() {
-    return (dispatch) => {
-      Dux.get(dispatch, OVERVIEW_AT, URLS);
-    };
-  },
-};
+const AD = new AsyncDux(NAME, INITIAL_STORE);
 
-const interfaceCache = new InterfaceCache();
+const T = new Translater({
+  linkState: { up: 'up', down: 'down', DEFAULT: 'down' },
+  duplex: { half: 'half', full: 'full', DEFAULT: 'full' },
+});
 
-function normalizePowerStatus(s) {
-  if (s === 'ok') {
-    return { text: 'ok', status: 'ok' };
-  } else if (s === 'fault_input') {
-    return { text: 'powerFaultInput', status: 'warning' };
-  } else if (s === 'fault_output') {
-    return { text: 'powerFaultOutput', status: 'critical' };
-  }
-  return { text: 'powerAbsent', status: 'warning' };
-}
+const IC = new InterfaceCache();
 
-function normalizeFanStatus(s) {
-  if (s === 'ok') {
-    return { text: 'ok', status: 'ok' };
-  } else if (s === 'fault') {
-    return { text: 'fanFault', status: 'critical' };
-  }
-  return { text: 'fanUninitialized', status: 'warning' };
-}
-
-function normalizeTempStatus(id, s) {
-  const max = Number(s.max) / 1000;
-  const min = Number(s.min) / 1000;
-  const value = Number(s.temperature) / 1000;
-  const status = value < max ? 'ok' : 'warning';
-  return {
-    id,
-    location: s.location,
-    max,
-    min,
-    value,
-    status,
-  };
-}
-
-function parseEcmp(ecmpCfg) {
-  function norm(key) {
-    return ecmpCfg && ecmpCfg[key] === 'false' ? 'disabled' : 'enabled';
-  }
-  return {
-    enabled: norm('enabled'),
-    hashDstIp: norm('hash_dstip_enabled'),
-    hashDstPort: norm('hash_dstport_enabled'),
-    hashSrcIp: norm('hash_srcip_enabled'),
-    hashSrcPort: norm('hash_srcport_enabled'),
-    resilientHash: norm('resilient_hash_enabled'),
-  };
-}
-
-function parseInterfaces(infBody, now) {
-  const interfaces = {};
-  infBody.forEach((elm) => {
-    const cfg = elm.configuration;
-    if (cfg.type === 'system') {
-      const data = Utils.parseInterface(elm);
-      if (data.linkState === 'up') {
-        const interfaceData = interfaceCache.getOrCreateInterface(
-          data.id, data.speed, data.duplex
-        );
-        if (data.duplex === 'half') {
-          interfaceData.updateMetric(TX_RX, data.rxBytes + data.txBytes, now);
-        } else if (data.duplex === 'full') {
-          interfaceData.updateMetric(TX, data.txBytes, now);
-          interfaceData.updateMetric(RX, data.rxBytes, now);
-        }
-      }
-      interfaces[data.id] = data;
-    }
-  });
-  return interfaces;
-}
-
-function parseOverviewResult(result) {
-
-  // Define some useful constants...
+const parser = (result) => {
+  const product = result[0].body.status.other_info['Product Name'];
+  const hostname = result[1].body.configuration.hostname;
 
   const now = Date.now();
-  const ssBaseBody = result[0].body;
-  const sysBody = result[1].body;
-  const infBody = result[2].body;
-  const pwrBody = result[3].body;
-  const fanBody = result[4].body;
-  const tempBody = result[5].body;
+  const interfaces = {};
+  result[2].body.forEach((elm) => {
+    const cfg = elm.configuration;
+    const status = elm.status;
+    const stats = elm.statistics.statistics;
+    if (cfg.type === 'system') {
+      const id = cfg.name;
+      const linkState = T.from('linkState', status.link_state);
 
-  const oi = ssBaseBody.status.other_info;
+      if (linkState === 'up') {
+        const speed = status.link_speed ? Number(status.link_speed) : 0;
+        const duplex = T.from('duplex', status.duplex);
+        const rxBytes = Number(stats.rx_bytes) || 0;
+        const txBytes = Number(stats.tx_bytes) || 0;
 
-  // Info
+        const interfaceData = IC.getOrCreateInterface(id, speed, duplex);
+        if (duplex === 'half') {
+          interfaceData.updateMetric(TX_RX, rxBytes + txBytes, now);
+        } else if (duplex === 'full') {
+          interfaceData.updateMetric(TX, txBytes, now);
+          interfaceData.updateMetric(RX, rxBytes, now);
+        }
 
-  const maxInterfaceSpeed = Formatter.mbpsToString(oi.max_interface_speed);
-  const baseMac = oi.base_mac_address && oi.base_mac_address.toUpperCase();
+        interfaces[id] = { id, linkState, speed, duplex, rxBytes, txBytes };
+      }
+    }
+  });
 
-  const info = {
-    hostname: sysBody.configuration.hostname,
-    version: sysBody.status.switch_version,
-    product: oi['Product Name'],
-    partNum: oi.part_number,
-    onieVersion: oi.onie_version,
-    baseMac,
-    serialNum: oi.serial_number,
-    vendor: oi.vendor,
-    maxInterfaceSpeed,
-    mtu: oi.max_transmission_unit,
-    interfaceCount: oi.interface_count,
-  };
-
-  // Interfaces
-
-  const interfaces = parseInterfaces(infBody, now);
-
-  const metrics = interfaceCache.metrics(now);
+  const metrics = IC.metrics(now);
   const interfaceMetrics = metrics.all;
   const interfaceTopMetrics = metrics.top;
 
-  // Power Supplies
-
-  const powerSupplies = {};
-  let critical = 0;
-  let warning = 0;
-  let ok = 0;
-  pwrBody.forEach((elm) => {
-    const id = elm.status.name;
-    const ps = normalizePowerStatus(elm.status.status);
-    powerSupplies[id] = {
-      id,
-      text: ps.text,
-      status: ps.status,
-    };
-    if (ps.status === 'critical') {
-      critical++;
-    } else if (ps.status === 'warning') {
-      warning++;
-    } else if (ps.status === 'ok') {
-      ok++;
-    }
-  });
-  let status = critical ? 'critical' :
-    warning ? 'warning' :
-      ok ? 'ok' : 'unknown';
-  const powerSuppliesRollup = { status, critical, warning, ok };
-
-  // Fans
-
-  const fans = {};
-  critical = 0;
-  warning = 0;
-  ok = 0;
-  fanBody.forEach((elm) => {
-    const id = elm.status.name;
-    const ps = normalizeFanStatus(elm.status.status);
-    const cfg = elm.configuration;
-    fans[id] = {
-      id,
-      text: ps.text,
-      status: ps.status,
-      dir: cfg.direction,
-      speed: cfg.speed,
-      rpm: elm.status.rpm
-    };
-    if (ps.status === 'critical') {
-      critical++;
-    } else if (ps.status === 'warning') {
-      warning++;
-    } else if (ps.status === 'ok') {
-      ok++;
-    }
-  });
-  status = critical ? 'critical' :
-    warning ? 'warning' :
-      ok ? 'ok' : 'unknown';
-  const fansRollup = { status, critical, warning, ok };
-
-  // Temperatures
-
-  const temps = {};
-  critical = 0;
-  warning = 0;
-  ok = 0;
-  tempBody.forEach((elm) => {
-    const id = elm.status.name;
-    const normTemp = normalizeTempStatus(id, elm.status);
-    if (normTemp.status === 'critical') {
-      critical++;
-    } else if (normTemp.status === 'warning') {
-      warning++;
-    } else if (normTemp.status === 'ok') {
-      ok++;
-    }
-    temps[id] = normTemp;
-  });
-  status = critical ? 'critical' :
-    warning ? 'warning' :
-      ok ? 'ok' : 'unknown';
-  const tempsRollup = { status, critical, warning, ok };
-
-  // LLDP
-
-  const sysOc = sysBody.configuration.other_config;
-  const lldp = {
-    enabled: sysOc && sysOc.lldp_enable === 'true',
-  };
-
-  // ECMP
-
-  const ecmp = parseEcmp(sysBody.configuration.ecmp_config);
-
-  // log
-
-  const log = Utils.parseLogOverview(); // TODO: mocked log data for now
-
   return {
-    info,
-    interfaces,
-    interfaceMetrics,
-    interfaceTopMetrics,
-    powerSupplies,
-    powerSuppliesRollup,
-    fans,
-    fansRollup,
-    temps,
-    tempsRollup,
-    lldp,
-    ecmp,
-    log,
+    product, hostname, interfaces, interfaceMetrics, interfaceTopMetrics
   };
-}
-
-const INITIAL_STORE = {
-  overview: {
-    ...Dux.mkAsyncStatus(),
-    info: {},
-    interfaces: {},
-    interfaceMetrics: {},
-    interfaceTopMetrics: [],
-    powerSupplies: {},
-    powerSuppliesRollup: { status: 'unknown' },
-    fans: {},
-    fansRollup: { status: 'unknown' },
-    temps: {},
-    tempsRollup: { status: 'unknown' },
-    lldp: {},
-    ecmp: {},
-    log: { entries: {} },
-  }
 };
 
-const REDUCER = Dux.mkReducer(INITIAL_STORE, [
-  Dux.mkAsyncHandler(NAME, OVERVIEW_ASYNC, OVERVIEW_AT, parseOverviewResult),
-]);
+const URL_BASE = '/rest/v1/system/subsystems/base';
+const URL_SYS = '/rest/v1/system';
+const URL_INFS = '/rest/v1/system/interfaces?depth=1';
+
+const AUTO_ACTIONS = {
+
+  fetch() {
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST'));
+      Async.parallel([
+        cb => Agent.get(URL_BASE).end(cb),
+        cb => Agent.get(URL_SYS).end(cb),
+        cb => Agent.get(URL_INFS).end(cb),
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser } ));
+      });
+    };
+  },
+
+};
 
 export default {
   NAME,
   AUTO_ACTIONS,
-  ACTIONS,
-  REDUCER,
+  REDUCER: AD.reducer(),
 };

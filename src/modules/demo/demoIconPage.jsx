@@ -20,7 +20,6 @@ import { connect } from 'react-redux';
 import Box from 'grommet/components/Box';
 import BrandLogo from 'brandLogo.jsx';
 import Section from 'grommet/components/Section';
-import EditIcon from 'grommet/components/icons/base/Edit';
 import SpanStatus from 'spanStatus.jsx';
 import TimeAgo from 'react-timeago';
 
@@ -45,15 +44,6 @@ class DemoIconPage extends Component {
           <BrandLogo size="medium" lightColor="grey" />
           <BrandLogo size="large" lightColor="grey" />
         </Section>
-        <Section className="pageBox" colorIndex="neutral-1">
-          <EditIcon />
-        </Section>
-        <Section className="pageBox" colorIndex="neutral-2">
-          <EditIcon large />
-        </Section>
-        <Section className="pageBox" colorIndex="neutral-1">
-          <EditIcon className="tiny" />
-        </Section>
         <Section pad={this.pad} className="pageBox" >
           <SpanStatus value="ok">
             SpanStatus with value="ok"
@@ -73,10 +63,6 @@ class DemoIconPage extends Component {
           <br/>
           <SpanStatus value="disabled">
             SpanStatus with value="disabled"
-          </SpanStatus>
-          <br/>
-          <SpanStatus value="label">
-            SpanStatus with value="label"
           </SpanStatus>
           <br/>
           <SpanStatus disabled value="warning">

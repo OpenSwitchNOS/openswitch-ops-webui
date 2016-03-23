@@ -15,21 +15,21 @@
 */
 
 
-export default class Translater {
+const NUMBER_GROUPS = /(-?\d*\.?\d+)/g;
 
-  constructor(mappings) {
-    this._mappings = mappings;
-  }
+export function naturalSort(a, b) {
+  const aa = String(a).split(NUMBER_GROUPS);
+  const bb = String(b).split(NUMBER_GROUPS);
+  const min = Math.min(aa.length, bb.length);
 
-  from(key, val) {
-    const map = this._mappings[key];
-    if (map) {
-      let mapVal = map[val];
-      if (!mapVal) {
-        mapVal = map.DEFAULT && map[map.DEFAULT];
-      }
-      return mapVal || 'unknown';
+  for (let i = 0; i < min; i++) {
+    const x = parseFloat(aa[i]) || aa[i].toLowerCase();
+    const y = parseFloat(bb[i]) || bb[i].toLowerCase();
+    if (x < y) {
+      return -1;
+    } else if (x > y) {
+      return 1;
     }
-    return 'unknown';
   }
+  return 0;
 }

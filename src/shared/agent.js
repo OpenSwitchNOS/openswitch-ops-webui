@@ -16,7 +16,6 @@
 
 
 import defaults from 'superagent-defaults';
-import Async from 'async';
 
 const Agent = defaults();
 let prefix = '';
@@ -34,39 +33,5 @@ export function agentInit(settings) {
 }
 
 export function getPrefix() { return prefix; }
-
-export function parseError(url, error) {
-  const resp = error.response;
-  return {
-    url,
-    status: error.status,
-    msg: error.message,
-    respMsg: resp && resp.error && resp.error.message,
-  };
-}
-
-export function mkAgentHandler(url, cb) {
-  return (err, res) => {
-    if (err) {
-      const fullUrl = `${prefix}${url}`;
-      return cb(parseError(fullUrl, err), res);
-    }
-    cb(null, res);
-  };
-}
-
-export function getParallel(urls, cb) {
-  if (Array.isArray(urls)) {
-    const gets = [];
-    urls.forEach(url => {
-      gets.push(cb2 => Agent.get(url).end(mkAgentHandler(url, cb2)));
-    });
-    Async.parallel(gets, cb);
-
-  } else {
-    const url = urls;
-    Agent.get(url).end(mkAgentHandler(url, cb));
-  }
-}
 
 export default Agent;

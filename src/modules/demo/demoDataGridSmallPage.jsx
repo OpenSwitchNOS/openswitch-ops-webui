@@ -18,7 +18,6 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import DataGrid from 'dataGrid.jsx';
-import FetchToolbar from 'fetchToolbar.jsx';
 import Section from 'grommet/components/Section';
 import ActionsIcon from 'grommet/components/icons/base/Actions';
 import Button from 'grommet/components/Button';
@@ -49,27 +48,23 @@ class DemoDataGridSmallPage extends Component {
       },
     ];
     this.state = {
-      externalSelect: 2,
+      externalSelect: '2',
     };
-  }
-
-  componentDidMount() {
-    this.props.actions.demo.fetch();
   }
 
   _onRefresh = () => {
     this.props.actions.demo.fetch();
   };
 
+  componentDidMount() {
+    const p = this.props;
+    p.actions.demo.fetch();
+    p.actions.toolbar.setFetchTB(p.demo.asyncStatus, this._onRefresh);
+  }
+
   componentWillReceiveProps(nextProps) {
-    const fetch = nextProps.demo.page;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={fetch.inProgress}
-          error={fetch.lastError}
-          date={fetch.lastSuccessMillis}
-          onRefresh={this._onRefresh}/>
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.demo.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -89,27 +84,25 @@ class DemoDataGridSmallPage extends Component {
   };
 
   _onAction = () => {
-    alert(`action - bottom grid selection: ${this.state.externalSelect}`);
+    alert('action');
   };
 
-  _onSelectChange = (selection) => {
-    alert(selection);
-    this.setState({ externalSelect: selection });
+  _onSelectChange = (selId) => {
+    this.setState({ externalSelect: selId });
   };
 
-  _onForceSelect = () => {
-    const size = Object.keys(this.props.demo.page.entities).length;
-    const externalSelect = (this.state.externalSelect + 1) % size;
-    this.setState({ externalSelect });
+  _onSelectLast = () => {
+    const selId = Object.keys(this.props.demo.entities).length;
+    this.setState({ externalSelect: selId.toString() });
   };
 
   render() {
-    const demoProps = this.props.demo;
+    const entities = this.props.demo.entities;
     return (
       <div className="mLeft">
         <Section>
           <DataGrid title="Full Toolbar" width={700} height={200}
-              data={demoProps.page.entities}
+              data={entities}
               columns={this.cols}
               onEdit={this._onEdit}
               onAdd={this._onAdd}
@@ -118,9 +111,8 @@ class DemoDataGridSmallPage extends Component {
         </Section>
         <Section>
           <DataGrid title="Select / No Edit" width={700} height={200}
-              data={demoProps.page.entities}
+              data={entities}
               columns={this.cols}
-              onSelectChange={this._onSelectChange}
               toolbar={[
                 <Menu key="k1" label="Actions">
                   <Anchor
@@ -147,11 +139,11 @@ class DemoDataGridSmallPage extends Component {
         </Section>
         <Section>
           <DataGrid title="Single Select" width={700} height={200}
-              data={demoProps.page.entities}
+              data={entities}
               columns={this.cols}
               singleSelect
               onSelectChange={this._onSelectChange}
-              select={this.state.externalSelect.toString()}
+              select={this.state.externalSelect}
               onEdit={this._onEdit}
               toolbar={[
                 <CheckBox className="mLeft mTopBottomAuto"
@@ -161,10 +153,8 @@ class DemoDataGridSmallPage extends Component {
                     label="Details"/>
               ]}
           />
-          <Button
-              label={`Select ID ${Number(this.state.externalSelect) + 1}`}
-              onClick={this._onForceSelect}
-          />
+          <br/>
+          <Button label="Select Last" onClick={this._onSelectLast} />
         </Section>
       </div>
     );

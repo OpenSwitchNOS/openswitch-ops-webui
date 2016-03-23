@@ -171,7 +171,7 @@ class DemoLayerPage extends Component {
           <Button label="Info" onClick={this._onOpenInfo}/>
         </p>
         {this.state.info ?
-          <StatusLayer onClose={this._onClose}>
+          <StatusLayer box onClose={this._onClose}>
             The text.
           </StatusLayer> : null
         }
