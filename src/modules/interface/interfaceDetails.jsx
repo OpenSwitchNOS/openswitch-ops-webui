@@ -14,120 +14,120 @@
     under the License.
 */
 
-import React, { PropTypes, Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
-import Header from 'grommet/components/Header';
-import Menu from 'grommet/components/Menu';
-import Title from 'grommet/components/Title';
-import Anchor from 'grommet/components/Anchor';
+// // import { t } from 'i18n/lookup.js';
+// // import Header from 'grommet/components/Header';
+// // import Menu from 'grommet/components/Menu';
+// // import Title from 'grommet/components/Title';
+// // import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
-import CloseIcon from 'grommet/components/icons/base/Close';
-import EditIcon from 'grommet/components/icons/base/Edit';
-import RefreshIcon from 'grommet/components/icons/base/Refresh';
-import ErrorLayer from 'errorLayer.jsx';
-import InterfaceEdit from './interfaceEdit.jsx';
-import _ from 'lodash';
-import Formatter from 'formatter.js';
+// import CloseIcon from 'grommet/components/icons/base/Close';
+// import EditIcon from 'grommet/components/icons/base/Edit';
+// import RefreshIcon from 'grommet/components/icons/base/Refresh';
+// import ErrorLayer from 'errorLayer.jsx';
+// import InterfaceEdit from './interfaceEdit.jsx';
+// import _ from 'lodash';
+// import Formatter from 'formatter.js';
 
-const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
+// const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
 
 class InterfaceDetails extends Component {
 
-  static propTypes = {
-    actions: PropTypes.object.isRequired,
-    autoActions: PropTypes.object.isRequired,
-    collector: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
-    interface: PropTypes.object.isRequired,
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  };
-
-  constructor(props) {
-    super(props);
-    this.fid = _.uniqueId('infForm_');
-    this.state = {
-      editMode: false,
-    };
-  }
-
-  _id = s => `${this.fid}_${s}`;
-
-  componentDidMount() {
-    this.props.actions.interface.fetchDetails(this.props.params.id);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.interface.set.lastSuccessMillis >
-        this.props.interface.set.lastSuccessMillis) {
-
-      this.props.actions.collector.fetchImmediate();
-
-    } else if (nextProps.params.id !== this.props.params.id ||
-        nextProps.collector.overview.lastSuccessMillis >
-        this.props.collector.overview.lastSuccessMillis) {
-
-      this.props.actions.interface.fetchDetails(nextProps.params.id);
-    }
-  }
-
-  _onClose = () => {
-    this.props.history.pushState(null, `/interface`);
-  };
-
-  _onEditToggle = () => {
-    const editMode = !this.state.editMode;
-    this.setState({ editMode });
-  };
-
-  _onEditSubmit = (detail, userCfg) => {
-    this.props.actions.interface.set(detail, userCfg);
-    this._onEditToggle();
-  };
-
-  _onCloseError = () => {
-    this.props.actions.interface.clearErrorForSet();
-  };
-
-  _tr = (td1, td2) => {
-    return (
-      <tr>
-        <td style={{width: 200}}>{td1}:</td>
-        <td style={{width: 200}}>{td2}</td>
-      </tr>
-    );
-  };
+  // static propTypes = {
+  //   actions: PropTypes.object.isRequired,
+  //   autoActions: PropTypes.object.isRequired,
+  //   collector: PropTypes.object.isRequired,
+  //   history: PropTypes.object.isRequired,
+  //   interface: PropTypes.object.isRequired,
+  //   params: PropTypes.shape({
+  //     id: PropTypes.string.isRequired,
+  //   }).isRequired,
+  // };
+  //
+  // constructor(props) {
+  //   super(props);
+  //   this.fid = _.uniqueId('infForm_');
+  //   this.state = {
+  //     editMode: false,
+  //   };
+  // }
+  //
+  // _id = s => `${this.fid}_${s}`;
+  //
+  // componentDidMount() {
+  //   // this.props.actions.interface.fetchDetails(this.props.params.id);
+  // }
+  //
+  // componentWillReceiveProps(nextProps) {
+  //   // if (nextProps.interface.set.lastSuccessMillis >
+  //   //     this.props.interface.set.lastSuccessMillis) {
+  //   //
+  //   //   this.props.actions.collector.fetchImmediate();
+  //   //
+  //   // } else if (nextProps.params.id !== this.props.params.id ||
+  //   //     nextProps.collector.overview.lastSuccessMillis >
+  //   //     this.props.collector.overview.lastSuccessMillis) {
+  //   //
+  //   //   this.props.actions.interface.fetchDetails(nextProps.params.id);
+  //   // }
+  // }
+  //
+  // _onClose = () => {
+  //   this.props.history.pushState(null, `/interface`);
+  // };
+  //
+  // _onEditToggle = () => {
+  //   const editMode = !this.state.editMode;
+  //   this.setState({ editMode });
+  // };
+  //
+  // _onEditSubmit = (detail, userCfg) => {
+  //   this.props.actions.interface.set(detail, userCfg);
+  //   this._onEditToggle();
+  // };
+  //
+  // _onCloseError = () => {
+  //   this.props.actions.interface.clearErrorForSet();
+  // };
+  //
+  // _tr = (td1, td2) => {
+  //   return (
+  //     <tr>
+  //       <td style={{width: 200}}>{td1}:</td>
+  //       <td style={{width: 200}}>{td2}</td>
+  //     </tr>
+  //   );
+  // };
 
   render() {
-    const id = this.props.params.id;
-    const detail = this.props.interface.detail;
-    const inf = detail.inf;
-    const port = detail.port;
-    const set = this.props.interface.set;
-    const editLayer = !this.state.editMode ? null :
-      <InterfaceEdit
-          onClose={this._onEditToggle}
-          onSubmit={this._onEditSubmit}
-          detail={detail}
-      />;
-
-    const errorLayer = !set.lastError ? null :
-      <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
-
-    const ipV4 = (port.id && port.ipV4) || t('notConfigured');
-    const ipV6 = (port.id && port.ipV6) || t('notConfigured');
-    const lldpOpsLink = !inf.lldp.sysDesc ||
-      inf.lldp.sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ? null : (
-        <a href={`http://${inf.lldp.ip}`} target="_blank">
-          &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
-        </a>
-      );
+    // const id = this.props.params.id;
+    // const detail = this.props.interface.detail;
+    // const inf = detail.inf;
+    // const port = detail.port;
+    // const set = this.props.interface.set;
+    // const editLayer = !this.state.editMode ? null :
+    //   <InterfaceEdit
+    //       onClose={this._onEditToggle}
+    //       onSubmit={this._onEditSubmit}
+    //       detail={detail}
+    //   />;
+    //
+    // const errorLayer = !set.lastError ? null :
+    //   <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
+    //
+    // const ipV4 = (port.id && port.ipV4) || t('notConfigured');
+    // const ipV6 = (port.id && port.ipV6) || t('notConfigured');
+    // const lldpOpsLink = !inf.lldp.sysDesc ||
+    //   inf.lldp.sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ? null : (
+    //     <a href={`http://${inf.lldp.ip}`} target="_blank">
+    //       &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
+    //     </a>
+    //   );
 
     return (
       <Box pad="small" className="details min200x400">
-        <Header tag="h4" justify="between">
+        {/*<Header tag="h4" justify="between">
           <Title>{`${t('interface')}: ${id}`}</Title>
           <Menu direction="row" justify="end" responsive={false}>
             <Anchor onClick={set.inProgress ? null : this._onEditToggle}>
@@ -189,7 +189,7 @@ class InterfaceDetails extends Component {
           {this._tr(t('framesRxUnrecog'), inf.lldp.framesRxUnrecog)}
           {this._tr(t('framesTx'), inf.lldp.framesTx)}
           </tbody>
-        </table>
+        </table>*/}
       </Box>
     );
   }
@@ -197,7 +197,6 @@ class InterfaceDetails extends Component {
 
 function select(store) {
   return {
-    collector: store.collector,
     interface: store.interface,
   };
 }

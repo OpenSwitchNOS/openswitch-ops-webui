@@ -179,9 +179,16 @@ table.logTable {
 }
 
 .guide {
-  border-radius: 5px;
-  border: 3px solid $brand-color;
   overflow: auto;
+  background-color: $pageBgColor;
+  > div {
+    margin-top: $space;
+    margin-bottom: $space/2;
+    margin-left: $space;
+    margin-right: $space;
+    border-radius: 5px;
+    border: 3px solid $brand-color;
+  }
   .header {
     height: 48px;
   }
@@ -249,6 +256,9 @@ $slideInColumnMinWidth: 350px;
 
 .asyncStatus.layer {
   z-index: 200;
+  &.clear {
+    background-image: none;
+  }
   .layer__container {
     .meter__graphic:focus {
       outline-width: 0px;

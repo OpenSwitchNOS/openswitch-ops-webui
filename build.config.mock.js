@@ -14,7 +14,7 @@
     under the License.
 */
 
-//TODO - Reactor mock data into module directories
+//TODO - clean up - Reactor mock data into module directories
 
 import CollectorDux from 'collector/collectorDux.js';
 import SyslogDux from 'syslog/syslogDux.jsx';

@@ -14,48 +14,48 @@
     under the License.
 */
 
-// import AsyncDux from 'asyncDux.js';
-// import InterfacePage from './interfacePage.jsx';
-// import InterfaceDetails from './interfaceDetails.jsx';
-// import Agent, { mkAgentHandler } from 'agent.js';
+import { t } from 'i18n/lookup.js';
+import AsyncDux from 'asyncDux.js';
+import InterfacePage from './interfacePage.jsx';
+import InterfaceDetails from './interfaceDetails.jsx';
+import Agent from 'agent.js';
 // import Async from 'async';
+import Translater from 'translater.js';
+import Formatter from 'formatter.js';
 
 
 const NAME = 'interface';
 
-// export const NAVS = [
-//   {
-//     route: { path: '/interface', component: InterfacePage },
-//     link: { path: '/interface', order: 200 }
-//   },
-//   {
-//     route: {path: '/interface/:id', component: InterfaceDetails},
-//     link: {path: '/interface', hidden: true}
-//   }
-// ];
-//
-// const DETAIL_ASYNC = 'detail';
-// const DETAIL_AT = Dux.mkAsyncActionTypes(NAME, DETAIL_ASYNC);
-//
-// const SET_ASYNC = 'set';
-// const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
-//
-// const INITIAL_STORE = {
-//   detail: {
-//     ...Dux.mkAsyncStatus(),
-//     ports: {
-//       urls: [],
-//     },
-//     port: {},
-//     inf: {
-//       lldp: {},
-//     },
-//   },
-//   set: {
-//     ...Dux.mkAsyncStatus(),
-//   }
-// };
-//
+export const NAVS = [
+  {
+    route: { path: '/interface', component: InterfacePage },
+    link: { path: '/interface', order: 200 }
+  },
+  {
+    route: {path: '/interface/:id', component: InterfaceDetails},
+    link: {path: '/interface', hidden: true}
+  }
+];
+
+const INITIAL_STORE = {
+  interfaces: {},
+  ports: {},
+  port: {},
+  inf: {
+    lldp: {},
+  },
+};
+
+const AD = new AsyncDux(NAME, INITIAL_STORE);
+
+const T = new Translater({
+  link: { up: 'up', down: 'down', DEFAULT: 'down' },
+  duplex: { half: 'half', full: 'full', DEFAULT: 'full' },
+  admin: { up: 'up', down: 'down', DEFAULT: 'down' },
+  flowCtrl: { none: 'none', rx: 'rx', tx: 'tx', rxtx: 'rxtx', DEFAULT: 'none' },
+  autoNeg: { on: 'on', off: 'off', DEFAULT: 'on' },
+});
+
 // function parseLldp(body) {
 //   const ni = body.status.lldp_neighbor_info;
 //   const ls = body.statistics.lldp_statistics;
@@ -74,6 +74,68 @@ const NAME = 'interface';
 //     framesRxUnrecog: (ls && ls.lldp_rx_unrecognized) || 0,
 //   };
 // }
+
+function parseInterface(inf) {
+  const cfg = inf.configuration;
+  const status = inf.status;
+
+  const cfgAdmin =
+    T.from('admin', cfg.user_config && cfg.user_config.admin);
+  // const cfgDuplex =
+  //   T.from('duplex', cfg.user_config && cfg.user_config.duplex);
+  // const cfgAutoNeg =
+  //   T.from('autoNeg', cfg.user_config && cfg.user_config.autoneg);
+  // const cfgFlowCtrl =
+  //   T.from('flowCtrl', cfg.user_config && cfg.user_config.pause);
+
+  const adminState = T.from('admin', status.admin_state);
+  const linkState = T.from('link', status.link_state);
+
+  const speed = (linkState !== 'up') ? '' :
+    status.link_speed ? Formatter.bpsToString(Number(status.link_speed)) : 0;
+
+  const duplex = (linkState !== 'up') ? '' : T.from('duplex', status.duplex);
+
+  const pm = status.pm_info;
+  const connector = (pm && pm.connector) || 'absent';
+
+  // const hw = status.hw_intf_info;
+  // const mac = (hw && hw.mac_addr) ? hw.mac_addr.toUpperCase() : '';
+
+  const adminStateConnector =
+    adminState !== 'up' && cfgAdmin === 'up' && connector === 'absent'
+    ? 'downAbsent' : adminState;
+
+  return {
+    id: cfg.name,
+    cfgAdmin,
+    // cfgDuplex,
+    // cfgAutoNeg,
+    // cfgFlowCtrl,
+    connector,
+    adminStateConnector,
+    // mac,
+    speed,
+    duplex,
+    linkState,
+  };
+}
+
+const parser = (result) => {
+  const interfaces = {};
+  result.body.forEach((elm) => {
+    const cfg = elm.configuration;
+    if (cfg.type === 'system') {
+      const inf = parseInterface(elm);
+      interfaces[inf.id] = inf;
+    }
+  });
+  return { interfaces };
+};
+
+const URL_INFS = '/rest/v1/system/interfaces?depth=1';
+
+
 //
 // function parsePorts(ports) {
 //   return {
@@ -110,7 +172,18 @@ const NAME = 'interface';
 // const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 // const QP_CFG_SELECT = '?selector=configuration';
 //
-// const ACTIONS = {
+const ACTIONS = {
+
+  fetch() {
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('loading') }));
+      Agent.get(URL_INFS).end((error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser } ));
+      });
+    };
+  },
+
 //
 //   set(detail, userCfg) {
 //     const patchUserCfg = Utils.userCfgForPatch(userCfg);
@@ -198,38 +271,19 @@ const NAME = 'interface';
 //     };
 //   },
 //
-//   clearErrorForSet() {
-//     return { type: SET_AT.CLEAR_ERROR };
-//   },
-//
-// };
-//
-// const REDUCER = Dux.mkReducer(INITIAL_STORE, [
-//   Dux.mkAsyncHandler(NAME, DETAIL_ASYNC, DETAIL_AT, parseDetailResult),
-//   Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
-// ]);
+  clearError() {
+    return AD.action('CLEAR_ERROR');
+  },
+
+};
 
 export default {
   NAME,
-  // NAVS,
-  // ACTIONS,
-  // REDUCER,
+  NAVS,
+  ACTIONS,
+  REDUCER: AD.reducer(),
 };
-//
-// const T = new Translater({
-//   powerStatus: {
-//     ok: { text: 'ok', status: 'ok' },
-//     'fault_input': { text: 'powerFaultInput', status: 'warning' },
-//     'fault_output': { text: 'powerFaultOutput', status: 'critical' },
-//     DEFAULT: 'fault_output',
-//   },
-//   fanStatus: {
-//     ok: { text: 'ok', status: 'ok' },
-//     fault: { text: 'fanFault', status: 'critical' },
-//     uninit: { text: 'fanUninitialized', status: 'warning' },
-//     DEFAULT: 'uninit',
-//   }
-// });
+
 
 
 
@@ -268,64 +322,6 @@ export default {
 //   return patchUserCfg;
 // }
 //
-// function parseInterface(inf) {
-//   const cfg = inf.configuration;
-//   const status = inf.status;
-//   const stats = inf.statistics.statistics;
-//   const userCfg = normalizeUserCfg(cfg.user_config);
-//   const userCfgAdmin = userCfg.admin;
-//   const userCfgDuplex = userCfg.duplex;
-//   const userCfgAutoNeg = userCfg.autoNeg;
-//   const userCfgFlowCtrl = userCfg.flowCtrl;
-//
-//   const adminState = status.admin_state;
-//
-//   let tmp = status.pm_info;
-//   const connector = (tmp && tmp.connector) || 'absent';
-//
-//   tmp = status.hw_intf_info;
-//   const mac = (tmp && tmp.mac_addr) ? tmp.mac_addr.toUpperCase() : '';
-//
-//   const adminStateConnector =
-//     adminState !== 'up' && userCfgAdmin === 'up' && connector === 'absent'
-//     ? 'downAbsent' : adminState;
-//
-//   let speed = '';
-//   let speedFormatted = '';
-//   let duplex = '';
-//   if (adminState === 'up') {
-//     speed = status.link_speed ? Number(status.link_speed) : 0;
-//     speedFormatted = Formatter.bpsToString(speed);
-//     duplex = status.duplex;
-//   }
-//
-//   return {
-//     id: cfg.name,
-//     userCfg,
-//     userCfgAdmin,
-//     userCfgDuplex,
-//     userCfgAutoNeg,
-//     userCfgFlowCtrl,
-//     connector,
-//     adminState,
-//     adminStateConnector,
-//     mac,
-//     speed,
-//     speedFormatted,
-//     duplex,
-//
-//     linkState: status.link_state,
-//     mtu: status.mtu,
-//
-//     rxBytes: Number(stats.rx_bytes) || 0,
-//     txBytes: Number(stats.tx_bytes) || 0,
-//     rxPackets: Number(stats.rx_packets) || 0,
-//     txPackets: Number(stats.tx_packets) || 0,
-//     rxErrors: Number(stats.rx_errors) || 0,
-//     txErrors: Number(stats.tx_errors) || 0,
-//     rxDropped: Number(stats.rx_dropped) || 0,
-//     txDropped: Number(stats.tx_dropped) || 0,
-//   };
 // }
 //
 // // TODO: use 'non-export' default way to export

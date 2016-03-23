@@ -104,9 +104,11 @@ export default class AsyncStatusLayer extends Component {
       </div>
     );
 
+    const cls = !error && !steps ? 'asyncStatus clear' : 'asyncStatus';
+
     return (
       <Layer
-          className="asyncStatus"
+          className={cls}
           onClose={data.lastError ? this.props.onClose : null}
           closer={data.lastError !== null}
           flush

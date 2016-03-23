@@ -27,10 +27,9 @@ export default class FetchToolbar extends Component {
   static propTypes = {
     date: PropTypes.number,
     error: PropTypes.shape({
-      url: PropTypes.string.isRequired,
+      url: PropTypes.string,
       status: PropTypes.number,
-      msg: PropTypes.string.isRequired,
-      respMsg: PropTypes.string,
+      message: PropTypes.string,
     }),
     isFetching: PropTypes.bool,
     onRefresh: PropTypes.func,

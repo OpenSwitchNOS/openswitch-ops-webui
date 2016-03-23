@@ -75,7 +75,7 @@ export default class BoxGraphic extends Component {
       linkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
-    const select = this.props.select || [];
+    const select = this.props.select && [ this.props.select ] || [];
     const selectedCls = classNames(
       'selected',
       select.map(i => this.props.spec.toSvgInterfaceName(i)),

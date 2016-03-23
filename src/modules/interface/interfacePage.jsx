@@ -22,19 +22,16 @@ import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
-
-// TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-// TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import CheckBox from 'grommet/components/CheckBox';
 
 
 class InterfacePage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    autoActions: PropTypes.object.isRequired,
     boxGraphic: PropTypes.object.isRequired,
     children: PropTypes.node,
-    collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
@@ -52,57 +49,53 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'userCfgAdmin',
-        header: t('userCfgAdmin'),
+        columnKey: 'cfgAdmin',
+        header: t('configured'),
         width: 150,
-        format: t,
       },
       {
         columnKey: 'adminStateConnector',
         header: t('adminState'),
         width: 160,
-        format: t,
+        format: v => v === 'downAbsent' ? t('downAbsent') : v,
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
         width: 150,
-        format: t,
-      },
-      {
-        columnKey: 'duplex',
-        header: t('duplex'),
-        width: 120,
-        format: t,
-      },
-      {
-        columnKey: 'speedFormatted',
-        header: t('speed'),
-        width: 110,
       },
       {
         columnKey: 'connector',
         header: t('connector'),
         width: 150,
       },
+      {
+        columnKey: 'duplex',
+        header: t('duplex'),
+        width: 120,
+      },
+      {
+        columnKey: 'speed',
+        header: t('speed'),
+        width: 120,
+      },
     ];
     this.state = {};
   }
 
   componentDidMount() {
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview, this._onRefresh
-    );
+    const p = this.props;
+    p.actions.interface.fetch();
+    p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
+    this.props.actions.interface.fetch();
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview, this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -114,12 +107,19 @@ class InterfacePage extends Component {
     this.props.history.pushState(null, url);
   };
 
-  render() {
-    const infs = this.props.collector.overview.interfaces;
-    const sel = this.props.params.id;
+  _onShowDetailsOnSelect = (evt) => {
+    this.setState({ showDetailsOnSelect: evt.target.checked });
+  };
 
-    // TODO: This check is not needed - see the vlan page
-    const details = !sel ? null : (
+  _onEdit = (sel) => {
+    alert(sel);
+  };
+
+  render() {
+    const selInfsId = this.props.params.id;
+    const showOnSel = this.state.showDetailsOnSelect;
+
+    const details = !selInfsId || !showOnSel ? null : (
       <Box className="pageBox">
         <ReactCSSTG
             transitionName="slideInColumn"
@@ -134,25 +134,45 @@ class InterfacePage extends Component {
       </Box>
     );
 
+    const async = this.props.interface.asyncStatus;
+    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
+      <AsyncStatusLayer
+          data={async}
+          onClose={this.props.actions.interface.clearError} />;
+
+    const infs = this.props.interface.interfaces;
+    const numInfs = Object.getOwnPropertyNames(infs).length;
+
     return (
       <Box direction="row" className="flex1">
+        {asyncStatusLayer}
         <Box className="flex1">
           <Box className="mTop mLeft">
             <BoxGraphic
                 spec={this.props.boxGraphic}
                 interfaces={infs}
-                select={sel && [sel]}
+                select={selInfsId}
                 onSelectChange={this._onSelect}
             />
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
+                  title={`${t('total')}: ${numInfs}`}
                   data={infs}
                   columns={this.cols}
                   singleSelect
-                  select={[ sel ]}
+                  select={selInfsId}
                   onSelectChange={this._onSelect}
+                  onEdit={this._onEdit}
+                  toolbar={[
+                    <CheckBox
+                        onChange={this._onShowDetailsOnSelect}
+                        key="infDetCb"
+                        id="infDetCb"
+                        name="infDetCb"
+                        label={t('details')}/>
+                  ]}
               />
             </ResponsiveBox>
           </Box>
@@ -166,7 +186,6 @@ class InterfacePage extends Component {
 
 function select(store) {
   return {
-    collector: store.collector,
     interface: store.interface,
     boxGraphic: store.boxGraphic,
   };

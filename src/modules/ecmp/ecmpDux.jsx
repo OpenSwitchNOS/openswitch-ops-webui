@@ -14,6 +14,8 @@
     under the License.
 */
 
+import AsyncDux, { cooledDown } from 'asyncDux.js';
+import Agent from 'agent.js';
 import EcmpPage from './ecmpPage.jsx';
 
 const NAME = 'ecmp';
@@ -25,7 +27,53 @@ const NAVS = [
   },
 ];
 
+const INITIAL_STORE = {};
+
+const AD = new AsyncDux(NAME, INITIAL_STORE);
+
+const parser = (result) => {
+  const ecmp = result.body.configuration.ecmp_config;
+
+  function norm(key) {
+    return ecmp && ecmp[key] === 'false' ? 'disabled' : 'enabled';
+  }
+
+  return {
+    enabled: norm('enabled'),
+    hashDstIp: norm('hash_dstip_enabled'),
+    hashDstPort: norm('hash_dstport_enabled'),
+    hashSrcIp: norm('hash_srcip_enabled'),
+    hashSrcPort: norm('hash_srcport_enabled'),
+    resilientHash: norm('resilient_hash_enabled'),
+  };
+};
+
+const URL_SYS = '/rest/v1/system';
+
+const ACTIONS = {
+
+  fetch() {
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      if (cooledDown(mStore, Date.now())) {
+        dispatch(AD.action('REQUEST'));
+        Agent.get(URL_SYS).end((error, result) => {
+          if (error) { return dispatch(AD.action('FAILURE', { error })); }
+          return dispatch(AD.action('SUCCESS', { result, parser }));
+        });
+      }
+    };
+  },
+
+  clearError() {
+    return AD.action('CLEAR_ERROR');
+  },
+
+};
+
 export default {
   NAME,
   NAVS,
+  ACTIONS,
+  REDUCER: AD.reducer(),
 };

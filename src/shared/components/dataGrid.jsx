@@ -107,6 +107,8 @@ class DataMap {
 
   getDataAtKey(dataKey) { return this.data[dataKey]; }
 
+  getIndexForKey(dataKey) { return this.dataKeyArray.indexOf(dataKey); }
+
   cloneDataKeyArray() { return this.dataKeyArray.slice(); }
 }
 
@@ -221,6 +223,8 @@ export default class DataGrid extends Component {
   }
 
   componentWillReceiveProps(newProps) {
+    let dataMap = this.state.dataMap;
+
     if (!_.isEqual(newProps.data, this.props.data)) {
       const defaultDataMap = new DataMap(newProps.data);
 
@@ -231,13 +235,17 @@ export default class DataGrid extends Component {
 
       DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
 
-      const dataMap = new DataMap(newProps.data, dataKeyArray);
+      dataMap = new DataMap(newProps.data, dataKeyArray);
       this.setState({ defaultDataMap, dataMap });
     }
+
     if (!_.isEqual(newProps.select, this.props.select)) {
       const sel = newProps.select;
       const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
-      this.setState({ activeDataKeys });
+      const scrollToRow = dataMap.getIndexForKey(activeDataKeys[0]);
+      this.setState({ activeDataKeys, scrollToRow });
+    } else {
+      this.setState({ scrollToRow: null });
     }
   }
 
@@ -273,7 +281,8 @@ export default class DataGrid extends Component {
 
   _rowClassName = (rowIdx) => {
     const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
-    return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
+    const isSel = this.state.activeDataKeys.indexOf(dataKey) >= 0;
+    return isSel ? 'active' : null;
   };
 
   _onSelectAll = () => {
@@ -437,7 +446,7 @@ export default class DataGrid extends Component {
           {delTool}
           {selectAllTool}
           {selectNoneTool}
-          &nbsp;
+          &nbsp;&nbsp;
           {searchTool}
         </div>
       </Toolbar>
@@ -454,6 +463,7 @@ export default class DataGrid extends Component {
             headerHeight={this.props.headerHeight}
             onRowClick={this._onRowClick}
             rowClassNameGetter={this._rowClassName}
+            scrollToRow={this.state.scrollToRow}
         >
           {columns}
         </Table>

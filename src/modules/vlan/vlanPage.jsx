@@ -61,6 +61,7 @@ class VlanPage extends Component {
         columnKey: 'operStateReason',
         header: t('reason'),
         width: 140,
+        format: t,
       },
       {
         columnKey: 'interfaces',
@@ -224,7 +225,6 @@ class VlanPage extends Component {
     // const set = this.props.vlan.set;
 
     const async = data.asyncStatus;
-
     const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
       <AsyncStatusLayer
           data={async}

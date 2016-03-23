@@ -16,13 +16,11 @@
 
 import CollectorDux from 'collector/collectorDux.js';
 import MonitorDux from 'monitor/monitorDux.jsx';
-import LogDux from 'log/logDux.jsx';
 import DemoDux from 'demo/demoDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import VlanDux from 'vlan/vlanDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
-import LagDux from 'lag/lagDux.jsx';
 
 const modules = [
   CollectorDux,
@@ -31,17 +29,13 @@ const modules = [
   OverviewDux,
   InterfaceDux,
   VlanDux,
-  LogDux,
   EcmpDux,
-  LagDux,
 ];
 
 import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
-import ConfigLagGuide from 'guides/configLagGuide.jsx';
 
 const guides = [
   ConfigInterfaceGuide,
-  ConfigLagGuide,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';

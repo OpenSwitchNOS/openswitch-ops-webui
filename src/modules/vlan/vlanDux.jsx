@@ -124,8 +124,7 @@ const ACTIONS = {
     return (dispatch, getStoreFn) => {
       const mStore = getStoreFn()[NAME];
       if (cooledDown(mStore, Date.now())) {
-        const title = t('loading');
-        dispatch(AD.action('REQUEST', { title }));
+        dispatch(AD.action('REQUEST', { title: t('loading') }));
         Async.parallel([
           cb => Agent.get(URL_INFS_D1).end(cb),
           cb => Agent.get(URL_VLANS_D1).end(cb),

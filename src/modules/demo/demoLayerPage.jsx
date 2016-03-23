@@ -17,16 +17,7 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-
-import Header from 'grommet/components/Header';
-import CheckBox from 'grommet/components/CheckBox';
-import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
-import FormField from 'grommet/components/FormField';
-import FormFields from 'grommet/components/FormFields';
 import Button from 'grommet/components/Button';
-import Menu from 'grommet/components/Menu';
-import Footer from 'grommet/components/Footer';
 
 import ConfirmLayer from 'confirmLayer.jsx';
 import StatusLayer from 'statusLayer.jsx';
@@ -123,10 +114,6 @@ class DemoLayerPage extends Component {
     this.setState({ dialog2: true });
   };
 
-  _onOpenEdit = () => {
-    this.setState({ edit: true });
-  };
-
   _onClose = () => {
     const asyncStatusData = { ...this.state.asyncStatusData };
     asyncStatusData.lastError = null;
@@ -137,7 +124,6 @@ class DemoLayerPage extends Component {
       warning: false,
       dialog1: false,
       dialog2: false,
-      edit: false,
     });
   };
 
@@ -216,54 +202,6 @@ class DemoLayerPage extends Component {
           </ConfirmLayer> : null
         }
 
-        <p>
-          <Button label="Edit" onClick={this._onOpenEdit}/>
-        </p>
-        {
-          this.state.edit ?
-          <Layer onClose={this._onClose} closer flush align="right">
-            <Form onSubmit={this._onSubmit}>
-              <Header>
-                <h2>Edit Some Things</h2>
-              </Header>
-              <FormFields>
-                <fieldset>
-                  <legend>First section</legend>
-                  <FormField label="Item 1" htmlFor="ffItem1"
-                      help="Some helpful text">
-                    <input id="ffItem1" name="ffItem1" type="text"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
-                        toggle />
-                  </FormField>
-                </fieldset>
-                <fieldset>
-                  <legend>Second section</legend>
-                  <FormField label="Item 1" htmlFor="ffItem1"
-                      help="Some helpful text">
-                    <input id="ffItem1" name="ffItem1" type="text"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
-                        toggle />
-                  </FormField>
-                </fieldset>
-              </FormFields>
-              <Footer pad={{vertical: 'medium'}}>
-                <Menu>
-                  <Button label={t('deploy')} primary onClick={this._onSubmit}/>
-                </Menu>
-              </Footer>
-            </Form>
-          </Layer> : null
-        }
       </div>
     );
   }

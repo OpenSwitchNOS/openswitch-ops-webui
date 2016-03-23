@@ -130,12 +130,12 @@ class MainApp extends Component {
           pad={{horizontal: 'medium'}}
           separator="bottom"
       >
-        <div>
+        <Menu direction="row" responsive={false}>
           {openNav}
           <Breadcrumbs excludes={['~/~']}
               routes={this.props.routes}
               params={this.props.params} />
-        </div>
+        </Menu>
         <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
           <a href={notifLink}>
@@ -149,22 +149,24 @@ class MainApp extends Component {
 
   _mkGuide = () => {
     return (
-      <Box className="guide mLeft mRight mBottom">
-        <Header
-            tag="h4"
-            direction="row"
-            pad={{horizontal: 'small'}}
-            justify="between">
-          <Menu direction="row" responsive={false}>
-            <Title>{t('quickGuide')}</Title>
-          </Menu>
-          <Menu direction="row" responsive={false}>
-            <Anchor onClick={this.props.actions.guide.hide}>
-              <CloseIcon />
-            </Anchor>
-          </Menu>
-        </Header>
-        {this.props.guide.component}
+      <Box className="guide">
+        <div>
+          <Header
+              tag="h4"
+              direction="row"
+              pad={{horizontal: 'small'}}
+              justify="between">
+            <Menu direction="row" responsive={false}>
+              <Title>{t('quickGuide')}</Title>
+            </Menu>
+            <Menu direction="row" responsive={false}>
+              <Anchor onClick={this.props.actions.guide.hide}>
+                <CloseIcon />
+              </Anchor>
+            </Menu>
+          </Header>
+          {this.props.guide.component}
+        </div>
       </Box>
     );
   };

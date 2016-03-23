@@ -21,12 +21,11 @@ import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 
 
-class ECMPPage extends Component {
+class EcmpPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    autoActions: PropTypes.object.isRequired,
-    collector: PropTypes.object.isRequired,
+    ecmp: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -35,23 +34,20 @@ class ECMPPage extends Component {
     this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
-  componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview,
-      this._onRefresh
-    );
-  }
-
   _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
+    this.props.actions.ecmp.fetch();
   };
 
+  componentDidMount() {
+    const p = this.props;
+    p.actions.ecmp.fetch();
+    p.actions.toolbar.setFetchTB(p.ecmp.asyncStatus, this._onRefresh);
+  }
+
+
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview,
-      this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.ecmp.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
@@ -59,13 +55,13 @@ class ECMPPage extends Component {
   }
 
   render() {
-    const ecmp = this.props.collector.overview.ecmp;
+    const data = this.props.ecmp;
     return (
       <Box className="flex1">
         <Box pad={this.pad} className="flex1 pageBox min200x400">
-          <span><b>{t('ecmp')}: </b>{t(ecmp.enabled)}</span>
+          <span><b>{t('ecmp')}: </b>{t(data.enabled)}</span>
           <br/>
-          <span><b>{t('resilientHash')}: </b>{t(ecmp.resilientHash)}</span>
+          <span><b>{t('resilientHash')}: </b>{t(data.resilientHash)}</span>
           <br/>
           <br/>
           <b>{t('ecmp')} {t('loadBalance')}</b>
@@ -74,22 +70,22 @@ class ECMPPage extends Component {
             <tbody>
               <tr>
                 <td style={{width: '180px'}}>{t('srcIp')}:</td>
-                <td>{t(ecmp.hashSrcIp)}</td>
+                <td>{t(data.hashSrcIp)}</td>
               </tr>
 
               <tr>
                 <td>{t('srcPort')}:</td>
-                <td>{t(ecmp.hashSrcPort)}</td>
+                <td>{t(data.hashSrcPort)}</td>
               </tr>
 
               <tr>
                 <td>{t('dstIp')}:</td>
-                <td>{t(ecmp.hashDstIp)}</td>
+                <td>{t(data.hashDstIp)}</td>
               </tr>
 
               <tr>
                 <td>{t('dstPort')}:</td>
-                <td>{t(ecmp.hashDstPort)}</td>
+                <td>{t(data.hashDstPort)}</td>
               </tr>
             </tbody>
           </table>
@@ -102,8 +98,8 @@ class ECMPPage extends Component {
 
 function select(store) {
   return {
-    collector: store.collector,
+    ecmp: store.ecmp,
   };
 }
 
-export default connect(select)(ECMPPage);
+export default connect(select)(EcmpPage);
