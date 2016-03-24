@@ -15,15 +15,16 @@
 */
 
 import React, { PropTypes, Component } from 'react';
-import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
-import AsyncStatusLayer from 'asyncStatusLayer.jsx';
 import CheckBox from 'grommet/components/CheckBox';
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import InterfaceEdit from './interfaceEdit.jsx';
+import DetailsBox from 'detailsBox.jsx';
 
 
 class InterfacePage extends Component {
@@ -111,27 +112,21 @@ class InterfacePage extends Component {
     this.setState({ showDetailsOnSelect: evt.target.checked });
   };
 
-  _onEdit = (sel) => {
-    alert(sel);
-  };
-
   render() {
-    const selInfsId = this.props.params.id;
+    const selInfId = this.props.params.id;
     const showOnSel = this.state.showDetailsOnSelect;
 
-    const details = !selInfsId || !showOnSel ? null : (
-      <Box className="pageBox">
-        <ReactCSSTG
-            transitionName="slideInColumn"
-            transitionAppear
-            transitionAppearTimeout={500}
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
-          <div>
-            {this.props.children}
-          </div>
-        </ReactCSSTG>
-      </Box>
+    const editLayer = !this.state.editMode ? null :
+      <InterfaceEdit
+          actions={this.props.actions}
+          infId={selInfId}
+          onClose={() => this.setState({editMode: false})}
+      />;
+
+    const details = !selInfId || !showOnSel ? null : (
+      <DetailsBox>
+        {this.props.children}
+      </DetailsBox>
     );
 
     const async = this.props.interface.asyncStatus;
@@ -146,12 +141,13 @@ class InterfacePage extends Component {
     return (
       <Box direction="row" className="flex1">
         {asyncStatusLayer}
+        {editLayer}
         <Box className="flex1">
           <Box className="mTop mLeft">
             <BoxGraphic
                 spec={this.props.boxGraphic}
                 interfaces={infs}
-                select={selInfsId}
+                select={selInfId}
                 onSelectChange={this._onSelect}
             />
           </Box>
@@ -162,9 +158,9 @@ class InterfacePage extends Component {
                   data={infs}
                   columns={this.cols}
                   singleSelect
-                  select={selInfsId}
+                  select={selInfId}
                   onSelectChange={this._onSelect}
-                  onEdit={this._onEdit}
+                  onEdit={() => this.setState({editMode: true})}
                   toolbar={[
                     <CheckBox
                         onChange={this._onShowDetailsOnSelect}

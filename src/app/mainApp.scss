@@ -231,17 +231,15 @@ $slideInColumnMinWidth: 350px;
 
 // Grommet overrides start here...
 
-// Form legend text is too big.
-.edit .form fieldset > legend {
-  font-size: 1rem;
-  margin-bottom: 0px;
-}
-
 @media screen and (min-width: 45em) {
   .edit .layer__container {
     margin: 8px;
     border: 3px solid $brand-color;
   }
+}
+
+.edit .layer__container {
+  min-width: 300px;
 }
 
 .edit.layer {

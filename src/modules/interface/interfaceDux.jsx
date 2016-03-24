@@ -19,7 +19,7 @@ import AsyncDux from 'asyncDux.js';
 import InterfacePage from './interfacePage.jsx';
 import InterfaceDetails from './interfaceDetails.jsx';
 import Agent from 'agent.js';
-// import Async from 'async';
+import Async from 'async';
 import Translater from 'translater.js';
 import Formatter from 'formatter.js';
 
@@ -41,7 +41,8 @@ const INITIAL_STORE = {
   interfaces: {},
   ports: {},
   port: {},
-  inf: {
+  interface: {
+    userCfg: {},
     lldp: {},
   },
 };
@@ -121,7 +122,7 @@ function parseInterface(inf) {
   };
 }
 
-const parser = (result) => {
+const fetchParser = (result) => {
   const interfaces = {};
   result.body.forEach((elm) => {
     const cfg = elm.configuration;
@@ -133,8 +134,28 @@ const parser = (result) => {
   return { interfaces };
 };
 
-const URL_INFS = '/rest/v1/system/interfaces?depth=1';
+const editParser = (result) => {
+  // parse the interface
+  let cfg = result[0].body.configuration;
+  const userCfg = {
+    admin: T.from('admin', cfg.user_config && cfg.user_config.admin),
+    duplex: T.from('duplex', cfg.user_config && cfg.user_config.duplex),
+    flowCtrl: T.from('flowCtrl', cfg.user_config && cfg.user_config.pause),
+    autoNeg: T.from('autoNeg', cfg.user_config && cfg.user_config.autoneg),
+  };
+  const etag = result[0].headers.etag;
+  const inf = { userCfg, etag };
 
+  // parse the port (if available)
+  const port = {};
+  if (result[1]) {
+    cfg = result[1].body.configuration;
+    port.admin = T.from('admin', cfg.admin);
+    port.etag = result[1].headers.etag;
+  }
+
+  return { interface: inf, port };
+};
 
 //
 // function parsePorts(ports) {
@@ -172,105 +193,143 @@ const URL_INFS = '/rest/v1/system/interfaces?depth=1';
 // const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
 // const QP_CFG_SELECT = '?selector=configuration';
 //
+
+const SEL_CFG = 'selector=configuration';
+const URL_INFS = '/rest/v1/system/interfaces';
+const URL_INFS_D1 = `${URL_INFS}?depth=1`;
+const URL_PORTS = '/rest/v1/system/ports';
+
 const ACTIONS = {
 
   fetch() {
     return (dispatch) => {
       dispatch(AD.action('REQUEST', { title: t('loading') }));
-      Agent.get(URL_INFS).end((error, result) => {
+      Agent.get(URL_INFS_D1).end((error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser } ));
+        return dispatch(AD.action('SUCCESS', { result, parser: fetchParser } ));
       });
     };
   },
 
+  fetchEdit(infId) {
+    const URL_INF_SEL_CFG = `${URL_INFS}/${infId}?${SEL_CFG}`;
+    const URL_PORT = `${URL_PORTS}/${infId}`;
+    const URL_PORT_SEL_CFG = `${URL_PORT}?${SEL_CFG}`;
+
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('loading') }));
+      Async.waterfall([
+        // Step: fetch the inteface data with etag
+        cb1 => Agent.get(URL_INF_SEL_CFG).end(cb1),
+        // Step: fetch the list of port URLs
+        (r1, cb2) => Agent.get(URL_PORTS).end((e2, r2) => cb2(e2, r1, r2)),
+        // Step: if the port already exists fetch the port data with etag
+        (r1, r2, cb3) => {
+          if (r2.body.indexOf(URL_PORT) < 0) {
+            cb3(null, [r1]);
+          } else {
+            Agent.get(URL_PORT_SEL_CFG).end((e3, r3) => cb3(e3, [r1, r3]));
+          }
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: editParser }));
+      });
+    };
+  },
+
+  edit(infId, userCfg) {
+    return (dispatch) => {
+      alert(dispatch, infId, userCfg);
+    };
+  },
+
+  // set(detail, userCfg) {
+  //   const patchUserCfg = Utils.userCfgForPatch(userCfg);
+  //   const INF_URL = `${INFS_URL}/${detail.inf.id}`;
+  //   const INF_CFG_URL = `${INFS_URL}/${detail.inf.id}${QP_CFG_SELECT}`;
+  //
+  //   return (dispatch) => {
+  //     const reqs = [];
+  //
+  //     if (Object.keys(patchUserCfg).length === 0) {
+  //       reqs.push(cb => Agent.patch(INF_CFG_URL)
+  //         .send([{op: 'remove', path: '/user_config'}])
+  //         .set('If-Match', detail.inf.etag)
+  //         .end(mkAgentHandler(INF_CFG_URL, cb))
+  //       );
+  //     } else {
+  //       reqs.push(cb => Agent.patch(INF_CFG_URL)
+  //         .send([{op: 'add', path: '/user_config', value: patchUserCfg}])
+  //         .set('If-Match', detail.inf.etag)
+  //         .end(mkAgentHandler(INF_CFG_URL, cb))
+  //       );
+  //     }
+  //
+  //     if (detail.port.id) {
+  //       const PORT_CFG_URL = `${PORTS_URL}/${detail.port.id}${QP_CFG_SELECT}`;
+  //       reqs.push(cb => Agent.patch(PORT_CFG_URL)
+  //         .send([{op: 'add', path: '/admin', value: userCfg.admin}])
+  //         .set('If-Match', detail.port.etag)
+  //         .end(mkAgentHandler(PORT_CFG_URL, cb))
+  //       );
+  //     } else if (userCfg.admin === 'up') {
+  //       reqs.push(cb => Agent.post(PORTS_URL)
+  //         .send({
+  //           configuration: {
+  //             admin: 'up',
+  //             name: detail.inf.id,
+  //             tag: 1,
+  //             'vlan_mode': 'access',
+  //             interfaces: [ INF_URL ],
+  //           },
+  //           'referenced_by': [{uri: BRIDGE_URL}],
+  //         })
+  //         .set('If-Match', detail.ports.etag)
+  //         .end(mkAgentHandler(PORTS_URL, cb))
+  //       );
+  //     }
+  //
+  //     Dux.dispatchRequest(dispatch, SET_AT);
+  //     const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
+  //     Async.parallel(reqs, dispatcher);
+  //   };
+  // },
 //
-//   set(detail, userCfg) {
-//     const patchUserCfg = Utils.userCfgForPatch(userCfg);
-//     const INF_URL = `${INFS_URL}/${detail.inf.id}`;
-//     const INF_CFG_URL = `${INFS_URL}/${detail.inf.id}${QP_CFG_SELECT}`;
-//
-//     return (dispatch) => {
-//       const reqs = [];
-//
-//       if (Object.keys(patchUserCfg).length === 0) {
-//         reqs.push(cb => Agent.patch(INF_CFG_URL)
-//           .send([{op: 'remove', path: '/user_config'}])
-//           .set('If-Match', detail.inf.etag)
-//           .end(mkAgentHandler(INF_CFG_URL, cb))
-//         );
-//       } else {
-//         reqs.push(cb => Agent.patch(INF_CFG_URL)
-//           .send([{op: 'add', path: '/user_config', value: patchUserCfg}])
-//           .set('If-Match', detail.inf.etag)
-//           .end(mkAgentHandler(INF_CFG_URL, cb))
-//         );
-//       }
-//
-//       if (detail.port.id) {
-//         const PORT_CFG_URL = `${PORTS_URL}/${detail.port.id}${QP_CFG_SELECT}`;
-//         reqs.push(cb => Agent.patch(PORT_CFG_URL)
-//           .send([{op: 'add', path: '/admin', value: userCfg.admin}])
-//           .set('If-Match', detail.port.etag)
-//           .end(mkAgentHandler(PORT_CFG_URL, cb))
-//         );
-//       } else if (userCfg.admin === 'up') {
-//         reqs.push(cb => Agent.post(PORTS_URL)
-//           .send({
-//             configuration: {
-//               admin: 'up',
-//               name: detail.inf.id,
-//               tag: 1,
-//               'vlan_mode': 'access',
-//               interfaces: [ INF_URL ],
-//             },
-//             'referenced_by': [{uri: BRIDGE_URL}],
-//           })
-//           .set('If-Match', detail.ports.etag)
-//           .end(mkAgentHandler(PORTS_URL, cb))
-//         );
-//       }
-//
-//       Dux.dispatchRequest(dispatch, SET_AT);
-//       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-//       Async.parallel(reqs, dispatcher);
-//     };
-//   },
-//
-//   fetchDetails(id) {
-//     const INF_URL = `${INFS_URL}/${id}`;
-//     const INF_CFG_URL = `${INFS_URL}/${id}${QP_CFG_SELECT}`;
-//     const PORT_URL = `${PORTS_URL}/${id}`;
-//     const PORT_CFG_URL = `${PORTS_URL}/${id}${QP_CFG_SELECT}`;
-//
-//     return (dispatch) => {
-//       Dux.dispatchRequest(dispatch, DETAIL_AT);
-//       const gets = {
-//         inf:
-//           cb => Agent.get(INF_URL).end(mkAgentHandler(INF_URL, cb)),
-//         infCfg:
-//           cb => Agent.get(INF_CFG_URL).end(mkAgentHandler(INF_CFG_URL, cb)),
-//         ports:
-//           cb => Agent.get(PORTS_URL).end(mkAgentHandler(PORTS_URL, cb)),
-//       };
-//       Async.parallel(gets, (e1, r1) => {
-//         if (e1) {
-//           return Dux.dispatchFail(dispatch, DETAIL_AT, e1);
-//         }
-//         if (r1.ports.body.indexOf(PORT_URL) < 0) {
-//           return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
-//         }
-//         Agent.get(PORT_CFG_URL).end(mkAgentHandler(PORT_CFG_URL, (e2, r2) => {
-//           if (e2) {
-//             return Dux.dispatchFail(dispatch, DETAIL_AT, e2);
-//           }
-//           r1.port = r2;
-//           return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
-//         }));
-//       });
-//     };
-//   },
-//
+  // fetchDetails(id) {
+  //   const INF_URL = `${INFS_URL}/${id}`;
+  //   const INF_CFG_URL = `${INFS_URL}/${id}${QP_CFG_SELECT}`;
+  //   const PORT_URL = `${PORTS_URL}/${id}`;
+  //   const PORT_CFG_URL = `${PORTS_URL}/${id}${QP_CFG_SELECT}`;
+  //
+  //   return (dispatch) => {
+  //     Dux.dispatchRequest(dispatch, DETAIL_AT);
+  //     const gets = {
+  //       inf:
+  //         cb => Agent.get(INF_URL).end(mkAgentHandler(INF_URL, cb)),
+  //       infCfg:
+  //         cb => Agent.get(INF_CFG_URL).end(mkAgentHandler(INF_CFG_URL, cb)),
+  //       ports:
+  //         cb => Agent.get(PORTS_URL).end(mkAgentHandler(PORTS_URL, cb)),
+  //     };
+  //     Async.parallel(gets, (e1, r1) => {
+  //       if (e1) {
+  //         return Dux.dispatchFail(dispatch, DETAIL_AT, e1);
+  //       }
+  //       if (r1.ports.body.indexOf(PORT_URL) < 0) {
+  //         return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
+  //       }
+  //       Agent.get(PORT_CFG_URL).end(mkAgentHandler(PORT_CFG_URL, (e2, r2) => {
+  //         if (e2) {
+  //           return Dux.dispatchFail(dispatch, DETAIL_AT, e2);
+  //         }
+  //         r1.port = r2;
+  //         return Dux.dispatchSuccess(dispatch, DETAIL_AT, r1);
+  //       }));
+  //     });
+  //   };
+  // },
+
   clearError() {
     return AD.action('CLEAR_ERROR');
   },

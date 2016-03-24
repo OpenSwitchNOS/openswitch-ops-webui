@@ -31,6 +31,7 @@ import _ from 'lodash';
 
 class VlanAdd extends Component {
 
+  // TODO: vlan should be called data or something
   static propTypes = {
     actions: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -39,7 +40,6 @@ class VlanAdd extends Component {
 
   constructor(props) {
     super(props);
-    this.pad = {horizontal: 'small', vertical: 'small'};
     this.fid = _.uniqueId('vlanAdd_');
     this.niVlanId = `${this.fid}_niVlanId`;
     this.vlanCols = [
