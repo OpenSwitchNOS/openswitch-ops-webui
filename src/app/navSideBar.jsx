@@ -174,7 +174,9 @@ class NavSideBar extends Component {
           <Box pad={{vertical: 'small'}}/>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+              <Anchor onClick={this.props.actions.auth.logout}>
+                {t('logout')}
+              </Anchor>
             </Menu>
             <span>{user}</span>
           </Box>

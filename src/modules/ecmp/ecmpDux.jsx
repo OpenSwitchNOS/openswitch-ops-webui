@@ -14,6 +14,7 @@
     under the License.
 */
 
+import { t } from 'i18n/lookup.js';
 import AsyncDux, { cooledDown } from 'asyncDux.js';
 import Agent from 'agent.js';
 import EcmpPage from './ecmpPage.jsx';
@@ -56,7 +57,7 @@ const ACTIONS = {
     return (dispatch, getStoreFn) => {
       const mStore = getStoreFn()[NAME];
       if (cooledDown(mStore, Date.now())) {
-        dispatch(AD.action('REQUEST'));
+        dispatch(AD.action('REQUEST', { title: t('loading') }));
         Agent.get(URL_SYS).end((error, result) => {
           if (error) { return dispatch(AD.action('FAILURE', { error })); }
           return dispatch(AD.action('SUCCESS', { result, parser }));

@@ -14,6 +14,7 @@
     under the License.
 */
 
+import { t } from 'i18n/lookup.js';
 import Async from 'async';
 import AsyncDux from 'asyncDux.js';
 import Agent from 'agent.js';
@@ -83,7 +84,7 @@ const AUTO_ACTIONS = {
 
   fetch() {
     return (dispatch) => {
-      dispatch(AD.action('REQUEST'));
+      dispatch(AD.action('REQUEST', { title: t('loading') }));
       Async.parallel([
         cb => Agent.get(URL_BASE).end(cb),
         cb => Agent.get(URL_SYS).end(cb),
@@ -93,6 +94,10 @@ const AUTO_ACTIONS = {
         return dispatch(AD.action('SUCCESS', { result, parser } ));
       });
     };
+  },
+
+  clearError() {
+    return AD.action('CLEAR_ERROR');
   },
 
 };

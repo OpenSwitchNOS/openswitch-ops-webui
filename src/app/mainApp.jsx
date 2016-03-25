@@ -39,8 +39,7 @@ import LoginLayer from 'loginLayer.jsx';
 import NavSideBar from './navSideBar.jsx';
 
 
-// FIXME: large auto actions for debugging.
-const AUTO_ACTIONS_INTERVAL = 1000000;
+const AUTO_ACTIONS_INTERVAL = 10000;
 
 class MainApp extends Component {
 

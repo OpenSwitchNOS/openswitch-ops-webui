@@ -34,7 +34,6 @@ const ACTIONS = {
       component: (
         <FetchToolbar
             isFetching={asyncStatus.inProgress}
-            error={asyncStatus.lastError}
             date={asyncStatus.lastSuccessMillis}
             onRefresh={onRefresh}/>
       )

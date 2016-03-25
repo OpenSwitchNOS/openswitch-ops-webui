@@ -17,7 +17,6 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import Box from 'grommet/components/Box';
-import FetchToolbar from 'fetchToolbar.jsx';
 
 
 class MonitorInterfacePage extends Component {
@@ -34,33 +33,20 @@ class MonitorInterfacePage extends Component {
     this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
-  _setToolbar = (props) => {
-    const collector = props.collector;
-    this.props.actions.toolbar.set(
-      <FetchToolbar
-          isFetching={collector.isFetching}
-          error={collector.lastError}
-          date={collector.lastUpdate}
-          onRefresh={this._onRefresh}
-      />
-    );
+  _onRefresh = () => {
+    this.props.autoActions.collector.fetch();
+    this.props.actions.overview.fetch();
   };
 
   componentDidMount() {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview, this._onRefresh
-    );
+    const p = this.props;
+    this._onRefresh();
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
   }
 
-  _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
-  };
-
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview, this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
