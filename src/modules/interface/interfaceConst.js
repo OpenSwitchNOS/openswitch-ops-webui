@@ -14,28 +14,18 @@
     under the License.
 */
 
-/*eslint no-undefined:0*/
+export const USER_CFG = 'user_config';
 
-let locale = null;
-let msgs = null;
-let navs = null;
+export const ADMIN = 'admin';
+export const ADMIN_DEF = 'down';
 
-export function setLocale(l) {
-  locale = l;
-  msgs = locale && locale.MESSAGES;
-  navs = locale && locale.NAVS;
-}
+export const DUPLEX = 'duplex';
+export const DUPLEX_DEF = 'full';
 
-export function getLocale() { return locale; }
+export const AUTO_NEG = 'autoneg';
+export const AUTO_NEG_DEF = 'on';
 
-export function navt(k) { return (navs && navs[k]) || `~${k}~`; }
+export const FLOW_CTRL = 'pause';
+export const FLOW_CTRL_DEF = 'none';
 
-export function t(k) {
-  if (k === null || k === undefined || k === '') { return ''; }
-  return (msgs && msgs[k]) || `~${k}~`;
-}
-
-export function tOrKey(k) {
-  if (k === null || k === undefined || k === '') { return ''; }
-  return (msgs && msgs[k]) || k;
-}
+export const PORT_ADMIN = 'admin';

@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, tOrKey } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
@@ -25,6 +25,7 @@ import CheckBox from 'grommet/components/CheckBox';
 import AsyncStatusLayer from 'asyncStatusLayer.jsx';
 import InterfaceEdit from './interfaceEdit.jsx';
 import DetailsBox from 'detailsBox.jsx';
+import Formatter from 'formatter.js';
 
 
 class InterfacePage extends Component {
@@ -53,32 +54,37 @@ class InterfacePage extends Component {
         columnKey: 'cfgAdmin',
         header: t('configured'),
         width: 150,
+        format: t
       },
       {
         columnKey: 'adminStateConnector',
         header: t('adminState'),
         width: 160,
-        format: v => v === 'downAbsent' ? t('downAbsent') : v,
+        format: t
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
         width: 150,
+        format: t
       },
       {
         columnKey: 'connector',
         header: t('connector'),
         width: 150,
+        format: tOrKey
       },
       {
         columnKey: 'duplex',
         header: t('duplex'),
         width: 120,
+        format: t,
       },
       {
         columnKey: 'speed',
         header: t('speed'),
         width: 120,
+        format: Formatter.toBpsString,
       },
     ];
     this.state = {};
@@ -86,12 +92,12 @@ class InterfacePage extends Component {
 
   componentDidMount() {
     const p = this.props;
-    p.actions.interface.fetch();
+    p.actions.interface.fetchPage();
     p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
-    this.props.actions.interface.fetch();
+    this.props.actions.interface.fetchPage();
   };
 
   componentWillReceiveProps(nextProps) {

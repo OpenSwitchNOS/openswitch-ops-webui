@@ -32,4 +32,17 @@ export default class Translater {
     }
     return 'unknown';
   }
+
+  clearDefaults(data) {
+    const result = { ...data };
+    Object.getOwnPropertyNames(data).forEach(key => {
+      const val = data[key];
+      const map = this._mappings[key];
+      if (map && map.DEFAULT && map[map.DEFAULT] === val) {
+        delete result[key];
+      }
+    });
+    return result;
+  }
+
 }

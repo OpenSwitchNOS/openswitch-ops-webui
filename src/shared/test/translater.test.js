@@ -56,4 +56,20 @@ describe('translater', () => {
     });
   });
 
+  it('clearDefaults', () => {
+    const ts = new Translater({
+      duplex: { half: 'FULL', full: 'FULL', DEFAULT: 'full' },
+      autoNeg: { on: 'ON', off: 'OFF', DEFAULT: 'on' },
+    });
+
+    let cfg = { duplex: 'FULL', autoNeg: 'ON' };
+    expect(ts.clearDefaults(cfg)).toEqual({});
+
+    cfg = { duplex: 'HALF', autoNeg: 'ON' };
+    expect(ts.clearDefaults(cfg)).toEqual({ duplex: 'HALF' });
+
+    cfg = { duplex: 'HALF', autoNeg: 'OFF' };
+    expect(ts.clearDefaults(cfg)).toEqual({ duplex: 'HALF', autoNeg: 'OFF' });
+  });
+
 });

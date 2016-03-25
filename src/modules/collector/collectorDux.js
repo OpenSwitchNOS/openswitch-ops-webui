@@ -83,7 +83,7 @@ const parser = (result) => {
 
 const URL_BASE = '/rest/v1/system/subsystems/base';
 const URL_SYS = '/rest/v1/system';
-const URL_INFS = '/rest/v1/system/interfaces?depth=1';
+const URL_INFS_D1 = '/rest/v1/system/interfaces?depth=1';
 
 const AUTO_ACTIONS = {
 
@@ -93,7 +93,7 @@ const AUTO_ACTIONS = {
       Async.parallel([
         cb => Agent.get(URL_BASE).end(cb),
         cb => Agent.get(URL_SYS).end(cb),
-        cb => Agent.get(URL_INFS).end(cb),
+        cb => Agent.get(URL_INFS_D1).end(cb),
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
         return dispatch(AD.action('SUCCESS', { result, parser } ));

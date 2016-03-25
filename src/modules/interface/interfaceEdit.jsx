@@ -26,6 +26,7 @@ import FormField from 'grommet/components/FormField';
 import RadioButton from 'grommet/components/RadioButton';
 import Button from 'grommet/components/Button';
 import _ from 'lodash';
+import * as C from './interfaceConst.js';
 
 
 class InterfaceEdit extends Component {
@@ -40,7 +41,7 @@ class InterfaceEdit extends Component {
   constructor(props) {
     super(props);
     this.fid = _.uniqueId('infEdit_');
-    this.state = { userCfg: {} };
+    this.state = { [C.USER_CFG]: {} };
   }
 
   _id = s => `${this.fid}_${s}`;
@@ -51,27 +52,32 @@ class InterfaceEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const p = nextProps;
-    this.setState({ userCfg: { ...p.interface.interface.userCfg }});
+    const edit = nextProps.interface.edit;
+    this.setState({ [C.USER_CFG]: { ...edit.interface[C.USER_CFG] }});
   }
 
   _isDirty = () => {
-    const initUserCfg = this.props.interface.interface.userCfg;
-    return !_.isEqual(this.state.userCfg, initUserCfg);
+    const initUserCfg = this.props.interface.edit.interface[C.USER_CFG];
+    return !_.isEqual(this.state[C.USER_CFG], initUserCfg);
   };
 
   _onOk = () => {
-    this.props.actions.interface.edit(this.props.infId, this.state.userCfg);
+    this.props.actions.interface.edit(this.state);
     this.props.onClose();
   };
 
   _onChange = (setting) => {
-    const userCfg = { ...this.state.userCfg, ...setting };
-    this.setState({ userCfg });
+    const newUserCfg = { ...this.state[C.USER_CFG], ...setting };
+    this.setState({ [C.USER_CFG]: newUserCfg });
   };
 
   render() {
-    const userCfg = this.state.userCfg;
+    const uc = this.state[C.USER_CFG];
+    const admin = uc && uc[C.ADMIN];
+    const duplex = uc && uc[C.DUPLEX];
+    const autoNeg = uc && uc[C.AUTO_NEG];
+    const flowCtrl = uc && uc[C.FLOW_CTRL];
+
     return (
       <Layer
           className="edit"
@@ -87,13 +93,13 @@ class InterfaceEdit extends Component {
             <RadioButton
                 id={this._id('adminUp')}
                 label={t('up')}
-                checked={userCfg.admin === 'up'}
-                onChange={() => this._onChange({admin: 'up'})} />
+                checked={admin === 'up'}
+                onChange={() => this._onChange({[C.ADMIN]: 'up'})} />
             <RadioButton
                 id={this._id('adminDown')}
                 label={t('down')}
-                checked={userCfg.admin !== 'up'}
-                onChange={() => this._onChange({admin: 'down'})} />
+                checked={admin === 'down'}
+                onChange={() => this._onChange({[C.ADMIN]: 'down'})} />
           </FormField>
           <br/>
           <b>{t('autoNeg')}</b>
@@ -101,13 +107,13 @@ class InterfaceEdit extends Component {
             <RadioButton
                 id={this._id('autoNegOn')}
                 label={t('on')}
-                checked={userCfg.autoNeg === 'on'}
-                onChange={() => this._onChange({autoNeg: 'on'})} />
+                checked={autoNeg === 'on'}
+                onChange={() => this._onChange({[C.AUTO_NEG]: 'on'})} />
             <RadioButton
                 id={this._id('autoNegOff')}
                 label={t('off')}
-                checked={userCfg.autoNeg !== 'on'}
-                onChange={() => this._onChange({autoNeg: 'off'})} />
+                checked={autoNeg === 'off'}
+                onChange={() => this._onChange({[C.AUTO_NEG]: 'off'})} />
           </FormField>
           <br/>
           <b>{t('duplex')}</b>
@@ -115,13 +121,13 @@ class InterfaceEdit extends Component {
             <RadioButton
                 id={this._id('duplexFull')}
                 label={t('full')}
-                checked={userCfg.duplex !== 'half'}
-                onChange={() => this._onChange({duplex: 'full'})} />
+                checked={duplex === 'full'}
+                onChange={() => this._onChange({[C.DUPLEX]: 'full'})} />
             <RadioButton
                 id={this._id('duplexHalf')}
                 label={t('half')}
-                checked={userCfg.duplex === 'half'}
-                onChange={() => this._onChange({duplex: 'half'})} />
+                checked={duplex === 'half'}
+                onChange={() => this._onChange({[C.DUPLEX]: 'half'})} />
           </FormField>
           <br/>
           <b>{t('flowControl')}</b>
@@ -129,23 +135,23 @@ class InterfaceEdit extends Component {
             <RadioButton
                 id={this._id('fcNone')}
                 label={t('none')}
-                checked={userCfg.flowCtrl === 'none'}
-                onChange={() => this._onChange({flowCtrl: 'none'})} />
+                checked={flowCtrl === 'none'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'none'})} />
             <RadioButton
                 id={this._id('fcTx')}
                 label={t('rx')}
-                checked={userCfg.flowCtrl === 'rx'}
-                onChange={() => this._onChange({flowCtrl: 'rx'})} />
+                checked={flowCtrl === 'rx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'rx'})} />
             <RadioButton
                 id={this._id('fcRx')}
                 label={t('tx')}
-                checked={userCfg.flowCtrl === 'tx'}
-                onChange={() => this._onChange({flowCtrl: 'tx'})} />
+                checked={flowCtrl === 'tx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'tx'})} />
             <RadioButton
                 id={this._id('fcRxTx')}
                 label={t('rxtx')}
-                checked={userCfg.flowCtrl === 'rxtx'}
-                onChange={() => this._onChange({flowCtrl: 'rxtx'})} />
+                checked={flowCtrl === 'rxtx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'rxtx'})} />
           </FormField>
           <Footer pad={{vertical: 'medium'}}>
             <Menu>

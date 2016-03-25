@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t, ed } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 
 import Box from 'grommet/components/Box';
 
@@ -226,7 +226,7 @@ class OverviewPage extends Component {
         <tbody>
           <tr>
             <td style={{width: '180px'}}>{t('lldp')}:</td>
-            <td>{ed(data.lldp.enabled)}</td>
+            <td>{t(data.lldp.enabled)}</td>
           </tr>
           <tr>
             <td style={{width: '180px'}}>{t('ecmp')}:</td>

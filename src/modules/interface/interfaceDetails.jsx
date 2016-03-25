@@ -14,182 +14,140 @@
     under the License.
 */
 
-import React, { Component } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-// // import { t } from 'i18n/lookup.js';
-// // import Header from 'grommet/components/Header';
-// // import Menu from 'grommet/components/Menu';
-// // import Title from 'grommet/components/Title';
-// // import Anchor from 'grommet/components/Anchor';
+import { t, tOrKey } from 'i18n/lookup.js';
+import Title from 'grommet/components/Title';
+import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
-// import CloseIcon from 'grommet/components/icons/base/Close';
-// import EditIcon from 'grommet/components/icons/base/Edit';
-// import RefreshIcon from 'grommet/components/icons/base/Refresh';
-// import ErrorLayer from 'errorLayer.jsx';
-// import InterfaceEdit from './interfaceEdit.jsx';
-// import _ from 'lodash';
-// import Formatter from 'formatter.js';
+import Tab from 'grommet/components/Tab';
+import Tabs from 'grommet/components/Tabs';
+import CloseIcon from 'grommet/components/icons/base/Close';
+import Formatter from 'formatter.js';
 
-// const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
+
+const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
+
 
 class InterfaceDetails extends Component {
 
-  // static propTypes = {
-  //   actions: PropTypes.object.isRequired,
-  //   autoActions: PropTypes.object.isRequired,
-  //   collector: PropTypes.object.isRequired,
-  //   history: PropTypes.object.isRequired,
-  //   interface: PropTypes.object.isRequired,
-  //   params: PropTypes.shape({
-  //     id: PropTypes.string.isRequired,
-  //   }).isRequired,
-  // };
-  //
-  // constructor(props) {
-  //   super(props);
-  //   this.fid = _.uniqueId('infForm_');
-  //   this.state = {
-  //     editMode: false,
-  //   };
-  // }
-  //
-  // _id = s => `${this.fid}_${s}`;
-  //
-  // componentDidMount() {
-  //   // this.props.actions.interface.fetchDetails(this.props.params.id);
-  // }
-  //
-  // componentWillReceiveProps(nextProps) {
-  //   // if (nextProps.interface.set.lastSuccessMillis >
-  //   //     this.props.interface.set.lastSuccessMillis) {
-  //   //
-  //   //   this.props.actions.collector.fetchImmediate();
-  //   //
-  //   // } else if (nextProps.params.id !== this.props.params.id ||
-  //   //     nextProps.collector.overview.lastSuccessMillis >
-  //   //     this.props.collector.overview.lastSuccessMillis) {
-  //   //
-  //   //   this.props.actions.interface.fetchDetails(nextProps.params.id);
-  //   // }
-  // }
-  //
-  // _onClose = () => {
-  //   this.props.history.pushState(null, `/interface`);
-  // };
-  //
-  // _onEditToggle = () => {
-  //   const editMode = !this.state.editMode;
-  //   this.setState({ editMode });
-  // };
-  //
-  // _onEditSubmit = (detail, userCfg) => {
-  //   this.props.actions.interface.set(detail, userCfg);
-  //   this._onEditToggle();
-  // };
-  //
-  // _onCloseError = () => {
-  //   this.props.actions.interface.clearErrorForSet();
-  // };
-  //
-  // _tr = (td1, td2) => {
-  //   return (
-  //     <tr>
-  //       <td style={{width: 200}}>{td1}:</td>
-  //       <td style={{width: 200}}>{td2}</td>
-  //     </tr>
-  //   );
-  // };
+  static propTypes = {
+    actions: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    interface: PropTypes.object.isRequired,
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  componentDidMount() {
+    const p = this.props;
+    p.actions.interface.fetchDetail(this.props.params.id);
+  }
+
+  _onRefresh = () => {
+    this.props.actions.interface.fetchDetail(this.props.params.id);
+  };
+
+  _onClose = () => {
+    this.props.history.pushState(null, `/interface`);
+  };
 
   render() {
-    // const id = this.props.params.id;
-    // const detail = this.props.interface.detail;
-    // const inf = detail.inf;
-    // const port = detail.port;
-    // const set = this.props.interface.set;
-    // const editLayer = !this.state.editMode ? null :
-    //   <InterfaceEdit
-    //       onClose={this._onEditToggle}
-    //       onSubmit={this._onEditSubmit}
-    //       detail={detail}
-    //   />;
-    //
-    // const errorLayer = !set.lastError ? null :
-    //   <ErrorLayer error={set.lastError} onClose={this._onCloseError} />;
-    //
-    // const ipV4 = (port.id && port.ipV4) || t('notConfigured');
-    // const ipV6 = (port.id && port.ipV6) || t('notConfigured');
-    // const lldpOpsLink = !inf.lldp.sysDesc ||
-    //   inf.lldp.sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ? null : (
-    //     <a href={`http://${inf.lldp.ip}`} target="_blank">
-    //       &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
-    //     </a>
-    //   );
+    const inf = this.props.interface.interface;
+    const port = this.props.interface.port;
+    const tcs = Formatter.toCommaString;
+
+    const sysDesc = inf.lldp.sysDesc;
+    const lldpOpsLink = sysDesc && sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ?
+      (
+        <a href={`http://${inf.lldp.ip}`} target="_blank">
+          &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
+        </a>
+      ) : null;
+
+    function tr(key, data, wKey, wData) {
+      return (
+        <tr>
+          {wKey ? <td style={{width: wKey}}>{t(key)}:</td> : <td>{t(key)}:</td>}
+          {wData ? <td style={{width: wData}}>{data}</td> : <td>{data}</td>}
+        </tr>
+      );
+    }
 
     return (
-      <Box pad="small" className="details min200x400">
-        {/*<Header tag="h4" justify="between">
-          <Title>{`${t('interface')}: ${id}`}</Title>
-          <Menu direction="row" justify="end" responsive={false}>
-            <Anchor onClick={set.inProgress ? null : this._onEditToggle}>
-              {set.inProgress ? <RefreshIcon className="spin"/> : <EditIcon/>}
-            </Anchor>
-            <Anchor onClick={this._onClose}>
-              <CloseIcon/>
-            </Anchor>
-          </Menu>
-        </Header>
-        <hr/>
-        {editLayer}
-        {errorLayer}
-        <table style={{tableLayout: 'fixed'}} className="propTable">
-          <tbody>
-          {this._tr(t('userCfgAdmin'), t(inf.userCfgAdmin))}
-          {this._tr(t('adminState'), t(inf.adminStateConnector))}
-          {this._tr(t('linkState'), t(inf.linkState))}
-          {this._tr(t('duplex'), t(inf.duplex))}
-          {this._tr(t('speed'), inf.speedFormatted)}
-          {this._tr(t('connector'), inf.connector)}
-          {this._tr(t('mac'), inf.mac)}
-          {this._tr(t('mtu'), inf.mtu)}
-          {this._tr(t('autoNeg'), t(inf.userCfgAutoNeg))}
-          {this._tr(t('flowControl'), t(inf.userCfgFlowCtrl))}
-          {this._tr(t('ipV4'), ipV4)}
-          {this._tr(t('ipV6'), ipV6)}
-          {this._tr(t('rxPackets'), Formatter.toCommaString(inf.rxPackets))}
-          {this._tr(t('rxBytes'), Formatter.toCommaString(inf.rxBytes))}
-          {this._tr(t('rxErrors'), Formatter.toCommaString(inf.rxErrors))}
-          {this._tr(t('rxDropped'), Formatter.toCommaString(inf.rxDropped))}
-          {this._tr(t('txPackets'), Formatter.toCommaString(inf.txPackets))}
-          {this._tr(t('txBytes'), Formatter.toCommaString(inf.txBytes))}
-          {this._tr(t('txErrors'), Formatter.toCommaString(inf.txErrors))}
-          {this._tr(t('txDropped'), Formatter.toCommaString(inf.txDropped))}
-          </tbody>
-        </table>
-        <br/>
-        <b>{t('lldpNeighborInfo')}{lldpOpsLink}</b>
-        <hr/>
-        <table style={{tableLayout: 'fixed'}} className="propTable">
-          <tbody>
-          {this._tr(t('chassisName'), inf.lldp.chassisName)}
-          {this._tr(t('chassisId'), inf.lldp.chassisId)}
-          {this._tr(t('ip'), inf.lldp.ip)}
-          {this._tr(t('portId'), inf.lldp.portId)}
-          {this._tr(t('sysDesc'), inf.lldp.sysDesc)}
-          {this._tr(t('capsSupported'), inf.lldp.capsSupported)}
-          {this._tr(t('capsEnabled'), inf.lldp.capsEnabled)}
-          </tbody>
-        </table>
-        <br/>
-        <b>{t('lldpPortStats')}</b>
-        <hr/>
-        <table style={{tableLayout: 'fixed'}} className="propTable">
-          <tbody>
-          {this._tr(t('framesRx'), inf.lldp.framesRx)}
-          {this._tr(t('framesRxDiscarded'), inf.lldp.framesRxDiscarded)}
-          {this._tr(t('framesRxUnrecog'), inf.lldp.framesRxUnrecog)}
-          {this._tr(t('framesTx'), inf.lldp.framesTx)}
-          </tbody>
-        </table>*/}
+      <Box pad="small">
+        <Box direction="row" justify="between">
+          <Title>{`${t('interface')}: ${this.props.params.id}`}</Title>
+          <Anchor onClick={this._onClose}>
+            <CloseIcon/>
+          </Anchor>
+        </Box>
+        <Tabs>
+          <Tab title={t('general')}>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {tr('configured', t(inf.cfgAdmin), 180, 200)}
+                {tr('adminState', t(inf.adminStateConnector))}
+                {tr('linkState', t(inf.linkState))}
+                {tr('duplex', t(inf.duplex))}
+                {tr('speed', inf.speedFormatted)}
+                {tr('connector', tOrKey(inf.connector))}
+                {tr('mac', inf.mac)}
+                {tr('mtu', inf.mtu)}
+                {tr('autoNeg', t(inf.cfgAutoNeg))}
+                {tr('flowControl', t(inf.cfgFlowCtrl))}
+                {tr('ipV4', port.ipV4)}
+                {tr('ipV6', port.ipV6)}
+              </tbody>
+            </table>
+          </Tab>
+          <Tab title={t('statistics')}>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {tr('rxPackets', tcs(inf.rxPackets), 180, 200)}
+                {tr('rxBytes', tcs(inf.rxBytes))}
+                {tr('rxErrors', tcs(inf.rxErrors))}
+                {tr('rxDropped', tcs(inf.rxDropped))}
+                {tr('txPackets', tcs(inf.txPackets))}
+                {tr('txBytes', tcs(inf.txBytes))}
+                {tr('txErrors', tcs(inf.txErrors))}
+                {tr('txDropped', tcs(inf.txDropped))}
+              </tbody>
+            </table>
+          </Tab>
+          <Tab title={t('lldp')}>
+            <small>{t('neighborInfo')}{lldpOpsLink}</small>
+            <hr/>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {tr('chassisName', inf.lldp.chassisName, 180, 200)}
+                {tr('chassisId', inf.lldp.chassisId)}
+                {tr('ip', inf.lldp.ip)}
+                {tr('portId', inf.lldp.portId)}
+                {tr('sysDesc', inf.lldp.sysDesc)}
+                {tr('capsSupported', inf.lldp.capsSupported)}
+                {tr('capsEnabled', inf.lldp.capsEnabled)}
+              </tbody>
+            </table>
+            <br/>
+            <small>{t('statistics')}</small>
+            <hr/>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {tr('framesRx', tcs(inf.lldp.framesRx), 180, 200)}
+                {tr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
+                {tr('framesRxUnrecog', tcs(inf.lldp.framesRxUnrecog))}
+                {tr('framesTx', tcs(inf.lldp.framesTx))}
+              </tbody>
+            </table>
+          </Tab>
+        </Tabs>
       </Box>
     );
   }
