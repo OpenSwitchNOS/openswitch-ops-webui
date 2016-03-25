@@ -162,21 +162,6 @@ class VlanPage extends Component {
     this.props.history.pushState(null, url);
   };
 
-  _onEditOpen = () => {
-    this.setState({ editMode: true });
-  };
-
-  // TODO: decide on OK vs Deploy (Apply and OK, is better then Apply and Deploy)
-  _onEditOk = (cfg) => {
-    this.props.actions.vlan.editVlan(this.props.vlan, cfg);
-    // TODO: this should wait until success or failure
-    this.setState({ editMode: false });
-  };
-
-  _onEditClose = () => {
-    this.setState({ editMode: false });
-  };
-
   _onAddOpen = () => {
     this.setState({ addMode: true });
   };
@@ -195,10 +180,6 @@ class VlanPage extends Component {
     this.setState({ addMode: false });
   };
 
-  _onDelete = (sel) => {
-    alert(`Delete: ${sel}`);
-  };
-
   render() {
     const data = this.props.vlan;
 
@@ -211,19 +192,6 @@ class VlanPage extends Component {
           onClose={() => this.setState({addVlanLayer: false})}
       />;
 
-    //
-    // // TODO: How do we want to standardize passing config to an edit component
-    // // TODO: How do we want to standardize passing data to a component
-    // const editLayer = !this.state.editMode ? null :
-    //   <VlanEdit
-    //       onClose={this._onEditClose}
-    //       onOk={this._onEditOk}
-    //       vlanId={this.props.params.id}
-    //       data={this.props.vlan.page}
-    //   />;
-    //
-    // const set = this.props.vlan.set;
-
     const async = data.asyncStatus;
     const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
       <AsyncStatusLayer
@@ -232,8 +200,6 @@ class VlanPage extends Component {
 
     return (
       <Box className="flex1 mTopHalf mLeft">
-        {/*{addLayer}
-        {editLayer}*/}
         {addVlanLayer}
         {asyncStatusLayer}
         <ResponsiveBox>
@@ -244,9 +210,7 @@ class VlanPage extends Component {
               singleSelect
               onSelectChange={this._onSelect}
               select={this.props.params.id}
-              onEdit={this._onEditOpen}
               onAdd={() => this.setState({addVlanLayer: true})}
-              onDelete={this._onDelete}
           />
         </ResponsiveBox>
         <br/>

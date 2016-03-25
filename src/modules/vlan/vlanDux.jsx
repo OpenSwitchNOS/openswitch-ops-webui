@@ -19,7 +19,6 @@ import AsyncDux, { cooledDown } from 'asyncDux.js';
 import VlanPage from './vlanPage.jsx';
 import Agent from 'agent.js';
 import Async from 'async';
-import Translater from 'translater.js';
 
 
 const NAME = 'vlan';
@@ -38,22 +37,6 @@ const INITIAL_STORE = {
 };
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
-
-const T = new Translater({
-  operState: { up: 'up', down: 'down', DEFAULT: 'down' },
-  operStateReason: {
-    ok: 'ok',
-    'admin_down': 'adminDown',
-    'no_member_port': 'noMemberPort',
-    DEFAULT: 'admin_down'
-  },
-  vlanMode: {
-    trunk: 'trunk',
-    access: 'access',
-    'native-tagged': 'nativeTagged',
-    'native-untagged': 'nativeUntagged',
-  }
-});
 
 const parser = (result) => {
 
@@ -75,8 +58,8 @@ const parser = (result) => {
       id,
       name: cfg.name,
       admin: cfg.admin,
-      operState: T.from('operState', status.oper_state),
-      operStateReason: T.from('operStateReason', status.oper_state_reason),
+      operState: status.oper_state,
+      operStateReason: status.oper_state_reason,
       interfaces: {},
     };
   });
@@ -90,7 +73,7 @@ const parser = (result) => {
         id,
         tag: cfg.tag,
         trunks: cfg.trunks,
-        vlanMode: T.from('vlanMode', cfg.vlan_mode),
+        vlanMode: cfg.vlan_mode,
         interface: interfaces[id],
       };
       if (data.tag) {

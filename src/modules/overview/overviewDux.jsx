@@ -18,7 +18,6 @@ import Async from 'async';
 import OverviewPage from './overviewPage.jsx';
 import AsyncDux from 'asyncDux.js';
 import Agent from 'agent.js';
-import Translater from 'translater.js';
 import Formatter from 'formatter.js';
 
 
@@ -44,33 +43,6 @@ const INITIAL_STORE = {
 };
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
-
-const T = new Translater({
-  powerStatus: {
-    ok: { text: 'ok', status: 'ok' },
-    'fault_input': { text: 'powerFaultInput', status: 'warning' },
-    'fault_output': { text: 'powerFaultOutput', status: 'critical' },
-    absent: { text: 'powerAbsent', status: 'warning' },
-    DEFAULT: 'absent',
-  },
-  fanStatus: {
-    ok: { text: 'ok', status: 'ok' },
-    fault: { text: 'fanFault', status: 'critical' },
-    uninit: { text: 'fanUninitialized', status: 'warning' },
-    DEFAULT: 'uninit',
-  },
-  fanDir: {
-    b2f: 'backToFront',
-    f2b: 'frontToBack',
-  },
-  fanSpeed: {
-    slow: 'slow',
-    normal: 'normal',
-    medium: 'medium',
-    fast: 'fast',
-    max: 'max',
-  },
-});
 
 function parseTempStatus(id, s) {
   const max = Number(s.max) / 1000;
@@ -99,6 +71,26 @@ function parseEcmp(ecmpCfg) {
     hashSrcPort: norm('hash_srcport_enabled'),
     resilientHash: norm('resilient_hash_enabled'),
   };
+}
+
+function parsePowerStatus(s) {
+  if (s === 'ok') {
+    return { text: 'ok', status: 'ok' };
+  } else if (s === 'fault_input') {
+    return { text: 'powerFaultInput', status: 'warning' };
+  } else if (s === 'fault_output') {
+    return { text: 'powerFaultOutput', status: 'critical' };
+  }
+  return { text: 'powerAbsent', status: 'warning' };
+}
+
+function parseFanStatus(s) {
+  if (s === 'ok') {
+    return { text: 'ok', status: 'ok' };
+  } else if (s === 'fault') {
+    return { text: 'fanFault', status: 'critical' };
+  }
+  return { text: 'fanUninitialized', status: 'warning' };
 }
 
 function updateRollup(status, rollup) {
@@ -152,7 +144,7 @@ const parser = (result) => {
   let rollup = { critical: 0, warning: 0, ok: 0 };
   pwrBody.forEach((elm) => {
     const id = elm.status.name;
-    const ps = T.from('powerStatus', elm.status.status);
+    const ps = parsePowerStatus(elm.status.status);
     powerSupplies[id] = { id, ...ps };
     updateRollup(ps.status, rollup);
   });
@@ -164,13 +156,13 @@ const parser = (result) => {
   rollup = { critical: 0, warning: 0, ok: 0 };
   fanBody.forEach((elm) => {
     const id = elm.status.name;
-    const ps = T.from('fanStatus', elm.status.status);
+    const ps = parseFanStatus(elm.status.status);
     const cfg = elm.configuration;
     fans[id] = {
       id,
       ...ps,
-      dir: T.from('fanDir', cfg.direction),
-      speed: T.from('fanSpeed', cfg.speed),
+      dir: cfg.direction,
+      speed: cfg.speed,
       rpm: Formatter.toCommaString(elm.status.rpm),
     };
     updateRollup(ps.status, rollup);

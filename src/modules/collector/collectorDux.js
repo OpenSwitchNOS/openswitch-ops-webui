@@ -17,7 +17,6 @@
 import Async from 'async';
 import AsyncDux from 'asyncDux.js';
 import Agent from 'agent.js';
-import Translater from 'translater.js';
 import InterfaceCache from './interfaceCache.js';
 import { TX, RX, TX_RX } from './interfaceData.js';
 
@@ -31,11 +30,6 @@ const INITIAL_STORE = {
 };
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
-
-const T = new Translater({
-  linkState: { up: 'up', down: 'down', DEFAULT: 'down' },
-  duplex: { half: 'half', full: 'full', DEFAULT: 'full' },
-});
 
 const IC = new InterfaceCache();
 
@@ -51,11 +45,11 @@ const parser = (result) => {
     const stats = elm.statistics.statistics;
     if (cfg.type === 'system') {
       const id = cfg.name;
-      const linkState = T.from('linkState', status.link_state);
+      const linkState = status.link_state;
 
       if (linkState === 'up') {
         const speed = status.link_speed ? Number(status.link_speed) : 0;
-        const duplex = T.from('duplex', status.duplex);
+        const duplex = status.duplex;
         const rxBytes = Number(stats.rx_bytes) || 0;
         const txBytes = Number(stats.tx_bytes) || 0;
 

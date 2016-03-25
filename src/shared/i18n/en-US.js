@@ -67,6 +67,7 @@ export const MESSAGES = {
   debug: 'Debug',
   degreesCelsius: 'C',
   deploy: 'Deploy',
+  deploying: 'Deploying...',
   details: 'Details',
   direction: 'Direction',
   disabled: 'Disabled',
