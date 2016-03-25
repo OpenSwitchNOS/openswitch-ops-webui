@@ -22,7 +22,7 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
 import CheckBox from 'grommet/components/CheckBox';
-import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 import InterfaceEdit from './interfaceEdit.jsx';
 import DetailsBox from 'detailsBox.jsx';
 import Formatter from 'formatter.js';
@@ -135,18 +135,16 @@ class InterfacePage extends Component {
       </DetailsBox>
     );
 
-    const async = this.props.interface.asyncStatus;
-    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
-      <AsyncStatusLayer
-          data={async}
-          onClose={this.props.actions.interface.clearError} />;
+    const statusLayer = mkStatusLayer(
+          this.props.interface.asyncStatus,
+          this.props.actions.interface.clearError);
 
     const infs = this.props.interface.interfaces;
     const numInfs = Object.getOwnPropertyNames(infs).length;
 
     return (
       <Box direction="row" className="flex1">
-        {asyncStatusLayer}
+        {statusLayer}
         {editLayer}
         <Box className="flex1">
           <Box className="mTop mLeft">

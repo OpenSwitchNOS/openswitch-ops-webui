@@ -24,6 +24,13 @@ import RefreshIcon from 'grommet/components/icons/base/Refresh';
 import SpanStatus from 'spanStatus.jsx';
 
 
+export function mkStatusLayer(async, onClose) {
+  return !async.lastError && !async.inProgress ? null :
+    <AsyncStatusLayer
+        data={async}
+        onClose={onClose} />;
+}
+
 export default class AsyncStatusLayer extends Component {
 
   static propTypes = {

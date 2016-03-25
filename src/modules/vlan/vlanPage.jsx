@@ -22,8 +22,7 @@ import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import Range from 'range.js';
 import VlanAdd from './vlanAdd.jsx';
-// import VlanEdit from './vlanEdit.jsx';
-import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
 
 class VlanPage extends Component {
@@ -192,16 +191,14 @@ class VlanPage extends Component {
           onClose={() => this.setState({addVlanLayer: false})}
       />;
 
-    const async = data.asyncStatus;
-    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
-      <AsyncStatusLayer
-          data={async}
-          onClose={this.props.actions.vlan.clearError} />;
+    const statusLayer = mkStatusLayer(
+          data.asyncStatus,
+          this.props.actions.vlan.clearError);
 
     return (
       <Box className="flex1 mTopHalf mLeft">
         {addVlanLayer}
-        {asyncStatusLayer}
+        {statusLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
               title={`${t('totalVlans')}: ${numVlans}`}

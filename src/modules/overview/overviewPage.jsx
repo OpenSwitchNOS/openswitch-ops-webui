@@ -21,7 +21,7 @@ import Box from 'grommet/components/Box';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
-import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
 
 const NUM_TRAFFIC_METRICS = 5;
@@ -368,15 +368,13 @@ class OverviewPage extends Component {
     const logEnd = new Date().toLocaleTimeString();
     const logNumAdded = 3;
 
-    const async = this.props.collector.asyncStatus;
-    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
-      <AsyncStatusLayer
-          data={async}
-          onClose={this.props.autoActions.collector.clearError} />;
+    const statusLayer = mkStatusLayer(
+          this.props.collector.asyncStatus,
+          this.props.autoActions.collector.clearError);
 
     return (
       <Box className="flex1">
-        {asyncStatusLayer}
+        {statusLayer}
         {psLayer}
         {tempsLayer}
         {fansLayer}

@@ -19,7 +19,7 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
-import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
 
 class EcmpPage extends Component {
@@ -58,15 +58,13 @@ class EcmpPage extends Component {
   render() {
     const data = this.props.ecmp;
 
-    const async = this.props.ecmp.asyncStatus;
-    const asyncStatusLayer = !async.lastError && !async.inProgress ? null :
-      <AsyncStatusLayer
-          data={async}
-          onClose={this.props.actions.ecmp.clearError} />;
+    const statusLayer = mkStatusLayer(
+          this.props.ecmp.asyncStatus,
+          this.props.actions.ecmp.clearError);
 
     return (
       <Box className="flex1">
-        {asyncStatusLayer}
+        {statusLayer}
         <Box pad={this.pad} className="flex1 pageBox min200x400">
           <span><b>{t('ecmp')}: </b>{t(data.enabled)}</span>
           <br/>
