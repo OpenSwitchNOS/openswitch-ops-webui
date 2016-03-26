@@ -81,6 +81,7 @@ export const MESSAGES = {
   emerg: 'Emerg',
   enabled: 'Enabled',
   error: 'Error',
+  exceededMax: 'Exceeded Max',
   frontToBack: 'Front-to-Back',
   facility: 'Facility',
   failedRequest: 'Failed Request',

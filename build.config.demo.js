@@ -21,6 +21,7 @@ import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import VlanDux from 'vlan/vlanDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
+import LagDux from 'lag/lagDux.jsx';
 
 const modules = [
   CollectorDux,
@@ -30,6 +31,7 @@ const modules = [
   InterfaceDux,
   VlanDux,
   EcmpDux,
+  LagDux,
 ];
 
 import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
