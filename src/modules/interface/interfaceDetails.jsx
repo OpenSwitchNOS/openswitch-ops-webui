@@ -24,6 +24,7 @@ import Tab from 'grommet/components/Tab';
 import Tabs from 'grommet/components/Tabs';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import Formatter from 'formatter.js';
+import { pr } from 'propRow.jsx';
 
 
 const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
@@ -71,15 +72,6 @@ class InterfaceDetails extends Component {
         </a>
       ) : null;
 
-    function tr(key, data, wKey, wData) {
-      return (
-        <tr>
-          {wKey ? <td style={{width: wKey}}>{t(key)}:</td> : <td>{t(key)}:</td>}
-          {wData ? <td style={{width: wData}}>{data}</td> : <td>{data}</td>}
-        </tr>
-      );
-    }
-
     return (
       <Box pad="small">
         <Box direction="row" justify="between">
@@ -92,32 +84,32 @@ class InterfaceDetails extends Component {
           <Tab title={t('general')}>
             <table style={{tableLayout: 'fixed'}} className="propTable">
               <tbody>
-                {tr('configured', t(inf.cfgAdmin), 180, 200)}
-                {tr('adminState', t(inf.adminStateConnector))}
-                {tr('linkState', t(inf.linkState))}
-                {tr('duplex', t(inf.duplex))}
-                {tr('speed', inf.speedFormatted)}
-                {tr('connector', tOrKey(inf.connector))}
-                {tr('mac', inf.mac)}
-                {tr('mtu', inf.mtu)}
-                {tr('autoNeg', t(inf.cfgAutoNeg))}
-                {tr('flowControl', t(inf.cfgFlowCtrl))}
-                {tr('ipV4', port.ipV4)}
-                {tr('ipV6', port.ipV6)}
+                {pr('configured', t(inf.cfgAdmin), 180, 200)}
+                {pr('adminState', t(inf.adminStateConnector))}
+                {pr('linkState', t(inf.linkState))}
+                {pr('duplex', t(inf.duplex))}
+                {pr('speed', inf.speedFormatted)}
+                {pr('connector', tOrKey(inf.connector))}
+                {pr('mac', inf.mac)}
+                {pr('mtu', inf.mtu)}
+                {pr('autoNeg', t(inf.cfgAutoNeg))}
+                {pr('flowControl', t(inf.cfgFlowCtrl))}
+                {pr('ipV4', port.ipV4)}
+                {pr('ipV6', port.ipV6)}
               </tbody>
             </table>
           </Tab>
           <Tab title={t('statistics')}>
             <table style={{tableLayout: 'fixed'}} className="propTable">
               <tbody>
-                {tr('rxPackets', tcs(inf.rxPackets), 180, 200)}
-                {tr('rxBytes', tcs(inf.rxBytes))}
-                {tr('rxErrors', tcs(inf.rxErrors))}
-                {tr('rxDropped', tcs(inf.rxDropped))}
-                {tr('txPackets', tcs(inf.txPackets))}
-                {tr('txBytes', tcs(inf.txBytes))}
-                {tr('txErrors', tcs(inf.txErrors))}
-                {tr('txDropped', tcs(inf.txDropped))}
+                {pr('rxPackets', tcs(inf.rxPackets), 180, 200)}
+                {pr('rxBytes', tcs(inf.rxBytes))}
+                {pr('rxErrors', tcs(inf.rxErrors))}
+                {pr('rxDropped', tcs(inf.rxDropped))}
+                {pr('txPackets', tcs(inf.txPackets))}
+                {pr('txBytes', tcs(inf.txBytes))}
+                {pr('txErrors', tcs(inf.txErrors))}
+                {pr('txDropped', tcs(inf.txDropped))}
               </tbody>
             </table>
           </Tab>
@@ -126,13 +118,13 @@ class InterfaceDetails extends Component {
             <hr/>
             <table style={{tableLayout: 'fixed'}} className="propTable">
               <tbody>
-                {tr('chassisName', inf.lldp.chassisName, 180, 200)}
-                {tr('chassisId', inf.lldp.chassisId)}
-                {tr('ip', inf.lldp.ip)}
-                {tr('portId', inf.lldp.portId)}
-                {tr('sysDesc', inf.lldp.sysDesc)}
-                {tr('capsSupported', inf.lldp.capsSupported)}
-                {tr('capsEnabled', inf.lldp.capsEnabled)}
+                {pr('chassisName', inf.lldp.chassisName, 180, 200)}
+                {pr('chassisId', inf.lldp.chassisId)}
+                {pr('ip', inf.lldp.ip)}
+                {pr('portId', inf.lldp.portId)}
+                {pr('sysDesc', inf.lldp.sysDesc)}
+                {pr('capsSupported', inf.lldp.capsSupported)}
+                {pr('capsEnabled', inf.lldp.capsEnabled)}
               </tbody>
             </table>
             <br/>
@@ -140,10 +132,10 @@ class InterfaceDetails extends Component {
             <hr/>
             <table style={{tableLayout: 'fixed'}} className="propTable">
               <tbody>
-                {tr('framesRx', tcs(inf.lldp.framesRx), 180, 200)}
-                {tr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
-                {tr('framesRxUnrecog', tcs(inf.lldp.framesRxUnrecog))}
-                {tr('framesTx', tcs(inf.lldp.framesTx))}
+                {pr('framesRx', tcs(inf.lldp.framesRx), 180, 200)}
+                {pr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
+                {pr('framesRxUnrecog', tcs(inf.lldp.framesRxUnrecog))}
+                {pr('framesTx', tcs(inf.lldp.framesTx))}
               </tbody>
             </table>
           </Tab>

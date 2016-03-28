@@ -14,64 +14,142 @@
     under the License.
 */
 
-// import AsyncDux from 'asyncDux.js';
-// import LagPage from './lagPage.jsx';
-// import LagDetails from './lagDetails.jsx';
-// import Agent, { mkAgentHandler } from 'agent.js';
-// import Async from 'async';
-// import LagEdit from './lagEdit.jsx';
+/*eslint no-console:0*/
 
+import { t } from 'i18n/lookup.js';
+import Agent from 'agent.js';
+import AsyncDux from 'asyncDux.js';
+import Async from 'async';
+import { sumValues } from 'calc.js';
+import LagPage from './lagPage.jsx';
+import LagDetails from './lagDetails.jsx';
+// import LagEdit from './lagEdit.jsx';
 
 
 const NAME = 'lag';
 
-// const PAGE_ASYNC = 'page';
-// const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
-//
-// const SET_ASYNC = 'set';
-// const SET_AT = Dux.mkAsyncActionTypes(NAME, SET_ASYNC);
-//
-// const INITIAL_STORE = {
-//   page: {
-//     ...Dux.mkAsyncStatus(),
-//     lags: {},
-//   },
-//   set: {
-//     ...Dux.mkAsyncStatus(),
-//   }
-// };
-//
-//
-// const NAVS = [
-//   {
-//     route: { path: '/lag', component: LagPage },
-//     link: { path: '/lag', order: 600 }
-//   },
-//   {
-//     route: { path: '/lag/:id', component: LagDetails },
-//     link: { path: '/lag', hidden: true }
-//   },
-//   {
-//     route: { path: '/lag/:id', component: LagEdit },
-//     link: { path: '/lag', hidden: true }
-//   },
-//
-// ];
-//
-// const PORTS_URL_WITH_DEPTH = '/rest/v1/system/ports?depth=1';
-// const INTERFACES_URL_WITH_DEPTH = '/rest/v1/system/interfaces?depth=1';
-//
-// const URLS = [ PORTS_URL_WITH_DEPTH, INTERFACES_URL_WITH_DEPTH ];
-//
-// const ACTIONS = {
-//
-//   fetch() {
-//     return (dispatch, getStoreFn) => {
-//       const mStore = getStoreFn()[NAME];
-//       Dux.getIfCooledDown(dispatch, mStore, PAGE_ASYNC, PAGE_AT, URLS);
-//     };
-//   },
-//
+const NAVS = [
+  {
+    route: { path: '/lag', component: LagPage },
+    link: { path: '/lag', order: 600 }
+  },
+  {
+    route: { path: '/lag/:id', component: LagDetails },
+    link: { path: '/lag', hidden: true }
+  },
+  // {
+  //   route: { path: '/lag/:id', component: LagEdit },
+  //   link: { path: '/lag', hidden: true }
+  // },
+  //
+];
+
+
+const INITIAL_STORE = {
+  lags: {},
+  edit: {}
+};
+
+const AD = new AsyncDux(NAME, INITIAL_STORE);
+
+const LAG_PREFIX = 'lag';
+const LAG_REGEX = /^lag/;
+
+function pageParser(result) {
+  const lags = {};
+
+  // parse the ports
+  result[0].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const name = cfg.name;
+
+    if (LAG_REGEX.test(name)) {
+      const status = elm.status;
+
+      const ls = status.lacp_status;
+      const bondStatus = ls && ls.bond_status;
+
+      const id = name.substring(LAG_PREFIX.length);
+      const vlanMode = cfg.vlan_mode;
+      const vlanIds = cfg.trunks || [];
+      if (cfg.tag && vlanIds.indexOf(cfg.tag) < 0) { vlanIds.push(cfg.tag); }
+      const lag = {
+        name,
+        id,
+        lacp: cfg.lacp,
+        admin: cfg.admin || 'down',
+        vlanMode,
+        vlanIds,
+        bondStatus,
+        interfaces: {},
+        stats: {},
+      };
+      lags[id] = lag;
+    }
+  });
+
+  // parse the interfaces
+  result[1].body.forEach(elm => {
+    const cfg = elm.configuration;
+    const stats = elm.statistics.statistics;
+    const id = cfg.name;
+
+    const oc = cfg.other_config;
+    const lacpAggrKey = oc && oc['lacp-aggregation-key'];
+    if (lacpAggrKey) {
+      const lag = lags[lacpAggrKey];
+      if (!lag) {
+        console.log(`Bad lacp-aggregation-key ${lacpAggrKey} for LAG ${id}`);
+      } else {
+        const data = {
+          id,
+          rxBytes: Number(stats.rx_bytes) || 0,
+          rxPackets: Number(stats.rx_packets) || 0,
+          rxErrors: Number(stats.rx_errors) || 0,
+          rxDropped: Number(stats.rx_dropped) || 0,
+          txBytes: Number(stats.tx_bytes) || 0,
+          txPackets: Number(stats.tx_packets) || 0,
+          txErrors: Number(stats.tx_errors) || 0,
+          txDropped: Number(stats.tx_dropped) || 0,
+          speed: status.link_speed ? Number(status.link_speed) : 0,
+          lacpAggrKey,
+        };
+        lag.interfaces[id] = data;
+      }
+    }
+  });
+
+  const STAT_KEYS = [
+    'rxBytes', 'rxPackets', 'rxErrors', 'rxDropped',
+    'txBytes', 'txPackets', 'txErrors', 'txDropped',
+    'speed'
+  ];
+  Object.getOwnPropertyNames(lags).forEach(lagId => {
+    const lag = lags[lagId];
+    lag.stats = sumValues(lag.interfaces, STAT_KEYS);
+  });
+
+  return { lags };
+}
+
+const URL_PORTS_D1 = '/rest/v1/system/ports?depth=1';
+const URL_INFS_D1 = '/rest/v1/system/interfaces?depth=1';
+
+const ACTIONS = {
+
+  fetchPage() {
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('loading') }));
+      Async.parallel([
+        cb => Agent.get(URL_PORTS_D1).end(cb),
+        cb => Agent.get(URL_INFS_D1).end(cb),
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+      });
+    };
+  },
+
 //   addLag(lag) {
 //     const PORTS_URL = '/rest/v1/system/ports/';
 //     const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
@@ -169,66 +247,14 @@ const NAME = 'lag';
 //     };
 //   },
 //
-//   clearErrorForSet() {
-//     return { type: SET_AT.CLEAR_ERROR };
-//   },
-//
-//
-//
-// };
-//
-// function parsePageResult(result) {
-//   const lags = {};
-//   result[0].body.forEach(elm => {
-//     const cfg = elm.configuration;
-//     const id = cfg.name;
-//     const status = elm.status;
-//     const tmp = status.lacp_status;
-//     const bondStatus = (tmp && tmp.bond_status) || '';
-//     const regularExpression = /^lag/;
-//     const idModified = id.substring(3);
-//     if (regularExpression.test(id)) {
-//       lags[idModified] = {
-//         idModified,
-//         name: id,
-//         lacp: cfg.lacp || '',
-//         status: cfg.admin || 'down',
-//         vlanMode: cfg.vlan_mode || '',
-//         bondStatus,
-//         vlans: {},
-//         lagInterfaces: {},
-//         availableInterfacesForLag: {},
-//       };
-//     }
-//   });
-//
-//   const lagInterfaces = {};
-//   result[1].body.forEach(elm => {
-//     const cfg = elm.configuration;
-//     const id = cfg.name;
-//     const tmp = cfg.other_config;
-//     const lacpAggregatoinKey = (tmp && tmp['lacp-aggregation-key']) || '';
-//     if (lacpAggregatoinKey !== '') {
-//       const data = {
-//         id,
-//         rxBytes: elm.statistics.statistics.rx_bytes || 0,
-//         rxPackets: elm.statistics.statistics.rx_packets || 0,
-//         rxErrors: elm.statistics.statistics.rx_errors || 0,
-//         rxDropped: elm.statistics.statistics.rx_dropped || 0,
-//         txBytes: elm.statistics.statistics.tx_bytes || 0,
-//         txPackets: elm.statistics.statistics.tx_packets || 0,
-//         txErrors: elm.statistics.statistics.tx_errors || 0,
-//         txDropped: elm.statistics.statistics.tx_dropped || 0,
-//         speed: elm.status.link_speed || 0,
-//         lacpAggregatoinKey,
-//       };
-//       lagInterfaces[id] = data;
-//       //TODO: lags Not Available in the below scope.
-//       if (data.lacpAggregatoinKey !== '') {
-//         lags[data.lacpAggregatoinKey].lagInterfaces[id] = data;
-//       }
-//     }
-//   });
+  clearError() {
+    return AD.action('CLEAR_ERROR');
+  },
+
+
+
+};
+
 //
 //   const availableInterfaces = {};
 //   result[1].body.forEach(elm => {
@@ -291,7 +317,7 @@ const NAME = 'lag';
 
 export default {
   NAME,
-  // NAVS,
-  // ACTIONS,
-  // REDUCER,
+  NAVS,
+  ACTIONS,
+  REDUCER: AD.reducer(),
 };

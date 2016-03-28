@@ -94,4 +94,48 @@ describe('calc', () => {
     });
   });
 
+  it('sum array of objects value for keys', () => {
+    const array = [
+      { width: 5, speed: 10 },
+      { speed: 8 },
+      { width: 20, speed: 24 },
+    ];
+    expect(Calc.sumValues(array, 'speed')).toEqual(42);
+    expect(Calc.sumValues([], 'speed')).toEqual(0);
+    expect(Calc.sumValues(array, 'bogus')).toEqual(0);
+    expect(Calc.sumValues(array, null)).toEqual(0);
+
+    expect(Calc.sumValues(array, ['speed', 'width'])).toEqual({
+      speed: 42, width: 25,
+    });
+    expect(Calc.sumValues(array, ['speed', 'height'])).toEqual({
+      speed: 42, height: 0,
+    });
+    expect(Calc.sumValues([], ['speed', 'height'])).toEqual({
+      speed: 0, height: 0,
+    });
+  });
+
+  it('sum object values for keys', () => {
+    const obj = {
+      123: { width: 5, speed: 10 },
+      456: { speed: 8 },
+      789: { width: 20, speed: 24 },
+    };
+    expect(Calc.sumValues(obj, 'speed')).toEqual(42);
+    expect(Calc.sumValues([], 'speed')).toEqual(0);
+    expect(Calc.sumValues(obj, 'bogus')).toEqual(0);
+    expect(Calc.sumValues(obj, null)).toEqual(0);
+
+    expect(Calc.sumValues(obj, ['speed', 'width'])).toEqual({
+      speed: 42, width: 25,
+    });
+    expect(Calc.sumValues(obj, ['speed', 'height'])).toEqual({
+      speed: 42, height: 0,
+    });
+    expect(Calc.sumValues([], ['speed', 'height'])).toEqual({
+      speed: 0, height: 0,
+    });
+  });
+
 });
