@@ -58,7 +58,8 @@ const settings = {
     },
   ],
   constants: {
-    VLAN_ID_RANGE: '1-4094'
+    VLAN_ID_RANGE: '1-4094',
+    LAG_ID_RANGE: '1-2000',
   }
 };
 

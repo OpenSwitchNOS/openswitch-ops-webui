@@ -23,7 +23,6 @@ import Async from 'async';
 import { sumValues } from 'calc.js';
 import LagPage from './lagPage.jsx';
 import LagDetails from './lagDetails.jsx';
-// import LagEdit from './lagEdit.jsx';
 import * as C from './lagConst.js';
 
 
@@ -38,17 +37,10 @@ const NAVS = [
     route: { path: '/lag/:id', component: LagDetails },
     link: { path: '/lag', hidden: true }
   },
-  // {
-  //   route: { path: '/lag/:id', component: LagEdit },
-  //   link: { path: '/lag', hidden: true }
-  // },
-  //
 ];
-
 
 const INITIAL_STORE = {
   lags: {},
-  edit: {}
 };
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
@@ -97,6 +89,7 @@ function pageParser(result) {
   });
 
   // parse the interfaces
+  const availInterfaces = {};
   result[1].body.forEach(elm => {
     const cfg = elm.configuration;
     const stats = elm.statistics.statistics;
@@ -124,6 +117,8 @@ function pageParser(result) {
         };
         lag.interfaces[id] = data;
       }
+    } else if (cfg.type === 'system') {
+      availInterfaces[id] = { id };
     }
   });
 
@@ -137,7 +132,7 @@ function pageParser(result) {
     lag.stats = sumValues(lag.interfaces, STAT_KEYS);
   });
 
-  return { lags };
+  return { lags, availInterfaces };
 }
 
 const SEL_CFG = 'selector=configuration';
@@ -209,7 +204,7 @@ const ACTIONS = {
     });
 
     return (dispatch) => {
-      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 9 }));
       Async.waterfall([
         cb1 => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
@@ -246,7 +241,116 @@ const ACTIONS = {
     };
   },
 
-  // setLagDetails(aggregationMode, otherConfigPatch, lagId) {
+  editLag(lagId, state) {
+    const URL_LAG = `${URL_PORTS}/${LAG_PREFIX}${lagId}?${SEL_CFG}`;
+
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 10 }));
+      Async.waterfall([
+        portsCb => {
+          // fetch the ports
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          Agent.get(URL_PORTS).end(portsCb);
+        },
+        (portsRes, cb2) => {
+          // delete any ports that exists for added interfaces to this LAG
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          const reqs = [];
+          Object.keys(state.diff.added).forEach(infId => {
+            const url = `${URL_PORTS}/${infId}`;
+            if (portsRes.body.indexOf(url) >= 0) {
+              reqs.push(cb => Agent.delete(url).end(cb));
+            }
+          });
+          Async.series(reqs, cb2);
+        },
+        (r2, cb3) => {
+          // fetch etag for each interface that we added to this LAG
+          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
+          const reqs = [];
+          Object.keys(state.diff.added).forEach(infId => {
+            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+            reqs.push(cb => Agent.get(url).end(cb));
+          });
+          Async.series(reqs, cb3);
+        },
+        (infsDataRes, cb4) => {
+          // patch (w/ etag) each interface that we added to this LAG
+          dispatch(AD.action('REQUEST_STEP', { currStep: 4 }));
+          const reqs = [];
+          infsDataRes.forEach(res => {
+            const infId = res.body.configuration.name;
+            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+            const etag = res.headers.etag;
+            const send = [
+              {op: 'add', path: '/user_config', value: { admin: 'up'}},
+              {op: 'add', path: '/other_config', value: {
+                'lacp-aggregation-key': lagId
+              }}
+            ];
+            reqs.push(cb => {
+              Agent.patch(url).send(send).set('If-Match', etag).end(cb);
+            });
+          });
+          Async.series(reqs, cb4);
+        },
+        (r4, cb5) => {
+          // fetch etag for each interface that we removed from this LAG
+          dispatch(AD.action('REQUEST_STEP', { currStep: 5 }));
+          const reqs = [];
+          Object.keys(state.diff.removed).forEach(infId => {
+            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+            reqs.push(cb => Agent.get(url).end(cb));
+          });
+          Async.series(reqs, cb5);
+        },
+        (infsDataRes, cb6) => {
+          // patch (w/ etag) each interface that we removed from this LAG
+          dispatch(AD.action('REQUEST_STEP', { currStep: 6 }));
+          const reqs = [];
+          infsDataRes.forEach(res => {
+            const infId = res.body.configuration.name;
+            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+            const etag = res.headers.etag;
+            const send = [{op: 'remove', path: '/other_config'}];
+            reqs.push(cb => {
+              Agent.patch(url).send(send).set('If-Match', etag).end(cb);
+            });
+          });
+          Async.series(reqs, cb6);
+        },
+        (r6, cb7) => {
+          // fetch etag for LAG port.
+          dispatch(AD.action('REQUEST_STEP', { currStep: 7 }));
+          Agent.get(URL_LAG).end(cb7);
+        },
+        (portData, cb8) => {
+          // patch (w/ etag) the LAG port with the interface URLs
+          dispatch(AD.action('REQUEST_STEP', { currStep: 8 }));
+          const urls = [];
+          Object.keys(state.lagInfs).forEach(infId => {
+            urls.push(`${URL_INFS}/${infId}`);
+          });
+          const etag = portData.headers.etag;
+          const send = [{op: 'add', path: '/interfaces', value: urls}];
+          Agent.patch(URL_LAG).send(send).set('If-Match', etag).end(cb8);
+        },
+        (r8, cb9) => {
+          // fetch page data
+          dispatch(AD.action('REQUEST_STEP', { currStep: 9 }));
+          Async.parallel([
+            cb => Agent.get(URL_PORTS_D1).end(cb),
+            cb => Agent.get(URL_INFS_D1).end(cb),
+          ], cb9);
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+      });
+    };
+  },
+
+  // TODO: setLagDetails(aggregationMode, otherConfigPatch, lagId) {
   //   const PORTS_URL = `/rest/v1/system/ports/lag${lagId}`;
   //   const otherConfiglagPatch = Utils.lagOtherConfig(otherConfigPatch);
   //   if (lagId) {
@@ -267,125 +371,11 @@ const ACTIONS = {
   //   }
   // },
 
-
-
-//
-//
-//
-//   editLag(lag, lagPorts, lagId) {
-//     const PORTS_URL_APPENDED = `/rest/v1/system/ports/lag${lagId}`;
-//     const reqs = [];
-//     const interfaces = [];
-//     let j = 0;
-//     Object.keys(lag).forEach(i => {
-//       interfaces[j] = `/rest/v1/system/interfaces/${lag[i].id}`;
-//       j++;
-//     });
-//     return (dispatch) => {
-//
-//       Object.keys(lag).forEach(i => {
-//         if (lagPorts[i] && (lagPorts[i].id === lag[i].id)) {
-//           const pathPassed = Number(lag[i].id);
-//           reqs.push(cb => Agent.delete(`/rest/v1/system/ports/${pathPassed}`)
-//             .end(mkAgentHandler('/rest/v1/system/ports/', cb)));
-//         }
-//       });
-//
-//       Object.keys(lag).forEach(i => {
-//         const URL = `/rest/v1/system/interfaces/${lag[i].id}`;
-//         reqs.push(cb =>
-//             Agent.patch(URL)
-//     .send([{op: 'add', path: '/user_config', value: { admin: 'up'}},
-//     {op: 'add', path: '/other_config', value: {'lacp-aggregation-key': lagId}}])
-//         .end(mkAgentHandler(URL, cb)));
-//       });
-//       reqs.push( cb => Agent.patch(PORTS_URL_APPENDED)
-//         .send([{op: 'add', path: '/interfaces', value: interfaces}])
-//         .end(mkAgentHandler(PORTS_URL_APPENDED, cb)));
-//
-//
-//       Dux.dispatchRequest(dispatch, SET_AT);
-//       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-//       Async.series(reqs, dispatcher);
-//     };
-//   },
-//
-//
-//   removeInterfaceFromLag(lagInterfaces) {
-//     const INTERFACES_URL = '/rest/v1/system/interfaces/';
-//     return (dispatch) => {
-//       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-//       Object.keys(lagInterfaces).forEach(i => {
-//         Agent.patch(`${INTERFACES_URL}${lagInterfaces[i]}`)
-//         .send([{op: 'remove', path: '/other_config'}])
-//         .end(mkAgentHandler(INTERFACES_URL, dispatcher));
-//       });
-//     };
-//   },
-
   clearError() {
     return AD.action('CLEAR_ERROR');
   },
 
-
-
 };
-
-//
-//   const availableInterfaces = {};
-//   result[1].body.forEach(elm => {
-//     const cfg = elm.configuration;
-//     const id = cfg.name;
-//     const tmp = cfg.other_config;
-//     const lacpAggregatoinKey = (tmp && tmp['lacp-aggregation-key']) || '';
-//     if (!(lacpAggregatoinKey !== '')) {
-//       const data = {
-//         id,
-//       };
-//       availableInterfaces[id] = data;
-//     }
-//   });
-//
-//
-//   const vlans = {};
-//   result[0].body.forEach(elm => {
-//     const cfg = elm.configuration;
-//     const id = cfg.name;
-//     if (cfg.vlan_mode) {
-//       const idModified = id.substring(3);
-//       const regularExpression = /^lag/;
-//       if (regularExpression.test(id)) {
-//         const data = {
-//           idModified,
-//           tag: cfg.tag || '',
-//           trunks: cfg.trunks || '',
-//           mode: cfg.vlan_mode || '',
-//         };
-//         vlans[idModified] = data;
-//         if (data.tag) {
-//           lags[idModified].vlans[data.tag] = data;
-//         }
-//         if (data.trunks) {
-//           data.trunks.forEach(e => lags[idModified].vlans[e] = data);
-//         }
-//       }
-//     }
-//   });
-// //TODO: Rename and find a better way to do it.
-//   const ports = {};
-//   result[0].body.forEach(elm => {
-//     const cfg = elm.configuration;
-//     const id = cfg.name;
-//     const data = {
-//       id,
-//     };
-//     ports[id] = data;
-//   });
-//
-//
-//   return {lags, lagInterfaces, availableInterfaces, ports};
-// }
-//
 
 export default {
   NAME,

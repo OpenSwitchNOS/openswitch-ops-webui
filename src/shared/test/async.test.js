@@ -56,6 +56,16 @@ describe('async', () => {
     });
   });
 
+  it('handles empty series', (done) => {
+    Async.series([
+    ],
+    (err, result) => {
+      expect(err).toBeNull();
+      expect(result).toEqual([]);
+      done();
+    });
+  });
+
   it('handles waterfall', (done) => {
     Async.waterfall([
       cb => cb(null, '1', '2'),

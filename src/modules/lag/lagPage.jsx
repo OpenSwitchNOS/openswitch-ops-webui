@@ -25,7 +25,7 @@ import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 import { naturalSort } from 'sorts.js';
 import DetailsBox from 'detailsBox.jsx';
 import ConfirmLayer from 'confirmLayer.jsx';
-// import LagEdit from './lagEdit.jsx';
+import LagEdit from './lagEdit.jsx';
 import LagAdd from './lagAdd.jsx';
 
 
@@ -158,10 +158,6 @@ class LagPage extends Component {
     this.props.actions.lag.deleteLag(lagId, infs);
     this.setState({ deleteLagLayer: false });
   };
-//
-// _onCloseError = () => {
-//   this.props.actions.lag.clearErrorForSet();
-// };
 
   _onShowDetailsOnSelect = (evt) => {
     this.setState({ showDetailsOnSelect: evt.target.checked });
@@ -169,11 +165,8 @@ class LagPage extends Component {
 
   render() {
     const lags = this.props.lag.lags;
-
     const numLags = Object.getOwnPropertyNames(lags).length;
-
     const selLagId = this.props.params.id;
-    // const set = this.props.lag.set;
 
     const statusLayer = mkStatusLayer(
           this.props.lag.asyncStatus,
@@ -191,11 +184,21 @@ class LagPage extends Component {
           onClose={() => this.setState({addLagLayer: false})}
       />;
 
+    // TODO: reuse addLag component and integrate with edit.
+    const editLagLayer = !this.state.editLagLayer ? null :
+      <LagEdit
+          actions={this.props.actions}
+          lagId={selLagId}
+          onClose={() => this.setState({editLagLayer: false})}
+      />;
+
     const deleteLagLayer = !this.state.deleteLagLayer ? null :
       <ConfirmLayer
+          title={`${t('deleteLag')} ${selLagId}`}
           onClose={() => this.setState({deleteLagLayer: false})}
-          onSubmit={this._onDelete}>
-        The text.
+          onSubmit={this._onDelete}
+          submitLabel={t('yes')}>
+        {t('areYouSureDeleteLag')}
       </ConfirmLayer>;
 
   // const editLayer = !this.state.edit || !this.state.id ? null :
@@ -239,6 +242,7 @@ class LagPage extends Component {
       <Box className="flex1" direction="row">
         {statusLayer}
         {addLagLayer}
+        {editLagLayer}
         {deleteLagLayer}
         <Box className="flex1 mTop mLeft">
           <ResponsiveBox>
@@ -250,6 +254,7 @@ class LagPage extends Component {
                 onSelectChange={this._onSelect}
                 onAdd={() => this.setState({addLagLayer: true})}
                 onDelete={() => this.setState({deleteLagLayer: true})}
+                onEdit={() => this.setState({editLagLayer: true})}
                 toolbar={[
                   <CheckBox
                       onChange={this._onShowDetailsOnSelect}

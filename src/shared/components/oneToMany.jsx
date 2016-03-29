@@ -88,7 +88,9 @@ export default class OneToMany extends Component {
       if (added[k]) { delete added[k]; }
     });
 
-    return { added, removed };
+    const addedCount = Object.keys(added).length;
+    const removedCount = Object.keys(removed).length;
+    return { added, addedCount, removed, removedCount };
   };
 
   _onAddSubSet = () => {

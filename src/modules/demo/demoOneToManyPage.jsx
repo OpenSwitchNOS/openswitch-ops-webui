@@ -85,8 +85,12 @@ class OneToManyPage extends Component {
             onChange={this._onChange}
             maxSubSetSize={8}
         />
-        <div>Added: {Object.keys(diff.added).join(', ')}</div>
-        <div>Removed: {Object.keys(diff.removed).join(', ')}</div>
+        <div>
+          Added: ({diff.addedCount}) {Object.keys(diff.added).join(', ')}
+        </div>
+        <div>
+          Removed: ({diff.removedCount}) {Object.keys(diff.removed).join(', ')}
+        </div>
       </Box>
     );
   }
