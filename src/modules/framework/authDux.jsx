@@ -14,12 +14,24 @@
     under the License.
 */
 
+/*eslint no-console:0*/
+
+import Agent from 'agent.js';
+
 const NAME = 'auth';
 const LOGIN = `${NAME}/LOGIN`;
 const LOGOUT = `${NAME}/LOGOUT`;
 
 const ACTIONS = {
-  login() { return { type: LOGIN }; },
+  login() {
+    // TODO: test the login.
+
+    Agent.post('/login').send('username=netop&password=netop').end((e, r) => {
+      console.log('login', e, r);
+    });
+
+    return { type: LOGIN };
+  },
   logout() { return { type: LOGOUT }; },
 };
 

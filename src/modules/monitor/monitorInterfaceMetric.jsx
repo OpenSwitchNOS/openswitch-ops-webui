@@ -41,13 +41,14 @@ class MonitorInterfaceMetric extends Component {
 
   render() {
     const id = this.props.params.id;
-    const metrics = this.props.collector.overview.interfaceMetrics[id];
+    const metrics = this.props.collector.interfaceMetrics[id];
 
     let content = null;
     if (!metrics || metrics.length === 0) {
       content = (
         <div style={{textAlign: 'center'}}>
           <RefreshIcon className="spin"/>
+          &nbsp;&nbsp;
           {t('loading')}
         </div>
       );
@@ -65,7 +66,7 @@ class MonitorInterfaceMetric extends Component {
 
     return (
       <Box pad={this.pad} className="pageBox">
-        <large><b>{`${t('interfaceUtiization')}: `}</b>{id}</large>
+        <large><b>{t('utilization')}</b></large>
         <br/>
         {content}
       </Box>

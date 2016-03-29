@@ -47,8 +47,7 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: ``,
-    // prefix: `http://${window.location.hostname}:8091`,
+    prefix: `http://${window.location.hostname}:8091`,
   },
   extLinks: [
     {

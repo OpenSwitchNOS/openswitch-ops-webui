@@ -33,26 +33,6 @@ class MonitorInterfacePage extends Component {
     this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
-  _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
-    this.props.actions.overview.fetch();
-  };
-
-  componentDidMount() {
-    const p = this.props;
-    this._onRefresh();
-    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const p = nextProps;
-    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
-  }
-
-  componentWillUnmount() {
-    this.props.actions.toolbar.clear();
-  }
-
   render() {
     return (
       <Box className="flex1">
