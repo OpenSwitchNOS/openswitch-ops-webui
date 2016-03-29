@@ -24,10 +24,9 @@ import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 import { naturalSort } from 'sorts.js';
 import DetailsBox from 'detailsBox.jsx';
-// import ReactCSSTG from 'react-addons-css-transition-group';
+import ConfirmLayer from 'confirmLayer.jsx';
 // import LagEdit from './lagEdit.jsx';
-// import LagCreation from './lagCreation.jsx';
-// import ErrorLayer from 'errorLayer.jsx';
+import LagAdd from './lagAdd.jsx';
 
 
 class LagPage extends Component {
@@ -153,11 +152,12 @@ class LagPage extends Component {
 //   this.setState({deleteLag});
 // };
 //
-// _onDeleteLag = (sel) => {
-//   const lagInterfacesToBeRemoved = this.props.lag.page.lags[sel].lagInterfaces;
-//   this.props.actions.lag.deletingLag(sel, lagInterfacesToBeRemoved);
-//   this._onDeleteLagToggle();
-// };
+  _onDelete = () => {
+    const lagId = this.props.params.id;
+    const infs = this.props.lag.lags[lagId].interfaces;
+    this.props.actions.lag.deleteLag(lagId, infs);
+    this.setState({ deleteLagLayer: false });
+  };
 //
 // _onCloseError = () => {
 //   this.props.actions.lag.clearErrorForSet();
@@ -184,6 +184,19 @@ class LagPage extends Component {
         {this.props.children}
       </DetailsBox>
     );
+
+    const addLagLayer = !this.state.addLagLayer ? null :
+      <LagAdd
+          actions={this.props.actions}
+          onClose={() => this.setState({addLagLayer: false})}
+      />;
+
+    const deleteLagLayer = !this.state.deleteLagLayer ? null :
+      <ConfirmLayer
+          onClose={() => this.setState({deleteLagLayer: false})}
+          onSubmit={this._onDelete}>
+        The text.
+      </ConfirmLayer>;
 
   // const editLayer = !this.state.edit || !this.state.id ? null :
   //   <LagEdit
@@ -212,7 +225,7 @@ class LagPage extends Component {
   //       onClose={this._onCreateNewLag}
   //       onSubmit={this._onEditSubmit}
   //   /> : null;
-  //
+  //deleteLagLayer
   // const deleteLag = this.state.deleteLag ?
   //   this._onDeleteLag(this.state.id) : null;
 
@@ -225,6 +238,8 @@ class LagPage extends Component {
     return (
       <Box className="flex1" direction="row">
         {statusLayer}
+        {addLagLayer}
+        {deleteLagLayer}
         <Box className="flex1 mTop mLeft">
           <ResponsiveBox>
             <DataGrid width={400} height={400}
@@ -233,6 +248,8 @@ class LagPage extends Component {
                 columns={this.cols}
                 singleSelect
                 onSelectChange={this._onSelect}
+                onAdd={() => this.setState({addLagLayer: true})}
+                onDelete={() => this.setState({deleteLagLayer: true})}
                 toolbar={[
                   <CheckBox
                       onChange={this._onShowDetailsOnSelect}

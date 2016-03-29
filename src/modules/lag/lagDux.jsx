@@ -24,6 +24,7 @@ import { sumValues } from 'calc.js';
 import LagPage from './lagPage.jsx';
 import LagDetails from './lagDetails.jsx';
 // import LagEdit from './lagEdit.jsx';
+import * as C from './lagConst.js';
 
 
 const NAME = 'lag';
@@ -73,6 +74,7 @@ function pageParser(result) {
       const vlanMode = cfg.vlan_mode;
       const vlanIds = cfg.trunks || [];
       if (cfg.tag && vlanIds.indexOf(cfg.tag) < 0) { vlanIds.push(cfg.tag); }
+
       const lag = {
         name,
         id,
@@ -84,6 +86,12 @@ function pageParser(result) {
         interfaces: {},
         stats: {},
       };
+
+      const oc = cfg[C.OTHER_CFG];
+      lag[C.FALLBACK] = (oc && oc[C.FALLBACK]) || C.FALLBACK_DEF;
+      lag[C.RATE] = (oc && oc[C.RATE]) || C.RATE_DEF;
+      lag[C.HASH] = (oc && oc[C.HASH]) || C.HASH_DEF;
+
       lags[id] = lag;
     }
   });
@@ -132,8 +140,13 @@ function pageParser(result) {
   return { lags };
 }
 
-const URL_PORTS_D1 = '/rest/v1/system/ports?depth=1';
-const URL_INFS_D1 = '/rest/v1/system/interfaces?depth=1';
+const SEL_CFG = 'selector=configuration';
+const URL_PORTS = '/rest/v1/system/ports';
+const URL_PORTS_D1 = `${URL_PORTS}?depth=1`;
+const URL_INFS = '/rest/v1/system/interfaces';
+const URL_INFS_D1 = `${URL_INFS}?depth=1`;
+const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
+
 
 const ACTIONS = {
 
@@ -150,25 +163,112 @@ const ACTIONS = {
     };
   },
 
-//   addLag(lag) {
-//     const PORTS_URL = '/rest/v1/system/ports/';
-//     const BRIDGE_URL = '/rest/v1/system/bridges/bridge_normal/';
-//     if (lag.lagId) {
-//       return (dispatch) => {
-//         const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-//         Agent.post(PORTS_URL)
-//         .send({
-//           configuration: {
-//             name: `lag${lag.lagId}`,
-//             lacp: lag.aggregationMode,
-//           },
-//           'referenced_by': [{uri: BRIDGE_URL}],
-//         })
-//       .end(mkAgentHandler(PORTS_URL, dispatcher));
-//       };
-//     }
-//   },
-//
+  addLag(state) {
+    const oc = { ...state[C.OTHER_CFG] };
+    if (oc[C.RATE] === C.RATE_DEF) { delete oc[C.RATE]; }
+    if (oc[C.FALLBACK] === C.FALLBACK_DEF) { delete oc[C.FALLBACK]; }
+    if (oc[C.HASH] === C.HASH_DEF) { delete oc[C.HASH]; }
+
+    const send = {
+      configuration: {
+        name: `lag${state.newLagId}`,
+        lacp: state[C.AGGR_MODE],
+      },
+      'referenced_by': [{uri: URL_BRIDGE}],
+    };
+    if (Object.keys(oc).length > 0) {
+      send.configuration[C.OTHER_CFG] = oc;
+    }
+
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 2 }));
+      Async.waterfall([
+        cb1 => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          Agent.post(URL_PORTS).send(send).set('If-None-Match', '*').end(cb1);
+        },
+        (r1, cb2) => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          Async.parallel([
+            cb => Agent.get(URL_PORTS_D1).end(cb),
+            cb => Agent.get(URL_INFS_D1).end(cb),
+          ], cb2);
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+      });
+    };
+  },
+
+  deleteLag(lagId, interfaces) {
+    const gets = [];
+    Object.keys(interfaces).forEach(infId => {
+      const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+      gets.push(cb => Agent.get(url).end(cb));
+    });
+
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
+      Async.waterfall([
+        cb1 => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          Async.parallel(gets, cb1);
+        },
+        (r1, cb2) => {
+          const patch = [];
+          r1.forEach(res => {
+            const infId = res.body.configuration.name;
+            const etag = res.headers.etag;
+            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+            patch.push(cb => Agent.patch(url)
+              .send([{op: 'remove', path: '/other_config'}])
+              .set('If-Match', etag)
+              .end(cb));
+          });
+          Async.series(patch, cb2);
+        },
+        (r2, cb3) => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          Agent.delete(`${URL_PORTS}/${LAG_PREFIX}${lagId}`).end(cb3);
+        },
+        (r3, cb4) => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
+          Async.parallel([
+            cb => Agent.get(URL_PORTS_D1).end(cb),
+            cb => Agent.get(URL_INFS_D1).end(cb),
+          ], cb4);
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+      });
+    };
+  },
+
+  // setLagDetails(aggregationMode, otherConfigPatch, lagId) {
+  //   const PORTS_URL = `/rest/v1/system/ports/lag${lagId}`;
+  //   const otherConfiglagPatch = Utils.lagOtherConfig(otherConfigPatch);
+  //   if (lagId) {
+  //     return (dispatch) => {
+  //       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
+  //       if (Object.keys(otherConfiglagPatch).length === 0) {
+  //         Agent.patch(PORTS_URL)
+  //       .send([{ op: 'add', path: '/lacp', value: aggregationMode},
+  //               {op: 'remove', path: '/other_config'}])
+  //       .end(mkAgentHandler(PORTS_URL, dispatcher));
+  //       } else {
+  //         Agent.patch(PORTS_URL)
+  //         .send([{ op: 'add', path: '/lacp', value: aggregationMode},
+  //               {op: 'add', path: '/other_config', value: otherConfiglagPatch}])
+  //         .end(mkAgentHandler(PORTS_URL, dispatcher));
+  //       }
+  //     };
+  //   }
+  // },
+
+
+
 //
 //
 //
@@ -222,31 +322,7 @@ const ACTIONS = {
 //       });
 //     };
 //   },
-//
-//   deletingLag(lagId, lagInterfaces) {
-//     const PORTS_URL = '/rest/v1/system/ports/';
-//     const INTERFACES_URL = '/rest/v1/system/interfaces/';
-//     const reqs = [];
-//
-//     return (dispatch) => {
-//       reqs.push(cb => {
-//         Agent.delete(`${PORTS_URL}lag${lagId}`)
-//         .end(mkAgentHandler(PORTS_URL, cb));
-//       });
-//
-//       Object.keys(lagInterfaces).forEach(i => {
-//         const intUrl = `${INTERFACES_URL}${lagInterfaces[i].id}`;
-//         reqs.push(cb => Agent.patch(intUrl)
-//         .send([{op: 'remove', path: '/other_config'}])
-//         .end(mkAgentHandler(INTERFACES_URL, cb)));
-//       });
-//
-//       Dux.dispatchRequest(dispatch, SET_AT);
-//       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-//       Async.series(reqs, dispatcher);
-//     };
-//   },
-//
+
   clearError() {
     return AD.action('CLEAR_ERROR');
   },
@@ -310,10 +386,6 @@ const ACTIONS = {
 //   return {lags, lagInterfaces, availableInterfaces, ports};
 // }
 //
-// const REDUCER = Dux.mkReducer(INITIAL_STORE, [
-//   Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
-//   Dux.mkAsyncHandler(NAME, SET_ASYNC, SET_AT),
-// ]);
 
 export default {
   NAME,

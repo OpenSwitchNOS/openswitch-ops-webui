@@ -94,7 +94,7 @@ class VlanAdd extends Component {
           closer
           flush
           align="right">
-        <Box pad="small" className="flex1">
+        <Box pad="medium" className="flex1">
           <Title>{t('addVlan')}</Title>
           <br/>
           <b>{t('vlanIdsAvailable')}</b>

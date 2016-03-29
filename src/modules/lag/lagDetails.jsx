@@ -24,6 +24,7 @@ import CloseIcon from 'grommet/components/icons/base/Close';
 import Formatter from 'formatter.js';
 import naturalSort from 'sorts.js';
 import { pr } from 'propRow.jsx';
+import * as C from './lagConst.js';
 
 
 class LagDetails extends Component {
@@ -65,7 +66,10 @@ class LagDetails extends Component {
           <tbody>
             {pr('name', lag.name, 160, 180)}
             {pr('id', lag.id)}
-            {pr('mode', t(lag.lacp))}
+            {pr('aggrMode', t(lag[C.AGGR_MODE]))}
+            {pr('rate', t(lag[C.RATE]))}
+            {pr('fallback', t(lag[C.FALLBACK]))}
+            {pr('hash', t(lag[C.HASH]))}
             {pr('interfaces', infs)}
             {pr('speed', lag.speed)}
             {pr('bondStatus', t(lag.bondStatus))}

@@ -238,18 +238,26 @@ $slideInColumnMinWidth: 350px;
   }
 }
 
-.edit .layer__container {
-  min-width: 300px;
+.edit {
+  .layer__container {
+    min-width: 300px;
+  }
+  &.layer {
+    z-index: 100;
+    &.second {
+      z-index: 101;
+    }
+    &.third {
+      z-index: 102;
+    }
+  }
+  .title {
+    line-height: 1.5em; // else the font gets clipped on bottom
+  }
 }
 
-.edit.layer {
-  z-index: 100;
-  &.second {
-    z-index: 101;
-  }
-  &.third {
-    z-index: 102;
-  }
+body .drop {
+  z-index: 110;
 }
 
 .asyncStatus.layer {

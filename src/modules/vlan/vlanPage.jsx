@@ -196,7 +196,7 @@ class VlanPage extends Component {
           this.props.actions.vlan.clearError);
 
     return (
-      <Box className="flex1 mTopHalf mLeft">
+      <Box className="flex1 mTop mLeft">
         {addVlanLayer}
         {statusLayer}
         <ResponsiveBox>

@@ -40,6 +40,7 @@ class InterfaceEdit extends Component {
 
   constructor(props) {
     super(props);
+    // TODO: do we really need to create IDs with lodash here?
     this.fid = _.uniqueId('infEdit_');
     this.state = { [C.USER_CFG]: {} };
   }
