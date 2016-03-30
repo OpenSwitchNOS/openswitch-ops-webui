@@ -28,7 +28,6 @@ import ConfirmLayer from 'confirmLayer.jsx';
 import LagEdit from './lagEdit.jsx';
 import LagAdd from './lagAdd.jsx';
 
-
 class LagPage extends Component {
 
   static propTypes = {
@@ -82,12 +81,6 @@ class LagPage extends Component {
       },
     ];
     this.state = {};
-    // this.state = {
-    //   id: null,
-    //   edit: false,
-    //   newLag: false,
-    //   deleteLag: false,
-    // };
   }
 
   _onCustomCell = (cellData, cellProps) => {
@@ -123,35 +116,6 @@ class LagPage extends Component {
      this.props.history.pushState(null, url);
    };
 
-//
-// _onEdit = () => {
-//   const edit = !this.state.edit;
-//   this.setState({edit});
-// };
-//
-// _onEditSubmit = (lag) => {
-//   this.props.actions.lag.addLag(lag);
-//   this._onCreateNewLag();
-// };
-//
-// _onSubmitLagEdit = () => {
-//   this._onEdit();
-// };
-
-// _onCreateNewLag = () => {
-//   const newLag = !this.state.newLag;
-//   this.setState({newLag});
-// };
-//
-// _onClose = () => {
-//   this.setState({newLag: false});
-// };
-//
-// _onDeleteLagToggle = () => {
-//   const deleteLag = !this.state.deleteLag;
-//   this.setState({deleteLag});
-// };
-//
   _onDelete = () => {
     const lagId = this.props.params.id;
     const infs = this.props.lag.lags[lagId].interfaces;
@@ -200,43 +164,6 @@ class LagPage extends Component {
           submitLabel={t('yes')}>
         {t('areYouSureDeleteLag')}
       </ConfirmLayer>;
-
-  // const editLayer = !this.state.edit || !this.state.id ? null :
-  //   <LagEdit
-  //       actions={this.props.actions}
-  //       onClose={this._onEdit}
-  //       onSubmit={this._onSubmitLagEdit}
-  //       params={this.props.params}
-  //     />;
-  // // TODO: This check is not needed - see the vlan page
-  // const details = !this.state.id ? null : (
-  //   <Box className="pageBox">
-  //     <ReactCSSTG
-  //         transitionName="slideInColumn"
-  //         transitionAppear
-  //         transitionAppearTimeout={500}
-  //         transitionEnterTimeout={500}
-  //         transitionLeaveTimeout={500}>
-  //       <div>
-  //         {this.props.children}
-  //       </div>
-  //     </ReactCSSTG>
-  //   </Box>
-  // );
-  // const addLag = this.state.newLag ?
-  //   <LagCreation
-  //       onClose={this._onCreateNewLag}
-  //       onSubmit={this._onEditSubmit}
-  //   /> : null;
-  //deleteLagLayer
-  // const deleteLag = this.state.deleteLag ?
-  //   this._onDeleteLag(this.state.id) : null;
-
-            // {/*select={this.state.id}
-            // onEdit={this._onEdit}
-            // onAdd={this._onCreateNewLag}
-            // onDelete={this._onDeleteLagToggle}*/}
-
 
     return (
       <Box className="flex1" direction="row">

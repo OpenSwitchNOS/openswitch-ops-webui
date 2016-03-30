@@ -25,7 +25,6 @@ import LagPage from './lagPage.jsx';
 import LagDetails from './lagDetails.jsx';
 import * as C from './lagConst.js';
 
-
 const NAME = 'lag';
 
 const NAVS = [
@@ -96,7 +95,7 @@ function pageParser(result) {
     const id = cfg.name;
 
     const oc = cfg.other_config;
-    const lacpAggrKey = oc && oc['lacp-aggregation-key'];
+    const lacpAggrKey = oc && oc[C.LACP_AGGR_KEY];
     if (lacpAggrKey) {
       const lag = lags[lacpAggrKey];
       if (!lag) {
@@ -204,7 +203,7 @@ const ACTIONS = {
     });
 
     return (dispatch) => {
-      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 9 }));
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
       Async.waterfall([
         cb1 => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
@@ -217,7 +216,7 @@ const ACTIONS = {
             const etag = res.headers.etag;
             const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
             patch.push(cb => Agent.patch(url)
-              .send([{op: 'remove', path: '/other_config'}])
+              .send([{op: 'remove', path: `/${[C.OTHER_CFG]}`}])
               .set('If-Match', etag)
               .end(cb));
           });
@@ -284,8 +283,8 @@ const ACTIONS = {
             const etag = res.headers.etag;
             const send = [
               {op: 'add', path: '/user_config', value: { admin: 'up'}},
-              {op: 'add', path: '/other_config', value: {
-                'lacp-aggregation-key': lagId
+              {op: 'add', path: `/${[C.OTHER_CFG]}`, value: {
+                [C.LACP_AGGR_KEY]: lagId
               }}
             ];
             reqs.push(cb => {
@@ -312,7 +311,7 @@ const ACTIONS = {
             const infId = res.body.configuration.name;
             const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
             const etag = res.headers.etag;
-            const send = [{op: 'remove', path: '/other_config'}];
+            const send = [{op: 'remove', path: `/${[C.OTHER_CFG]}`}];
             reqs.push(cb => {
               Agent.patch(url).send(send).set('If-Match', etag).end(cb);
             });
@@ -350,7 +349,8 @@ const ACTIONS = {
     };
   },
 
-  // TODO: setLagDetails(aggregationMode, otherConfigPatch, lagId) {
+  // TODO: Editing Aggreagtion Mode, Fallback, Rate and Hash from LagPage.
+  // setLagDetails(aggregationMode, otherConfigPatch, lagId) {
   //   const PORTS_URL = `/rest/v1/system/ports/lag${lagId}`;
   //   const otherConfiglagPatch = Utils.lagOtherConfig(otherConfigPatch);
   //   if (lagId) {
