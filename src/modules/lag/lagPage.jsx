@@ -178,6 +178,7 @@ class LagPage extends Component {
                 data={lags}
                 columns={this.cols}
                 singleSelect
+                select={selLagId}
                 onSelectChange={this._onSelect}
                 onAdd={() => this.setState({addLagLayer: true})}
                 onDelete={() => this.setState({deleteLagLayer: true})}

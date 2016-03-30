@@ -207,7 +207,7 @@ class VlanPage extends Component {
         {statusLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
-              title={`${t('totalVlans')}: ${numVlans}`}
+              title={`${t('total')}: ${numVlans}`}
               data={data.vlans}
               columns={this.byVlanCols}
               noSelect
