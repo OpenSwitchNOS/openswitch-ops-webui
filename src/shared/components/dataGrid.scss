@@ -23,6 +23,14 @@
 
   .public_fixedDataTableCell_cellContent {
     padding-right: 24px; // allow for the scrollbar when cell is right aligned
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .fixedDataTableCellLayout_wrap1 {
+    table-layout: fixed;
   }
 
   .public_fixedDataTable_header .public_fixedDataTableCell_main  {

@@ -103,7 +103,14 @@ const AD = new AsyncDux(NAME, INITIAL_STORE);
 const parser = () => {
   const entities = {};
   for (let i=1; i<=15; i++) {
-    entities[`${i}`] = { id: i, text: `This is item ${i}` };
+    if (i === 7) {
+      entities[`${i}`] = {
+        id: i,
+        text: `This is a very very very very very very very very very very very loooooooooooooooong item ${i}`
+      };
+    } else {
+      entities[`${i}`] = { id: i, text: `This is item ${i}` };
+    }
   }
   return { entities };
 };

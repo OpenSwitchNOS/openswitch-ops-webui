@@ -44,7 +44,7 @@ class DemoDataGridSmallPage extends Component {
       {
         columnKey: 'text',
         header: t('text'),
-        width: 300,
+        width: 500,
       },
     ];
     this.state = {

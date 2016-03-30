@@ -31,7 +31,7 @@ const NAME = 'lag';
 const NAVS = [
   {
     route: { path: '/lag', component: LagPage },
-    link: { path: '/lag', order: 600 }
+    link: { path: '/lag', order: 325 }
   },
   {
     route: { path: '/lag/:id', component: LagDetails },
