@@ -23,7 +23,7 @@ export const NAVS = {
   general: 'General',
   interface: 'Interfaces',
   log: 'Log',
-  lag: 'LAG',
+  lag: 'LAGs',
   monitorInterface: 'Monitor Interface',
   overview: 'Overview',
   syslog: 'Syslog',

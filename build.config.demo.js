@@ -37,9 +37,13 @@ const modules = [
 ];
 
 import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
+import ConfigLagGuide from 'guides/configLagGuide.jsx';
+import ViewInterfacesGuide from 'guides/viewInterfacesGuide.jsx';
 
 const guides = [
   ConfigInterfaceGuide,
+  ConfigLagGuide,
+  ViewInterfacesGuide,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';

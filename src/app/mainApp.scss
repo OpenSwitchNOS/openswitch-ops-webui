@@ -184,6 +184,16 @@ table.propTable {
   to { transform: rotate(360deg); }
 }
 
+@mixin rotate($deg) {
+  transform: rotate($deg);
+  -moz-transform: rotate($deg);
+  -webkit-transform: rotate($deg);
+}
+
+.rotate45 {
+  @include rotate(45deg);
+}
+
 .mHalf {
   margin: $space/2;
 }
@@ -204,6 +214,14 @@ table.propTable {
   }
   ul {
     margin-left: 1rem;
+    margin-bottom: 4px;
+    li {
+      max-width: none;
+      margin-bottom: 4px;
+    }
+  }
+  td {
+    padding-right: 16px;
   }
 }
 

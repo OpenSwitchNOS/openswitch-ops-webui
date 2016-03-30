@@ -18,21 +18,41 @@
 import React from 'react';
 import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
-import CfgIcon from 'grommet/components/icons/base/Configuration';
 
 
-const MENU_TEXT = 'How to configure basic interface properties...';
+const MENU_TEXT = 'Device graphic legend...';
 
 const COMPONENT = (
   <Box pad={{horizontal: 'small'}}>
-    <b>Configure basic interface properties</b>
+    <b>Device graphic legend</b>
     <ul>
       <li>Navigate to the page: <Anchor primary href="#/interface">Interfaces</Anchor></li>
-      <li>To select an interface, click on a table row or select an interface box in the graphic.</li>
-      <li>In the table header, click on the <CfgIcon/> which will now be enabled.</li>
-      <li>In the edit slide-in panel, configure the inteface as desired.</li>
-      <li>Click <b>OK</b> to deploy the changes or <b>X</b> to cancel.</li>
+      <li>Each interface box may contain:</li>
     </ul>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <div
+                className="rotate45"
+                style={{paddingTop: '4px', paddingLeft: '8px', color: '#A00', fontSize: '30px'}}>
+              /
+            </div>
+          </td>
+          <td><i>forward slash</i></td>
+          <td><b>Admin State</b> is <b>Down</b></td>
+        </tr>
+        <tr>
+          <td>
+            <div
+                style={{width: '20px', height: '20px', backgroundColor: '#0F0'}}>
+            </div>
+          </td>
+          <td><i>filled rectangle</i></td>
+          <td><b>Link State</b> is <b>Up</b></td>
+        </tr>
+      </tbody>
+    </table>
   </Box>
 );
 
