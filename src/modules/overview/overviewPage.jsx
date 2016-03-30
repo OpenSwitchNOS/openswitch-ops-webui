@@ -373,7 +373,7 @@ class OverviewPage extends Component {
           this.props.autoActions.collector.clearError);
 
     return (
-      <Box className="flex1">
+      <Box className="flex1auto">
         {statusLayer}
         {psLayer}
         {tempsLayer}
@@ -412,7 +412,7 @@ class OverviewPage extends Component {
             {utl.caption}
           </Box>
         </Box>
-        <Box pad={this.pad} className="flex1 pageBox min300x400">
+        <Box pad={this.pad} className="flex1 pageBox min150x400">
           <span>
             <b>{t('log')}&nbsp;&nbsp;</b>
             <small>{logHdr}</small>

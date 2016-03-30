@@ -102,6 +102,7 @@ function parseInterface(inf) {
     cfgAutoNeg,
     cfgFlowCtrl,
     connector,
+    adminState, // needed by the boxGraphic
     adminStateConnector,
     mac,
     speed,
