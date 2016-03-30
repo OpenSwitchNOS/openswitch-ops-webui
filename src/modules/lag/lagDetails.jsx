@@ -70,7 +70,7 @@ class LagDetails extends Component {
             {pr('rate', t(lag[C.RATE]))}
             {pr('fallback', t(lag[C.FALLBACK]))}
             {pr('hash', t(lag[C.HASH]))}
-            {pr('interfaces', infs)}
+            {pr('interfaces', infs, 160, 180)}
             {pr('speed', lag.speed)}
             {pr('bondStatus', t(lag.bondStatus))}
             {pr('rxPackets', tcs(lag.stats.rxPackets))}

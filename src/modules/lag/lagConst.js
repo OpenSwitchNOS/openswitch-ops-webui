@@ -36,3 +36,5 @@ export const HASH_L2 = 'l2-src-dst';
 export const HASH_L2_VID = 'l2vid-src-dst';
 export const HASH_L4 = 'l4-src-dst';
 export const HASH_DEF = HASH_L3;
+
+export const LACP_AGGR_KEY = 'lacp-aggregation-key';

@@ -42,7 +42,7 @@ class LagEdit extends Component {
     this.cols = [{
       columnKey: 'id',
       header: t('id'),
-      width: 80,
+      width: 180,
     }];
 
     const lagInfs = props.lag.lags[props.lagId].interfaces;
@@ -84,9 +84,11 @@ class LagEdit extends Component {
           <br/>
           <OneToMany
               fullSetInit={this.availInfsInit}
+              fullSetTitle={t('available')}
               fullSet={this.state.availInfs}
               fullSetCols={this.cols}
               subSetInit={this.lagInfsInit}
+              subSetTitle={`LAG ${this.props.lagId}`}
               subSet={this.state.lagInfs}
               subSetCols={this.cols}
               onChange={this._onChangeLag}
