@@ -21,9 +21,11 @@ import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import Range from 'range.js';
-import VlanAdd from './vlanAdd.jsx';
+// import VlanAdd from './vlanAdd.jsx';
 import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
+
+// TODO: Needs to be refactored when we actually can configure VLANs.
 
 class VlanPage extends Component {
 
@@ -55,6 +57,7 @@ class VlanPage extends Component {
         columnKey: 'operState',
         header: t('status'),
         width: 140,
+        format: t,
       },
       {
         columnKey: 'operStateReason',
@@ -80,6 +83,7 @@ class VlanPage extends Component {
         columnKey: 'mode',
         header: t('vlanMode'),
         width: 160,
+        format: t,
       },
       {
         columnKey: 'tag',
@@ -117,25 +121,25 @@ class VlanPage extends Component {
     );
   };
 
-  _onTrunksCell = (cellData, cellProps) => {
-    // TOOD: this should be moved into Utils.
-    // const idKeys = [];
-    // const lagKeys = [];
-    // Object.keys(cellData).forEach( k => {
-    //   if (isNaN(k)) {
-    //     lagKeys.push(k);
-    //   } else {
-    //     idKeys.push(Number(k));
-    //   }
-    // });
-    // const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
-    // const idStr = new Range(idKeys).toString().split(',').join(', ');
-    return (
-      <CustomCell {...cellProps}>
-        {cellData}
-      </CustomCell>
-    );
-  };
+  // _onTrunksCell = (cellData, cellProps) => {
+  //   // TOOD: this should be moved into Utils.
+  //   // const idKeys = [];
+  //   // const lagKeys = [];
+  //   // Object.keys(cellData).forEach( k => {
+  //   //   if (isNaN(k)) {
+  //   //     lagKeys.push(k);
+  //   //   } else {
+  //   //     idKeys.push(Number(k));
+  //   //   }
+  //   // });
+  //   // const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+  //   // const idStr = new Range(idKeys).toString().split(',').join(', ');
+  //   return (
+  //     <CustomCell {...cellProps}>
+  //       {cellData}
+  //     </CustomCell>
+  //   );
+  // };
 
   componentDidMount() {
     const p = this.props;
@@ -156,68 +160,69 @@ class VlanPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (sel) => {
-    const url = sel ? `/vlan/${sel}` : '/vlan';
-    this.props.history.pushState(null, url);
-  };
-
-  _onAddOpen = () => {
-    this.setState({ addMode: true });
-  };
-
-  _onAddApply = (cfg) => {
-    // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
-    this.props.actions.vlan.addVlan(this.props.vlan, cfg);
-  };
-
-  _onAddOk = (data) => {
-    this._onAddApply(data);
-    this.setState({ addMode: false });
-  };
-
-  _onAddClose = () => {
-    this.setState({ addMode: false });
-  };
+  // _onSelect = (sel) => {
+  //   const url = sel ? `/vlan/${sel}` : '/vlan';
+  //   this.props.history.pushState(null, url);
+  // };
+  //
+  // _onAddOpen = () => {
+  //   this.setState({ addMode: true });
+  // };
+  //
+  // _onAddApply = (cfg) => {
+  //   // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
+  //   this.props.actions.vlan.addVlan(this.props.vlan, cfg);
+  // };
+  //
+  // _onAddOk = (data) => {
+  //   this._onAddApply(data);
+  //   this.setState({ addMode: false });
+  // };
+  //
+  // _onAddClose = () => {
+  //   this.setState({ addMode: false });
+  // };
 
   render() {
     const data = this.props.vlan;
 
     const numVlans = Object.getOwnPropertyNames(data.vlans).length;
-    const numInterfaces = Object.getOwnPropertyNames(data.interfaces).length;
+    // const numInterfaces = Object.getOwnPropertyNames(data.interfaces).length;
 
-    const addVlanLayer = !this.state.addVlanLayer ? null :
-      <VlanAdd
-          actions={this.props.actions}
-          onClose={() => this.setState({addVlanLayer: false})}
-      />;
+    // const addVlanLayer = !this.state.addVlanLayer ? null :
+    //   <VlanAdd
+    //       actions={this.props.actions}
+    //       onClose={() => this.setState({addVlanLayer: false})}
+    //   />;
 
     const statusLayer = mkStatusLayer(
           data.asyncStatus,
           this.props.actions.vlan.clearError);
 
+    // onAdd={() => this.setState({addVlanLayer: true})}
+
     return (
       <Box className="flex1 mTop mLeft">
-        {addVlanLayer}
+        {/*{addVlanLayer}*/}
         {statusLayer}
         <ResponsiveBox>
           <DataGrid width={400} height={400}
               title={`${t('totalVlans')}: ${numVlans}`}
               data={data.vlans}
               columns={this.byVlanCols}
-              singleSelect
+              noSelect
               onSelectChange={this._onSelect}
               select={this.props.params.id}
-              onAdd={() => this.setState({addVlanLayer: true})}
           />
         </ResponsiveBox>
-        <br/>
+        {/*<br/>
         <ResponsiveBox>
           <DataGrid width={400} height={400}
               title={`${t('totalInterfaces')}: ${numInterfaces}`}
               columns={this.byInterfaceCols}
               data={data.interfaces}
           />
-        </ResponsiveBox>
+        </ResponsiveBox>*/}
       </Box>
     );
   }

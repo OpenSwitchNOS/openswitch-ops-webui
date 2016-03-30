@@ -218,7 +218,7 @@ class OverviewPage extends Component {
     );
   };
 
-  _mkFeatureProps = () => {
+  _mkGeneralProps = () => {
     const data = this.props.overview;
     const info = data.info;
     return (
@@ -385,9 +385,9 @@ class OverviewPage extends Component {
             {this._mkSystemProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min300x300">
-            <b>{t('features')}</b>
+            <b>{t('general')}</b>
             <hr/>
-            {this._mkFeatureProps()}
+            {this._mkGeneralProps()}
           </Box>
           <Box pad={this.pad} className="flex1 pageBox min300x300">
             <b>{t('hardware')}</b>

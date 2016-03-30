@@ -29,7 +29,7 @@ import Title from 'grommet/components/Title';
 import Split from 'grommet/components/Split';
 import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
-import NotificationIcon from 'grommet/components/icons/base/Notification';
+// TODO: import NotificationIcon from 'grommet/components/icons/base/Notification';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import NextIcon from 'grommet/components/icons/base/Next';
@@ -120,8 +120,9 @@ class MainApp extends Component {
     const openNav = this.props.nav.paneActive ? null :
       <a onClick={this._onPageNavClicked}><NextIcon /></a>;
 
-    const notifLink = '#/log';
-    const notifCount = 3; // TODO: implement me
+    // TODO: log page header
+    // const notifLink = '#/log';
+    // const notifCount = 3; // TODO: implement me
 
     return (
       <Header
@@ -137,10 +138,10 @@ class MainApp extends Component {
         </Menu>
         <Menu direction="row" responsive={false}>
           {this.props.toolbar.component}
-          <a href={notifLink}>
+          {/*<a href={notifLink}>
             <NotificationIcon className="mHalf"/>
             <small>{notifCount}</small>
-          </a>
+          </a>*/}
         </Menu>
       </Header>
     );
