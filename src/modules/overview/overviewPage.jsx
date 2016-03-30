@@ -18,11 +18,12 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
+import Status from 'grommet/components/icons/Status';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
 import { mkStatusLayer } from 'asyncStatusLayer.jsx';
-
+import * as Time from 'time.js';
 
 const NUM_TRAFFIC_METRICS = 5;
 
@@ -53,7 +54,7 @@ class OverviewPage extends Component {
 
   componentDidMount() {
     const p = this.props;
-    this._onRefresh();
+    this.props.actions.overview.fetch();
     p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
   }
 
@@ -252,27 +253,23 @@ class OverviewPage extends Component {
     );
   };
 
-  // TODO: Not implemented
   _mkLog = () => {
-    function tr(elm) {
+    function tr(i) {
       return (
-        <tr key={elm.id}>
-          <td>{new Date(elm.ts).toLocaleTimeString()}</td>
-          <td><SpanStatus value={elm.sev}>{t(elm.sev)}</SpanStatus></td>
-          <td>{elm.msg}</td>
+        <tr key={i.id}>
+          <td style={{width: '120px'}}>{Time.toTimestamp(i.ts)}</td>
+          <td style={{width: '60px'}}><Status value={i.sev}/></td>
+          <td>{i.msg}</td>
         </tr>
       );
     }
-    const logs = [];
-    // TODO: No log info yet.
-    const entries = {};
+    const entries = this.props.collector.log.entries;
+    const rows = [];
     Object.getOwnPropertyNames(entries).forEach(k => {
-      logs.push(entries[k]);
+      rows.push(tr(entries[k]));
     });
-    logs.sort((l1, l2) => l1.ts < l2.ts);
-    const rows = logs.map(e => tr(e));
     return (
-      <table className="logTable">
+      <table>
         <tbody>
           {rows}
         </tbody>
@@ -301,8 +298,8 @@ class OverviewPage extends Component {
     } else {
       const m = metrics[0];
       if (m.size() > 1) {
-        const oldDate = new Date(m.getDataPoint(0).ts()).toLocaleTimeString();
-        const newDate = new Date(m.latestDataPoint().ts()).toLocaleTimeString();
+        const oldDate = Time.toTimestamp(m.getDataPoint(0).ts());
+        const newDate = Time.toTimestamp(m.latestDataPoint().ts());
         caption = (
           <div>
             <small>
@@ -363,10 +360,13 @@ class OverviewPage extends Component {
 
     const utl = this._mkUtilization();
 
-    // TODO: get log start/end time and number added
-    const logStart = new Date().toLocaleTimeString();
-    const logEnd = new Date().toLocaleTimeString();
-    const logNumAdded = 3;
+    let logHdr = null;
+    const logData = this.props.collector.log;
+    if (logData.tsMin) {
+      const ts1 = Time.toTimestamp(logData.tsMin);
+      const ts2 = Time.toTimestamp(this.props.collector.ts);
+      logHdr = `${ts1} - ${ts2}`;
+    }
 
     const statusLayer = mkStatusLayer(
           this.props.collector.asyncStatus,
@@ -413,13 +413,12 @@ class OverviewPage extends Component {
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min300x400">
-          <span><b>{t('log')}&nbsp;&nbsp;</b>
-            <small>
-              {`${logStart} - ${logEnd} (${logNumAdded} ${t('new')})`}
-            </small>
+          <span>
+            <b>{t('log')}&nbsp;&nbsp;</b>
+            <small>{logHdr}</small>
           </span>
           <hr/>
-          <div style={{overflow: 'auto'}}>
+          <div className="logTable">
             {this._mkLog()}
           </div>
         </Box>

@@ -185,7 +185,7 @@ const parser = (result) => {
   // LLDP
   const sysOc = sysBody.configuration.other_config;
   const lldp = {
-    enabled: sysOc && sysOc.lldp_enable === 'true',
+    enabled: (sysOc && sysOc.lldp_enable) ? 'enabled' : 'disabled'
   };
 
   // ECMP

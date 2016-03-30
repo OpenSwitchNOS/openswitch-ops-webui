@@ -26,6 +26,10 @@ import LagDetails from './lagDetails.jsx';
 import * as C from './lagConst.js';
 
 
+// TODO: in general we should not grab the etag without the lastest data
+// TODO: we should follow the pattern of grabing the new data and etag when
+// TODO: the edit page is displayed
+
 const NAME = 'lag';
 
 const NAVS = [

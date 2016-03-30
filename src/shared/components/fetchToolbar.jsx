@@ -41,7 +41,7 @@ export default class FetchToolbar extends Component {
 
     const refresh = (
       <a onClick={this.props.onRefresh}>
-        <RefreshIcon className={p.isFetching ? 'spin mHalf' : 'mHalf'}/>
+        <RefreshIcon className="mHalf"/>
       </a>
     );
 

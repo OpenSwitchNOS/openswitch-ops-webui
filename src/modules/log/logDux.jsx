@@ -37,19 +37,6 @@ const LIMIT = 100;
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
 
-function toSeverity(priority) {
-  let sev = 'ok';
-  const n = Number(priority);
-  if (n >= 0) {
-    if (n <= 3) {
-      sev = 'critical';
-    } else if (n <= 5) {
-      sev = 'warning';
-    }
-  }
-  return sev;
-}
-
 const parser = (result) => {
   const entries = {};
   if (!Array.isArray(result.body)) {
@@ -60,7 +47,12 @@ const parser = (result) => {
     const entry = {};
     entry.id = id++;
     entry.ts = Math.round(item.__REALTIME_TIMESTAMP / 1000);
-    entry.sev = toSeverity(item.PRIORITY);
+
+    const pri = Number(item.PRIORITY);
+    entry.sev =
+      (pri >= 0 && pri <= 3) ? 'critical' :
+        pri >= 4 && pri <= 5 ? 'warning' : 'ok';
+
     entry.syslogId = item.SYSLOG_IDENTIFIER;
     entry.cat = item.MESSAGE_ID;
     entry.msg = item.MESSAGE.split('|').join(', '); // more readable

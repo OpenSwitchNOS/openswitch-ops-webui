@@ -100,15 +100,24 @@ table.propTable {
 }
 
 // Property styles for 'logTable' plain html tables
-table.logTable {
-  tbody {
-    vertical-align: top;
+.logTable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  table {
+    width: 100%;
+    table-layout: fixed;
+    tbody {
+      vertical-align: top;
+    }
+    td {
+      padding-right: 16px;
+      padding-bottom: 16px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    margin-bottom: 0px;
   }
-  td {
-    padding-right: 16px;
-    padding-bottom: 16px;
-  }
-  margin-bottom: 0px;
 }
 
 @mixin pageBox($marginTop: $space, $marginLeft: $space) {

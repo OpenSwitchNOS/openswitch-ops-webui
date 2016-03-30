@@ -28,6 +28,7 @@ const INITIAL_STORE = {
   interfaces: {},
   interfaceMetrics: {},
   interfaceTopMetrics: [],
+  log: { entries: {}, count: 0 },
 };
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
@@ -71,14 +72,45 @@ const parser = (result) => {
   const interfaceMetrics = metrics.all;
   const interfaceTopMetrics = metrics.top;
 
+  const entries = {};
+  let logId = 1;
+  let tsMin = 0;
+  let tsMax = 0;
+  if (Array.isArray(result[3].body)) {
+    result[3].body.forEach(item => {
+      const entry = {};
+      entry.id = logId++;
+      entry.ts = Math.round(item.__REALTIME_TIMESTAMP / 1000);
+      if (!tsMin || tsMin > entry.ts) { tsMin = entry.ts; }
+      if (!tsMax || tsMax < entry.ts) { tsMax = entry.ts; }
+
+      const pri = Number(item.PRIORITY);
+      entry.sev =
+        (pri >= 0 && pri <= 3) ? 'critical' :
+          pri >= 4 && pri <= 5 ? 'warning' : 'ok';
+
+      entry.msg = item.MESSAGE.split('|').join(', ');
+      entries[entry.id] = entry;
+    });
+  }
+  const log = { entries, count: logId - 1, tsMin, tsMax };
+
   return {
-    product, hostname, interfaces, interfaceMetrics, interfaceTopMetrics
+    product,
+    hostname,
+    interfaces,
+    interfaceMetrics,
+    interfaceTopMetrics,
+    log,
+    ts: now,
   };
 };
 
 const URL_BASE = '/rest/v1/system/subsystems/base';
 const URL_SYS = '/rest/v1/system';
 const URL_INFS_D1 = '/rest/v1/system/interfaces?depth=1';
+const URL_LOG = '/rest/v1/logs';
+const URL_OFF0_L100 = `${URL_LOG}?offset=0&limit=10&priority=3`;
 
 const AUTO_ACTIONS = {
 
@@ -89,6 +121,7 @@ const AUTO_ACTIONS = {
         cb => Agent.get(URL_BASE).end(cb),
         cb => Agent.get(URL_SYS).end(cb),
         cb => Agent.get(URL_INFS_D1).end(cb),
+        cb => Agent.get(URL_OFF0_L100).end(cb),
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
         return dispatch(AD.action('SUCCESS', { result, parser } ));
