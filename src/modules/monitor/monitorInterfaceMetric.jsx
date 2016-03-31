@@ -19,8 +19,8 @@ import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 
 import Box from 'grommet/components/Box';
+import Anchor from 'grommet/components/Anchor';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
-
 import MetricChart from 'metricChart.jsx';
 
 
@@ -64,9 +64,17 @@ class MonitorInterfaceMetric extends Component {
       });
     }
 
+    const infHref = `#/interface/${this.props.params.id}`;
+
     return (
       <Box pad={this.pad} className="pageBox">
-        <large><b>{t('utilization')}</b></large>
+        <span>
+          <large><b>{t('utilization')}</b></large>
+          &nbsp;&nbsp;&nbsp;
+          <Anchor href={infHref}>
+              {`(${t('interfaceDetails')})`}
+          </Anchor>
+        </span>
         <br/>
         {content}
       </Box>

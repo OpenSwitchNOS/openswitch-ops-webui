@@ -55,6 +55,14 @@ class InterfaceDetails extends Component {
     this.props.actions.interface.fetchDetail(this.props.params.id);
   };
 
+  componentWillReceiveProps(nextProps) {
+    const p = nextProps;
+    if (this.props.params.id !== p.params.id) {
+      this.props.actions.interface.fetchDetail(p.params.id);
+    }
+    p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
+  }
+
   _onClose = () => {
     this.props.history.pushState(null, `/interface`);
   };

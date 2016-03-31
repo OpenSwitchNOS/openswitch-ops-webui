@@ -33,7 +33,7 @@ const INITIAL_STORE = {
   entries: {},
 };
 
-const LIMIT = 100;
+const LIMIT = 1000;
 
 const AD = new AsyncDux(NAME, INITIAL_STORE);
 
