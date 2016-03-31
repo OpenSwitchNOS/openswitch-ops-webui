@@ -59,20 +59,6 @@ const ACTIONS = {
   },
 };
 
-// function REDUCER(moduleStore = INITIAL_STORE, action) {
-//   switch (action.type) {
-//
-//     case LOGIN:
-//       return { ...moduleStore, isLoggedIn: true };
-//
-//     case LOGOUT:
-//       return { ...moduleStore, isLoggedIn: false };
-//
-//     default:
-//       return moduleStore;
-//   }
-// }
-
 export default {
   NAME,
   ACTIONS,
