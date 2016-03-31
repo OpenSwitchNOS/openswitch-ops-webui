@@ -23,8 +23,7 @@ let prefix = '';
 export function agentInit(settings) {
   prefix = (settings && settings.prefix) || '';
   Agent
-    // .auth(..., ...) <- user, pwd
-    // .set(..., ...) <- headers
+    .withCredentials()
     .on('request', (req) => {
       if (req.url[0] === '/') {
         req.url = prefix + req.url;

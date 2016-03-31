@@ -17,44 +17,64 @@
 /*eslint no-console:0*/
 
 import Agent from 'agent.js';
+import AsyncDux from 'asyncDux.js';
 
 const NAME = 'auth';
-const LOGIN = `${NAME}/LOGIN`;
-const LOGOUT = `${NAME}/LOGOUT`;
-
-const ACTIONS = {
-  login() {
-    // TODO: test the login.
-
-    Agent.post('/login').send('username=netop&password=netop').end((e, r) => {
-      console.log('login', e, r);
-    });
-
-    return { type: LOGIN };
-  },
-  logout() { return { type: LOGOUT }; },
-};
 
 const INITIAL_STORE = {
-  isLoggedIn: false
+  isLoggedIn: false,
 };
 
-function REDUCER(moduleStore = INITIAL_STORE, action) {
-  switch (action.type) {
+const AD = new AsyncDux(NAME, INITIAL_STORE);
 
-    case LOGIN:
-      return { ...moduleStore, isLoggedIn: true };
+const ACTIONS = {
 
-    case LOGOUT:
-      return { ...moduleStore, isLoggedIn: false };
+  login(data) {
+    const { username, password } = data;
+    const send = `username=${username}&password=${password}`;
 
-    default:
-      return moduleStore;
-  }
-}
+    return dispatch => {
+      dispatch(AD.action('REQUEST'));
+      Agent.post('/login').send(send).end((error) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', {
+          parser: () => { return { username, isLoggedIn: true }; }
+        }));
+      });
+    };
+  },
+
+  logout() {
+    return dispatch => {
+      dispatch(AD.action('REQUEST'));
+      return dispatch(AD.action('SUCCESS', {
+        parser: () => { return { username: null, isLoggedIn: false }; }
+      }));
+    };
+
+  },
+
+  clearError() {
+    return AD.action('CLEAR_ERROR');
+  },
+};
+
+// function REDUCER(moduleStore = INITIAL_STORE, action) {
+//   switch (action.type) {
+//
+//     case LOGIN:
+//       return { ...moduleStore, isLoggedIn: true };
+//
+//     case LOGOUT:
+//       return { ...moduleStore, isLoggedIn: false };
+//
+//     default:
+//       return moduleStore;
+//   }
+// }
 
 export default {
   NAME,
   ACTIONS,
-  REDUCER,
+  REDUCER: AD.reducer(),
 };

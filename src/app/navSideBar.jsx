@@ -41,6 +41,7 @@ class NavSideBar extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    auth: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
     extLinks: PropTypes.array.isRequired,
     guides: PropTypes.array.isRequired,
@@ -130,8 +131,6 @@ class NavSideBar extends Component {
   };
 
   render() {
-    const user = 'jpowell';
-
     return (
       <Sidebar colorIndex="neutral-3" fixed separator="right">
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
@@ -178,7 +177,7 @@ class NavSideBar extends Component {
                 {t('logout')}
               </Anchor>
             </Menu>
-            <span>{user}</span>
+            <span>{this.props.auth.username}</span>
           </Box>
         </Footer>
       </Sidebar>
@@ -188,6 +187,7 @@ class NavSideBar extends Component {
 }
 
 const select = (store) => ({
+  auth: store.auth,
   links: store.links,
   nav: store.nav,
   guides: store.guides,
