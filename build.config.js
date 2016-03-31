@@ -53,12 +53,12 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: `http://${window.location.hostname}:8091`,
+    prefix: '',
   },
   extLinks: [
     {
       key: 'osApi',
-      href: `http://${window.location.hostname}:8091/api/index.html`
+      href: '/api/index.html'
     },
     {
       key: 'osNet',
