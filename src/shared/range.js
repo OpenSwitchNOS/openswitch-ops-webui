@@ -225,7 +225,13 @@ export default class Range {
 
   firstItem() {
     const ranges = this.getRanges();
-    return ranges.length > 0 ? ranges[0][0] : 1;
+    return ranges.length > 0 ? ranges[0][0] : 0;
+  }
+
+  lastItem() {
+    const ranges = this.getRanges();
+    if (ranges.length === 0) { return 0; }
+    return ranges[ranges.length - 1][1];
   }
 
   has(value) {

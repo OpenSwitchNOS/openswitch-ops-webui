@@ -25,7 +25,7 @@ const SET = `${NAME}/SET`;
 const ACTIONS = {
   clear() { return { type: CLEAR }; },
   set(component) { return { type: SET, component }; },
-  setFetchTB(asyncStatus, onRefresh) {
+  setFetchTB(asyncStatus, onRefresh, spin) {
     if (!asyncStatus) {
       throw new Error('invalid async object set on toolbar');
     }
@@ -34,6 +34,7 @@ const ACTIONS = {
       component: (
         <FetchToolbar
             isFetching={asyncStatus.inProgress}
+            spin={spin}
             date={asyncStatus.lastSuccessMillis}
             onRefresh={onRefresh}/>
       )

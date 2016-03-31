@@ -25,6 +25,7 @@ export default class FetchToolbar extends Component {
     date: PropTypes.number,
     isFetching: PropTypes.bool,
     onRefresh: PropTypes.func,
+    spin: PropTypes.bool,
   };
 
   constructor(props) {
@@ -39,9 +40,11 @@ export default class FetchToolbar extends Component {
       <small><TimeAgo date={p.date}/>&nbsp;</small>
     );
 
+    const cls = this.props.spin && this.props.isFetching
+      ? 'mHalf spin' : 'mHalf';
     const refresh = (
       <a onClick={this.props.onRefresh}>
-        <RefreshIcon className="mHalf"/>
+        <RefreshIcon className={cls}/>
       </a>
     );
 

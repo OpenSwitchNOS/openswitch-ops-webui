@@ -22,8 +22,10 @@ import Status from 'grommet/components/icons/Status';
 import MetricTable from 'metricTable.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import StatusLayer from 'statusLayer.jsx';
-import { mkStatusLayer } from 'asyncStatusLayer.jsx';
+import Range from 'range.js';
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
 import * as Time from 'time.js';
+
 
 const NUM_TRAFFIC_METRICS = 5;
 
@@ -33,6 +35,7 @@ class OverviewPage extends Component {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
+    constants: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     overview: PropTypes.object.isRequired,
   };
@@ -55,12 +58,12 @@ class OverviewPage extends Component {
   componentDidMount() {
     const p = this.props;
     this.props.actions.overview.fetch();
-    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh, true);
   }
 
   componentWillReceiveProps(nextProps) {
     const p = nextProps;
-    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh);
+    p.actions.toolbar.setFetchTB(p.overview.asyncStatus, this._onRefresh, true);
   }
 
   componentWillUnmount() {
@@ -219,8 +222,11 @@ class OverviewPage extends Component {
   };
 
   _mkGeneralProps = () => {
+    const range = new Range(this.props.constants.VLAN_ID_RANGE);
+    const maxVlans = range.lastItem();
     const data = this.props.overview;
     const info = data.info;
+    const numVlans = info.numVlans || 0;
     return (
       <table style={{tableLayout: 'fixed'}} className="propTable">
         <tbody>
@@ -234,7 +240,7 @@ class OverviewPage extends Component {
           </tr>
           <tr>
             <td>{t('vlans')}:</td>
-            <td>{info.numVlans}</td>
+            <td>{`${numVlans} ${t('of')} ${maxVlans}`}</td>
           </tr>
           <tr>
             <td>{t('interfaces')}:</td>
@@ -368,9 +374,12 @@ class OverviewPage extends Component {
       logHdr = `${ts1} - ${ts2}`;
     }
 
-    const statusLayer = mkStatusLayer(
-          this.props.collector.asyncStatus,
-          this.props.autoActions.collector.clearError);
+    const async = this.props.collector.asyncStatus;
+    const statusLayer = !async.lastError ? null :
+      <AsyncStatusLayer
+          data={async}
+          onClose={this.props.autoActions.collector.clearError}
+      />;
 
     return (
       <Box className="flex1auto">
@@ -430,6 +439,7 @@ class OverviewPage extends Component {
 
 function select(store) {
   return {
+    constants: store.constants,
     collector: store.collector,
     overview: store.overview,
   };

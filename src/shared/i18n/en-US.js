@@ -158,6 +158,7 @@ export const MESSAGES = {
   notice: 'Notice',
   notConfigured: 'Not Configured',
   noTopInterfaces: 'Currently no traffic data available...',
+  of: 'of',
   off: 'Off',
   ok: 'OK',
   on: 'On',

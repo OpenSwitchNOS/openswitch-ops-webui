@@ -32,6 +32,7 @@ describe('range', () => {
       toArray: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
       toRanges: [[1, 1], [3, 15]],
       firstItem: 1,
+      lastItem: 15,
       continuous: false,
     },
     {
@@ -45,7 +46,22 @@ describe('range', () => {
       toArray: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
       toRanges: [[1, 17]],
       firstItem: 1,
+      lastItem: 17,
       continuous: true,
+    },
+    {
+      name: 'handles empty case',
+      init: '',
+      add: [],
+      sub: [],
+      has: '',
+      hasNot: '18',
+      toString: '',
+      toArray: [],
+      toRanges: [],
+      firstItem: 0,
+      lastItem: 0,
+      continuous: false,
     },
   ];
 
@@ -60,6 +76,7 @@ describe('range', () => {
       expect(rng.toArray()).toEqual(s.toArray);
       expect(rng.getRanges()).toEqual(s.toRanges);
       expect(rng.firstItem()).toEqual(s.firstItem);
+      expect(rng.lastItem()).toEqual(s.lastItem);
       if (s.continuous) {
         expect(rng.isContinuous()).toBeTruthy();
       } else {
