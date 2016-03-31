@@ -36,7 +36,22 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: `http://${window.location.hostname}:8091`,
+    prefix: ``,
+  },
+  extLinks: [
+    {
+      key: 'osApi',
+      href: `https://${window.location.hostname}/api/`
+    },
+    {
+      key: 'osNet',
+      href: 'http://openswitch.net'
+    },
+  ],
+  constants: {
+    VLAN_ID_RANGE: '1-4094',
+    LAG_ID_RANGE: '1-2000',
+    LAG_MAX_INTERFACES: 8,
   }
 };
 
