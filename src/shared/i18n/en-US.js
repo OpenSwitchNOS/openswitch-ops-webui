@@ -70,6 +70,7 @@ export const MESSAGES = {
   date: 'Date',
   dataPoints: 'data points',
   debug: 'Debug',
+  defaulted: 'Defaulted',
   degreesCelsius: 'C',
   deleteLag: 'Delete LAG',
   deploy: 'Deploy',

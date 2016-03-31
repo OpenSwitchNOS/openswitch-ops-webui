@@ -58,8 +58,8 @@ class LagPage extends Component {
         width: 120,
       },
       {
-        columnKey: 'admin',
-        header: t('admin'),
+        columnKey: 'bondStatus',
+        header: t('status'),
         width: 140,
         format: t,
       },
@@ -152,7 +152,7 @@ class LagPage extends Component {
       />;
 
     // TODO: reuse addLag component and integrate with edit.
-    const editLagLayer = !this.state.editLagLayer ? null :
+    const editLagLayer = !selLagId || !this.state.editLagLayer ? null :
       <LagEdit
           actions={this.props.actions}
           lagId={selLagId}
@@ -190,6 +190,7 @@ class LagPage extends Component {
                 data={lags}
                 columns={this.cols}
                 singleSelect
+                select={selLagId}
                 onSelectChange={this._onSelect}
                 onAdd={() => this.setState({addLagLayer: true})}
                 onDelete={() => this.setState({deleteLagLayer: true})}
