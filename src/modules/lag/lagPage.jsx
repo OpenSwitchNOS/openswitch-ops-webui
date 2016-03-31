@@ -27,6 +27,9 @@ import DetailsBox from 'detailsBox.jsx';
 import ConfirmLayer from 'confirmLayer.jsx';
 import LagEdit from './lagEdit.jsx';
 import LagAdd from './lagAdd.jsx';
+import Anchor from 'grommet/components/Anchor';
+import EditIcon from 'grommet/components/icons/base/Edit';
+import LagEditDetails from './lagEditDetails.jsx';
 
 class LagPage extends Component {
 
@@ -156,6 +159,14 @@ class LagPage extends Component {
           onClose={() => this.setState({editLagLayer: false})}
       />;
 
+    //TODO: Try to see if you can reuse addLag.
+    const editDetails = !selLagId || !this.state.editDetails ? null :
+      <LagEditDetails
+          actions={this.props.actions}
+          lagId={selLagId}
+          onClose={() => this.setState({editDetails: false})}
+      />;
+
     const deleteLagLayer = !this.state.deleteLagLayer ? null :
       <ConfirmLayer
           title={`${t('deleteLag')} ${selLagId}`}
@@ -171,6 +182,7 @@ class LagPage extends Component {
         {addLagLayer}
         {editLagLayer}
         {deleteLagLayer}
+        {editDetails}
         <Box className="flex1 mTop mLeft">
           <ResponsiveBox>
             <DataGrid width={400} height={400}
@@ -178,7 +190,6 @@ class LagPage extends Component {
                 data={lags}
                 columns={this.cols}
                 singleSelect
-                select={selLagId}
                 onSelectChange={this._onSelect}
                 onAdd={() => this.setState({addLagLayer: true})}
                 onDelete={() => this.setState({deleteLagLayer: true})}
@@ -189,7 +200,16 @@ class LagPage extends Component {
                       key="lagDetCb"
                       id="lagDetCb"
                       name="lagDetCb"
-                      label={t('details')}/>
+                      label={t('details')}
+                      />,
+                  <Anchor
+                      key="lagDetEdit"
+                      disabled={!selLagId}
+                      onClick={
+                        selLagId ?
+                        () => this.setState({editDetails: true}) : null}>
+                      <EditIcon/>
+                  </Anchor>
                 ]}
             />
           </ResponsiveBox>
