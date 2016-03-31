@@ -35,6 +35,7 @@ import CloseIcon from 'grommet/components/icons/base/Close';
 import NextIcon from 'grommet/components/icons/base/Next';
 
 import LoginLayer from 'loginLayer.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 import NavSideBar from './navSideBar.jsx';
 
@@ -110,8 +111,8 @@ class MainApp extends Component {
     this.props.actions.nav.showPane();
   };
 
-  _onLoginSubmit = () => {
-    this.props.actions.auth.login();
+  _onLoginSubmit = (data) => {
+    this.props.actions.auth.login(data);
   };
 
   _mkPageHdr = () => {
@@ -188,36 +189,42 @@ class MainApp extends Component {
     // Show the "quick guide" if one has been set.
     const guide = !this.props.guide.component ? null : this._mkGuide();
 
+    const auth = this.props.auth.asyncStatus;
+    const infoLayer = !auth.lastError ? null :
+      <StatusLayer
+          value="warning"
+          title={t('loginFailed')}
+          onClose={() => this.props.actions.auth.clearError()}>
+        {t('reenterUserPwd')}
+      </StatusLayer>;
+
     // Split will only show the priority column on small screens, we make this
     // the first (left) column because we want to be able to show the navigation
     // column on small screens. When we remove the first (left) column, the
     // page column will be the "new" left column and it will be shown. make
     // sure to completely toggle the first (left) column.
 
-    const splitContent = (
-      <Split
-          flex="right"
-          onResponsive={this._onNavSplitResponsive}
-          priority="left">
-
-        {nav}
-
-        <Box responsive={false} direction="row">
-          <Box id="page" className="flex1">
-            {this._mkPageHdr()}
-            {guide}
-            {page}
-          </Box>
-        </Box>
-
-      </Split>
-    );
-
-    const login = <LoginLayer onSubmit={this._onLoginSubmit}/>;
-
     return (
       <App centered={false}>
-        {this.props.auth.isLoggedIn ? splitContent : login}
+        {infoLayer}
+        {this.props.auth.isLoggedIn
+          ? <Split
+              flex="right"
+              onResponsive={this._onNavSplitResponsive}
+              priority="left"
+            >
+              {nav}
+              <Box responsive={false} direction="row">
+                <Box id="page" className="flex1">
+                  {this._mkPageHdr()}
+                  {guide}
+                  {page}
+                </Box>
+              </Box>
+            </Split>
+          : <LoginLayer
+              onSubmit={auth.inProgress ? null : this._onLoginSubmit}/>
+        }
       </App>
     );
   }
