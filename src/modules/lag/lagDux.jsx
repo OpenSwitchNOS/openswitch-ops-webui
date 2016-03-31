@@ -162,6 +162,8 @@ const ACTIONS = {
     };
   },
 
+//TODO: Create a Routing port by default...
+// Creating a non-routing port for demo purpose.
   addLag(state) {
     const oc = { ...state[C.OTHER_CFG] };
     if (oc[C.RATE] === C.RATE_DEF) { delete oc[C.RATE]; }
@@ -171,7 +173,9 @@ const ACTIONS = {
     const send = {
       configuration: {
         name: `lag${state.newLagId}`,
+        tag: 1,
         lacp: state[C.AGGR_MODE],
+        'vlan_mode': 'access',
       },
       'referenced_by': [{uri: URL_BRIDGE}],
     };
@@ -354,27 +358,63 @@ const ACTIONS = {
     };
   },
 
-  // TODO: Editing Aggreagtion Mode, Fallback, Rate and Hash from LagPage.
-  // setLagDetails(aggregationMode, otherConfigPatch, lagId) {
-  //   const PORTS_URL = `/rest/v1/system/ports/lag${lagId}`;
-  //   const otherConfiglagPatch = Utils.lagOtherConfig(otherConfigPatch);
-  //   if (lagId) {
-  //     return (dispatch) => {
-  //       const dispatcher = Dux.mkAsyncDispatcher(dispatch, SET_AT);
-  //       if (Object.keys(otherConfiglagPatch).length === 0) {
-  //         Agent.patch(PORTS_URL)
-  //       .send([{ op: 'add', path: '/lacp', value: aggregationMode},
-  //               {op: 'remove', path: '/other_config'}])
-  //       .end(mkAgentHandler(PORTS_URL, dispatcher));
-  //       } else {
-  //         Agent.patch(PORTS_URL)
-  //         .send([{ op: 'add', path: '/lacp', value: aggregationMode},
-  //               {op: 'add', path: '/other_config', value: otherConfiglagPatch}])
-  //         .end(mkAgentHandler(PORTS_URL, dispatcher));
-  //       }
-  //     };
-  //   }
-  // },
+  // Editing Aggreagtion Mode, Fallback, Rate and Hash from LagPage.
+  editLagDetails(lagId, state, patchAggrMode, patchOC) {
+
+    const URL_LAG = `${URL_PORTS}/${LAG_PREFIX}${lagId}?${SEL_CFG}`;
+
+    const oc = { ...state[C.OTHER_CFG] };
+    if (oc[C.RATE] === C.RATE_DEF) { delete oc[C.RATE]; }
+    if (oc[C.FALLBACK] === C.FALLBACK_DEF) { delete oc[C.FALLBACK]; }
+    if (oc[C.HASH] === C.HASH_DEF) { delete oc[C.HASH]; }
+
+    const send = [];
+
+    //TODO: Find a better way to do this.
+    if (patchAggrMode) {
+      send.push(
+        {op: 'add', path: `/${[C.AGGR_MODE]}`, value: state[C.AGGR_MODE]},
+      );
+    }
+    if (patchOC) {
+      if (Object.keys(oc).length > 0) {
+        send.push(
+          {op: 'add', path: `/${[C.OTHER_CFG]}`, value: oc}
+        );
+      } else {
+        send.push({op: 'remove', path: `/${[C.OTHER_CFG]}`});
+      }
+    }
+
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
+      Async.waterfall([
+        cb1 => {
+          // fetch etag for LAG port.
+          //TODO: Fetch etags differently
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          Agent.get(URL_LAG).end(cb1);
+        },
+        (r1, cb2) => {
+          // patch the lag port with new aggr mode, hash, rate and fallback.
+          const etag = r1.headers.etag;
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2}));
+          Agent.patch(URL_LAG).send(send).set('If-Match', etag).end(cb2);
+        },
+        (r3, cb3) => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
+          Async.parallel([
+            cb => Agent.get(URL_PORTS_D1).end(cb),
+            cb => Agent.get(URL_INFS_D1).end(cb),
+          ], cb3);
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+      });
+    };
+  },
+
 
   clearError() {
     return AD.action('CLEAR_ERROR');
