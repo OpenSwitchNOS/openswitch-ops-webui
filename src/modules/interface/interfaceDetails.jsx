@@ -65,7 +65,7 @@ class InterfaceDetails extends Component {
     const tcs = Formatter.toCommaString;
 
     const sysDesc = inf.lldp.sysDesc;
-    const lldpOpsLink = sysDesc && sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) < 0 ?
+    const lldpOpsLink = sysDesc && sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) >= 0 ?
       (
         <a href={`http://${inf.lldp.ip}`} target="_blank">
           &nbsp;&nbsp;<u>{inf.lldp.ip}</u>
@@ -122,7 +122,7 @@ class InterfaceDetails extends Component {
                 {pr('chassisId', inf.lldp.chassisId)}
                 {pr('ip', inf.lldp.ip)}
                 {pr('portId', inf.lldp.portId)}
-                {pr('sysDesc', inf.lldp.sysDesc)}
+                {pr('sysDesc', inf.lldp.sysDesc, 180, 200)}
                 {pr('capsSupported', inf.lldp.capsSupported)}
                 {pr('capsEnabled', inf.lldp.capsEnabled)}
               </tbody>

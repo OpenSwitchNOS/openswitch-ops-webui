@@ -137,7 +137,7 @@ const detailParser = (result) => {
     inf.rxDropped = Number(stats.rx_dropped) || 0;
     inf.txDropped = Number(stats.tx_dropped) || 0;
     inf.txErrors = Number(stats.tx_errors) || 0;
-    inf.lldp = parseLldp(inf);
+    inf.lldp = parseLldp(result[0].body);
   } else {
     inf.lldp = {};
   }

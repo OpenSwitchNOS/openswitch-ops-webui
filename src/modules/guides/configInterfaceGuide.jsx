@@ -19,19 +19,28 @@ import React from 'react';
 import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
 import CfgIcon from 'grommet/components/icons/base/Configuration';
+import AddIcon from 'grommet/components/icons/base/Add';
+import SubIcon from 'grommet/components/icons/base/Subtract';
 
 
-const MENU_TEXT = 'How to configure basic interface properties...';
+const MENU_TEXT = 'How to configure an interface...';
 
 const COMPONENT = (
   <Box pad={{horizontal: 'small'}}>
-    <b>Configure basic interface properties</b>
+    <b>Configure an interface</b>
     <ul>
-      <li>Navigate to the page: <Anchor primary href="#/interface">Interfaces</Anchor></li>
-      <li>To select an interface, click on a table row or select an interface box in the graphic.</li>
-      <li>In the table header, click on the <CfgIcon/> which will now be enabled.</li>
-      <li>In the edit slide-in panel, configure the inteface as desired.</li>
-      <li>Click <b>OK</b> to deploy the changes or <b>X</b> to cancel.</li>
+      <li>For basic operation:</li>
+      <ul>
+        <li>Navigate to the page: <Anchor primary href="#/interface">Interfaces</Anchor></li>
+        <li>Select an interface and click on <CfgIcon/> to bring up the edit panel.</li>
+      </ul>
+      <li>As part of a LAG:</li>
+      <ul>
+        <li>Navigate to the page: <Anchor primary href="#/lag">LAGs</Anchor></li>
+        <li>To add a new LAG, click on <AddIcon/>.</li>
+        <li>To delete a LAG, select a LAG and click on <SubIcon/>.</li>
+        <li>To edit a LAG, select an interface and click on <CfgIcon/> to bring up the edit panel.</li>
+      </ul>
     </ul>
   </Box>
 );
