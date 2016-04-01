@@ -54,6 +54,21 @@ const ACTIONS = {
 
   },
 
+  changePassword(changePw) {
+    const OLDPW = changePw.oldPw;
+    const NEWPW = changePw.newPw;
+    console.log('changePassword called()...oldPw = ${OLDPW} newPW = ${NEWPW}');
+    return dispatch => {
+      dispatch(AD.action('REQUEST'));
+      Agent.put('/account').send({configuration: {password: OLDPW, 'new_password': NEWPW}}).end((error) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', {
+          parser: () => { return { 'SUCCESS': true }; }
+        }));
+      });
+    };
+  },
+
   clearError() {
     return AD.action('CLEAR_ERROR');
   },

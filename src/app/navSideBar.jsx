@@ -35,6 +35,8 @@ import HelpIcon from 'grommet/components/icons/base/Help';
 import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
+import PasswordChange from './passwordChange.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 
 class NavSideBar extends Component {
@@ -130,9 +132,39 @@ class NavSideBar extends Component {
     });
   };
 
+  _onClosePwChange = () => {
+    this.setState({chpw: false});
+  };
+
+  _onPwChange = () => {
+    this.setState({chpw: true});
+  };
+
+ _onPwChangeSubmit= (changePw) => {
+   this.props.actions.auth.changePassword(changePw);
+   this._onClosePwChange();
+ };
+
   render() {
+
+    const auth = this.props.auth.asyncStatus;
+    const chpwInfoLayer = !auth.lastError ? null :
+      <StatusLayer
+          value="warning"
+          title={t('changePwFailed')}
+          onClose={() => this.props.actions.auth.clearError()}>
+        {t('retryChPw')}
+      </StatusLayer>;
+
+    const changePw = this.state.chpw ?
+      <PasswordChange
+          onClose={this._onClosePwChange}
+          onSubmit={this._onPwChangeSubmit}
+      /> : null;
     return (
+
       <Sidebar colorIndex="neutral-3" fixed separator="right">
+      {chpwInfoLayer}
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
             <BrandLogo />
@@ -176,8 +208,10 @@ class NavSideBar extends Component {
               <Anchor onClick={this.props.actions.auth.logout}>
                 {t('logout')}
               </Anchor>
+              <Anchor onClick={this._onPwChange}>{t('changePw')}</Anchor>
             </Menu>
             <span>{this.props.auth.username}</span>
+            {changePw}
           </Box>
         </Footer>
       </Sidebar>
