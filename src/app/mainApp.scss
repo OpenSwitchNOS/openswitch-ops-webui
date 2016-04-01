@@ -338,3 +338,7 @@ nav.menu--primary > a:not(.button).active {
 u {
   text-decoration: underline;
 }
+
+.search--inline input.search__input {
+  width: 160px;
+}

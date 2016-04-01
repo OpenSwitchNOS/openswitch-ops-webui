@@ -100,6 +100,7 @@ export const MESSAGES = {
   fanUninitialized: 'Uninitialized',
   fast: 'Fast',
   flowControl: 'Flow Control',
+  found: 'found',
   framesRx: 'Frames Rx',
   framesRxDiscarded: 'Frames Rx Discard',
   framesRxUnrecog: 'Frames Rx Unrecog',

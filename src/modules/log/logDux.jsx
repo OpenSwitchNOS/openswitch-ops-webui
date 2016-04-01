@@ -18,6 +18,7 @@ import { t } from 'i18n/lookup.js';
 import Agent from 'agent.js';
 import AsyncDux from 'asyncDux.js';
 import LogPage from './logPage.jsx';
+import * as Time from 'time.js';
 
 
 const NAME = 'log';
@@ -46,7 +47,7 @@ const parser = (result) => {
   result.body.forEach(item => {
     const entry = {};
     entry.id = id++;
-    entry.ts = Math.round(item.__REALTIME_TIMESTAMP / 1000);
+    entry.ts = Time.toTimestamp(Math.round(item.__REALTIME_TIMESTAMP / 1000));
 
     const pri = Number(item.PRIORITY);
     entry.sev =

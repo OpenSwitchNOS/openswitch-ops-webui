@@ -146,7 +146,7 @@ export default class DataGrid extends Component {
     rowHeight: 40,
   };
 
-  static mkFiltered(defaultDataMap, dataKeyArray, filterText) {
+  _mkFiltered = (defaultDataMap, dataKeyArray, filterText) => {
     if (!filterText) {
       return dataKeyArray;
     }
@@ -154,28 +154,37 @@ export default class DataGrid extends Component {
     for (let i=0; i<defaultDataMap.size(); i++) {
       const dataKey = defaultDataMap.getDataKeyAt(i);
       const rowData = defaultDataMap.getDataAtKey(dataKey);
-      if (!DataGrid.filterRowData(rowData, filterText)) {
+      if (!this._filterRowData(rowData, filterText)) {
         filteredKeyArray.push(dataKey);
       }
     }
     return filteredKeyArray;
-  }
+  };
 
-  static filterRowData(rowData, filterText) {
-    for (const key in rowData) {
-      if (rowData.hasOwnProperty(key)) {
-        const val = rowData[key];
-        const type = typeof val;
-        if (type === 'string' && val.toLowerCase().indexOf(filterText) !== -1) {
-          return false;
-        }
-        if (type === 'number' && val.toString().indexOf(filterText) !== -1) {
-          return false;
-        }
+  _trimRowDataToCols = (rowData) => {
+    const trimmedRowData = {};
+    this.props.columns.forEach(col => {
+      const k = col.columnKey;
+      trimmedRowData[k] = rowData[k];
+    });
+    return trimmedRowData;
+  };
+
+  _filterRowData = (rowData, filterText) => {
+    const trimmedRowData = this._trimRowDataToCols(rowData);
+    const keys = Object.keys(trimmedRowData);
+    for (const key of keys) {
+      const val = trimmedRowData[key];
+      const type = typeof val;
+      if (type === 'string' && val.toLowerCase().indexOf(filterText) !== -1) {
+        return false;
+      }
+      if (type === 'number' && val.toString().indexOf(filterText) !== -1) {
+        return false;
       }
     }
     return true;
-  }
+  };
 
   static sort(defaultDataMap, dataKeyArray, sortingSpecs) {
     const ss0 = sortingSpecs && sortingSpecs[0];
@@ -231,7 +240,7 @@ export default class DataGrid extends Component {
       let dataKeyArray = defaultDataMap.cloneDataKeyArray();
 
       const ft = this.state.filterText;
-      dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+      dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, ft);
 
       DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
 
@@ -305,7 +314,7 @@ export default class DataGrid extends Component {
 
     let dataKeyArray = defaultDataMap.cloneDataKeyArray();
     const ft = this.state.filterText;
-    dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+    dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, ft);
     DataGrid.sort(defaultDataMap, dataKeyArray, sortingSpecs);
 
     const dataMap = new DataMap(this.props.data, dataKeyArray);
@@ -317,9 +326,7 @@ export default class DataGrid extends Component {
     const defaultDataMap = this.state.defaultDataMap;
 
     let dataKeyArray = defaultDataMap.cloneDataKeyArray();
-    dataKeyArray = DataGrid.mkFiltered(
-      defaultDataMap, dataKeyArray, filterText
-    );
+    dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, filterText);
 
     DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
 
@@ -423,6 +430,9 @@ export default class DataGrid extends Component {
     const addTool = !this.props.onAdd ? null :
       <Anchor onClick={this.props.onAdd}><AddIcon/></Anchor>;
 
+    const searchResultCount = this.props.noFilter || !this.state.filterText
+      ? '' : ` (${t('found')}: ${rowCount})`;
+
     const searchTool = this.props.noFilter ? null :
       <Search
           inline
@@ -434,7 +444,9 @@ export default class DataGrid extends Component {
 
     const tb = (
       <Toolbar width={gridWidth}>
-        <b className="mTopBottomAuto">{this.props.title}</b>
+        <b className="mTopBottomAuto">
+          {`${this.props.title}${searchResultCount}`}
+        </b>
         <div>
           {this.props.toolbar}
           {editTool}

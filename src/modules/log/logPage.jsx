@@ -23,7 +23,6 @@ import DataGrid, { CustomCell } from 'dataGrid.jsx';
 import SpanStatus from 'spanStatus.jsx';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
-import * as Time from 'time.js';
 import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
 
@@ -51,7 +50,6 @@ class LogPage extends Component {
         columnKey: 'ts',
         header: t('time'),
         width: 140,
-        format: (ts) => Time.toTimestamp(ts),
       },
       {
         columnKey: 'sev',
