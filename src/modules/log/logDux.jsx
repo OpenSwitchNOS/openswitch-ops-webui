@@ -52,7 +52,7 @@ const parser = (result) => {
     const pri = Number(item.PRIORITY);
     entry.sev =
       (pri >= 0 && pri <= 3) ? 'critical' :
-        pri >= 4 && pri <= 5 ? 'warning' : 'ok';
+        pri === 4 ? 'warning' : 'ok';
 
     entry.syslogId = item.SYSLOG_IDENTIFIER;
     entry.cat = item.MESSAGE_ID;

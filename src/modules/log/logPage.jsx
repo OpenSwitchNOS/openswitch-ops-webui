@@ -32,7 +32,7 @@ const LAST_24_HRS = '24 hour ago';
 const LAST_7_DAYS = '7 day ago';
 
 const T_CRIT = 3; // Critical only
-const T_WARN = 5; // Warning and Critical
+const T_WARN = 4; // Warning and Critical
 const T_ALL = 7;  // Info, Warning and Critical
 
 
