@@ -16,14 +16,21 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
+import { t } from 'i18n/lookup.js';
 import Layer from 'grommet/components/Layer';
-import Footer from 'grommet/components/Footer';
 import Menu from 'grommet/components/Menu';
 import Button from 'grommet/components/Button';
 import Title from 'grommet/components/Title';
-import { t } from 'i18n/lookup.js';
+import FormField from 'grommet/components/FormField';
+import Footer from 'grommet/components/Footer';
+import Anchor from 'grommet/components/Anchor';
+import RadioButton from 'grommet/components/RadioButton';
 import Box from 'grommet/components/Box';
+import Tabs from 'grommet/components/Tabs';
+import Tab from 'grommet/components/Tab';
 import OneToMany from 'oneToMany.jsx';
+import * as C from './lagConst.js';
+import _ from 'lodash';
 
 
 class LagEdit extends Component {
@@ -45,15 +52,25 @@ class LagEdit extends Component {
       width: 180,
     }];
 
-    const lagInfs = props.lag.lags[props.lagId].interfaces;
+    const lagId = props.lagId;
+    const lag = props.lag.lags[lagId];
 
     this.availInfsInit = { ...props.lag.availInterfaces };
-    this.lagInfsInit = { ...lagInfs };
+    this.lagInfsInit = { ...lag.interfaces };
+    this.initAggrMode = lag[C.AGGR_MODE];
+    this.initOtherCfg = {
+      [C.RATE]: lag[C.RATE],
+      [C.FALLBACK]: lag[C.FALLBACK],
+      [C.HASH]: lag[C.HASH],
+    };
 
     this.state = {
+      lagId,
       availInfs: { ...this.availInfsInit },
       lagInfs: { ...this.lagInfsInit },
-      diff: { addedCount: 0, added: {}, removedCount: 0, removed: {}, }
+      diff: { addedCount: 0, added: {}, removedCount: 0, removed: {}, },
+      [C.AGGR_MODE]: this.initAggrMode,
+      [C.OTHER_CFG]: { ...this.initOtherCfg },
     };
   }
 
@@ -61,14 +78,26 @@ class LagEdit extends Component {
     this.setState({ lagInfs, availInfs, diff });
   };
 
+  _onChangeMode = (setting) => {
+    this.setState({ [C.AGGR_MODE]: setting });
+  };
+
+  _onChangeOtherConfig = (setting) => {
+    const newOtherCfg = { ...this.state[C.OTHER_CFG], ...setting };
+    this.setState({ [C.OTHER_CFG]: newOtherCfg });
+  };
+
   _onOk = () => {
-    this.props.actions.lag.editLag(this.props.lagId, this.state);
+    const state = { ...this.state, lagId: this.state.lagId.toString() };
+    this.props.actions.lag.editLag(state);
     this.props.onClose();
   };
 
   render() {
-    const isDirty = this.state.diff.addedCount +
-      this.state.diff.removedCount > 0;
+    const isDirty = this.state.diff.addedCount > 0 ||
+      this.state.diff.removedCount > 0 ||
+      this.initAggrMode !== this.state[C.AGGR_MODE] ||
+      !_.isEqual(this.initOtherCfg, this.state[C.OTHER_CFG]);
 
     return (
       <Layer
@@ -78,22 +107,106 @@ class LagEdit extends Component {
           flush
           align="right">
         <Box pad="medium" className="flex1">
-          <Title>{t('editLag')}</Title>
+          <Title>{`${t('editLag')}: ${this.state.lagId}`}</Title>
           <br/>
-          <b>{t('addDeleteInterfacesFromLag')}</b>
-          <br/>
-          <OneToMany
-              fullSetInit={this.availInfsInit}
-              fullSetTitle={t('available')}
-              fullSet={this.state.availInfs}
-              fullSetCols={this.cols}
-              subSetInit={this.lagInfsInit}
-              subSetTitle={`LAG ${this.props.lagId}`}
-              subSet={this.state.lagInfs}
-              subSetCols={this.cols}
-              onChange={this._onChangeLag}
-              maxSubSetSize={this.props.constants.LAG_MAX_INTERFACES}
-          />
+          <Tabs>
+            <Tab title={t('interfaces')}>
+              <OneToMany
+                  fullSetInit={this.availInfsInit}
+                  fullSetTitle={t('available')}
+                  fullSet={this.state.availInfs}
+                  fullSetCols={this.cols}
+                  subSetInit={this.lagInfsInit}
+                  subSetTitle={`LAG ${this.state.lagId}`}
+                  subSet={this.state.lagInfs}
+                  subSetCols={this.cols}
+                  onChange={this._onChangeLag}
+                  maxSubSetSize={this.props.constants.LAG_MAX_INTERFACES}
+              />
+            </Tab>
+            <Tab title={t('attributes')}>
+              <b>{t('aggrMode')}</b>
+              <div>
+                <Menu label={t(this.state[C.AGGR_MODE])}>
+                  <Anchor
+                      onClick={() => this._onChangeMode(C.AGGR_MODE_ACTIVE)}>
+                    {t(C.AGGR_MODE_ACTIVE)}
+                  </Anchor>
+                  <Anchor
+                      onClick={() => this._onChangeMode(C.AGGR_MODE_PASSIVE)}>
+                    {t(C.AGGR_MODE_PASSIVE)}
+                  </Anchor>
+                  <Anchor
+                      onClick={() => this._onChangeMode(C.AGGR_MODE_OFF)}>
+                    {t(C.AGGR_MODE_OFF)}
+                  </Anchor>
+                </Menu>
+              </div>
+              <br/>
+              <b>{t('rate')}</b>
+              <FormField>
+                <RadioButton
+                    id="rateSlow"
+                    label={t('slow')}
+                    checked={this.state[C.OTHER_CFG][C.RATE] === 'slow'}
+                    onChange={
+                      () => this._onChangeOtherConfig({[C.RATE]: C.RATE_SLOW})
+                    } />
+                <RadioButton
+                    id="rateFast"
+                    label={t('fast')}
+                    checked={this.state[C.OTHER_CFG][C.RATE] === 'fast'}
+                    onChange={
+                      () => this._onChangeOtherConfig({[C.RATE]: C.RATE_FAST})
+                    } />
+              </FormField>
+              <br/>
+              <b>{t('fallback')}</b>
+              <FormField>
+                <RadioButton
+                    id="fallbackFalse"
+                    label={t('false')}
+                    checked={this.state[C.OTHER_CFG][C.FALLBACK] === 'false'}
+                    onChange={
+                      () => this._onChangeOtherConfig({[C.FALLBACK]: 'false'})
+                    } />
+                <RadioButton
+                    id="fallbackTrue"
+                    label={t('true')}
+                    checked={this.state[C.OTHER_CFG][C.FALLBACK] === 'true'}
+                    onChange={
+                      () => this._onChangeOtherConfig({[C.FALLBACK]: 'true'})
+                    } />
+              </FormField>
+              <br/>
+              <b>{t('hash')}</b>
+              <div>
+                <Menu label={t(this.state[C.OTHER_CFG][C.HASH])}>
+                  <Anchor onClick={
+                    () => this._onChangeOtherConfig({[C.HASH]: C.HASH_L3})
+                  }>
+                    {t(C.HASH_L3)}
+                  </Anchor>
+                  <Anchor onClick={
+                    () => this._onChangeOtherConfig({[C.HASH]: C.HASH_L2})
+                  }>
+                    {t(C.HASH_L2)}
+                  </Anchor>
+                  <Anchor onClick={
+                    () => this._onChangeOtherConfig({[C.HASH]: C.HASH_L2_VID})
+                  }>
+                    {t(C.HASH_L2_VID)}
+                  </Anchor>
+                  <Anchor onClick={
+                    () => this._onChangeOtherConfig({[C.HASH]: C.HASH_L4})
+                  }>
+                    {t(C.HASH_L4)}
+                  </Anchor>
+                </Menu>
+              </div>
+            </Tab>
+          </Tabs>
+          <hr style={{minWidth: '544px'}}/>
           <Footer pad={{vertical: 'medium'}}>
             <Menu>
               <Button

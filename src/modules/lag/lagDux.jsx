@@ -29,6 +29,10 @@ import * as C from './lagConst.js';
 // TODO: in general we should not grab the etag without the lastest data
 // TODO: we should follow the pattern of grabing the new data and etag when
 // TODO: the edit page is displayed
+// TODO: Create a routing vs. non-routing port?
+// TODO: fetch the etag when the edit loads.
+// TODO: maybe fetch the lag port if there is a selection because we might have
+//       stale date that we are using for the details and edit panels.
 
 const NAME = 'lag';
 
@@ -52,7 +56,7 @@ const AD = new AsyncDux(NAME, INITIAL_STORE);
 const LAG_PREFIX = 'lag';
 const LAG_REGEX = /^lag/;
 
-function pageParser(result) {
+function parsePortsInfs(result) {
   const lags = {};
 
   // parse the ports
@@ -147,274 +151,226 @@ const URL_INFS_D1 = `${URL_INFS}?depth=1`;
 const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
 
 
+function fetchInfsSelCfg(infs, resultCb) {
+  const reqs = [];
+  Object.keys(infs).forEach(infId => {
+    const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+    reqs.push(cb => Agent.get(url).end(cb));
+  });
+  Async.series(reqs, resultCb);
+}
+
+function addInfsToLag(infs, lagId, resultCb) {
+  Async.waterfall([
+    cb1 => fetchInfsSelCfg(infs, cb1),
+    (resArray, cb2) => {
+      const reqs = [];
+      resArray.forEach(res => {
+        const infId = res.body.configuration.name;
+        const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+        const etag = res.headers.etag;
+        const send = [
+          {op: 'add', path: '/user_config', value: { admin: 'up'}},
+          {op: 'add', path: `/${[C.OTHER_CFG]}`, value: {
+            [C.LACP_AGGR_KEY]: lagId
+          }}
+        ];
+        reqs.push(cb => {
+          Agent.patch(url).send(send).set('If-Match', etag).end(cb);
+        });
+      });
+      Async.series(reqs, cb2);
+    }
+  ], resultCb);
+}
+
+function removeInfsFromLag(infs, resultCb) {
+  Async.waterfall([
+    cb1 => fetchInfsSelCfg(infs, cb1),
+    (resArray, cb2) => {
+      const reqs = [];
+      resArray.forEach(res => {
+        const id = res.body.configuration.name;
+        const url = `${URL_INFS}/${id}?${SEL_CFG}`;
+        const etag = res.headers.etag;
+        const send = [{op: 'remove', path: `/${[C.OTHER_CFG]}`}];
+        reqs.push(cb => {
+          Agent.patch(url).send(send).set('If-Match', etag).end(cb);
+        });
+      });
+      Async.series(reqs, cb2);
+    }
+  ], resultCb);
+}
+
+function deletePortsForInfs(infs, resultCb) {
+  Async.waterfall([
+    cb1 => Agent.get(URL_PORTS).end(cb1),
+    (res1, cb2) => {
+      const reqs = [];
+      Object.keys(infs).forEach(infId => {
+        const url = `${URL_PORTS}/${infId}`;
+        if (res1.body.indexOf(url) >= 0) {
+          reqs.push(cb => Agent.delete(url).end(cb));
+        }
+      });
+      Async.series(reqs, cb2);
+    }
+  ], resultCb);
+}
+
+function fetchPortsInfsD1(resultCb) {
+  Async.parallel([
+    cb => Agent.get(URL_PORTS_D1).end(cb),
+    cb => Agent.get(URL_INFS_D1).end(cb),
+  ], resultCb);
+}
+
+function createLag(state, resultCb) {
+  const infsIds = Object.keys(state.lagInfs);
+  const infsUrls = infsIds.map(i => `${URL_INFS}/${i}`);
+  const oc = C.copyWithoutDefs(state[C.OTHER_CFG]);
+  const send = {
+    configuration: {
+      name: `lag${state.lagId}`,
+      tag: 1,
+      lacp: state[C.AGGR_MODE],
+      'vlan_mode': 'access',
+      interfaces: infsUrls,
+      [C.OTHER_CFG]: oc,
+    },
+    'referenced_by': [{uri: URL_BRIDGE}],
+  };
+  Agent.post(URL_PORTS).send(send).set('If-None-Match', '*').end(resultCb);
+}
+
+function patchLag(state, resultCb) {
+  const lagUrl = `${URL_PORTS}/${LAG_PREFIX}${state.lagId}?${SEL_CFG}`;
+  Async.waterfall([
+    cb1 => Agent.get(lagUrl).end(cb1),
+    (lagRes, cb2) => {
+      const etag = lagRes.headers.etag;
+      const infsIds = Object.keys(state.lagInfs);
+      const infsUrls = infsIds.map(i => `${URL_INFS}/${i}`);
+      const send = [
+        {op: 'add', path: `/${[C.AGGR_MODE]}`, value: state[C.AGGR_MODE]},
+        {op: 'add', path: '/interfaces', value: infsUrls},
+      ];
+      const oc = C.copyWithoutDefs(state[C.OTHER_CFG]);
+      if (Object.keys(oc).length > 0) {
+        send.push({op: 'add', path: `/${[C.OTHER_CFG]}`, value: oc});
+      } else {
+        const currOc = lagRes.body.configuration[C.OTHER_CFG];
+        if (currOc) {
+          send.push({op: 'remove', path: `/${[C.OTHER_CFG]}`});
+        }
+      }
+      Agent.patch(lagUrl).send(send).set('If-Match', etag).end(cb2);
+    }
+  ], resultCb);
+}
+
 const ACTIONS = {
 
   fetchPage() {
     return (dispatch) => {
       dispatch(AD.action('REQUEST', { title: t('loading') }));
-      Async.parallel([
-        cb => Agent.get(URL_PORTS_D1).end(cb),
-        cb => Agent.get(URL_INFS_D1).end(cb),
-      ], (error, result) => {
+      fetchPortsInfsD1((error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+        return dispatch(AD.action('SUCCESS', {
+          result, parser: parsePortsInfs
+        }));
       });
     };
   },
 
-//TODO: Create a Routing port by default...
-// Creating a non-routing port for demo purpose.
   addLag(state) {
-    const oc = { ...state[C.OTHER_CFG] };
-    if (oc[C.RATE] === C.RATE_DEF) { delete oc[C.RATE]; }
-    if (oc[C.FALLBACK] === C.FALLBACK_DEF) { delete oc[C.FALLBACK]; }
-    if (oc[C.HASH] === C.HASH_DEF) { delete oc[C.HASH]; }
-
-    const send = {
-      configuration: {
-        name: `lag${state.newLagId}`,
-        tag: 1,
-        lacp: state[C.AGGR_MODE],
-        'vlan_mode': 'access',
-      },
-      'referenced_by': [{uri: URL_BRIDGE}],
-    };
-    if (Object.keys(oc).length > 0) {
-      send.configuration[C.OTHER_CFG] = oc;
-    }
-
     return (dispatch) => {
-      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 2 }));
-      Async.waterfall([
-        cb1 => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 4 }));
+      Async.series([
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
-          Agent.post(URL_PORTS).send(send).set('If-None-Match', '*').end(cb1);
+          deletePortsForInfs(state.diff.added, cb);
         },
-        (r1, cb2) => {
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
-          Async.parallel([
-            cb => Agent.get(URL_PORTS_D1).end(cb),
-            cb => Agent.get(URL_INFS_D1).end(cb),
-          ], cb2);
-        }
-      ], (error, result) => {
-        if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
-      });
-    };
-  },
-
-  deleteLag(lagId, interfaces) {
-    const gets = [];
-    Object.keys(interfaces).forEach(infId => {
-      const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-      gets.push(cb => Agent.get(url).end(cb));
-    });
-
-    return (dispatch) => {
-      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
-      Async.waterfall([
-        cb1 => {
-          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
-          Async.parallel(gets, cb1);
+          addInfsToLag(state.diff.added, state.lagId, cb);
         },
-        (r1, cb2) => {
-          const patch = [];
-          r1.forEach(res => {
-            const infId = res.body.configuration.name;
-            const etag = res.headers.etag;
-            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-            patch.push(cb => Agent.patch(url)
-              .send([{op: 'remove', path: `/${[C.OTHER_CFG]}`}])
-              .set('If-Match', etag)
-              .end(cb));
-          });
-          Async.series(patch, cb2);
-        },
-        (r2, cb3) => {
-          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
-          Agent.delete(`${URL_PORTS}/${LAG_PREFIX}${lagId}`).end(cb3);
-        },
-        (r3, cb4) => {
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
-          Async.parallel([
-            cb => Agent.get(URL_PORTS_D1).end(cb),
-            cb => Agent.get(URL_INFS_D1).end(cb),
-          ], cb4);
-        }
-      ], (error, result) => {
-        if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
-      });
-    };
-  },
-
-  editLag(lagId, state) {
-    const URL_LAG = `${URL_PORTS}/${LAG_PREFIX}${lagId}?${SEL_CFG}`;
-
-    return (dispatch) => {
-      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 10 }));
-      Async.waterfall([
-        portsCb => {
-          // fetch the ports
-          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
-          Agent.get(URL_PORTS).end(portsCb);
+          createLag(state, cb);
         },
-        (portsRes, cb2) => {
-          // delete any ports that exists for added interfaces to this LAG
-          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
-          const reqs = [];
-          Object.keys(state.diff.added).forEach(infId => {
-            const url = `${URL_PORTS}/${infId}`;
-            if (portsRes.body.indexOf(url) >= 0) {
-              reqs.push(cb => Agent.delete(url).end(cb));
-            }
-          });
-          Async.series(reqs, cb2);
-        },
-        (r2, cb3) => {
-          // fetch etag for each interface that we added to this LAG
-          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
-          const reqs = [];
-          Object.keys(state.diff.added).forEach(infId => {
-            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-            reqs.push(cb => Agent.get(url).end(cb));
-          });
-          Async.series(reqs, cb3);
-        },
-        (infsDataRes, cb4) => {
-          // patch (w/ etag) each interface that we added to this LAG
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 4 }));
-          const reqs = [];
-          infsDataRes.forEach(res => {
-            const infId = res.body.configuration.name;
-            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-            const etag = res.headers.etag;
-            const send = [
-              {op: 'add', path: '/user_config', value: { admin: 'up'}},
-              {op: 'add', path: `/${[C.OTHER_CFG]}`, value: {
-                [C.LACP_AGGR_KEY]: lagId
-              }}
-            ];
-            reqs.push(cb => {
-              Agent.patch(url).send(send).set('If-Match', etag).end(cb);
-            });
-          });
-          Async.series(reqs, cb4);
+          fetchPortsInfsD1(cb);
         },
-        (r4, cb5) => {
-          // fetch etag for each interface that we removed from this LAG
-          dispatch(AD.action('REQUEST_STEP', { currStep: 5 }));
-          const reqs = [];
-          Object.keys(state.diff.removed).forEach(infId => {
-            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-            reqs.push(cb => Agent.get(url).end(cb));
-          });
-          Async.series(reqs, cb5);
-        },
-        (infsDataRes, cb6) => {
-          // patch (w/ etag) each interface that we removed from this LAG
-          dispatch(AD.action('REQUEST_STEP', { currStep: 6 }));
-          const reqs = [];
-          infsDataRes.forEach(res => {
-            const infId = res.body.configuration.name;
-            const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
-            const etag = res.headers.etag;
-            const send = [{op: 'remove', path: `/${[C.OTHER_CFG]}`}];
-            reqs.push(cb => {
-              Agent.patch(url).send(send).set('If-Match', etag).end(cb);
-            });
-          });
-          Async.series(reqs, cb6);
-        },
-        (r6, cb7) => {
-          // fetch etag for LAG port.
-          dispatch(AD.action('REQUEST_STEP', { currStep: 7 }));
-          Agent.get(URL_LAG).end(cb7);
-        },
-        (portData, cb8) => {
-          // patch (w/ etag) the LAG port with the interface URLs
-          dispatch(AD.action('REQUEST_STEP', { currStep: 8 }));
-          const urls = [];
-          Object.keys(state.lagInfs).forEach(infId => {
-            urls.push(`${URL_INFS}/${infId}`);
-          });
-          const etag = portData.headers.etag;
-          const send = [{op: 'add', path: '/interfaces', value: urls}];
-          Agent.patch(URL_LAG).send(send).set('If-Match', etag).end(cb8);
-        },
-        (r8, cb9) => {
-          // fetch page data
-          dispatch(AD.action('REQUEST_STEP', { currStep: 9 }));
-          Async.parallel([
-            cb => Agent.get(URL_PORTS_D1).end(cb),
-            cb => Agent.get(URL_INFS_D1).end(cb),
-          ], cb9);
-        }
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+        return dispatch(AD.action('SUCCESS', {
+          result: result[3], parser: parsePortsInfs
+        }));
       });
     };
   },
 
-  // Editing Aggreagtion Mode, Fallback, Rate and Hash from LagPage.
-  editLagDetails(lagId, state, patchAggrMode, patchOC) {
+  editLag(state) {
+    return (dispatch) => {
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 5 }));
+      Async.series([
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          removeInfsFromLag(state.diff.removed, cb);
+        },
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          deletePortsForInfs(state.diff.added, cb);
+        },
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
+          addInfsToLag(state.diff.added, state.lagId, cb);
+        },
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 4 }));
+          patchLag(state, cb);
+        },
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 5 }));
+          fetchPortsInfsD1(cb);
+        },
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', {
+          result: result[4], parser: parsePortsInfs
+        }));
+      });
+    };
+  },
 
-    const URL_LAG = `${URL_PORTS}/${LAG_PREFIX}${lagId}?${SEL_CFG}`;
-
-    const oc = { ...state[C.OTHER_CFG] };
-    if (oc[C.RATE] === C.RATE_DEF) { delete oc[C.RATE]; }
-    if (oc[C.FALLBACK] === C.FALLBACK_DEF) { delete oc[C.FALLBACK]; }
-    if (oc[C.HASH] === C.HASH_DEF) { delete oc[C.HASH]; }
-
-    const send = [];
-
-    //TODO: Find a better way to do this.
-    if (patchAggrMode) {
-      send.push(
-        {op: 'add', path: `/${[C.AGGR_MODE]}`, value: state[C.AGGR_MODE]},
-      );
-    }
-    if (patchOC) {
-      if (Object.keys(oc).length > 0) {
-        send.push(
-          {op: 'add', path: `/${[C.OTHER_CFG]}`, value: oc}
-        );
-      } else {
-        send.push({op: 'remove', path: `/${[C.OTHER_CFG]}`});
-      }
-    }
-
+  // TODO: should the delete fetch the interfaces for the LAG at this time?
+  deleteLag(lagId, infs) {
     return (dispatch) => {
       dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
-      Async.waterfall([
-        cb1 => {
-          // fetch etag for LAG port.
-          //TODO: Fetch etags differently
+      Async.series([
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
-          Agent.get(URL_LAG).end(cb1);
+          removeInfsFromLag(infs, cb);
         },
-        (r1, cb2) => {
-          // patch the lag port with new aggr mode, hash, rate and fallback.
-          const etag = r1.headers.etag;
-          dispatch(AD.action('REQUEST_STEP', { currStep: 2}));
-          Agent.patch(URL_LAG).send(send).set('If-Match', etag).end(cb2);
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          Agent.delete(`${URL_PORTS}/${LAG_PREFIX}${lagId}`).end(cb);
         },
-        (r3, cb3) => {
+        cb => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
-          Async.parallel([
-            cb => Agent.get(URL_PORTS_D1).end(cb),
-            cb => Agent.get(URL_INFS_D1).end(cb),
-          ], cb3);
-        }
+          fetchPortsInfsD1(cb);
+        },
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', { result, parser: pageParser } ));
+        return dispatch(AD.action('SUCCESS', {
+          result: result[2], parser: parsePortsInfs
+        }));
       });
     };
   },
-
 
   clearError() {
     return AD.action('CLEAR_ERROR');
