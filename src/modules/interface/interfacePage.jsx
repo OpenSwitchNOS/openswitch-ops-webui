@@ -84,7 +84,7 @@ class InterfacePage extends Component {
         columnKey: 'speed',
         header: t('speed'),
         width: 120,
-        format: Formatter.toBpsString,
+        format: Formatter.bpsToString,
       },
     ];
     this.state = {};

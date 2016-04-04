@@ -105,6 +105,8 @@ class VlanPage extends Component {
     // TOOD: this should be moved into Utils.
     const idKeys = [];
     const lagKeys = [];
+    let lagStr = '';
+    let idStr = '';
     Object.keys(cellData).forEach( k => {
       if (isNaN(k)) {
         lagKeys.push(k);
@@ -112,8 +114,12 @@ class VlanPage extends Component {
         idKeys.push(Number(k));
       }
     });
-    const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
-    const idStr = new Range(idKeys).toString().split(',').join(', ');
+    if (idKeys.length > 0) {
+      idStr = new Range(idKeys).toString().split(',').join(', ');
+      lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+    } else {
+      lagStr = lagKeys.length === 0 ? '' : `${lagKeys.sort().join(', ')}`;
+    }
     return (
       <CustomCell {...cellProps}>
         {`${idStr}${lagStr}`}
