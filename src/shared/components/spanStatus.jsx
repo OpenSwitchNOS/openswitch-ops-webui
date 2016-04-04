@@ -25,7 +25,9 @@ export default class SpanStatus extends Component {
     onClick: PropTypes.func,
     size: PropTypes.string,
     space: PropTypes.bool,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.oneOf([
+      'critical', 'warning', 'ok', 'disabled', 'unknown'
+    ]).isRequired,
   };
 
   static defaultProps = {

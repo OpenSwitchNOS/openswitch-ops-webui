@@ -20,14 +20,18 @@ import React, { PropTypes, Component } from 'react';
 import { t } from 'i18n/lookup.js';
 import _ from 'lodash';
 import { Table, Column, Cell } from 'fixed-data-table';
-import SearchInput from 'grommet/components/SearchInput';
-import DownIcon from 'grommet/components/icons/base/CaretDown';
-import UpIcon from 'grommet/components/icons/base/CaretUp';
-import CheckBox from 'grommet/components/CheckBox';
-import EditIcon from 'grommet/components/icons/base/Edit';
-import Title from 'grommet/components/Title';
-import Menu from 'grommet/components/Menu';
+import Search from 'grommet/components/Search';
+import DownIcon from 'grommet/components/icons/base/LinkDown';
+import UpIcon from 'grommet/components/icons/base/LinkUp';
+import EditIcon from 'grommet/components/icons/base/Configuration';
+import AddIcon from 'grommet/components/icons/base/Add';
+import CbIcon from 'grommet/components/icons/base/Checkbox';
+import CbSelIcon from 'grommet/components/icons/base/CheckboxSelected';
+import SubtractIcon from 'grommet/components/icons/base/Subtract';
 import Toolbar from 'toolbar.jsx';
+import Anchor from 'grommet/components/Anchor';
+import { naturalSort } from 'sorts.js';
+
 
 const ASC = 'asc';
 const DESC = 'desc';
@@ -52,9 +56,9 @@ class SortHeaderCell extends Component {
     sortDirection: null,
   };
 
-  static UP = <UpIcon className="tiny" />;
-  static DOWN = <DownIcon className="tiny" />;
-  static NONE = <UpIcon className="tiny noColor"/>;
+  static UP = <UpIcon />;
+  static DOWN = <DownIcon />;
+  static NONE = <UpIcon className="noColor"/>;
 
   static toggleSortDir(ds) { return ds === DESC ? ASC : DESC; }
 
@@ -103,6 +107,8 @@ class DataMap {
 
   getDataAtKey(dataKey) { return this.data[dataKey]; }
 
+  getIndexForKey(dataKey) { return this.dataKeyArray.indexOf(dataKey); }
+
   cloneDataKeyArray() { return this.dataKeyArray.slice(); }
 }
 
@@ -120,12 +126,18 @@ export default class DataGrid extends Component {
     height: PropTypes.number.isRequired,
     noFilter: PropTypes.bool,
     noSelect: PropTypes.bool,
+    onAdd: PropTypes.func,
+    onDelete: PropTypes.func,
     onEdit: PropTypes.func,
     onSelectChange: PropTypes.func,
     rowHeight: PropTypes.number,
-    select: PropTypes.arrayOf(PropTypes.string),
+    select: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string,
+    ]),
     singleSelect: PropTypes.bool,
     title: PropTypes.string,
+    toolbar: PropTypes.arrayOf(PropTypes.node),
     width: PropTypes.number.isRequired,
   };
 
@@ -134,7 +146,7 @@ export default class DataGrid extends Component {
     rowHeight: 40,
   };
 
-  static mkFiltered(defaultDataMap, dataKeyArray, filterText) {
+  _mkFiltered = (defaultDataMap, dataKeyArray, filterText) => {
     if (!filterText) {
       return dataKeyArray;
     }
@@ -142,28 +154,37 @@ export default class DataGrid extends Component {
     for (let i=0; i<defaultDataMap.size(); i++) {
       const dataKey = defaultDataMap.getDataKeyAt(i);
       const rowData = defaultDataMap.getDataAtKey(dataKey);
-      if (!DataGrid.filterRowData(rowData, filterText)) {
+      if (!this._filterRowData(rowData, filterText)) {
         filteredKeyArray.push(dataKey);
       }
     }
     return filteredKeyArray;
-  }
+  };
 
-  static filterRowData(rowData, filterText) {
-    for (const key in rowData) {
-      if (rowData.hasOwnProperty(key)) {
-        const val = rowData[key];
-        const type = typeof val;
-        if (type === 'string' && val.toLowerCase().indexOf(filterText) !== -1) {
-          return false;
-        }
-        if (type === 'number' && val.toString().indexOf(filterText) !== -1) {
-          return false;
-        }
+  _trimRowDataToCols = (rowData) => {
+    const trimmedRowData = {};
+    this.props.columns.forEach(col => {
+      const k = col.columnKey;
+      trimmedRowData[k] = rowData[k];
+    });
+    return trimmedRowData;
+  };
+
+  _filterRowData = (rowData, filterText) => {
+    const trimmedRowData = this._trimRowDataToCols(rowData);
+    const keys = Object.keys(trimmedRowData);
+    for (const key of keys) {
+      const val = trimmedRowData[key];
+      const type = typeof val;
+      if (type === 'string' && val.toLowerCase().indexOf(filterText) !== -1) {
+        return false;
+      }
+      if (type === 'number' && val.toString().indexOf(filterText) !== -1) {
+        return false;
       }
     }
     return true;
-  }
+  };
 
   static sort(defaultDataMap, dataKeyArray, sortingSpecs) {
     const ss0 = sortingSpecs && sortingSpecs[0];
@@ -183,12 +204,7 @@ export default class DataGrid extends Component {
     return (rowDataA, rowDataB) => {
       const a = rowDataA[k];
       const b = rowDataB[k];
-      let result = 0;
-      if (a > b) {
-        result = 1;
-      } else if (a < b) {
-        result = -1;
-      }
+      let result = naturalSort(a, b);
       if (result !== 0 && sortDirection === ASC) {
         result = result * -1;
       }
@@ -203,8 +219,11 @@ export default class DataGrid extends Component {
 
     this.selectCbId = _.uniqueId('dataGridSelCkBx_');
 
+    const sel = this.props.select;
+    const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
+
     this.state = {
-      activeDataKeys: this.props.select || [],
+      activeDataKeys,
       filterText: null,
       sortingSpecs: [],
       defaultDataMap,
@@ -213,23 +232,35 @@ export default class DataGrid extends Component {
   }
 
   componentWillReceiveProps(newProps) {
+    let dataMap = this.state.dataMap;
+
     if (!_.isEqual(newProps.data, this.props.data)) {
       const defaultDataMap = new DataMap(newProps.data);
 
       let dataKeyArray = defaultDataMap.cloneDataKeyArray();
 
       const ft = this.state.filterText;
-      dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+      dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, ft);
 
       DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
 
-      const dataMap = new DataMap(newProps.data, dataKeyArray);
+      dataMap = new DataMap(newProps.data, dataKeyArray);
       this.setState({ defaultDataMap, dataMap });
     }
-    if (!_.isEqual(newProps.select, this.props.select)) {
-      this.setState({ activeDataKeys: newProps.select });
-    }
+
+    const sel = newProps.select;
+    const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
+    const scrollToRow = dataMap.getIndexForKey(activeDataKeys[0]);
+    this.setState({ activeDataKeys, scrollToRow });
   }
+
+  _normalizeSelect = (activeDataKeys) => {
+    let sel = activeDataKeys.slice();
+    if (this.props.singleSelect) {
+      sel = (sel.length > 0) ? sel[0] : null;
+    }
+    return sel;
+  };
 
   _onRowClick = (e, rowIdx) => {
     if (!this.props.noSelect) {
@@ -248,24 +279,32 @@ export default class DataGrid extends Component {
       this.setState({ activeDataKeys });
 
       if (this.props.onSelectChange) {
-        this.props.onSelectChange(activeDataKeys.slice());
+        this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
       }
     }
   };
 
   _rowClassName = (rowIdx) => {
     const dataKey = this.state.dataMap.getDataKeyAt(rowIdx);
-    return this.state.activeDataKeys.indexOf(dataKey) >= 0 ? 'active' : null;
+    const isSel = this.state.activeDataKeys.indexOf(dataKey) >= 0;
+    return isSel ? 'active' : null;
   };
 
-  _onSelectToggle = (e) => {
-    const activeDataKeys = e.target.checked ?
-      this.state.dataMap.cloneDataKeyArray() : [];
-
+  _onSelectAll = () => {
+    const activeDataKeys = this.state.dataMap.cloneDataKeyArray();
     this.setState({ activeDataKeys });
 
     if (this.props.onSelectChange) {
-      this.props.onSelectChange(activeDataKeys.slice());
+      this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
+    }
+  };
+
+  _onSelectNone = () => {
+    const activeDataKeys = [];
+    this.setState({ activeDataKeys });
+
+    if (this.props.onSelectChange) {
+      this.props.onSelectChange(this._normalizeSelect(activeDataKeys));
     }
   };
 
@@ -275,7 +314,7 @@ export default class DataGrid extends Component {
 
     let dataKeyArray = defaultDataMap.cloneDataKeyArray();
     const ft = this.state.filterText;
-    dataKeyArray = DataGrid.mkFiltered(defaultDataMap, dataKeyArray, ft);
+    dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, ft);
     DataGrid.sort(defaultDataMap, dataKeyArray, sortingSpecs);
 
     const dataMap = new DataMap(this.props.data, dataKeyArray);
@@ -287,9 +326,7 @@ export default class DataGrid extends Component {
     const defaultDataMap = this.state.defaultDataMap;
 
     let dataKeyArray = defaultDataMap.cloneDataKeyArray();
-    dataKeyArray = DataGrid.mkFiltered(
-      defaultDataMap, dataKeyArray, filterText
-    );
+    dataKeyArray = this._mkFiltered(defaultDataMap, dataKeyArray, filterText);
 
     DataGrid.sort(defaultDataMap, dataKeyArray, this.state.sortingSpecs);
 
@@ -298,7 +335,11 @@ export default class DataGrid extends Component {
   };
 
   _onEditClicked = () => {
-    this.props.onEdit(this.state.activeDataKeys.slice());
+    this.props.onEdit(this._normalizeSelect(this.state.activeDataKeys));
+  };
+
+  _onDeleteClicked = () => {
+    this.props.onDelete(this._normalizeSelect(this.state.activeDataKeys));
   };
 
   _mkCell = (cellProps, colProps) => {
@@ -346,26 +387,56 @@ export default class DataGrid extends Component {
 
     // Compute the grid dimensions. If are parent in a responsive box then
     // we will be passed the computed dimensions.
-    const gridWidth = this.props.computedAvailableWidth || this.props.width;
-    const height = this.props.computedAvailableHeight || this.props.height;
+    const gridWidth = Math.floor(this.props.computedAvailableWidth)
+      || this.props.width;
+    const height = Math.floor(this.props.computedAvailableHeight)
+      || this.props.height;
     const gridHeight = height - Toolbar.height();
 
     // Determine which tools are avialable.
 
-    const selectTool = this.props.singleSelect || this.props.noSelect ? null :
-      <CheckBox id={this.selectCbId} label="" onChange={this._onSelectToggle}/>;
+    const selectAllTool = this.props.singleSelect || this.props.noSelect
+      ? null : (
+        <Anchor onClick={this._onSelectAll}><CbSelIcon/></Anchor>
+      );
+
+    const selectNoneTool = !selectAllTool
+      ? null : (
+        <Anchor onClick={this._onSelectNone}><CbIcon/></Anchor>
+      );
+
+    const haveSel = this.state.activeDataKeys.length > 0;
 
     let editTool = null;
     const editCb = this.props.onEdit ? this._onEditClicked : null;
     if (editCb) {
-      editTool = this.state.activeDataKeys.length > 0 ?
-        <a onClick={editCb}><EditIcon/></a> :
-        <EditIcon className="disabled"/>;
+      editTool = (
+        <Anchor disabled={!haveSel} onClick={haveSel ? editCb : null}>
+          <EditIcon/>
+        </Anchor>
+      );
     }
 
+    let delTool = null;
+    const delCb = this.props.onDelete ? this._onDeleteClicked : null;
+    if (delCb) {
+      delTool = (
+        <Anchor disabled={!haveSel} onClick={haveSel ? delCb : null}>
+          <SubtractIcon/>
+        </Anchor>
+      );
+    }
+
+    const addTool = !this.props.onAdd ? null :
+      <Anchor onClick={this.props.onAdd}><AddIcon/></Anchor>;
+
+    const searchResultCount = this.props.noFilter || !this.state.filterText
+      ? '' : ` (${t('found')}: ${rowCount})`;
+
     const searchTool = this.props.noFilter ? null :
-      <SearchInput
-          value={this.state.filterText}
+      <Search
+          inline
+          value={this.state.filterText || ''}
           onChange={this._onFilterChange}
           placeHolder={t('search')} />;
 
@@ -373,12 +444,19 @@ export default class DataGrid extends Component {
 
     const tb = (
       <Toolbar width={gridWidth}>
-        <Menu direction="row" align="center" responsive={false}>
-          {selectTool}
+        <b className="mTopBottomAuto">
+          {`${this.props.title}${searchResultCount}`}
+        </b>
+        <div>
+          {this.props.toolbar}
+          {editTool}
+          {addTool}
+          {delTool}
+          {selectAllTool}
+          {selectNoneTool}
+          &nbsp;&nbsp;
           {searchTool}
-          <Title>{this.props.title}</Title>
-        </Menu>
-        {editTool}
+        </div>
       </Toolbar>
     );
 
@@ -393,6 +471,7 @@ export default class DataGrid extends Component {
             headerHeight={this.props.headerHeight}
             onRowClick={this._onRowClick}
             rowClassNameGetter={this._rowClassName}
+            scrollToRow={this.state.scrollToRow}
         >
           {columns}
         </Table>

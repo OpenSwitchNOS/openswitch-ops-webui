@@ -15,26 +15,35 @@
 */
 
 const NAME = 'nav';
+const AUTO_HIDE = `${NAME}/AUTO_HIDE`;
 const SHOW_PANE = `${NAME}/SHOW_PANE`;
 const HIDE_PANE = `${NAME}/HIDE_PANE`;
 
 const ACTIONS = {
+  autoHide(on) { return { type: AUTO_HIDE, on }; },
   showPane() { return { type: SHOW_PANE }; },
   hidePane() { return { type: HIDE_PANE }; },
 };
 
 const INITIAL_STORE = {
   paneActive: false,
+  autoHide: false,
 };
 
 function REDUCER(moduleStore = INITIAL_STORE, action) {
   switch (action.type) {
 
-    case SHOW_PANE:
-      return { ...moduleStore, paneActive: true };
+    case AUTO_HIDE: {
+      return { ...moduleStore, autoHide: action.on };
+    }
 
-    case HIDE_PANE:
+    case SHOW_PANE: {
+      return { ...moduleStore, paneActive: true };
+    }
+
+    case HIDE_PANE: {
       return { ...moduleStore, paneActive: false };
+    }
 
     default:
       return moduleStore;

@@ -54,6 +54,9 @@ function createReducers(BuildConfig) {
     links: (moduleStore = {}) => { return moduleStore; },
     routeToLink: (moduleStore = {}) => { return moduleStore; },
     boxGraphic: (moduleStore = {}) => { return moduleStore; },
+    guides: (moduleStore = {}) => { return moduleStore; },
+    extLinks: (moduleStore = {}) => { return moduleStore; },
+    constants: (moduleStore = {}) => { return moduleStore; },
   };
   modules.forEach(i => reducers[i.NAME] = i.REDUCER);
   return combineReducers(reducers);
@@ -123,6 +126,9 @@ export function mainInit(BuildConfig) {
     links: navModel.links,
     routeToLink: navModel.routeToLink,
     boxGraphic: BuildConfig.settings.boxGraphic,
+    extLinks: BuildConfig.settings.extLinks,
+    guides: BuildConfig.guides || [],
+    constants: BuildConfig.settings.constants || {},
   };
 
   store = createReducersAndStore(BuildConfig, initStore);
@@ -144,9 +150,11 @@ function createElement(RouteComponent, props) {
 export default class Main extends Component {
   render() {
     return (
-      <Provider store={store}>
-        <Router routes={routes} createElement={createElement}/>
-      </Provider>
+      <div>
+        <Provider store={store}>
+          <Router routes={routes} createElement={createElement}/>
+        </Provider>
+      </div>
     );
   }
 }

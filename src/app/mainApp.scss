@@ -27,12 +27,6 @@ h1, h2, h3, .headline, .title {
 }
 
 .control-icon {
-  &.tiny {
-    width: 32px;
-    height: 32px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
   &.noColor {
     stroke: none;
     fill: none;
@@ -40,6 +34,10 @@ h1, h2, h3, .headline, .title {
   &.disabled {
     @extend .disabled;
   }
+}
+
+.toolbar .box {
+  height: 100%;
 }
 
 @mixin flex($g, $s, $b) {
@@ -70,6 +68,7 @@ h1, h2, h3, .headline, .title {
 
 .min200x200 { @include minHxW(); }
 .min200x400 { @include minHxW(200px, 400px); }
+.min150x400 { @include minHxW(150px, 400px); }
 .min100x200 { @include minHxW(100px, 200px); }
 .min300x300 { @include minHxW(300px, 300px); }
 .min300x300 { @include minHxW(300px, 300px); }
@@ -86,7 +85,7 @@ table th {
   font-weight: bold;
 }
 
-// Property styles for plain html tables
+// Property styles for 'propTable' plain html tables
 table.propTable {
   tbody {
     vertical-align: top;
@@ -101,6 +100,27 @@ table.propTable {
   margin-bottom: 0px;
 }
 
+// Property styles for 'logTable' plain html tables
+.logTable {
+  overflow-y: auto;
+  overflow-x: hidden;
+  table {
+    width: 100%;
+    table-layout: fixed;
+    tbody {
+      vertical-align: top;
+    }
+    td {
+      padding-right: 16px;
+      padding-bottom: 16px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    margin-bottom: 0px;
+  }
+}
+
 @mixin pageBox($marginTop: $space, $marginLeft: $space) {
   background-color: white;
   border-radius: 5px;
@@ -112,7 +132,6 @@ table.propTable {
 }
 
 #page {
-  background-color: $pageBgColor;
   height: 100vh;
 
   .mTop { margin-top: $space; }
@@ -127,11 +146,11 @@ table.propTable {
   .pLeft { padding-left: $space; }
 
   #pageContent {
+    background-color: $pageBgColor;
     overflow: auto;
-    // The following margin top/left (along with the .pageBox space, provides
+    // The following margin top/left (along with the .pageBox space) provides
     // spacing between pageBox items if the items are on the same row only,
     // when pageBox items wrap, the margin is not added.
-    margin-top: -$space;
     margin-left: -$space;
 
     .pageBox {
@@ -140,15 +159,17 @@ table.propTable {
   }
 }
 
+.mTopBottomAuto { margin-top: auto; margin-bottom: auto; }
+
 // Adds a continuous spin to an element (i.e. refresh icon).
 .spin {
   -webkit-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
   -ms-transform-origin: 50% 50%; /* IE 9 */
-  -webkit-animation: spin 1s infinite linear;
-  -moz-animation: spin 1s infinite linear;
-  -o-animation: spin 1s infinite linear;
-  animation: spin 1s infinite linear;
+  -webkit-animation: spin 3s infinite linear;
+  -moz-animation: spin 3s infinite linear;
+  -o-animation: spin 3s infinite linear;
+  animation: spin 3s infinite linear;
 }
 @-moz-keyframes spin {
   from { -moz-transform: rotate(0deg); }
@@ -163,30 +184,44 @@ table.propTable {
   to { transform: rotate(360deg); }
 }
 
-@media screen and (min-width: 45em) {
-  .edit .layer__container {
-    margin: 8px;
-    border: 3px solid $brand-color;
-  }
-}
-.edit.layer {
-  z-index: 100;
+@mixin rotate($deg) {
+  transform: rotate($deg);
+  -moz-transform: rotate($deg);
+  -webkit-transform: rotate($deg);
 }
 
-@media screen and (min-width: 45em) {
-  .guide {
-    margin: 8px;
+.rotate45 {
+  @include rotate(45deg);
+}
+
+.mHalf {
+  margin: $space/2;
+}
+
+.guide {
+  overflow: auto;
+  background-color: $pageBgColor;
+  > div {
+    margin-top: $space;
+    margin-bottom: $space/2;
+    margin-left: $space;
+    margin-right: $space;
     border-radius: 5px;
     border: 3px solid $brand-color;
-    overflow: auto;
-    .header {
-      height: 48px;
-    }
   }
-}
-.guide {
+  .header {
+    height: 48px;
+  }
   ul {
     margin-left: 1rem;
+    margin-bottom: 4px;
+    li {
+      max-width: none;
+      margin-bottom: 4px;
+    }
+  }
+  td {
+    padding-right: 16px;
   }
 }
 
@@ -224,6 +259,51 @@ $slideInColumnMinWidth: 350px;
 
 // Grommet overrides start here...
 
+@media screen and (min-width: 45em) {
+  .edit .layer__container {
+    margin: 8px;
+    border: 3px solid $brand-color;
+  }
+}
+
+.edit {
+  .layer__container {
+    min-width: 300px;
+  }
+  &.layer {
+    z-index: 100;
+    &.second {
+      z-index: 101;
+    }
+    &.third {
+      z-index: 102;
+    }
+  }
+  .title {
+    line-height: 1.5em; // else the font gets clipped on bottom
+  }
+}
+
+body .drop {
+  z-index: 110;
+}
+
+.asyncStatus.layer {
+  z-index: 200;
+  &.clear {
+    background-image: none;
+  }
+  .layer__container {
+    .meter__graphic:focus {
+      outline-width: 0px;
+    }
+  }
+}
+
+.error.layer {
+  z-index: 1000;
+}
+
 // Override the sidebar-width for the navigation pane.
 $sidebar-width: 320px; // this is used by _objects.sidebar.scss
 
@@ -257,4 +337,8 @@ nav.menu--primary > a:not(.button).active {
 
 u {
   text-decoration: underline;
+}
+
+.search--inline input.search__input {
+  width: 160px;
 }

@@ -14,37 +14,45 @@
     under the License.
 */
 
-function bpsToString(bitsPerSecond) {
-  if (isNaN(bitsPerSecond)) {
-    throw new Error('Bits Per Second should be a Number');
+function bpsToString(bps) {
+  if (bps === null || isNaN(bps)) {
+    return '';
   }
-  if (bitsPerSecond >= 1000000000) {
+
+  if (bps >= 1000000000) {
     //Formula : Gigabits per second = bits per second ÷ 1,000,000,000
-    return `${(bitsPerSecond / 1000000000)} Gbps`;
-  } else if (bitsPerSecond >= 1000000) {
-    //Formula : Megabytes per second = bits per second ÷ 1,000,000
-    return `${(bitsPerSecond / 1000000)}  Mbps`;
-  } else if (bitsPerSecond >= 1000) {
-    //Formula: Kilobytes per second = bits per second ÷ 1,000
-    return `${bitsPerSecond} Kbps`;
-  } else if (bitsPerSecond > 0) {
-    // 0 - 999 bps
-    return `${bitsPerSecond} bps`;
+    return `${(bps / 1000000000)} Gbps`;
   }
-  return `${bitsPerSecond} bps`;
+
+  if (bps >= 1000000) {
+    //Formula : Megabytes per second = bits per second ÷ 1,000,000
+    return `${(bps / 1000000)}  Mbps`;
+  }
+
+  if (bps >= 1000) {
+    //Formula: Kilobytes per second = bits per second ÷ 1,000
+    return `${bps} Kbps`;
+  }
+
+  if (bps > 0) {
+    // 0 - 999 bps
+    return `${bps} bps`;
+  }
+
+  return `${bps} bps`;
 }
 
 
-function mbpsToString(megaBitsPerSecond) {
-  if (isNaN(megaBitsPerSecond)) {
-    throw new Error('Bits Per Second should be a Number');
+function mbpsToString(mbps) {
+  if (mbps === null || isNaN(mbps)) {
+    return '';
   }
-  return bpsToString(megaBitsPerSecond * 1000000);
+  return bpsToString(mbps * 1000000);
 }
 
 function toCommaString(x) {
-  if (isNaN(x)) {
-    throw new Error('Should be a Number');
+  if (x === null || isNaN(x)) {
+    return '';
   }
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

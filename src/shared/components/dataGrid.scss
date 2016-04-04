@@ -21,22 +21,16 @@
 
   overflow: hidden;
 
-  .header {
-    height: 48px;
-    input.search-input__input {
-      padding-top: 4px;
-      padding-bottom: 4px;
-    }
-    .search-input__control {
-      .control-icon {
-        width: 36px;
-        height: 36px;
-      }
-    }
-  }
-
   .public_fixedDataTableCell_cellContent {
     padding-right: 24px; // allow for the scrollbar when cell is right aligned
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .fixedDataTableCellLayout_wrap1 {
+    table-layout: fixed;
   }
 
   .public_fixedDataTable_header .public_fixedDataTableCell_main  {
@@ -50,11 +44,6 @@
         fill: $headerHoverColor;
         stroke: $headerHoverColor;
       }
-    }
-    .control-icon.tiny {
-      margin-top: 0px;
-      margin-bottom: 0px;
-      margin-left: -8px;
     }
   }
 

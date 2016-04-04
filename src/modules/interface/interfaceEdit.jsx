@@ -15,58 +15,70 @@
 */
 
 import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import Menu from 'grommet/components/Menu';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
 import FormField from 'grommet/components/FormField';
-import FormFields from 'grommet/components/FormFields';
 import RadioButton from 'grommet/components/RadioButton';
 import Button from 'grommet/components/Button';
 import _ from 'lodash';
+import * as C from './interfaceConst.js';
 
 
 class InterfaceEdit extends Component {
 
   static propTypes = {
-    detail: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
+    infId: PropTypes.string.isRequired,
+    interface: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
-    onSubmit: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.pad = {horizontal: 'small', vertical: 'small'};
+    // TODO: do we really need to create IDs with lodash here?
     this.fid = _.uniqueId('infEdit_');
-    const userCfg = { ...this.props.detail.inf.userCfg };
-    this.state = { userCfg };
+    this.state = { [C.USER_CFG]: {} };
   }
-
-  _isDirty = () => {
-    return !_.isEqual(this.state.userCfg, this.props.detail.inf.userCfg);
-  };
-
-  _onSubmit = () => {
-    this.props.onSubmit(this.props.detail, this.state.userCfg);
-  };
 
   _id = s => `${this.fid}_${s}`;
 
-  _onChangeAdminUp = () => {
-    const userCfg = { ...this.state.userCfg, admin: 'up' };
-    this.setState({ userCfg });
+  componentDidMount() {
+    const p = this.props;
+    p.actions.interface.fetchEdit(this.props.infId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const edit = nextProps.interface.edit;
+    this.setState({ [C.USER_CFG]: { ...edit.interface[C.USER_CFG] }});
+  }
+
+  _isDirty = () => {
+    const initUserCfg = this.props.interface.edit.interface[C.USER_CFG];
+    return !_.isEqual(this.state[C.USER_CFG], initUserCfg);
   };
 
-  _onChangeAdminDown = () => {
-    const userCfg = { ...this.state.userCfg, admin: 'down' };
-    this.setState({ userCfg });
+  _onOk = () => {
+    this.props.actions.interface.edit(this.state);
+    this.props.onClose();
+  };
+
+  _onChange = (setting) => {
+    const newUserCfg = { ...this.state[C.USER_CFG], ...setting };
+    this.setState({ [C.USER_CFG]: newUserCfg });
   };
 
   render() {
+    const uc = this.state[C.USER_CFG];
+    const admin = uc && uc[C.ADMIN];
+    const duplex = uc && uc[C.DUPLEX];
+    const autoNeg = uc && uc[C.AUTO_NEG];
+    const flowCtrl = uc && uc[C.FLOW_CTRL];
+
     return (
       <Layer
           className="edit"
@@ -74,46 +86,92 @@ class InterfaceEdit extends Component {
           closer
           flush
           align="right">
-        <Box pad="small" className="flex1">
-          <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
-            <Title>
-              {`${t('edit')} ${t('interface')}: ${this.props.detail.inf.id}`}
-            </Title>
-          </Header>
-          <hr/>
-          <Form>
-            <Header>
-              <h3>{t('userCfgAdmin')}</h3>
-            </Header>
-            <FormFields>
-              <fieldset>
-                <FormField>
-                  <RadioButton
-                      id={this._id('userCfgAdminUp')}
-                      label={t('up')}
-                      checked={this.state.userCfg.admin === 'up'}
-                      onChange={this._onChangeAdminUp} />
-                  <RadioButton
-                      id={this._id('userCfgAdminDown')}
-                      label={t('down')}
-                      checked={this.state.userCfg.admin !== 'up'}
-                      onChange={this._onChangeAdminDown} />
-                </FormField>
-              </fieldset>
-            </FormFields>
-            <Footer pad={{vertical: 'medium'}}>
-              <Menu>
-                <Button
-                    label={t('deploy')}
-                    primary
-                    onClick={this._isDirty() ? this._onSubmit : null}/>
-              </Menu>
-            </Footer>
-          </Form>
+        <Box pad="medium" className="flex1">
+          <Title>{`${t('edit')} ${t('interface')}: ${this.props.infId}`}</Title>
+          <br/>
+          <b>{t('configured')}</b>
+          <FormField>
+            <RadioButton
+                id={this._id('adminUp')}
+                label={t('up')}
+                checked={admin === 'up'}
+                onChange={() => this._onChange({[C.ADMIN]: 'up'})} />
+            <RadioButton
+                id={this._id('adminDown')}
+                label={t('down')}
+                checked={admin === 'down'}
+                onChange={() => this._onChange({[C.ADMIN]: 'down'})} />
+          </FormField>
+          <br/>
+          <b>{t('autoNeg')}</b>
+          <FormField>
+            <RadioButton
+                id={this._id('autoNegOn')}
+                label={t('on')}
+                checked={autoNeg === 'on'}
+                onChange={() => this._onChange({[C.AUTO_NEG]: 'on'})} />
+            <RadioButton
+                id={this._id('autoNegOff')}
+                label={t('off')}
+                checked={autoNeg === 'off'}
+                onChange={() => this._onChange({[C.AUTO_NEG]: 'off'})} />
+          </FormField>
+          <br/>
+          <b>{t('duplex')}</b>
+          <FormField>
+            <RadioButton
+                id={this._id('duplexFull')}
+                label={t('full')}
+                checked={duplex === 'full'}
+                onChange={() => this._onChange({[C.DUPLEX]: 'full'})} />
+            <RadioButton
+                id={this._id('duplexHalf')}
+                label={t('half')}
+                checked={duplex === 'half'}
+                onChange={() => this._onChange({[C.DUPLEX]: 'half'})} />
+          </FormField>
+          <br/>
+          <b>{t('flowControl')}</b>
+          <FormField>
+            <RadioButton
+                id={this._id('fcNone')}
+                label={t('none')}
+                checked={flowCtrl === 'none'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'none'})} />
+            <RadioButton
+                id={this._id('fcTx')}
+                label={t('rx')}
+                checked={flowCtrl === 'rx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'rx'})} />
+            <RadioButton
+                id={this._id('fcRx')}
+                label={t('tx')}
+                checked={flowCtrl === 'tx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'tx'})} />
+            <RadioButton
+                id={this._id('fcRxTx')}
+                label={t('rxtx')}
+                checked={flowCtrl === 'rxtx'}
+                onChange={() => this._onChange({[C.FLOW_CTRL]: 'rxtx'})} />
+          </FormField>
+          <Footer pad={{vertical: 'medium'}}>
+            <Menu>
+              <Button
+                  label={t('ok')}
+                  primary
+                  onClick={this._isDirty() ? this._onOk : null}/>
+            </Menu>
+          </Footer>
         </Box>
       </Layer>
     );
   }
 }
 
-export default InterfaceEdit;
+function select(store) {
+  return {
+    interface: store.interface,
+  };
+}
+
+export default connect(select)(InterfaceEdit);

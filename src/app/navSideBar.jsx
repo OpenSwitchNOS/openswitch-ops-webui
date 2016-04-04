@@ -35,6 +35,8 @@ import HelpIcon from 'grommet/components/icons/base/Help';
 import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
+import PasswordChange from './passwordChange.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 const API_LINK = `https://${window.location.hostname}/api/`;
 const OPS_LINK = 'http://openswitch.net';
@@ -43,8 +45,10 @@ class NavSideBar extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    auth: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
-    guide: PropTypes.object.isRequired,
+    extLinks: PropTypes.array.isRequired,
+    guides: PropTypes.array.isRequired,
     links: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
   };
@@ -111,25 +115,58 @@ class NavSideBar extends Component {
     const tree = NavSideBar.mkOrderedNavItemTree(this.props.links, {});
     this.items = [];
     NavSideBar.mkNavItems(tree.items, this.items);
-
-    // TODO: Guides net to be implemented - this will come from the build config
-    this.guide = [
-      { menuKey: 'configMgmtInterface', component: <div>ConfigMgmtIntf</div> },
-      { menuKey: 'configVlan', component: <div>ConfigVLAN</div> },
-    ];
   }
 
   _onClose = () => {
     this.props.actions.nav.hidePane();
   };
 
-  _onClickGuide = (index) => {
-    this.props.actions.guide.show(this.guide[index].component);
+  _mkExtLinks = () => {
+    return this.props.extLinks.map( lnk => {
+      return <Anchor key={lnk.key} href={lnk.href}>{t(lnk.key)}</Anchor>;
+    });
   };
 
+  _mkGuides = () => {
+    return this.props.guides.map( (g, i) => {
+      const clk = () => this.props.actions.guide.show(g.COMPONENT);
+      return <Anchor key={`guide${i}`} onClick={clk}>{g.MENU_TEXT}</Anchor>;
+    });
+  };
+
+  _onClosePwChange = () => {
+    this.setState({chpw: false});
+  };
+
+  _onPwChange = () => {
+    this.setState({chpw: true});
+  };
+
+ _onPwChangeSubmit= (changePw) => {
+   this.props.actions.auth.changePassword(changePw);
+   this._onClosePwChange();
+ };
+
   render() {
+
+    const auth = this.props.auth.asyncStatus;
+    const chpwInfoLayer = !auth.lastError ? null :
+      <StatusLayer
+          value="warning"
+          title={t('changePwFailed')}
+          onClose={() => this.props.actions.auth.clearError()}>
+        {t('retryChPw')}
+      </StatusLayer>;
+
+    const changePw = this.state.chpw ?
+      <PasswordChange
+          onClose={this._onClosePwChange}
+          onSubmit={this._onPwChangeSubmit}
+      /> : null;
     return (
+
       <Sidebar colorIndex="neutral-3" fixed separator="right">
+      {chpwInfoLayer}
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
             <BrandLogo />
@@ -144,10 +181,10 @@ class NavSideBar extends Component {
         <Box>
           <Box pad={{horizontal: 'medium', vertical: 'small'}}>
             <div><b>{t('hostname')}</b></div>
-            <div>{this.props.collector.overview.info.hostname}</div>
+            <div>{this.props.collector.hostname}</div>
             <br/>
             <div><b>{t('product')}</b></div>
-            <div>{this.props.collector.overview.info.product}</div>
+            <div>{this.props.collector.product}</div>
           </Box>
           <br/>
           <Menu primary>
@@ -157,24 +194,26 @@ class NavSideBar extends Component {
         <Footer pad={{vertical: 'small'}} direction="column" align="start">
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<HelpIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this._onClickGuide.bind(this, 0)}>{t(this.guide[0].menuKey)}</a>
-              <a onClick={this._onClickGuide.bind(this, 1)}>{t(this.guide[1].menuKey)}</a>
+              {this._mkGuides()}
             </Menu>
             <span>{t('guides')}</span>
           </Box>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<WorldIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a href={API_LINK}>{t('openSwitchApi')}</a>
-              <a href={OPS_LINK}>{t('openSwitchNet')}</a>
+              {this._mkExtLinks()}
             </Menu>
             <span>{t('links')}</span>
           </Box>
           <Box pad={{vertical: 'small'}}/>
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
             <Menu icon={<UserSettingsIcon />} dropAlign={{bottom: 'bottom'}}>
-              <a onClick={this.props.actions.auth.logout}>{t('logout')}</a>
+              <Anchor onClick={this.props.actions.auth.logout}>
+                {t('logout')}
+              </Anchor>
+              <Anchor onClick={this._onPwChange}>{t('changePw')}</Anchor>
             </Menu>
-            <span>jpowell</span>
+            <span>{this.props.auth.username}</span>
+            {changePw}
           </Box>
         </Footer>
       </Sidebar>
@@ -184,10 +223,12 @@ class NavSideBar extends Component {
 }
 
 const select = (store) => ({
+  auth: store.auth,
   links: store.links,
   nav: store.nav,
-  guide: store.guide,
+  guides: store.guides,
   collector: store.collector,
+  extLinks: store.extLinks,
 });
 
 export default connect(select)(NavSideBar);

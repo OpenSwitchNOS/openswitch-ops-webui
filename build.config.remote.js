@@ -19,6 +19,8 @@ import MonitorDux from 'monitor/monitorDux.jsx';
 import OverviewDux from 'overview/overviewDux.jsx';
 import InterfaceDux from 'interface/interfaceDux.jsx';
 import EcmpDux from 'ecmp/ecmpDux.jsx';
+import LagDux from 'lag/lagDux.jsx';
+import VlanDux from 'vlan/vlanDux.jsx';
 
 const modules = [
   CollectorDux,
@@ -26,6 +28,14 @@ const modules = [
   OverviewDux,
   InterfaceDux,
   EcmpDux,
+  LagDux,
+  VlanDux,
+];
+
+import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
+
+const guides = [
+  ConfigInterfaceGuide,
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
@@ -36,8 +46,21 @@ const settings = {
   boxGraphic: As5712,
   reduxLogger: true,
   agent: {
-    prefix: 'http://15.108.30.246:8091',
+    prefix: 'http://15.108.30.248:8091',
+  },
+  extLinks: [
+    {
+      key: 'osApi',
+      href: `http://15.108.30.248:8091/api/index.html`
+    },
+    {
+      key: 'osNet',
+      href: 'http://openswitch.net'
+    },
+  ],
+  constants: {
+    VLAN_ID_RANGE: '1-4094'
   }
 };
 
-export default { modules, settings };
+export default { modules, guides, settings };

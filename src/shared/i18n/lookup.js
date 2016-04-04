@@ -14,6 +14,8 @@
     under the License.
 */
 
+/*eslint no-undefined:0*/
+
 let locale = null;
 let msgs = null;
 let navs = null;
@@ -29,12 +31,11 @@ export function getLocale() { return locale; }
 export function navt(k) { return (navs && navs[k]) || `~${k}~`; }
 
 export function t(k) {
-  if (k === '') { return ''; }
+  if (k === null || k === undefined || k === '') { return ''; }
   return (msgs && msgs[k]) || `~${k}~`;
 }
 
-export function tf(v) { return t(v ? 'true' : 'false'); }
-
-export function ed(v) { return t(v ? 'enabled' : 'disabled'); }
-
-export function ud(v) { return t(v ? 'up' : 'down'); }
+export function tOrKey(k) {
+  if (k === null || k === undefined || k === '') { return ''; }
+  return (msgs && msgs[k]) || k;
+}

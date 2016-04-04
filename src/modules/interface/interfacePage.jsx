@@ -16,24 +16,24 @@
 
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
-import { t } from 'i18n/lookup.js';
+import { t, tOrKey } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
 import DataGrid from 'dataGrid.jsx';
 import BoxGraphic from 'boxGraphics/boxGraphic.jsx';
-
-// TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-// TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
+import CheckBox from 'grommet/components/CheckBox';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
+import InterfaceEdit from './interfaceEdit.jsx';
+import DetailsBox from 'detailsBox.jsx';
+import Formatter from 'formatter.js';
 
 
 class InterfacePage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    autoActions: PropTypes.object.isRequired,
     boxGraphic: PropTypes.object.isRequired,
     children: PropTypes.node,
-    collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
@@ -51,22 +51,28 @@ class InterfacePage extends Component {
         align: 'left',
       },
       {
-        columnKey: 'userCfgAdmin',
-        header: t('userCfgAdmin'),
+        columnKey: 'cfgAdmin',
+        header: t('configured'),
         width: 150,
-        format: t,
+        format: t
       },
       {
         columnKey: 'adminStateConnector',
         header: t('adminState'),
         width: 160,
-        format: t,
+        format: t
       },
       {
         columnKey: 'linkState',
         header: t('linkState'),
         width: 150,
-        format: t,
+        format: t
+      },
+      {
+        columnKey: 'connector',
+        header: t('connector'),
+        width: 150,
+        format: tOrKey
       },
       {
         columnKey: 'duplex',
@@ -75,72 +81,98 @@ class InterfacePage extends Component {
         format: t,
       },
       {
-        columnKey: 'speedFormatted',
+        columnKey: 'speed',
         header: t('speed'),
-        width: 110,
-      },
-      {
-        columnKey: 'connector',
-        header: t('connector'),
-        width: 150,
+        width: 120,
+        format: Formatter.bpsToString,
       },
     ];
     this.state = {};
   }
 
   componentDidMount() {
-    this.props.actions.toolbar.setFetchTB(
-      this.props.collector.overview, this._onRefresh
-    );
+    const p = this.props;
+    p.actions.interface.fetchPage();
+    p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
-    this.props.autoActions.collector.fetch();
+    this.props.actions.interface.fetchPage();
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.collector.overview, this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.interface.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (id) => {
-    this.props.history.pushState(null, `/interface/${id}`);
+  _onSelect = (sel) => {
+    const url = sel ? `/interface/${sel}` : '/interface';
+    this.props.history.pushState(null, url);
+  };
+
+  _onShowDetailsOnSelect = (evt) => {
+    this.setState({ showDetailsOnSelect: evt.target.checked });
   };
 
   render() {
-    const infs = this.props.collector.overview.interfaces;
-    const sel = this.props.params.id;
+    const selInfId = this.props.params.id;
+    const showOnSel = this.state.showDetailsOnSelect;
 
-    const details = !sel ? null : (
-      <Box className="pageBox">
+    const editLayer = !this.state.editMode ? null :
+      <InterfaceEdit
+          actions={this.props.actions}
+          infId={selInfId}
+          onClose={() => this.setState({editMode: false})}
+      />;
+
+    const details = !selInfId || !showOnSel ? null : (
+      <DetailsBox>
         {this.props.children}
-      </Box>
+      </DetailsBox>
     );
+
+    const statusLayer = mkStatusLayer(
+          this.props.interface.asyncStatus,
+          this.props.actions.interface.clearError);
+
+    const infs = this.props.interface.interfaces;
+    const numInfs = Object.getOwnPropertyNames(infs).length;
 
     return (
       <Box direction="row" className="flex1">
+        {statusLayer}
+        {editLayer}
         <Box className="flex1">
-          <Box className="mtop mLeft pTop">
+          <Box className="mTop mLeft">
             <BoxGraphic
                 spec={this.props.boxGraphic}
                 interfaces={infs}
-                select={sel && [sel]}
+                select={selInfId}
                 onSelectChange={this._onSelect}
             />
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
               <DataGrid width={300} height={400}
+                  title={`${t('total')}: ${numInfs}`}
                   data={infs}
                   columns={this.cols}
                   singleSelect
-                  select={[ sel ]}
+                  select={selInfId}
                   onSelectChange={this._onSelect}
+                  onEdit={() => this.setState({editMode: true})}
+                  toolbar={[
+                    <CheckBox
+                        onChange={this._onShowDetailsOnSelect}
+                        key="infDetCb"
+                        id="infDetCb"
+                        name="infDetCb"
+                        label={t('details')}/>
+                  ]}
               />
             </ResponsiveBox>
           </Box>
@@ -154,7 +186,6 @@ class InterfacePage extends Component {
 
 function select(store) {
   return {
-    collector: store.collector,
     interface: store.interface,
     boxGraphic: store.boxGraphic,
   };

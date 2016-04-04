@@ -28,7 +28,7 @@ import BrandLogo from 'brandLogo.jsx';
 export default class LoginLayer extends Component {
 
   static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func,
   };
 
   constructor(props) {
@@ -41,6 +41,7 @@ export default class LoginLayer extends Component {
       <Layer id="loginLayer" flush align="top">
         <LoginForm
             logo={<BrandLogo size="large" lightColor="grey"/>}
+            usernameType="text"
             title={t('openSwitch')}
             onSubmit={this.props.onSubmit}
         />

@@ -19,9 +19,9 @@
 import './mainApp.scss';
 
 import React, { PropTypes, Component } from 'react';
-import ReactCSSTG from 'react-addons-css-transition-group';
+import Breadcrumbs from 'react-breadcrumbs';
 import { connect } from 'react-redux';
-import { navt } from 'i18n/lookup.js';
+import { t } from 'i18n/lookup.js';
 
 import App from 'grommet/components/App';
 import Header from 'grommet/components/Header';
@@ -29,13 +29,13 @@ import Title from 'grommet/components/Title';
 import Split from 'grommet/components/Split';
 import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
-import NotificationIcon from 'grommet/components/icons/base/Notification';
+// TODO: import NotificationIcon from 'grommet/components/icons/base/Notification';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
-import EditIcon from 'grommet/components/icons/base/Edit';
 import NextIcon from 'grommet/components/icons/base/Next';
 
 import LoginLayer from 'loginLayer.jsx';
+import StatusLayer from 'statusLayer.jsx';
 
 import NavSideBar from './navSideBar.jsx';
 
@@ -53,7 +53,9 @@ class MainApp extends Component {
     guide: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
+    routes: PropTypes.array.isRequired,
     toolbar: PropTypes.object.isRequired,
   };
 
@@ -85,11 +87,18 @@ class MainApp extends Component {
         );
       }
     }
+    if (this.props.nav.autoHide) {
+      if (newProps.location !== this.props.location ||
+          newProps.guide.component !== this.props.guide.component) {
+        this.props.actions.nav.hidePane();
+      }
+    }
   }
 
   // Called when a responsive change happens on the main Split component.
   // This will result in 'single' or 'multiple' mode.
   _onNavSplitResponsive = (mode) => {
+    this.props.actions.nav.autoHide(mode === 'single');
     const act = this.props.nav.paneActive;
     if (act && mode === 'single') {
       this.props.actions.nav.hidePane();
@@ -102,56 +111,74 @@ class MainApp extends Component {
     this.props.actions.nav.showPane();
   };
 
-  // FIXME: this is broken with /vlan/:id - use a "breadcrumb" plug in?
-  _linkPathName = () => {
-    const loc = this.props.location.pathname;
-    const linkPath = this.props.routeToLink[loc];
-    if (linkPath) {
-      const name = [];
-      const parts = linkPath.split('/');
-      parts.forEach(p => {
-        if (p) { name.push(navt(p)); }
-      });
-      return name.join('/');
-    }
-    return '/';
+  _onLoginSubmit = (data) => {
+    this.props.actions.auth.login(data);
   };
 
-  _onLoginSubmit = () => {
-    this.props.actions.auth.login();
+  _mkPageHdr = () => {
+    // For the breadcrumb, when we assign the name to the route we do a 'navt'
+    // lookup, so '/' gets converted to '~/~'.
+    const openNav = this.props.nav.paneActive ? null :
+      <a onClick={this._onPageNavClicked}><NextIcon /></a>;
+
+    // TODO: log page header
+    // const notifLink = '#/log';
+    // const notifCount = 3; // TODO: implement me
+
+    return (
+      <Header
+          justify="between"
+          pad={{horizontal: 'medium'}}
+          separator="bottom"
+      >
+        <Menu direction="row" responsive={false}>
+          {openNav}
+          <Breadcrumbs excludes={['~/~']}
+              routes={this.props.routes}
+              params={this.props.params} />
+        </Menu>
+        <Menu direction="row" responsive={false}>
+          {this.props.toolbar.component}
+          {/*<a href={notifLink}>
+            <NotificationIcon className="mHalf"/>
+            <small>{notifCount}</small>
+          </a>*/}
+        </Menu>
+      </Header>
+    );
+  };
+
+  _mkGuide = () => {
+    return (
+      <Box className="guide">
+        <div>
+          <Header
+              tag="h4"
+              direction="row"
+              pad={{horizontal: 'small'}}
+              justify="between">
+            <Menu direction="row" responsive={false}>
+              <Title>{t('quickGuide')}</Title>
+            </Menu>
+            <Menu direction="row" responsive={false}>
+              <Anchor onClick={this.props.actions.guide.hide}>
+                <CloseIcon />
+              </Anchor>
+            </Menu>
+          </Header>
+          {this.props.guide.component}
+        </div>
+      </Box>
+    );
   };
 
   render() {
+
     // The only reason we pass in the location to the NavSideBar is so that
     // it will rerender when we select a navigation item (and show the new
     // active item).
-    const nav = this.props.nav.paneActive ?
-      <NavSideBar location={this.props.location} actions={this.props.actions}/>
-      : null;
-
-    // FIXME: this.props.syslog.numUnread;
-    // data retieved from this.props.collector.?
-    const numSyslog = 99;
-
-    const pageHdr = (
-      <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
-          justify="between">
-        <Box direction="row" align="center" responsive={false}>
-          {this.props.nav.paneActive ? null :
-            <Anchor onClick={this._onPageNavClicked}>
-              <NextIcon />
-            </Anchor>
-          }
-          <Title>{this._linkPathName()}</Title>
-        </Box>
-        <Box direction="row" align="center" responsive={false}>
-          {this.props.toolbar.component}
-          <a href="#/syslog">
-            <NotificationIcon/><small>{numSyslog}</small>
-          </a>
-        </Box>
-      </Header>
-    );
+    const nav = !this.props.nav.paneActive ? null :
+      <NavSideBar location={this.props.location} actions={this.props.actions}/>;
 
     const page = (
       <Box id="pageContent" className="flex1 pLeft pRight pBottom">
@@ -159,71 +186,45 @@ class MainApp extends Component {
       </Box>
     );
 
-    const guide = !this.props.guide.component ? null : (
-      <Box key="guideKey" className="guide">
+    // Show the "quick guide" if one has been set.
+    const guide = !this.props.guide.component ? null : this._mkGuide();
 
-        <ReactCSSTG
-            transitionName="slideInColumn"
-            transitionAppear
-            transitionAppearTimeout={500}
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
+    const auth = this.props.auth.asyncStatus;
+    const infoLayer = !auth.lastError ? null :
+      <StatusLayer
+          value="warning"
+          title={t('loginFailed')}
+          onClose={() => this.props.actions.auth.clearError()}>
+        {t('reenterUserPwd')}
+      </StatusLayer>;
 
-          <div key="guideContentKey">
-            <Header tag="h4" direction="row" pad={{horizontal: 'small'}}
-                justify="between">
-              <Menu direction="row" responsive={false}>
-                <Title>Quick Guide</Title>
-              </Menu>
-              <Menu direction="row" responsive={false}>
-                <Anchor onClick={this.props.actions.guide.hide}>
-                  <CloseIcon />
-                </Anchor>
-              </Menu>
-            </Header>
-            <Box pad={{horizontal: 'small'}}>
-              <b>Setup the Management Interface</b>
-              <br/>
-              <ul>
-                <li>Navigate to the page:</li>
-                <Anchor primary href="#/interface">interface</Anchor>
-                <li>Select the interface in the table.</li>
-                <li>Click the edit icon:</li>
-                <EditIcon/>
-                <li>Configure the IP from within the <b>Edit</b> slide-in pane</li>
-                <li><b>Deploy</b> the modification.</li>
-                <li>Click the <b>Restart</b> from within the confirmation dialog.</li>
-                <li><i>Switch will need to be restarted.</i></li>
-              </ul>
-            </Box>
-          </div>
-
-        </ReactCSSTG>
-
-      </Box>
-    );
-
-    const splitContent = (
-      <Split flex="right" onResponsive={this._onNavSplitResponsive}
-          priority="left">
-        <Box responsive={false} direction="row">
-          {guide}
-          {nav}
-        </Box>
-        <Box responsive={false} direction="row">
-          <Box id="page" className="flex1">
-            {pageHdr}
-            {page}
-          </Box>
-        </Box>
-      </Split>
-    );
-
-    const login = <LoginLayer onSubmit={this._onLoginSubmit}/>;
+    // Split will only show the priority column on small screens, we make this
+    // the first (left) column because we want to be able to show the navigation
+    // column on small screens. When we remove the first (left) column, the
+    // page column will be the "new" left column and it will be shown. make
+    // sure to completely toggle the first (left) column.
 
     return (
       <App centered={false}>
-        {this.props.auth.isLoggedIn ? splitContent : login}
+        {infoLayer}
+        {this.props.auth.isLoggedIn
+          ? <Split
+              flex="right"
+              onResponsive={this._onNavSplitResponsive}
+              priority="left"
+            >
+              {nav}
+              <Box responsive={false} direction="row">
+                <Box id="page" className="flex1">
+                  {this._mkPageHdr()}
+                  {guide}
+                  {page}
+                </Box>
+              </Box>
+            </Split>
+          : <LoginLayer
+              onSubmit={auth.inProgress ? null : this._onLoginSubmit}/>
+        }
       </App>
     );
   }

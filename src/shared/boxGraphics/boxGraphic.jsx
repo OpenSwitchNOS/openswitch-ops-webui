@@ -28,7 +28,10 @@ export default class BoxGraphic extends Component {
   static propTypes = {
     interfaces: PropTypes.object.isRequired,
     onSelectChange: PropTypes.func,
-    select: PropTypes.arrayOf(PropTypes.string),
+    select: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.string,
+    ]),
     spec: PropTypes.shape({
       onClick: PropTypes.func.isRequired,
       toExternalInterfaceId: PropTypes.func.isRequired,
@@ -72,7 +75,7 @@ export default class BoxGraphic extends Component {
       linkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
-    const select = this.props.select || [];
+    const select = this.props.select && [ this.props.select ] || [];
     const selectedCls = classNames(
       'selected',
       select.map(i => this.props.spec.toSvgInterfaceName(i)),
