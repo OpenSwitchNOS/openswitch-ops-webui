@@ -36,7 +36,7 @@ import WorldIcon from 'grommet/components/icons/base/Language';
 
 import BrandLogo from 'brandLogo.jsx';
 
-const API_LINK = `https://${window.location.hostname}/api/`;
+const API_LINK = `http://${window.location.hostname}:8091/api/index.html`;
 const OPS_LINK = 'http://openswitch.net';
 
 class NavSideBar extends Component {
