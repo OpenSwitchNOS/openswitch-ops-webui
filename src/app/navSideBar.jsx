@@ -38,7 +38,6 @@ import BrandLogo from 'brandLogo.jsx';
 import PasswordChange from './passwordChange.jsx';
 import StatusLayer from 'statusLayer.jsx';
 
-
 class NavSideBar extends Component {
 
   static propTypes = {
