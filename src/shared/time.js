@@ -15,10 +15,10 @@
 */
 
 
-export function toTimestamp(millis) {
+export function toTimestamp(millis, utc) {
   const d = new Date(millis);
 
-  const h = d.getHours();
+  const h = utc ? d.getUTCHours() : d.getHours();
   const hs = h < 10 ? `0${h}` : h.toString();
 
   const m = d.getMinutes();

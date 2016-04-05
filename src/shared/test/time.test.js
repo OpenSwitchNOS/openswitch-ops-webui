@@ -13,16 +13,16 @@
     License for the specific language governing permissions and limitations
     under the License.
 */
-//TODO: Uncomment this
-// /*global describe, it, expect */
-//
-// import * as Time from '../time.js';
-//
-// describe('time', () => {
-//
-//   it('basic', () => {
-//     const d = new Date(1459300059123);
-//     expect(Time.toTimestamp(d.getTime())).toEqual('18:07:39.123');
-//   });
-//
-// });
+
+/*global describe, it, expect */
+
+import * as Time from '../time.js';
+
+describe('time', () => {
+
+  it('basic', () => {
+    const d = new Date(1459300059123);
+    expect(Time.toTimestamp(d.getTime(), true)).toEqual('01:07:39.123');
+  });
+
+});
