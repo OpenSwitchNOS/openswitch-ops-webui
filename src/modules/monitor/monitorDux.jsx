@@ -14,18 +14,18 @@
     under the License.
 */
 
-import InterfacePage from './monitorInterfacePage.jsx';
-import InterfaceMetric from './monitorInterfaceMetric.jsx';
+import MonInterfacePage from './monitorInterfacePage.jsx';
+import MonInterfaceMetric from './monitorInterfaceMetric.jsx';
 
 const NAME = 'monitor';
 
 const NAVS = [
   {
-    route: { path: '/monitorInterface', component: InterfacePage },
+    route: { path: '/monitorInterface', component: MonInterfacePage },
     link: { path: '/monitor', hidden: true }
   },
   {
-    route: { path: '/monitorInterface/:id', component: InterfaceMetric },
+    route: { path: '/monitorInterface/:id', component: MonInterfaceMetric },
     link: { path: '/monitor', hidden: true }
   },
 ];

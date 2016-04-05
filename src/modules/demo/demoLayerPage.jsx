@@ -17,19 +17,12 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
-
-import Header from 'grommet/components/Header';
-import CheckBox from 'grommet/components/CheckBox';
-import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
-import FormField from 'grommet/components/FormField';
-import FormFields from 'grommet/components/FormFields';
 import Button from 'grommet/components/Button';
-import Menu from 'grommet/components/Menu';
-import Footer from 'grommet/components/Footer';
 
 import ConfirmLayer from 'confirmLayer.jsx';
 import StatusLayer from 'statusLayer.jsx';
+import AsyncStatusLayer from 'asyncStatusLayer.jsx';
+
 
 class DemoLayerPage extends Component {
 
@@ -40,8 +33,66 @@ class DemoLayerPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      asyncStatusData: {
+        title: t('loading'),
+        inProgress: false,
+        lastSuccessMillis: 0,
+        lastError: null,
+        numSteps: 0,
+        currStep: 0,
+        currStepMsg: '',
+      }
+    };
   }
+
+  _onOpenAsyncStatus = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.inProgress = true;
+    asyncStatusData.currStep = 1;
+    asyncStatusData.numSteps = 3;
+    asyncStatusData.currStepMsg = 'Step #1';
+    this.setState({ asyncStatusData });
+    setTimeout(() => {
+      asyncStatusData.currStep = 2;
+      asyncStatusData.currStepMsg = 'Step #2';
+      this.setState({ asyncStatusData });
+      setTimeout(() => {
+        asyncStatusData.currStep = 3;
+        asyncStatusData.currStepMsg = 'Step #3';
+        this.setState({ asyncStatusData });
+        setTimeout(() => {
+          asyncStatusData.inProgress = false;
+          asyncStatusData.lastSuccessMillis = Date.now();
+          this.setState({ asyncStatusData });
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  };
+
+  _onOpenAsyncStatusErr = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.lastError = {
+      url: '/rest/v1/blah/bogus',
+      status: 123,
+      msg: 'Some message',
+      respMsg: 'Some response message',
+    };
+    this.setState({ asyncStatusData });
+  };
+
+  _onOpenAsyncStatus1 = () => {
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.inProgress = true;
+    asyncStatusData.currStep = 1;
+    asyncStatusData.numSteps = 1;
+    this.setState({ asyncStatusData });
+    setTimeout(() => {
+      asyncStatusData.inProgress = false;
+      asyncStatusData.lastSuccessMillis = Date.now();
+      this.setState({ asyncStatusData });
+    }, 3000);
+  };
 
   _onOpenInfo = () => {
     this.setState({ info: true });
@@ -63,17 +114,17 @@ class DemoLayerPage extends Component {
     this.setState({ dialog2: true });
   };
 
-  _onOpenEdit = () => {
-    this.setState({ edit: true });
-  };
-
   _onClose = () => {
-    this.setState({ info: false });
-    this.setState({ error: false });
-    this.setState({ warning: false });
-    this.setState({ dialog1: false });
-    this.setState({ dialog2: false });
-    this.setState({ edit: false });
+    const asyncStatusData = { ...this.state.asyncStatusData };
+    asyncStatusData.lastError = null;
+    this.setState({
+      asyncStatusData,
+      info: false,
+      error: false,
+      warning: false,
+      dialog1: false,
+      dialog2: false,
+    });
   };
 
   _onSubmit = () => {
@@ -82,14 +133,31 @@ class DemoLayerPage extends Component {
   };
 
   render() {
+    const asyncData = this.state.asyncStatusData;
     return (
       <div className="mLeft">
+
+        <p>
+          <Button label="Async Status" onClick={this._onOpenAsyncStatus}/>
+          &nbsp;
+          <Button label="Error" onClick={this._onOpenAsyncStatusErr}/>
+          &nbsp;
+          <Button label="1 Step" onClick={this._onOpenAsyncStatus1}/>
+        </p>
+        {asyncData.inProgress || asyncData.lastError ?
+          <AsyncStatusLayer
+              onClose={this._onClose}
+              title="Some Workflow"
+              data={asyncData}
+          />
+          : null
+        }
 
         <p>
           <Button label="Info" onClick={this._onOpenInfo}/>
         </p>
         {this.state.info ?
-          <StatusLayer onClose={this._onClose}>
+          <StatusLayer box onClose={this._onClose}>
             The text.
           </StatusLayer> : null
         }
@@ -134,54 +202,6 @@ class DemoLayerPage extends Component {
           </ConfirmLayer> : null
         }
 
-        <p>
-          <Button label="Edit" onClick={this._onOpenEdit}/>
-        </p>
-        {
-          this.state.edit ?
-          <Layer onClose={this._onClose} closer flush align="right">
-            <Form onSubmit={this._onSubmit}>
-              <Header>
-                <h2>Edit Some Things</h2>
-              </Header>
-              <FormFields>
-                <fieldset>
-                  <legend>First section</legend>
-                  <FormField label="Item 1" htmlFor="ffItem1"
-                      help="Some helpful text">
-                    <input id="ffItem1" name="ffItem1" type="text"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
-                        toggle />
-                  </FormField>
-                </fieldset>
-                <fieldset>
-                  <legend>Second section</legend>
-                  <FormField label="Item 1" htmlFor="ffItem1"
-                      help="Some helpful text">
-                    <input id="ffItem1" name="ffItem1" type="text"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem2" name="cbItem2" label="Item 2"/>
-                  </FormField>
-                  <FormField>
-                    <CheckBox id="cbItem3" name="cbItem3" label="Item 3"
-                        toggle />
-                  </FormField>
-                </fieldset>
-              </FormFields>
-              <Footer pad={{vertical: 'medium'}}>
-                <Menu>
-                  <Button label={t('deploy')} primary onClick={this._onSubmit}/>
-                </Menu>
-              </Footer>
-            </Form>
-          </Layer> : null
-        }
       </div>
     );
   }

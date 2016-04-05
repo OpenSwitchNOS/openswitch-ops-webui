@@ -17,12 +17,10 @@
 /*global describe, beforeAll, afterAll, afterEach, it, expect */
 /*eslint no-undefined:0*/
 
-import Agent, {
-  agentInit, getPrefix, parseError, mkAgentHandler
-} from '../agent.js';
-
+import Agent, { agentInit, getPrefix } from '../agent.js';
 import AgentMock from 'superagent-mock';
 import Async from 'async';
+
 
 describe('agent', () => {
 
@@ -36,7 +34,10 @@ describe('agent', () => {
         return 'DATA2';
       }
       if (match[1] === '/e404') {
-        throw new Error(404);
+        const e = new Error('e404');
+        e.status = 404;
+        e.url = 'https://test.com/e404';
+        throw e;
       }
     },
     get: (match, data) => { return { body: data }; }
@@ -54,19 +55,21 @@ describe('agent', () => {
     agentInit('');
   });
 
-  it('gets mock server data for /data1', () => {
+  it('gets mock server data for /data1', (done) => {
     Agent.get('https://test.com/data1', (err, res) => {
       expect(err).toBeNull();
       expect(res.body).toEqual('DATA1');
+      done();
     });
   });
 
-  it('injects a prefix for URLs', () => {
+  it('injects a prefix for URLs', (done) => {
     expect(getPrefix()).toEqual('');
     agentInit({ prefix: 'https://test.com' });
     expect(getPrefix()).toEqual('https://test.com');
     Agent.get('/data1', (err, res) => {
       expect(res.body).toEqual('DATA1');
+      done();
     });
   });
 
@@ -74,124 +77,70 @@ describe('agent', () => {
     expect(getPrefix()).toEqual('');
   });
 
-  it('parses errors with various responses', () => {
-    const error = {
-      status: '201',
-      message: 'abc',
-    };
-    expect(parseError('https://test.com/data1', error)).toEqual({
-      url: 'https://test.com/data1',
-      status: '201',
-      msg: 'abc',
-      respMsg: undefined,
-    });
-
-    error.response = {};
-    expect(parseError('https://test.com/data1', error)).toEqual({
-      url: 'https://test.com/data1',
-      status: '201',
-      msg: 'abc',
-      respMsg: undefined,
-    });
-
-    error.response = { error: {} };
-    expect(parseError('https://test.com/data1', error)).toEqual({
-      url: 'https://test.com/data1',
-      status: '201',
-      msg: 'abc',
-      respMsg: undefined,
-    });
-
-    error.response = { error: { message: 'msg' } };
-    expect(parseError('https://test.com/data1', error)).toEqual({
-      url: 'https://test.com/data1',
-      status: '201',
-      msg: 'abc',
-      respMsg: 'msg',
-    });
-
-  });
-
-  it('allows requests in parallel using Async', () => {
+  it('allows requests in parallel', (done) => {
     agentInit({ prefix: 'https://test.com' });
-    Async.parallel(
-      {
-        data1: (cb) => { Agent.get('/data1').end(cb); },
-        data2: (cb) => { Agent.get('/data2').end(cb); },
-      },
-      (err, results) => {
-        expect(err).toBeNull();
-        expect(results).toEqual({
-          data1: { body: 'DATA1' },
-          data2: { body: 'DATA2' },
-        });
-      }
-    );
-  });
-
-  it('provides a handler to inject the URL in the error', () => {
-    agentInit({ prefix: 'https://test.com' });
-
-    let url = '/data1';
-    Agent.get(url, mkAgentHandler(url, (err, res) => {
+    Async.parallel([
+      cb => Agent.get('/data1', cb),
+      cb => Agent.get('/data2', cb),
+    ], (err, res) => {
       expect(err).toBeNull();
-      expect(res.body).toEqual('DATA1');
-    }));
+      expect(res).toEqual([
+        { body: 'DATA1' },
+        { body: 'DATA2' },
+      ]);
+      done();
+    });
+  });
 
-    url = '/e404';
-    Agent.get(url, mkAgentHandler(url, (err, res) => {
+  it('handler errors', (done) => {
+    agentInit({ prefix: 'https://test.com' });
+    const url = '/e404';
+    Agent.get(url, (err, res) => {
       expect(res).toBeDefined();
-      expect(err).toEqual({
-        url: `${getPrefix()}/e404`,
-        status: undefined,
-        msg: '404',
-        respMsg: undefined,
-      });
-    }));
+      expect(err.toString()).toEqual('Error: e404');
+      expect(err.status).toEqual(404);
+      expect(err.url).toEqual(`${getPrefix()}/e404`);
+      done();
+    });
   });
 
-  it('handler works in parallel requests', () => {
+  it('handler errors in parallel', (done) => {
     agentInit({ prefix: 'https://test.com' });
-    Async.parallel(
-      {
-        data1: (cb) => {
-          Agent.get('/data1').end(mkAgentHandler('/data1', cb));
-        },
-        data2: (cb) => {
-          Agent.get('/data2').end(mkAgentHandler('/data2', cb));
-        },
-      },
-      (err, results) => {
-        expect(err).toBeNull();
-        expect(results).toEqual({
-          data1: { body: 'DATA1' },
-          data2: { body: 'DATA2' },
-        });
-      }
-    );
+    Async.parallel([
+      cb => Agent.get('/data1', cb),
+      cb => Agent.get('/e404', cb),
+    ], (err, res) => {
+      expect(res).toBeDefined();
+      expect(err.toString()).toEqual('Error: e404');
+      done();
+    });
   });
 
-  it('handler works in parallel requests with errors', () => {
+  it('allows requests in waterfall', (done) => {
     agentInit({ prefix: 'https://test.com' });
-    Async.parallel(
-      {
-        data1: (cb) => {
-          Agent.get('/data1').end(mkAgentHandler('/data1', cb));
-        },
-        data2: (cb) => {
-          Agent.get('/e404').end(mkAgentHandler('/e404', cb));
-        },
-      },
-      (err, results) => {
-        expect(results).toBeDefined();
-        expect(err).toEqual({
-          url: `${getPrefix()}/e404`,
-          status: undefined,
-          msg: '404',
-          respMsg: undefined,
-        });
-      }
-    );
+    Async.waterfall([
+      cb1 => Agent.get('/data1', cb1),
+      (r1, cb2) => Agent.get('/data2', (e2, r2) => cb2(e2, [r1, r2])),
+    ], (err, res) => {
+      expect(err).toBeNull();
+      expect(res).toEqual([
+        { body: 'DATA1' },
+        { body: 'DATA2' },
+      ]);
+      done();
+    });
+  });
+
+  it('handles request errors in waterfall', (done) => {
+    agentInit({ prefix: 'https://test.com' });
+    Async.waterfall([
+      cb1 => Agent.get('/data1', cb1),
+      (r1, cb2) => Agent.get('/e404', (e2, r2) => cb2(e2, [r1, r2])),
+    ], (err, res) => {
+      expect(res).toBeDefined();
+      expect(err.toString()).toEqual('Error: e404');
+      done();
+    });
   });
 
 });

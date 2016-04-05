@@ -36,19 +36,39 @@ class DemoMetricPage extends Component {
 
   constructor(props) {
     super(props);
-    const ts = Date.now();
     this.state = {
       selectedMetricIdx: 0,
       selectedDataPoint: null,
     };
-    this.metrics = [
+    this.metrics = this.generateMetrics();
+    this.pad = {horizontal: 'small', vertical: 'small'};
+  }
+
+  generateMsgs(n) {
+    const msgs = [];
+    const nMsgs = n % 5;
+    for (let i=0; i<nMsgs; i++) {
+      msgs.push(`msg#${i+1}`);
+    }
+    return msgs;
+  }
+
+  generateUtilizationDataPoints(ts) {
+    const dps = [];
+    for (let i=0; i<6; i++) {
+      dps.push(
+        new DataPoint((i * 55) % 100, ts + (i * 1000), this.generateMsgs(i)),
+      );
+    }
+    return dps;
+  }
+
+  generateMetrics() {
+    const ts = Date.now();
+    return [
       new Metric()
         .setName('Metric #1').setUnits('%')
-        .setDataPoints([
-          new DataPoint(1, ts, ['msg1 msg2']),
-          new DataPoint(91, ts+1000, ['msg3']),
-          new DataPoint(3, ts+2000, [])
-        ])
+        .setDataPoints(this.generateUtilizationDataPoints(ts))
         .setColorIndex('graph-2'),
       new Metric()
         .setName('Metric #2').setUnits('GB').setThresholds(0, 500)
@@ -65,7 +85,6 @@ class DemoMetricPage extends Component {
           new DataPoint(0.8, ts+2000, [])
         ]),
     ];
-    this.pad = {horizontal: 'small', vertical: 'small'};
   }
 
   _onSelectMetric = (metric, idx) => {

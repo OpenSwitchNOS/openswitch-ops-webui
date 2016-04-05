@@ -27,9 +27,9 @@ import { t } from 'i18n/lookup.js';
 export default class StatusLayer extends Component {
 
   static propTypes = {
-    box: PropTypes.bool,
     children: PropTypes.node,
     className: PropTypes.string,
+    form: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string,
     value: PropTypes.string,
@@ -46,7 +46,7 @@ export default class StatusLayer extends Component {
     if (!title) {
       if (value === 'warning') {
         title = t('warning');
-      } else if (value === 'error') {
+      } else if (value === 'critical') {
         title = t('error');
       } else {
         title = t('information');
@@ -58,7 +58,7 @@ export default class StatusLayer extends Component {
         <Header>
           <Title>
             <SpanStatus size="large" space={false} value={value}>
-            {title}
+              {title}
             </SpanStatus>
           </Title>
         </Header>
@@ -67,8 +67,8 @@ export default class StatusLayer extends Component {
       </div>
     );
 
-    const boxOrForm = this.props.box
-      ? <Box pad="medium">{content}</Box> : <Form>{content}</Form>;
+    const boxOrForm = this.props.form ? <Form>{content}</Form> :
+      <Box pad="large">{content}</Box>;
 
     return (
       <Layer

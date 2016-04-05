@@ -16,7 +16,7 @@
 
 /*global describe, it, expect, beforeEach, afterEach */
 
-import { getLocale, setLocale, t } from '../lookup.js';
+import { getLocale, setLocale, t, tOrKey } from '../lookup.js';
 
 describe('i18n/lookup', () => {
 
@@ -30,6 +30,12 @@ describe('i18n/lookup', () => {
         a: 'A',
         b: 'B',
         c: 'C',
+        true: 'true',
+        false: 'false',
+        enabled: 'enabled',
+        disabled: 'disabled',
+        up: 'up',
+        down: 'down',
       }
     });
   });
@@ -48,6 +54,26 @@ describe('i18n/lookup', () => {
 
   it('returns the key if not found', () => {
     expect(t('aa')).toEqual('~aa~');
+  });
+
+  it('returns the key without ~ if not found', () => {
+    expect(tOrKey('aa')).toEqual('aa');
+  });
+
+  it('handles empty string key', () => {
+    expect(t('')).toEqual('');
+    expect(tOrKey('')).toEqual('');
+  });
+
+  it('handles null key', () => {
+    expect(t(null)).toEqual('');
+    expect(tOrKey(null)).toEqual('');
+  });
+
+  it('handles undefined key', () => {
+    const obj = {};
+    expect(t(obj.bogus)).toEqual('');
+    expect(tOrKey(obj.bogus)).toEqual('');
   });
 
 });

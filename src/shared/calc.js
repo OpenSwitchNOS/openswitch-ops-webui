@@ -14,6 +14,9 @@
     under the License.
 */
 
+import _ from 'lodash';
+
+
 export function utilization(prevBytes, currBytes, speed, intervalMillis) {
 
   if (isNaN(prevBytes) || isNaN(currBytes) || isNaN(speed) ||
@@ -28,4 +31,23 @@ export function utilization(prevBytes, currBytes, speed, intervalMillis) {
   const result = 100 * (bytesPerSec / maxBytesPerSec);
 
   return (result > 100) ? 100 : result;
+}
+
+export function sumValues(arrayOrObj, keysOrKey) {
+  const array = Array.isArray(arrayOrObj) ? arrayOrObj : _.values(arrayOrObj);
+  const keys = Array.isArray(keysOrKey) ? keysOrKey : [ keysOrKey ];
+  const values = {};
+  keys.forEach(key => values[key] = 0);
+
+  if (Array.isArray(array)) {
+    array.forEach(obj => {
+      keys.forEach(key => {
+        const s = obj[key];
+        if (!isNaN(s)) {
+          values[key] += s;
+        }
+      });
+    });
+  }
+  return keys.length > 1 ? values : values[keys[0]];
 }

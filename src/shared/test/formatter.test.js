@@ -66,15 +66,12 @@ describe('formatter', () => {
   });
 
   it('handles isNaN for bpsToString Method Case 1', () => {
-    expect(() => {
-      Formatter.bpsToString(0 / 0);
-    }).toThrow();
+    expect(Formatter.bpsToString('a')).toEqual('');
   });
 
-  it('handles isNaN for bpsToString Method Case 2', () => {
-    expect(() => {
-      Formatter.bpsToString('Error!!');
-    }).toThrow();
+  it('handles undefined/null for bpsToString', () => {
+    expect(Formatter.bpsToString({}.bogus)).toEqual('');
+    expect(Formatter.bpsToString(null)).toEqual('');
   });
 
   SPECSFORMBPS.forEach(s => {
@@ -85,15 +82,12 @@ describe('formatter', () => {
   });
 
   it('handles isNaN for mbpsToString Method Case 1', () => {
-    expect(() => {
-      Formatter.mbpsToString(0 / 0);
-    }).toThrow();
+    expect(Formatter.mbpsToString('a')).toEqual('');
   });
 
-  it('handles isNaN for mbpsToString Method Case 2', () => {
-    expect(() => {
-      Formatter.mbpsToString('Error!!');
-    }).toThrow();
+  it('handles undefined/null for mbpsToString Method Case 2', () => {
+    expect(Formatter.mbpsToString({}.bogus)).toEqual('');
+    expect(Formatter.mbpsToString(null)).toEqual('');
   });
 
   it('handles toCommaString XXX,XXX,XXX', () => {
@@ -117,9 +111,16 @@ describe('formatter', () => {
   });
 
   it('handles isNaN for toCommaString', () => {
-    expect(() => {
-      Formatter.toCommaString('abc');
-    }).toThrow();
+    expect(Formatter.toCommaString('abc')).toEqual('');
+  });
+
+  it('handles undefined/null for toCommaString', () => {
+    expect(Formatter.toCommaString({}.bogus)).toEqual('');
+    expect(Formatter.toCommaString(null)).toEqual('');
+  });
+
+  it('handles undefined/null for toCommaString', () => {
+    expect(Formatter.toCommaString({}.bogus)).toEqual('');
   });
 
 });

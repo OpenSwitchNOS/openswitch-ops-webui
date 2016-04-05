@@ -15,18 +15,23 @@
 */
 
 import React, { PropTypes, Component } from 'react';
-import ReactCSSTG from 'react-addons-css-transition-group';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import ResponsiveBox from 'responsiveBox.jsx';
-import DataGrid from 'dataGrid.jsx';
+import DataGrid, { CustomCell } from 'dataGrid.jsx';
+import Range from 'range.js';
+// import VlanAdd from './vlanAdd.jsx';
+import { mkStatusLayer } from 'asyncStatusLayer.jsx';
 
+
+// TODO: Needs to be refactored when we actually can configure VLANs.
 
 class VlanPage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    autoActions: PropTypes.object.isRequired,
     children: PropTypes.node,
     history: PropTypes.object.isRequired,
     params: PropTypes.shape({
@@ -37,29 +42,115 @@ class VlanPage extends Component {
 
   constructor(props) {
     super(props);
-    this.cols = [
+    this.byVlanCols = [
       {
         columnKey: 'id',
-        header: t('id'),
-        width: 100,
-        align: 'right',
+        header: t('vlanId'),
+        width: 130,
       },
       {
         columnKey: 'name',
-        header: t('name'),
-        flexGrow: 1,
+        header: t('vlanName'),
         width: 200,
+      },
+      {
+        columnKey: 'operState',
+        header: t('status'),
+        width: 140,
+        format: t,
+      },
+      {
+        columnKey: 'operStateReason',
+        header: t('reason'),
+        width: 140,
+        format: t,
+      },
+      {
+        columnKey: 'interfaces',
+        header: t('interfaces'),
+        cell: this._onInterfacesCell,
+        flexGrow: 1,
+        width: 140,
+      },
+    ];
+    this.byInterfaceCols = [
+      {
+        columnKey: 'id',
+        header: t('interface'),
+        width: 130,
+      },
+      {
+        columnKey: 'mode',
+        header: t('vlanMode'),
+        width: 160,
+        format: t,
+      },
+      {
+        columnKey: 'tag',
+        header: t('tag'),
+        width: 100,
+      },
+      {
+        columnKey: 'trunks',
+        header: t('trunks'),
+        width: 200,
+        cell: this._onTrunksCell,
+        flexGrow: 1,
       },
     ];
     this.state = {};
   }
 
-  componentDidMount() {
-    this.props.actions.vlan.fetch();
-    this.props.actions.toolbar.setFetchTB(
-      this.props.vlan.page,
-      this._onRefresh
+  _onInterfacesCell = (cellData, cellProps) => {
+    // TOOD: this should be moved into Utils.
+    const idKeys = [];
+    const lagKeys = [];
+    let lagStr = '';
+    let idStr = '';
+    Object.keys(cellData).forEach( k => {
+      if (isNaN(k)) {
+        lagKeys.push(k);
+      } else {
+        idKeys.push(Number(k));
+      }
+    });
+    if (idKeys.length > 0) {
+      idStr = new Range(idKeys).toString().split(',').join(', ');
+      lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+    } else {
+      lagStr = lagKeys.length === 0 ? '' : `${lagKeys.sort().join(', ')}`;
+    }
+    return (
+      <CustomCell {...cellProps}>
+        {`${idStr}${lagStr}`}
+      </CustomCell>
     );
+  };
+
+  // _onTrunksCell = (cellData, cellProps) => {
+  //   // TOOD: this should be moved into Utils.
+  //   // const idKeys = [];
+  //   // const lagKeys = [];
+  //   // Object.keys(cellData).forEach( k => {
+  //   //   if (isNaN(k)) {
+  //   //     lagKeys.push(k);
+  //   //   } else {
+  //   //     idKeys.push(Number(k));
+  //   //   }
+  //   // });
+  //   // const lagStr = lagKeys.length === 0 ? '' : `, ${lagKeys.sort().join(', ')}`;
+  //   // const idStr = new Range(idKeys).toString().split(',').join(', ');
+  //   return (
+  //     <CustomCell {...cellProps}>
+  //       {cellData}
+  //     </CustomCell>
+  //   );
+  // };
+
+  componentDidMount() {
+    const p = this.props;
+    p.actions.vlan.fetch();
+    p.actions.toolbar.setFetchTB(p.vlan.asyncStatus, this._onRefresh);
   }
 
   _onRefresh = () => {
@@ -67,56 +158,77 @@ class VlanPage extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    this.props.actions.toolbar.setFetchTB(
-      nextProps.vlan.page,
-      this._onRefresh
-    );
+    const p = nextProps;
+    p.actions.toolbar.setFetchTB(p.vlan.asyncStatus, this._onRefresh);
   }
 
   componentWillUnmount() {
     this.props.actions.toolbar.clear();
   }
 
-  _onSelect = (id) => {
-    this.props.history.pushState(null, `/vlan/${id}`);
-  };
+  // _onSelect = (sel) => {
+  //   const url = sel ? `/vlan/${sel}` : '/vlan';
+  //   this.props.history.pushState(null, url);
+  // };
+  //
+  // _onAddOpen = () => {
+  //   this.setState({ addMode: true });
+  // };
+  //
+  // _onAddApply = (cfg) => {
+  //   // TODO: Need to standardize the data and new cfg to set methods...see interface Dux.
+  //   this.props.actions.vlan.addVlan(this.props.vlan, cfg);
+  // };
+  //
+  // _onAddOk = (data) => {
+  //   this._onAddApply(data);
+  //   this.setState({ addMode: false });
+  // };
+  //
+  // _onAddClose = () => {
+  //   this.setState({ addMode: false });
+  // };
 
   render() {
-    const vlans = this.props.vlan.page.entities;
+    const data = this.props.vlan;
 
-    // TODO: On small screens the layer is not overlayed so not model, need a way to keep the layer on small screens (i.e. disable the page)
-    // TODO: Grommet has a display: none for + 'app' classes but the toplevel page is not a sibling of the layer
-    const details = !this.props.params.id ? null : (
-        <Box className="pageBox">
-          <ReactCSSTG
-              transitionName="slideInColumn"
-              transitionAppear
-              transitionAppearTimeout={500}
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={500}>
-            {this.props.children}
-          </ReactCSSTG>
-        </Box>
-    );
+    const numVlans = Object.getOwnPropertyNames(data.vlans).length;
+    // const numInterfaces = Object.getOwnPropertyNames(data.interfaces).length;
+
+    // const addVlanLayer = !this.state.addVlanLayer ? null :
+    //   <VlanAdd
+    //       actions={this.props.actions}
+    //       onClose={() => this.setState({addVlanLayer: false})}
+    //   />;
+
+    const statusLayer = mkStatusLayer(
+          data.asyncStatus,
+          this.props.actions.vlan.clearError);
+
+    // onAdd={() => this.setState({addVlanLayer: true})}
 
     return (
-      <Box direction="row" className="flex1">
-        <Box className="flex1">
-          <Box className="pageBox min200x200">
-            ...BoxGraphic goes here...
-          </Box>
-          <Box className="flex1 mTopHalf mLeft">
-            <ResponsiveBox>
-              <DataGrid width={300} height={400}
-                  data={vlans}
-                  columns={this.cols}
-                  singleSelect
-                  onSelectChange={this._onSelect}
-              />
-            </ResponsiveBox>
-          </Box>
-        </Box>
-        {details}
+      <Box className="flex1 mTop mLeft">
+        {/*{addVlanLayer}*/}
+        {statusLayer}
+        <ResponsiveBox>
+          <DataGrid width={400} height={400}
+              title={`${t('total')}: ${numVlans}`}
+              data={data.vlans}
+              columns={this.byVlanCols}
+              noSelect
+              onSelectChange={this._onSelect}
+              select={this.props.params.id}
+          />
+        </ResponsiveBox>
+        {/*<br/>
+        <ResponsiveBox>
+          <DataGrid width={400} height={400}
+              title={`${t('totalInterfaces')}: ${numInterfaces}`}
+              columns={this.byInterfaceCols}
+              data={data.interfaces}
+          />
+        </ResponsiveBox>*/}
       </Box>
     );
   }

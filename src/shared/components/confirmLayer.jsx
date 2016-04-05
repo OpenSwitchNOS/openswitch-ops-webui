@@ -16,7 +16,7 @@
 
 import React, { PropTypes, Component } from 'react';
 import Header from 'grommet/components/Header';
-import Form from 'grommet/components/Form';
+import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
 import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
@@ -49,7 +49,7 @@ export default class ConfirmLayer extends Component {
   render() {
     return (
       <Layer onClose={this.props.onClose} closer flush align="top">
-        <Form onSubmit={this._onSubmit}>
+        <Box pad="large">
           <Header>
             <Title>
               <SpanStatus size="large" space={false} value="unknown">
@@ -64,7 +64,7 @@ export default class ConfirmLayer extends Component {
                   primary onClick={this.props.onSubmit} />
             </Menu>
           </Footer>
-        </Form>
+        </Box>
       </Layer>
     );
   }

@@ -14,9 +14,18 @@
     under the License.
 */
 
-@import "~_settings.scss";
+export const USER_CFG = 'user_config';
 
+export const ADMIN = 'admin';
+export const ADMIN_DEF = 'down';
 
-.error.layer {
-  z-index: 1000;
-}
+export const DUPLEX = 'duplex';
+export const DUPLEX_DEF = 'full';
+
+export const AUTO_NEG = 'autoneg';
+export const AUTO_NEG_DEF = 'on';
+
+export const FLOW_CTRL = 'pause';
+export const FLOW_CTRL_DEF = 'none';
+
+export const PORT_ADMIN = 'admin';

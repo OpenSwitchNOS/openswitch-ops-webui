@@ -14,15 +14,13 @@
     under the License.
 */
 
-import Dux from 'dux.js';
-
+import AsyncDux from 'asyncDux.js';
 import DemoBox1Page from './demoBox1Page.jsx';
 import DemoBox2Page from './demoBox2Page.jsx';
 import DemoBox3Page from './demoBox3Page.jsx';
 import DemoBoxDataGridPage from './demoBoxDataGridPage.jsx';
 import DemoIconPage from './demoIconPage.jsx';
 import DemoColorPage from './demoColorPage.jsx';
-import DemoHeaderPage from './demoHeaderPage.jsx';
 import DemoTablePage from './demoTablePage.jsx';
 import DemoDataGridPage from './demoDataGridPage.jsx';
 import DemoDataGridSmallPage from './demoDataGridSmallPage.jsx';
@@ -30,6 +28,8 @@ import DemoButtonPage from './demoButtonPage.jsx';
 import DemoFormPage from './demoFormPage.jsx';
 import DemoLayerPage from './demoLayerPage.jsx';
 import DemoMetricPage from './demoMetricPage.jsx';
+import DemoOneToManyPage from './demoOneToManyPage.jsx';
+
 
 const NAME = 'demo';
 
@@ -61,10 +61,6 @@ const NAVS = [
     link: { path: '/demo/color', order: order++ }
   },
   {
-    route: { path: '/demoHeader', component: DemoHeaderPage },
-    link: { path: '/demo/header', order: order++ }
-  },
-  {
     route: { path: '/demoTable', component: DemoTablePage },
     link: { path: '/demo/table', order: order++ }
   },
@@ -92,41 +88,45 @@ const NAVS = [
     route: { path: '/demoMetric', component: DemoMetricPage },
     link: { path: '/demo/metric', order: order++ }
   },
+  {
+    route: { path: '/demoOneToMany', component: DemoOneToManyPage },
+    link: { path: '/demo/oneToMany', order: order++ }
+  },
 ];
 
-const PAGE_ASYNC = 'page';
-const PAGE_AT = Dux.mkAsyncActionTypes(NAME, PAGE_ASYNC);
+const INITIAL_STORE = {
+  entities: {},
+};
+
+const AD = new AsyncDux(NAME, INITIAL_STORE);
+
+const parser = () => {
+  const entities = {};
+  for (let i=1; i<=15; i++) {
+    if (i === 7) {
+      entities[`${i}`] = {
+        id: i,
+        text: `This is a very very very very very very very very very very very loooooooooooooooong item ${i}`
+      };
+    } else {
+      entities[`${i}`] = { id: i, text: `This is item ${i}` };
+    }
+  }
+  return { entities };
+};
 
 const ACTIONS = {
   fetch() {
     return (dispatch) => {
-      Dux.dispatchRequest(dispatch, PAGE_AT);
-      Dux.dispatchSuccess(dispatch, PAGE_AT);
+      dispatch(AD.action('REQUEST'));
+      dispatch(AD.action('SUCCESS', { parser }));
     };
   }
 };
-
-const INITIAL_STORE = {
-  page: {
-    entities: {},
-  },
-};
-
-function parsePageResult() {
-  const entities = {};
-  for (let i=1; i<=30; i++) {
-    entities[`${i}`] = { id: i, text: `This is item ${i}` };
-  }
-  return { entities };
-}
-
-const REDUCER = Dux.mkReducer(INITIAL_STORE, [
-  Dux.mkAsyncHandler(NAME, PAGE_ASYNC, PAGE_AT, parsePageResult),
-]);
 
 export default {
   NAME,
   NAVS,
   ACTIONS,
-  REDUCER,
+  REDUCER: AD.reducer(),
 };

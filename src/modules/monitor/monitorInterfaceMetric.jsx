@@ -19,8 +19,8 @@ import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 
 import Box from 'grommet/components/Box';
+import Anchor from 'grommet/components/Anchor';
 import RefreshIcon from 'grommet/components/icons/base/Refresh';
-
 import MetricChart from 'metricChart.jsx';
 
 
@@ -41,13 +41,14 @@ class MonitorInterfaceMetric extends Component {
 
   render() {
     const id = this.props.params.id;
-    const metrics = this.props.collector.overview.interfaceMetrics[id];
+    const metrics = this.props.collector.interfaceMetrics[id];
 
     let content = null;
     if (!metrics || metrics.length === 0) {
       content = (
         <div style={{textAlign: 'center'}}>
           <RefreshIcon className="spin"/>
+          &nbsp;&nbsp;
           {t('loading')}
         </div>
       );
@@ -56,16 +57,24 @@ class MonitorInterfaceMetric extends Component {
         return (
           <div key={m.getName()}>
             <b>{m.getName()}</b>
-            <MetricChart points size="large" metric={m}/>
+            <MetricChart size="large" metric={m}/>
             <br/>
           </div>
         );
       });
     }
 
+    const infHref = `#/interface/${this.props.params.id}`;
+
     return (
       <Box pad={this.pad} className="pageBox">
-        <large><b>{`${t('interfaceUtiization')}: `}</b>{id}</large>
+        <span>
+          <large><b>{t('utilization')}</b></large>
+          &nbsp;&nbsp;&nbsp;
+          <Anchor href={infHref}>
+              {`(${t('interfaceDetails')})`}
+          </Anchor>
+        </span>
         <br/>
         {content}
       </Box>

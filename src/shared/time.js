@@ -14,26 +14,21 @@
     under the License.
 */
 
-@import "~_settings.scss";
 
-$toolbarHeight: 48px; // Keep identical with constant in Toolbar class
+export function toTimestamp(millis) {
+  const d = new Date(millis);
 
-.toolbar {
+  const h = d.getHours();
+  const hs = h < 10 ? `0${h}` : h.toString();
 
-  .header {
-    height: $toolbarHeight;
+  const m = d.getMinutes();
+  const ms = m < 10 ? `0${m}` : m.toString();
 
-    input.search-input__input {
-      padding-top: 4px;
-      padding-bottom: 4px;
-      width: 10rem;
-    }
-    .search-input__control {
-      .control-icon {
-        width: 36px;
-        height: 36px;
-      }
-    }
-  }
+  const s = d.getSeconds();
+  const ss = s < 10 ? `0${s}` : s.toString();
 
+  const z = d.getMilliseconds();
+  const zs = z < 10 ? `00${z}` : z < 100 ? `0${z}` : z.toString();
+
+  return `${hs}:${ms}:${ss}.${zs}`;
 }
