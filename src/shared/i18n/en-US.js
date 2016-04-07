@@ -121,6 +121,7 @@ export const MESSAGES = {
   identifier: 'Identifier',
   information: 'Information',
   interface: 'Interface',
+  interfaceId: 'Interface ID',
   interfaceDetails: 'Interface Details',
   interfaces: 'Interfaces',
   invalid: 'Invalid',

@@ -48,7 +48,7 @@ class LagEdit extends Component {
 
     this.cols = [{
       columnKey: 'id',
-      header: t('id'),
+      header: t('interfaceId'),
       width: 180,
     }];
 

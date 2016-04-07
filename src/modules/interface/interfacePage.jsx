@@ -87,7 +87,9 @@ class InterfacePage extends Component {
         format: Formatter.bpsToString,
       },
     ];
-    this.state = {};
+    this.state = {
+      showDetailsOnSelect: true,
+    };
   }
 
   componentDidMount() {
@@ -168,6 +170,7 @@ class InterfacePage extends Component {
                   toolbar={[
                     <CheckBox
                         onChange={this._onShowDetailsOnSelect}
+                        checked={this.state.showDetailsOnSelect}
                         key="infDetCb"
                         id="infDetCb"
                         name="infDetCb"

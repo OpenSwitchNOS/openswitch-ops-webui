@@ -81,7 +81,9 @@ class LagPage extends Component {
         format: arr => arr.sort(naturalSort).join(', '),
       },
     ];
-    this.state = {};
+    this.state = {
+      showDetailsOnSelect: true,
+    };
   }
 
   _onCustomCell = (cellData, cellProps) => {
@@ -186,6 +188,7 @@ class LagPage extends Component {
                 toolbar={[
                   <CheckBox
                       onChange={this._onShowDetailsOnSelect}
+                      checked={this.state.showDetailsOnSelect}
                       key="lagDetCb"
                       id="lagDetCb"
                       name="lagDetCb"
