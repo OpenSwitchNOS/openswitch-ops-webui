@@ -48,7 +48,7 @@ class LagAdd extends Component {
 
     this.cols = [{
       columnKey: 'id',
-      header: t('id'),
+      header: t('interfaceId'),
       width: 180,
     }];
 
