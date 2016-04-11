@@ -40,12 +40,14 @@ class DemoDataGridPage extends Component {
         align: 'center',
         flexGrow: 1,
         cell: this._onCustomCell,
+        tooltip: d => `Tip for: ${d}`,
       },
       {
         columnKey: 'text',
         header: t('text'),
         width: 200,
-        flexGrow: 1
+        flexGrow: 1,
+        tooltip: d => `Tip for: ${d}`,
       },
     ];
   }
@@ -66,8 +68,9 @@ class DemoDataGridPage extends Component {
   }
 
   _onCustomCell = (cellData, cellProps, colProps) => {
+    const tip = `CustomCell tip for row ${cellProps.rowIndex}`;
     return (
-      <CustomCell {...cellProps}>
+      <CustomCell title={tip} {...cellProps}>
         {cellData}
         <i>{
           ` (rowIndex: ${cellProps.rowIndex}, columnKey: ${colProps.columnKey})`

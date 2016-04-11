@@ -142,6 +142,7 @@ export default class DataGrid extends Component {
   };
 
   static defaultProps = {
+    title: '',
     headerHeight: 40,
     rowHeight: 40,
   };
@@ -348,8 +349,9 @@ export default class DataGrid extends Component {
     if (colProps.format) {
       cellData = colProps.format(cellData);
     }
+    const tooltip = colProps.tooltip ? colProps.tooltip(cellData) : null;
     if (!colProps.cell) {
-      return ( <Cell {...cellProps}>{cellData}</Cell> );
+      return ( <Cell title={tooltip} {...cellProps}>{cellData}</Cell> );
     }
     return colProps.cell(cellData, cellProps, colProps);
   };
