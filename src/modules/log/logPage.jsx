@@ -72,6 +72,7 @@ class LogPage extends Component {
         header: t('message'),
         width: 100,
         flexGrow: 1,
+        cell: this._onMsgCell,
       },
     ];
     this.state = { priority: T_CRIT, since: LAST_HOUR };
@@ -87,6 +88,14 @@ class LogPage extends Component {
     return (
       <CustomCell {...cellProps}>
         <SpanStatus value={cellData}>{t(cellData)}</SpanStatus>
+      </CustomCell>
+    );
+  };
+
+  _onMsgCell = (cellData, cellProps) => {
+    return (
+      <CustomCell title={t(cellData)} {...cellProps}>
+        {t(cellData)}
       </CustomCell>
     );
   };
