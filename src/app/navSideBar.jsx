@@ -45,10 +45,10 @@ class NavSideBar extends Component {
     actions: PropTypes.object.isRequired,
     auth: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
-    extLinks: PropTypes.array.isRequired,
     guides: PropTypes.array.isRequired,
     links: PropTypes.object.isRequired,
     nav: PropTypes.object.isRequired,
+    settings: PropTypes.object.isRequired,
   };
 
   // Create a flatten navgiation list based on the navigation model. The list
@@ -120,7 +120,8 @@ class NavSideBar extends Component {
   };
 
   _mkExtLinks = () => {
-    return this.props.extLinks.map( lnk => {
+    if (!this.props.settings.extLinks) { return []; }
+    return this.props.settings.extLinks.map( lnk => {
       return <Anchor key={lnk.key} href={lnk.href}>{t(lnk.key)}</Anchor>;
     });
   };
@@ -226,7 +227,7 @@ const select = (store) => ({
   nav: store.nav,
   guides: store.guides,
   collector: store.collector,
-  extLinks: store.extLinks,
+  settings: store.settings,
 });
 
 export default connect(select)(NavSideBar);

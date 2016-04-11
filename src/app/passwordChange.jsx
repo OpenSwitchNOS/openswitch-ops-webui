@@ -30,6 +30,8 @@ import Title from 'grommet/components/Title';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 
+// TODO: over 80 columns, rethink name
+
 class PasswordChange extends Component {
 
   static propTypes = {

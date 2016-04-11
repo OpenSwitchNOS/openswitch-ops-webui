@@ -32,13 +32,15 @@ class InterfacePage extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    boxGraphic: PropTypes.object.isRequired,
     children: PropTypes.node,
     history: PropTypes.object.isRequired,
     interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
     }),
+    settings: PropTypes.shape({
+      boxGraphic: PropTypes.object.isRequired,
+    }).isRequired,
   };
 
   constructor(props) {
@@ -151,7 +153,7 @@ class InterfacePage extends Component {
         <Box className="flex1">
           <Box className="mTop mLeft">
             <BoxGraphic
-                spec={this.props.boxGraphic}
+                spec={this.props.settings.boxGraphic}
                 interfaces={infs}
                 select={selInfId}
                 onSelectChange={this._onSelect}
@@ -190,7 +192,7 @@ class InterfacePage extends Component {
 function select(store) {
   return {
     interface: store.interface,
-    boxGraphic: store.boxGraphic,
+    settings: store.settings,
   };
 }
 

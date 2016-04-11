@@ -50,12 +50,21 @@ import * as i18nLocale from 'i18n/en-US.js';
 import As5712 from 'boxGraphics/as5712.jsx';
 
 const settings = {
-  i18nLocale,
-  boxGraphic: As5712,
   reduxLogger: true,
+
+  AUTO_ACTIONS_INTERVAL: 10000,
+  LAG_ID_RANGE: '1-2000',
+  LAG_MAX_INTERFACES: 8,
+  VLAN_ID_RANGE: '1-4094',
+
+  i18nLocale,
+
+  boxGraphic: As5712,
+
   agent: {
     prefix: 'https://15.108.30.248',
   },
+
   extLinks: [
     {
       key: 'osApi',
@@ -66,11 +75,6 @@ const settings = {
       href: 'http://openswitch.net'
     },
   ],
-  constants: {
-    VLAN_ID_RANGE: '1-4094',
-    LAG_ID_RANGE: '1-2000',
-    LAG_MAX_INTERFACES: 8,
-  }
 };
 
 export default { modules, guides, settings };

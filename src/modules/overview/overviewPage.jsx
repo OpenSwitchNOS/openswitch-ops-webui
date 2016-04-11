@@ -35,9 +35,9 @@ class OverviewPage extends Component {
     actions: PropTypes.object.isRequired,
     autoActions: PropTypes.object.isRequired,
     collector: PropTypes.object.isRequired,
-    constants: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     overview: PropTypes.object.isRequired,
+    settings: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -222,7 +222,7 @@ class OverviewPage extends Component {
   };
 
   _mkGeneralProps = () => {
-    const range = new Range(this.props.constants.VLAN_ID_RANGE);
+    const range = new Range(this.props.settings.VLAN_ID_RANGE);
     const maxVlans = range.lastItem();
     const data = this.props.overview;
     const info = data.info;
@@ -439,7 +439,7 @@ class OverviewPage extends Component {
 
 function select(store) {
   return {
-    constants: store.constants,
+    settings: store.settings,
     collector: store.collector,
     overview: store.overview,
   };

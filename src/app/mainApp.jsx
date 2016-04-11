@@ -40,8 +40,6 @@ import StatusLayer from 'statusLayer.jsx';
 import NavSideBar from './navSideBar.jsx';
 
 
-const AUTO_ACTIONS_INTERVAL = 10000;
-
 class MainApp extends Component {
 
   static propTypes = {
@@ -56,6 +54,7 @@ class MainApp extends Component {
     params: PropTypes.object.isRequired,
     routeToLink: PropTypes.object.isRequired,
     routes: PropTypes.array.isRequired,
+    settings: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired,
   };
 
@@ -83,7 +82,7 @@ class MainApp extends Component {
       if (isLoggedIn) {
         this._invokeAutoActions();
         this.autoActionsTimer = setInterval(
-          this._onAutoActionTimer, AUTO_ACTIONS_INTERVAL
+          this._onAutoActionTimer, this.props.settings.AUTO_ACTIONS_INTERVAL
         );
       }
     }
@@ -238,6 +237,7 @@ const select = (store) => ({
   toolbar: store.toolbar,
   collector: store.collector,
   guide: store.guide,
+  settings: store.settings,
 });
 
 export default connect(select)(MainApp);

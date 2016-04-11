@@ -38,9 +38,9 @@ class LagAdd extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    constants: PropTypes.object.isRequired,
     lag: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
+    settings: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -75,7 +75,7 @@ class LagAdd extends Component {
   };
 
   _calcAvailLagIdRange = (props) => {
-    const range = new Range(props.constants.LAG_ID_RANGE);
+    const range = new Range(props.settings.LAG_ID_RANGE);
     const used = Object.keys(props.lag.lags).map( k => Number(k) );
     range.subtract(used);
     return range;
@@ -134,7 +134,7 @@ class LagAdd extends Component {
                   subSet={this.state.lagInfs}
                   subSetCols={this.cols}
                   onChange={this._onChangeLag}
-                  maxSubSetSize={this.props.constants.LAG_MAX_INTERFACES}
+                  maxSubSetSize={this.props.settings.LAG_MAX_INTERFACES}
               />
             </Tab>
             <Tab title={t('attributes')}>
@@ -235,7 +235,7 @@ class LagAdd extends Component {
 }
 
 const select = (store) => ({
-  constants: store.constants,
+  settings: store.settings,
   lag: store.lag
 });
 
