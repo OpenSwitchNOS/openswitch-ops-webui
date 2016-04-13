@@ -181,8 +181,8 @@ const SEL_CFG = 'selector=configuration';
 const URL_INFS = '/rest/v1/system/interfaces';
 const URL_INFS_D1 = `${URL_INFS}?depth=1`;
 const URL_PORTS = '/rest/v1/system/ports';
-const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
-
+//const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
+const URL_VRF = '/rest/v1/system/vrfs/vrf_default';
 const ACTIONS = {
 
   fetchPage() {
@@ -297,7 +297,7 @@ const ACTIONS = {
                   'vlan_mode': 'access',
                   interfaces: [URL_INF],
                 },
-                'referenced_by': [{uri: URL_BRIDGE}],
+                'referenced_by': [{uri: URL_VRF}],
               })
               .set('If-None-Match', '*')
               .end(cb2);

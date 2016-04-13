@@ -78,7 +78,7 @@ function parsePortsInfs(result) {
       const lag = {
         name,
         id,
-        lacp: cfg.lacp,
+        lacp: cfg.lacp || 'off',
         admin: cfg.admin || 'down',
         vlanMode,
         vlanIds,
