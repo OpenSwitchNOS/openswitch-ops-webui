@@ -40,6 +40,7 @@ const INITIAL_STORE = {
   interfaces: {},
   interface: {
     lldp: {},
+    lag: {},
   },
   port: {},
   edit: {
@@ -69,6 +70,24 @@ function parseLldp(inf) {
   };
 }
 
+function parseLag(inf) {
+  const lacpStatus = inf.status.lacp_status;
+  if (lacpStatus) {
+    return {
+      actorKey: lacpStatus.actor_key,
+      actorSystemId: lacpStatus.actor_system_id,
+      actorPortId: lacpStatus.actor_port_id,
+      actorState: lacpStatus.actor_state,
+
+      partnerKey: lacpStatus.partner_key,
+      partnerSystemId: lacpStatus.partner_system_id,
+      partnerPortId: lacpStatus.partner_port_id,
+      partnerState: lacpStatus.partner_state
+    };
+  }
+  return {};
+}
+
 function parseInterface(inf) {
   const cfg = inf.configuration;
   const status = inf.status;
@@ -95,6 +114,8 @@ function parseInterface(inf) {
   const adminStateConnector = adminState !== 'up' &&
     cfgAdmin === 'up' && connector === 'absent' ? 'downAbsent' : adminState;
 
+  const lacpStatus = parseLag(inf);
+
   return {
     id: cfg.name,
     cfgAdmin,
@@ -108,6 +129,7 @@ function parseInterface(inf) {
     speed,
     duplex,
     linkState,
+    lacpStatus
   };
 }
 
@@ -138,8 +160,10 @@ const detailParser = (result) => {
     inf.txDropped = Number(stats.tx_dropped) || 0;
     inf.txErrors = Number(stats.tx_errors) || 0;
     inf.lldp = parseLldp(result[0].body);
+    inf.lag = parseLag(result[0].body);
   } else {
     inf.lldp = {};
+    inf.lag = {};
   }
   // parse the port (if available)
   const port = {};
