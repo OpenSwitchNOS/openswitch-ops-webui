@@ -53,6 +53,7 @@ class LagDetails extends Component {
     const tcs = Formatter.toCommaString;
     const infs = Object.keys(lag.interfaces).sort(naturalSort).join(', ');
 
+
     return (
       <Box pad="small">
         <Box direction="row" justify="between">
@@ -73,6 +74,10 @@ class LagDetails extends Component {
             {pr('interfaces', infs, 160, 180)}
             {pr('speed', lag.speed)}
             {pr('bondStatus', t(lag.bondStatus))}
+            {pr('lagActorKey', lag.status.actorKey)}
+            {pr('lagActorSystemId', lag.status.actorSystemId)}
+            {pr('lagPartnerKey', lag.status.partnerKey)}
+            {pr('lagPartnerSystemId', lag.status.partnerSystemId)}
             {pr('rxPackets', tcs(lag.stats.rxPackets))}
             {pr('rxBytes', tcs(lag.stats.rxBytes))}
             {pr('rxErrors', tcs(lag.stats.rxErrors))}

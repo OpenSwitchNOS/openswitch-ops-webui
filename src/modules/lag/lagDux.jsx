@@ -56,6 +56,27 @@ const AD = new AsyncDux(NAME, INITIAL_STORE);
 const LAG_PREFIX = 'lag';
 const LAG_REGEX = /^lag/;
 
+// This is a default.  Lower numeric is higher priority.
+const PARTNER_SYS_PRIO = 65534;
+
+function getLagStatus(infs) {
+  const lagStatus = {};
+  Object.getOwnPropertyNames(infs).forEach(key => {
+    const status = infs[key].lagStatus;
+    if (status) {
+      lagStatus.actorKey = status.actor_key;
+      lagStatus.actorSystemId = status.actor_system_id;
+      // Choose higher system priority with lower numeric value
+      const prio = status.partner_system_id.split(',')[0];
+      if (prio > 0 && prio <= PARTNER_SYS_PRIO) {
+        lagStatus.partnerKey = status.partner_key;
+        lagStatus.partnerSystemId = status.partner_system_id;
+      }
+    }
+  });
+  return lagStatus;
+}
+
 function parsePortsInfs(result) {
   const lags = {};
 
@@ -85,6 +106,7 @@ function parsePortsInfs(result) {
         bondStatus,
         interfaces: {},
         stats: {},
+        status: {}
       };
 
       const oc = cfg[C.OTHER_CFG];
@@ -102,7 +124,6 @@ function parsePortsInfs(result) {
     const cfg = elm.configuration;
     const stats = elm.statistics.statistics;
     const id = cfg.name;
-
     const oc = cfg.other_config;
     const lacpAggrKey = oc && oc[C.LACP_AGGR_KEY];
     if (lacpAggrKey) {
@@ -122,6 +143,7 @@ function parsePortsInfs(result) {
           txDropped: Number(stats.tx_dropped) || 0,
           speed: status.link_speed ? Number(status.link_speed) : 0,
           lacpAggrKey,
+          lagStatus: elm.status.lacp_status,
         };
         lag.interfaces[id] = data;
       }
@@ -138,6 +160,7 @@ function parsePortsInfs(result) {
   Object.getOwnPropertyNames(lags).forEach(lagId => {
     const lag = lags[lagId];
     lag.stats = sumValues(lag.interfaces, STAT_KEYS);
+    lag.status = getLagStatus(lag.interfaces);
   });
 
   return { lags, availInterfaces };
