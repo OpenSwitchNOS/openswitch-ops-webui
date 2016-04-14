@@ -26,7 +26,6 @@ import CloseIcon from 'grommet/components/icons/base/Close';
 import Formatter from 'formatter.js';
 import { pr } from 'propRow.jsx';
 
-
 const LLDP_SYS_DESC_SEARCH = 'OpenSwitch';
 
 
@@ -144,6 +143,20 @@ class InterfaceDetails extends Component {
                 {pr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
                 {pr('framesRxUnrecog', tcs(inf.lldp.framesRxUnrecog))}
                 {pr('framesTx', tcs(inf.lldp.framesTx))}
+              </tbody>
+            </table>
+          </Tab>
+          <Tab title={t('lag')}>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {pr('lagActorKey', inf.lag.actorKey)}
+                {pr('lagActorSystemId', inf.lag.actorSystemId)}
+                {pr('lagActorPortId', inf.lag.actorPortId)}
+                {pr('lagActorState', inf.lag.actorState)}
+                {pr('lagPartnerKey', inf.lag.partnerKey)}
+                {pr('lagPartnerSystemId', inf.lag.partnerSystemId)}
+                {pr('lagPartnerPortId', inf.lag.partnerPortId)}
+                {pr('lagPartnerState', inf.lag.partnerState)}
               </tbody>
             </table>
           </Tab>
