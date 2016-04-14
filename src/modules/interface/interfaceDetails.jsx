@@ -69,6 +69,25 @@ class InterfaceDetails extends Component {
 
   render() {
     const inf = this.props.interface.interface;
+    let actorKey = '';
+    let actorSystemId = '';
+    let actorPortId = '';
+    let actorState = '';
+    let partnerKey = '';
+    let partnerSystemId = '';
+    let partnerPortId = '';
+    let partnerState = '';
+    const lacpStatus = inf.lacpStatus;
+    if (lacpStatus) {
+      actorKey = lacpStatus.actor_key;
+      actorSystemId = lacpStatus.actor_system_id;
+      actorPortId = lacpStatus.actor_port_id;
+      actorState = lacpStatus.actor_state;
+      partnerKey = lacpStatus.partner_key;
+      partnerSystemId = lacpStatus.partner_system_id;
+      partnerPortId = lacpStatus.partner_port_id;
+      partnerState = lacpStatus.partner_state;
+    }
     const port = this.props.interface.port;
     const tcs = Formatter.toCommaString;
 
@@ -144,6 +163,22 @@ class InterfaceDetails extends Component {
                 {pr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
                 {pr('framesRxUnrecog', tcs(inf.lldp.framesRxUnrecog))}
                 {pr('framesTx', tcs(inf.lldp.framesTx))}
+              </tbody>
+            </table>
+          </Tab>
+          <Tab title={t('lag')}>
+            <small>{t('status')}{lldpOpsLink}</small>
+            <hr/>
+            <table style={{tableLayout: 'fixed'}} className="propTable">
+              <tbody>
+                {pr('lagActorKey', actorKey)}
+                {pr('lagActorSystemId', actorSystemId)}
+                {pr('lagActorPortId', actorPortId)}
+                {pr('lagActorState', actorState)}
+                {pr('lagPartnerKey', partnerKey)}
+                {pr('lagPartnerSystemId', partnerSystemId)}
+                {pr('lagPartnerPortId', partnerPortId)}
+                {pr('lagPartnerState', partnerState)}
               </tbody>
             </table>
           </Tab>

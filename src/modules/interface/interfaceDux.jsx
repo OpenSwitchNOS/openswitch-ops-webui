@@ -95,6 +95,8 @@ function parseInterface(inf) {
   const adminStateConnector = adminState !== 'up' &&
     cfgAdmin === 'up' && connector === 'absent' ? 'downAbsent' : adminState;
 
+  const lacpStatus = status.lacp_status || {};
+
   return {
     id: cfg.name,
     cfgAdmin,
@@ -108,6 +110,7 @@ function parseInterface(inf) {
     speed,
     duplex,
     linkState,
+    lacpStatus
   };
 }
 
