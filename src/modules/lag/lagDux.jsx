@@ -85,6 +85,8 @@ function parsePortsInfs(result) {
         bondStatus,
         interfaces: {},
         stats: {},
+        partnerKey: '',
+        partnerSystemId: '',
       };
 
       const oc = cfg[C.OTHER_CFG];
@@ -101,8 +103,20 @@ function parsePortsInfs(result) {
   result[1].body.forEach(elm => {
     const cfg = elm.configuration;
     const stats = elm.statistics.statistics;
+    // const status = elm.status.lacp_status ||
+    //               {partner_key: 'na', partner_system_id: 'na'};
     const id = cfg.name;
-
+    let actorKey = '';
+    let actorSystemId = '';
+    let partnerKey = '';
+    let partnerSystemId = '';
+    const lacpStatus = elm.status.lacp_status;
+    if (lacpStatus) {
+      actorKey = lacpStatus.actor_key;
+      actorSystemId = lacpStatus.actor_system_id;
+      partnerKey = lacpStatus.partner_key;
+      partnerSystemId = lacpStatus.partner_system_id;
+    }
     const oc = cfg.other_config;
     const lacpAggrKey = oc && oc[C.LACP_AGGR_KEY];
     if (lacpAggrKey) {
@@ -122,8 +136,16 @@ function parsePortsInfs(result) {
           txDropped: Number(stats.tx_dropped) || 0,
           speed: status.link_speed ? Number(status.link_speed) : 0,
           lacpAggrKey,
+          actorKey,
+          actorSystemId,
+          partnerKey,
+          partnerSystemId
         };
         lag.interfaces[id] = data;
+        lag.actorKey = data.actorKey;
+        lag.actorSystemId = data.actorSystemId;
+        lag.partnerKey = data.partnerKey;
+        lag.partnerSystemId = data.partnerSystemId;
       }
     } else if (cfg.type === 'system') {
       availInterfaces[id] = { id };
