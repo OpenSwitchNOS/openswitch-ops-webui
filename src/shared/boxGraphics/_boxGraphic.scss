@@ -20,6 +20,7 @@ $adminDownColor: #A00;
 $linkUpColor: #0F0;
 $linkUpHoverColor: #0A0;
 $hoverColor: lighten(black, 20%);
+$canSplitColor: lighten(black, 30%);
 $activeColor: $brand-color;
 
 
@@ -27,7 +28,8 @@ $activeColor: $brand-color;
 
   @each $i in $cssIds {
     $mainCssId: #{nth($i, 1)};
-    $subCssId: #{nth($i, 2)};
+    $slashCssId: #{nth($i, 2)};
+    $multiCssId: #{nth($i, 3)};
 
     .boxGraphic {
 
@@ -44,12 +46,39 @@ $activeColor: $brand-color;
 
       .selected.#{$mainCssId} #{$svgId} ##{$mainCssId} {
         stroke: $activeColor;
-        stroke-width: 8px;
+        stroke-width: 5px;
       }
 
-      .adminDown.#{$mainCssId} #{$svgId} ##{$subCssId} {
+      .adminDown.#{$mainCssId} #{$svgId} ##{$slashCssId} {
         fill: $adminDownColor;
         display: block;
+      }
+
+      .canSplit.#{$mainCssId} #{$svgId} ##{$multiCssId} {
+        fill: $canSplitColor;
+        display: block;
+      }
+
+      .isSplit.#{$mainCssId} #{$svgId} ##{$multiCssId} {
+        stroke: $linkUpColor;
+        stroke-width: 2px;
+        fill: none;
+      }
+
+      .splitLinkUp.#{$mainCssId}_1 #{$svgId} ##{$multiCssId}_1 {
+        fill: $linkUpColor;
+      }
+
+      .splitLinkUp.#{$mainCssId}_2 #{$svgId} ##{$multiCssId}_2 {
+        fill: $linkUpColor;
+      }
+
+      .splitLinkUp.#{$mainCssId}_3 #{$svgId} ##{$multiCssId}_3 {
+        fill: $linkUpColor;
+      }
+
+      .splitLinkUp.#{$mainCssId}_4 #{$svgId} ##{$multiCssId}_4 {
+        fill: $linkUpColor;
       }
 
     }

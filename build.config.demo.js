@@ -68,7 +68,7 @@ const settings = {
   extLinks: [
     {
       key: 'osApi',
-      href: `http://15.108.30.248:8091/api/index.html`
+      href: `http://15.108.30.248/api/index.html`
     },
     {
       key: 'osNet',

@@ -75,6 +75,22 @@ export default class BoxGraphic extends Component {
       linkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
+    // TODO: Replace with correct mapping from the data.
+    const canSplitCls = classNames(
+      'canSplit',
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+    );
+
+    const isSplitCls = classNames(
+      'isSplit',
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+    );
+
+    const splitLinkCls = classNames(
+      'splitLinkUp',
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+    );
+
     const select = this.props.select && [ this.props.select ] || [];
     const selectedCls = classNames(
       'selected',
@@ -85,8 +101,14 @@ export default class BoxGraphic extends Component {
       <div className="boxGraphic" onClick={this._onClick}>
         <div className={adminCls}>
           <div className={linkCls}>
-            <div className={selectedCls}>
-              {this.props.spec.svg}
+            <div className={canSplitCls}>
+              <div className={isSplitCls}>
+                <div className={splitLinkCls}>
+                  <div className={selectedCls}>
+                    {this.props.spec.svg}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

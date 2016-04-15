@@ -18,12 +18,12 @@
 
 
 $as5712_cssIds: (
-  ( bxGfx_mgmt, bxGfx_s_mgmt ),
-  ( bxGfx_console, bxGfx_s_console )
+  ( bxGfx_mgmt, bxGfx_s_mgmt, bxGfx_m_mgmt ),
+  ( bxGfx_console, bxGfx_s_console, bxGfx_m_console )
 );
 
 @for $i from 1 through 54 {
-  $ids: ( bxGfx_#{$i}, bxGfx_s_#{$i} );
+  $ids: ( bxGfx_#{$i}, bxGfx_s_#{$i}, bxGfx_m_#{$i} );
   $as5712_cssIds: append($as5712_cssIds, $ids);
 }
 
@@ -44,20 +44,23 @@ $as5712_cssIds: (
     stroke-width: 3px;
   }
 
-  #bxGfx_interfaces {
-    rect {
-      stroke: silver;
+  #bxGfx_interfaces rect {
+    stroke: silver;
+    stroke-width: 3px;
+    &#bxGfx_s_mgmt, &#bxGfx_s_console {
+      display: block;
+      stroke: lighten(black, 30%);
       stroke-width: 3px;
     }
-    polygon {
-      display: none;
-      pointer-events:none;
-      &#bxGfx_s_mgmt, &#bxGfx_s_console {
-        display: block;
-        stroke: lighten(black, 30%);
-        stroke-width: 3px;
-      }
-    }
+  }
+
+  #bxGfx_interfacesSlash polygon {
+    display: none;
+    pointer-events: none;
+  }
+
+  #bxGfx_interfacesMulti circle {
+    pointer-events: none;
   }
 
 }
