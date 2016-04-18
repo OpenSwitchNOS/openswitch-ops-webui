@@ -64,29 +64,41 @@
  <g display="inline">
   <title>InterfacesMulti</title>
   <g id="bxGfx_interfacesMulti">
+   <g id="bxGfx_m_49">
+    <circle cx="1571.25" cy="16.75" r="5.65685" id="bxGfx_m_49-1"/>
+    <circle cx="1611.25" cy="16.75" r="5.65685" id="bxGfx_m_49-4"/>
+    <circle cx="1584.75" cy="16.75" r="5.65685" id="bxGfx_m_49-2"/>
+    <circle cx="1598" cy="16.75" r="5.65685" id="bxGfx_m_49-3"/>
+   </g>
+   <g id="bxGfx_m_50">
+    <circle cx="1571.875" cy="112.875" r="5.65685" id="bxGfx_m_50-1"/>
+    <circle cx="1611.125" cy="112.875" r="5.65685" id="bxGfx_m_50-4"/>
+    <circle cx="1584.625" cy="112.875" r="5.65685" id="bxGfx_m_50-2"/>
+    <circle cx="1598.875" cy="112.875" r="5.65685" id="bxGfx_m_50-3"/>
+   </g>
    <g id="bxGfx_m_52">
-    <circle cx="1634.25" cy="16.75" r="5.65685" id="bxGfx_m_52_1"/>
-    <circle cx="1674.25" cy="16.75" r="5.65685" id="bxGfx_m_52_4"/>
-    <circle cx="1647.75" cy="16.75" r="5.65685" id="bxGfx_m_52_2"/>
-    <circle cx="1661" cy="16.75" r="5.65685" id="bxGfx_m_52_3"/>
+    <circle cx="1634.25" cy="16.75" r="5.65685" id="bxGfx_m_52-1"/>
+    <circle cx="1674.25" cy="16.75" r="5.65685" id="bxGfx_m_52-4"/>
+    <circle cx="1647.75" cy="16.75" r="5.65685" id="bxGfx_m_52-2"/>
+    <circle cx="1661" cy="16.75" r="5.65685" id="bxGfx_m_52-3"/>
    </g>
    <g id="bxGfx_m_53">
-    <circle cx="1634.875" cy="112.875" r="5.65685" id="bxGfx_m_53_1"/>
-    <circle cx="1675.125" cy="112.875" r="5.65685" id="bxGfx_m_53_4"/>
-    <circle cx="1648.625" cy="112.875" r="5.65685" id="bxGfx_m_53_2"/>
-    <circle cx="1661.875" cy="112.875" r="5.65685" id="bxGfx_m_53_3"/>
+    <circle cx="1634.875" cy="112.875" r="5.65685" id="bxGfx_m_53-1"/>
+    <circle cx="1675.125" cy="112.875" r="5.65685" id="bxGfx_m_53-4"/>
+    <circle cx="1648.625" cy="112.875" r="5.65685" id="bxGfx_m_53-2"/>
+    <circle cx="1661.875" cy="112.875" r="5.65685" id="bxGfx_m_53-3"/>
    </g>
    <g id="bxGfx_m_54">
-    <circle cx="1634.12501" cy="168.37501" r="5.65685" id="bxGfx_m_54_1"/>
-    <circle cx="1674.12501" cy="168.37501" r="5.65685" id="bxGfx_m_54_4"/>
-    <circle cx="1647.62501" cy="168.37501" r="5.65685" id="bxGfx_m_54_2"/>
-    <circle cx="1660.87501" cy="168.37501" r="5.65685" id="bxGfx_m_54_3"/>
+    <circle cx="1634.12501" cy="168.37501" r="5.65685" id="bxGfx_m_54-1"/>
+    <circle cx="1674.12501" cy="168.37501" r="5.65685" id="bxGfx_m_54-4"/>
+    <circle cx="1647.62501" cy="168.37501" r="5.65685" id="bxGfx_m_54-2"/>
+    <circle cx="1660.87501" cy="168.37501" r="5.65685" id="bxGfx_m_54-3"/>
    </g>
    <g id="bxGfx_m_51">
-    <circle cx="1571.375" cy="168.125" r="5.65685" id="bxGfx_m_51_1"/>
-    <circle cx="1611.375" cy="168.125" r="5.65685" id="bxGfx_m_51_4"/>
-    <circle cx="1584.875" cy="168.125" r="5.65685" id="bxGfx_m_51_2"/>
-    <circle cx="1598.125" cy="168.125" r="5.65685" id="bxGfx_m_51_3"/>
+    <circle cx="1571.375" cy="168.125" r="5.65685" id="bxGfx_m_51-1"/>
+    <circle cx="1611.375" cy="168.125" r="5.65685" id="bxGfx_m_51-4"/>
+    <circle cx="1584.875" cy="168.125" r="5.65685" id="bxGfx_m_51-2"/>
+    <circle cx="1598.125" cy="168.125" r="5.65685" id="bxGfx_m_51-3"/>
    </g>
   </g>
  </g>

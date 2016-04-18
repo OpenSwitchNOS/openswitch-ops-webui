@@ -65,19 +65,35 @@ $activeColor: $brand-color;
         fill: none;
       }
 
-      .splitLinkUp.#{$mainCssId}_1 #{$svgId} ##{$multiCssId}_1 {
+      .splitAdminDown.#{$mainCssId}-1 #{$svgId} ##{$multiCssId}-1 {
+        stroke: $adminDownColor;
+      }
+
+      .splitAdminDown.#{$mainCssId}-2 #{$svgId} ##{$multiCssId}-2 {
+        stroke: $adminDownColor;
+      }
+
+      .splitAdminDown.#{$mainCssId}-3 #{$svgId} ##{$multiCssId}-3 {
+        stroke: $adminDownColor;
+      }
+
+      .splitAdminDown.#{$mainCssId}-4 #{$svgId} ##{$multiCssId}-4 {
+        stroke: $adminDownColor;
+      }
+
+      .splitLinkUp.#{$mainCssId}-1 #{$svgId} ##{$multiCssId}-1 {
         fill: $linkUpColor;
       }
 
-      .splitLinkUp.#{$mainCssId}_2 #{$svgId} ##{$multiCssId}_2 {
+      .splitLinkUp.#{$mainCssId}-2 #{$svgId} ##{$multiCssId}-2 {
         fill: $linkUpColor;
       }
 
-      .splitLinkUp.#{$mainCssId}_3 #{$svgId} ##{$multiCssId}_3 {
+      .splitLinkUp.#{$mainCssId}-3 #{$svgId} ##{$multiCssId}-3 {
         fill: $linkUpColor;
       }
 
-      .splitLinkUp.#{$mainCssId}_4 #{$svgId} ##{$multiCssId}_4 {
+      .splitLinkUp.#{$mainCssId}-4 #{$svgId} ##{$multiCssId}-4 {
         fill: $linkUpColor;
       }
 
