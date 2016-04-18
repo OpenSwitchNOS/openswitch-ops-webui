@@ -91,6 +91,11 @@ export default class BoxGraphic extends Component {
       [].map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
+    const splitAdminCls = classNames(
+      'splitAdminDown',
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+    );
+
     const select = this.props.select && [ this.props.select ] || [];
     const selectedCls = classNames(
       'selected',
@@ -104,8 +109,10 @@ export default class BoxGraphic extends Component {
             <div className={canSplitCls}>
               <div className={isSplitCls}>
                 <div className={splitLinkCls}>
-                  <div className={selectedCls}>
-                    {this.props.spec.svg}
+                  <div className={splitAdminCls}>
+                    <div className={selectedCls}>
+                      {this.props.spec.svg}
+                    </div>
                   </div>
                 </div>
               </div>
