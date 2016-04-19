@@ -22,6 +22,13 @@ import Anchor from 'grommet/components/Anchor';
 
 const MENU_TEXT = 'Device graphic legend...';
 
+const SPLIT_DOT = {display: 'inline-block', width: '12px', height: '12px', borderRadius: '6px', border: '2px solid grey', backgroundColor: 'grey'};
+
+const SPLIT_SUPPORTED = { ...SPLIT_DOT };
+const SPLIT = { ...SPLIT_DOT, borderColor: '#0A0'};
+const SPLIT_LINK = { ...SPLIT_DOT, backgroundColor: '#0F0', borderColor: '#0A0'};
+const SPLIT_ADMIN_DOWN = { ...SPLIT_DOT, borderColor: '#F00'};
+
 const COMPONENT = (
   <Box pad={{horizontal: 'small'}}>
     <b>Device graphic legend</b>
@@ -39,8 +46,8 @@ const COMPONENT = (
               /
             </div>
           </td>
-          <td><i>forward slash</i></td>
-          <td><b>Admin State</b> is <b>Down</b></td>
+          <td><i>red slash</i></td>
+          <td>Admin State is <b>Down</b></td>
         </tr>
         <tr>
           <td>
@@ -48,8 +55,80 @@ const COMPONENT = (
                 style={{width: '20px', height: '20px', backgroundColor: '#0F0'}}>
             </div>
           </td>
-          <td><i>filled rectangle</i></td>
-          <td><b>Link State</b> is <b>Up</b></td>
+          <td><i>green box</i></td>
+          <td>Link State is <b>Up</b></td>
+        </tr>
+        <tr>
+          <td>
+            <div
+                style={SPLIT_SUPPORTED}>
+            </div>
+            <div
+                style={SPLIT_SUPPORTED}>
+            </div>
+            <div
+                style={SPLIT_SUPPORTED}>
+            </div>
+            <div
+                style={SPLIT_SUPPORTED}>
+            </div>
+          </td>
+          <td><i>grey</i></td>
+          <td>Split Interfaces are <b>Supported</b></td>
+        </tr>
+        <tr>
+          <td>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+          </td>
+          <td><i>green outline</i></td>
+          <td>Split Interfaces are <b>Enabled</b></td>
+        </tr>
+        <tr>
+          <td>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT_LINK}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+          </td>
+          <td><i>green</i></td>
+          <td>Split Interface Link State is <b>Up</b></td>
+        </tr>
+        <tr>
+          <td>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT_ADMIN_DOWN}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+            <div
+                style={SPLIT}>
+            </div>
+          </td>
+          <td><i>red outline</i></td>
+          <td>Split Interface Admin State is <b>Down</b></td>
         </tr>
       </tbody>
     </table>
