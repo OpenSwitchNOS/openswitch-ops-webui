@@ -78,22 +78,22 @@ export default class BoxGraphic extends Component {
     // TODO: Replace with correct mapping from the data.
     const canSplitCls = classNames(
       'canSplit',
-      [25, 26, 27].map(i => this.props.spec.toSvgInterfaceName(i)),
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const isSplitCls = classNames(
       'isSplit',
-      [25, 26].map(i => this.props.spec.toSvgInterfaceName(i)),
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const splitLinkCls = classNames(
       'splitLinkUp',
-      ['25-2'].map(i => this.props.spec.toSvgInterfaceName(i)),
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const splitAdminCls = classNames(
       'splitAdminDown',
-      ['25-1', '26-4'].map(i => this.props.spec.toSvgInterfaceName(i)),
+      [].map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const select = this.props.select && [ this.props.select ] || [];
