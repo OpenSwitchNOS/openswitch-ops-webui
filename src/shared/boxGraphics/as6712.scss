@@ -17,28 +17,22 @@
 @import "_boxGraphic.scss";
 
 
-$as5712_cssIds: ();
+$as6712_cssIds: ();
 
-@for $i from 1 through 54 {
+@for $i from 1 through 32 {
   $ids: ( bxGfx_#{$i}, bxGfx_s_#{$i}, bxGfx_m_#{$i} );
-  $as5712_cssIds: append($as5712_cssIds, $ids);
+  $as6712_cssIds: append($as6712_cssIds, $ids);
 }
 
-@include bxGfx(#as5712, $as5712_cssIds);
+@include bxGfx(#as6712, $as6712_cssIds);
 
-#as5712 {
+#as6712 {
 
   background-color: lighten(black, 20%);
   min-width: 400px;
 
   #bxGfx_labels {
     fill: white;
-  }
-
-  #bxGfx_middleSeparators {
-    fill: silver;
-    stroke: silver;
-    stroke-width: 3px;
   }
 
   #bxGfx_interfaces rect {

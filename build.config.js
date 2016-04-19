@@ -46,7 +46,9 @@ const guides = [
 ];
 
 import * as i18nLocale from 'i18n/en-US.js';
+
 import As5712 from 'boxGraphics/as5712.jsx';
+import As6712 from 'boxGraphics/as6712.jsx';
 
 const settings = {
   reduxLogger: true,
@@ -58,7 +60,7 @@ const settings = {
 
   i18nLocale,
 
-  boxGraphic: As5712,
+  boxGraphics: [ As5712, As6712 ],
 
   agent: {
     prefix: '',

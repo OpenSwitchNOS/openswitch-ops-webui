@@ -37,6 +37,7 @@ const IC = new InterfaceCache();
 
 const parser = (result) => {
   const product = result[0].body.status.other_info['Product Name'];
+  const platform = result[0].body.status.other_info.platform_name;
   const hostname = result[1].body.configuration.hostname;
 
   const now = Date.now();
@@ -97,6 +98,7 @@ const parser = (result) => {
 
   return {
     product,
+    platform,
     hostname,
     interfaces,
     interfaceMetrics,

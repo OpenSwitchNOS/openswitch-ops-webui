@@ -55,8 +55,8 @@
    <rect height="43" width="59" y="80" x="1562" id="bxGfx_50"/>
    <rect height="43" width="59" y="7" x="1625" id="bxGfx_52"/>
    <rect height="43" width="59" y="80" x="1625" id="bxGfx_53"/>
-   <rect height="43" width="59" y="7" x="1692" id="bxGfx_mgmt"/>
-   <rect height="43" width="59" y="80" x="1692" id="bxGfx_console"/>
+   <rect height="43" width="59" y="7" x="1692"/>
+   <rect height="43" width="59" y="80" x="1692"/>
    <rect height="43" width="59" y="158" x="1562" id="bxGfx_51"/>
    <rect height="43" width="59" y="158" x="1625" id="bxGfx_54"/>
   </g>
