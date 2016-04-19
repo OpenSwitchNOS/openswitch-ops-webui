@@ -42,7 +42,7 @@ const COMPONENT = (
           <td>
             <div
                 className="rotate45"
-                style={{paddingTop: '4px', paddingLeft: '8px', color: '#A00', fontSize: '30px'}}>
+                style={{paddingTop: '4px', paddingLeft: '16px', color: '#A00', fontSize: '30px'}}>
               /
             </div>
           </td>
@@ -52,7 +52,7 @@ const COMPONENT = (
         <tr>
           <td>
             <div
-                style={{width: '20px', height: '20px', backgroundColor: '#0F0'}}>
+                style={{width: '20px', height: '20px', marginLeft: '12px', backgroundColor: '#0F0'}}>
             </div>
           </td>
           <td><i>green box</i></td>
