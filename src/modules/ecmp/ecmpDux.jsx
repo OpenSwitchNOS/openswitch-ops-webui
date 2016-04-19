@@ -66,6 +66,26 @@ const ACTIONS = {
     };
   },
 
+  editEcmp(ecmpDataObj) {
+    const ecmpEnabled = (ecmpDataObj.enabled === 'enabled').toString();
+    const resilientHash = (ecmpDataObj.resilientHash === 'enabled').toString();
+    const hashDstPort = (ecmpDataObj.hashDstPort === 'enabled').toString();
+    const hashDstIp = (ecmpDataObj.hashDstIp === 'enabled').toString();
+    const hashSrcIp = (ecmpDataObj.hashSrcIp === 'enabled').toString();
+    const hashSrcPort = (ecmpDataObj.hashSrcPort === 'enabled').toString();
+
+    return dispatch => {
+      dispatch(AD.action('REQUEST'));
+      Agent.patch('/rest/v1/system').send([
+        {'op': 'add', 'path': '/ecmp_config', 'value': {enabled: ecmpEnabled, 'resilient_hash_enabled': resilientHash, 'hash_dstip_enabled': hashDstIp, 'hash_dstport_enabled': hashDstPort, 'hash_srcip_enabled': hashSrcIp, 'hash_srcport_enabled': hashSrcPort}}]).end((error) => {
+          if (error) { return dispatch(AD.action('FAILURE', { error })); }
+          return dispatch(AD.action('SUCCESS', {
+            parser: () => { return { 'SUCCESS': true }; }
+          }));
+        });
+    };
+  },
+
   clearError() {
     return AD.action('CLEAR_ERROR');
   },
