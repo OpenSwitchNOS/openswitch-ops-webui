@@ -33,13 +33,14 @@ class InterfacePage extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     children: PropTypes.node,
+    collector: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     interface: PropTypes.object.isRequired,
     params: PropTypes.shape({
       id: PropTypes.string
     }),
     settings: PropTypes.shape({
-      boxGraphic: PropTypes.object.isRequired,
+      boxGraphics: PropTypes.array.isRequired,
     }).isRequired,
   };
 
@@ -122,6 +123,24 @@ class InterfacePage extends Component {
     this.setState({ showDetailsOnSelect: evt.target.checked });
   };
 
+  _mkBoxGraphic = () => {
+    let boxGraphic = null;
+    const bgs = this.props.settings.boxGraphics;
+    for (let i=0; i<bgs.length; i++) {
+      if (bgs[i].supportsPlatform(this.props.collector.platform)) {
+        boxGraphic = (
+          <BoxGraphic
+              spec={bgs[i]}
+              interfaces={this.props.interface.interfaces}
+              select={this.props.params.id}
+              onSelectChange={this._onSelect}
+          />
+        );
+      }
+    }
+    return boxGraphic;
+  };
+
   render() {
     const selInfId = this.props.params.id;
     const showOnSel = this.state.showDetailsOnSelect;
@@ -152,12 +171,7 @@ class InterfacePage extends Component {
         {editLayer}
         <Box className="flex1">
           <Box className="mTop mLeft">
-            <BoxGraphic
-                spec={this.props.settings.boxGraphic}
-                interfaces={infs}
-                select={selInfId}
-                onSelectChange={this._onSelect}
-            />
+            {this._mkBoxGraphic()}
           </Box>
           <Box className="flex1 mTopHalf mLeft">
             <ResponsiveBox>
@@ -192,6 +206,7 @@ class InterfacePage extends Component {
 function select(store) {
   return {
     interface: store.interface,
+    collector: store.collector,
     settings: store.settings,
   };
 }

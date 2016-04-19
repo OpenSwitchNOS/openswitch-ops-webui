@@ -20,6 +20,8 @@ import React from 'react';
 
 const SVG_INTERFACE_NAME_PREFIX = 'bxGfx_';
 
+const supportsPlatform = desc => desc && 0 < desc.indexOf('_as5712_');
+
 const toSvgInterfaceName = (id) => {
   return `${SVG_INTERFACE_NAME_PREFIX}${id}`;
 };
@@ -94,8 +96,8 @@ const SVG = (
    <rect id="bxGfx_50" x="1562" y="80" width="59" height="43"/>
    <rect id="bxGfx_52" x="1625" y="7" width="59" height="43"/>
    <rect id="bxGfx_53" x="1625" y="80" width="59" height="43"/>
-   <rect id="bxGfx_mgmt" x="1692" y="7" width="59" height="43"/>
-   <rect id="bxGfx_console" x="1692" y="80" width="59" height="43"/>
+   <rect x="1692" y="7" width="59" height="43"/>
+   <rect x="1692" y="80" width="59" height="43"/>
    <rect id="bxGfx_51" x="1562" y="158" width="59" height="43"/>
    <rect id="bxGfx_54" x="1625" y="158" width="59" height="43"/>
   </g>
@@ -593,4 +595,5 @@ export default {
   onClick,
   toSvgInterfaceName,
   toExternalInterfaceId,
+  supportsPlatform,
 };
