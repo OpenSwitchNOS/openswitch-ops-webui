@@ -288,6 +288,9 @@ body .drop {
   z-index: 110;
 }
 
+.confirm.layer {
+  z-index: 150;
+}
 .asyncStatus.layer {
   z-index: 200;
   &.clear {

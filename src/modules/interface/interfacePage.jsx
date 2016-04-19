@@ -89,6 +89,12 @@ class InterfacePage extends Component {
         width: 120,
         format: Formatter.bpsToString,
       },
+      {
+        columnKey: 'canSplit',
+        header: t('canSplit'),
+        width: 120,
+        format: t,
+      },
     ];
     this.state = {
       showDetailsOnSelect: true,

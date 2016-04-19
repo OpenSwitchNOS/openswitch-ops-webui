@@ -28,4 +28,17 @@ export const AUTO_NEG_DEF = 'on';
 export const FLOW_CTRL = 'pause';
 export const FLOW_CTRL_DEF = 'none';
 
+export const LANE_SPLIT = 'lane_split';
+export const LANE_SPLIT_DEFAULT = '';
+
 export const PORT_ADMIN = 'admin';
+
+export function copyWithoutDefs(uc) {
+  const ucCopy = { ...uc };
+  if (uc[ADMIN] === ADMIN_DEF) { delete ucCopy[ADMIN]; }
+  if (uc[DUPLEX] === DUPLEX_DEF) { delete ucCopy[DUPLEX]; }
+  if (uc[AUTO_NEG] === AUTO_NEG_DEF) { delete ucCopy[AUTO_NEG]; }
+  if (uc[FLOW_CTRL] === FLOW_CTRL_DEF) { delete ucCopy[FLOW_CTRL]; }
+  if (uc[LANE_SPLIT] === LANE_SPLIT_DEFAULT) { delete ucCopy[LANE_SPLIT]; }
+  return ucCopy;
+}

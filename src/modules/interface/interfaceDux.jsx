@@ -88,6 +88,11 @@ function parseLag(inf) {
   return {};
 }
 
+function formatUrl(arr) {
+  const result = arr.map(i => i.split('/').pop());
+  return result;
+}
+
 function parseInterface(inf) {
   const cfg = inf.configuration;
   const status = inf.status;
@@ -97,6 +102,7 @@ function parseInterface(inf) {
   const cfgDuplex = (uc && uc[C.DUPLEX]) || C.DUPLEX_DEF;
   const cfgAutoNeg = (uc && uc[C.AUTO_NEG]) || C.AUTO_NEG_DEF;
   const cfgFlowCtrl = (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF;
+  const cfgLaneSplit = (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT;
 
   const adminState = status.admin_state;
   const linkState = status.link_state;
@@ -106,7 +112,7 @@ function parseInterface(inf) {
   const duplex = linkState !== 'up' ? null : status.duplex;
 
   const pm = status.pm_info;
-  const connector = (pm && pm.connector) || 'absent';
+  let connector = (pm && pm.connector) || 'absent';
 
   const hw = status.hw_intf_info;
   const mac = (hw && hw.mac_addr) ? hw.mac_addr.toUpperCase() : '';
@@ -116,12 +122,25 @@ function parseInterface(inf) {
 
   const lacpStatus = parseLag(inf);
 
+  const canSplit = (hw && hw.split_4) ? hw.split_4 : '';
+
+  let splitParent = '';
+  let splitChildren = [];
+  if (cfg.split_children) {
+    splitChildren = formatUrl(cfg.split_children);
+  }
+  if (cfg.split_parent) {
+    splitParent = formatUrl(cfg.split_parent);
+    connector = '';
+  }
+
   return {
     id: cfg.name,
     cfgAdmin,
     cfgDuplex,
     cfgAutoNeg,
     cfgFlowCtrl,
+    cfgLaneSplit, //is split if cfglaneSplit is split
     connector,
     adminState, // needed by the boxGraphic
     adminStateConnector,
@@ -129,21 +148,41 @@ function parseInterface(inf) {
     speed,
     duplex,
     linkState,
-    lacpStatus
+    lacpStatus,
+    canSplit,
+    splitParent,
+    splitChildren,
+
   };
 }
 
 const pageParser = (result) => {
+  const allInterfaces = {};
   const interfaces = {};
   result.body.forEach((elm) => {
     const cfg = elm.configuration;
     if (cfg.type === 'system') {
       const inf = parseInterface(elm);
-      interfaces[inf.id] = inf;
+      allInterfaces[inf.id] = inf;
     }
   });
+
+  Object.keys(allInterfaces).forEach(infId => {
+    if (!allInterfaces[infId].splitParent) {
+      if (allInterfaces[infId].cfgLaneSplit === 'split' &&
+            allInterfaces[infId].splitChildren) {
+        allInterfaces[infId].splitChildren.forEach(childId => {
+          const splitChildrenId = childId.split('/').pop();
+          interfaces[splitChildrenId] = allInterfaces[splitChildrenId];
+        });
+      }
+      interfaces[infId] = allInterfaces[infId];
+    }
+  });
+
   return { interfaces };
 };
+
 
 const detailParser = (result) => {
   // parse the interface
@@ -186,6 +225,7 @@ const editParser = (result) => {
     [C.DUPLEX]: (uc && uc[C.DUPLEX]) || C.DUPLEX_DEF,
     [C.AUTO_NEG]: (uc && uc[C.AUTO_NEG]) || C.AUTO_NEG_DEF,
     [C.FLOW_CTRL]: (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF,
+    [C.LANE_SPLIT]: (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEFAULT,
   };
   const id = cfg.name;
   const etag = result[0].headers.etag;
@@ -205,8 +245,98 @@ const SEL_CFG = 'selector=configuration';
 const URL_INFS = '/rest/v1/system/interfaces';
 const URL_INFS_D1 = `${URL_INFS}?depth=1`;
 const URL_PORTS = '/rest/v1/system/ports';
-//const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
 const URL_VRF = '/rest/v1/system/vrfs/vrf_default';
+
+function infPatch(send, mStore, resultCb) {
+  const id = mStore.edit.id;
+  const etag = mStore.edit.interface.etag;
+  const URL_INF = `${URL_INFS}/${id}`;
+  const URL_INF_SEL_CFG = `${URL_INF}?${SEL_CFG}`;
+  Agent.patch(URL_INF_SEL_CFG)
+    .send(send)
+    .set('If-Match', etag)
+    .end(resultCb);
+}
+
+function patchPortAdminUp(url, send, etag, resultCb) {
+  Agent.patch(url)
+    .send(send)
+    .set('If-Match', etag)
+    .end(resultCb);
+}
+
+function createPort(id, URL_INF, resultCb) {
+  const infUrl = URL_INF;
+  Agent.post(URL_PORTS)
+    .send({
+      configuration: {
+        admin: 'up',
+        name: id,
+        interfaces: [infUrl],
+      },
+      'referenced_by': [{uri: URL_VRF}],
+    })
+    .set('If-None-Match', '*')
+    .end(resultCb);
+}
+
+function fetchInfAndPort(URL_INF, URL_PORT, resultCb) {
+  Async.parallel([
+    cb => Agent.get(URL_INFS_D1).end(cb),
+    cb => Agent.get(URL_INF).end(cb),
+    cb => Agent.get(URL_PORT).end(cb),
+  ], resultCb);
+}
+
+function fetchInf(URL_INF, resultCb) {
+  Async.parallel([
+    cb => Agent.get(URL_INFS_D1).end(cb),
+    cb => Agent.get(URL_INF).end(cb),
+  ], resultCb);
+}
+
+
+function createorPatchPort(admin, mStore, resultCb) {
+  const id = mStore.edit.id;
+  const etag = mStore.edit.port.etag;
+  const URL_PORT = `${URL_PORTS}/${id}`;
+  const URL_PORT_SEL_CFG = `${URL_PORT}?${SEL_CFG}`;
+  const URL_INF = `${URL_INFS}/${id}`;
+  const send = [{op: 'add', path: '/admin', value: admin}];
+  if (mStore.edit.port.etag) {
+    patchPortAdminUp(URL_PORT_SEL_CFG, send, etag, resultCb);
+  } else {
+    createPort(id, URL_INF, resultCb);
+  }
+}
+
+function deletePortsForInfs(infs, resultCb) {
+  Async.waterfall([
+    cb1 => Agent.get(URL_PORTS).end(cb1),
+    (res1, cb2) => {
+      const reqs = [];
+      infs.forEach(infId => {
+        const url = `${URL_PORTS}/${infId}`;
+        if (res1.body.indexOf(url) >= 0) {
+          reqs.push(cb => Agent.delete(url).end(cb));
+        }
+      });
+      Async.series(reqs, cb2);
+    }
+  ], resultCb);
+}
+
+function deleteParentPort(mStore, resultCb) {
+  const id = mStore.edit.id;
+  const URL_PORT = `${URL_PORTS}/${id}`;
+  if (mStore.edit.port.etag) {
+    Agent.delete(URL_PORT).end(resultCb);
+  } else {
+    resultCb(null, {});
+  }
+}
+
+
 const ACTIONS = {
 
   fetchPage() {
@@ -273,68 +403,84 @@ const ACTIONS = {
   },
 
   edit(state) {
-    const uc = { ...state[C.USER_CFG] };
-    const admin = uc[C.ADMIN]; // the port admin needs this as well
-    if (admin === C.ADMIN_DEF) { delete uc[C.ADMIN]; }
-    if (uc[C.DUPLEX] === C.DUPLEX_DEF) { delete uc[C.DUPLEX]; }
-    if (uc[C.AUTO_NEG] === C.AUTO_NEG_DEF) { delete uc[C.AUTO_NEG]; }
-    if (uc[C.FLOW_CTRL] === C.FLOW_CTRL_DEF) { delete uc[C.FLOW_CTRL]; }
-
-    const send = Object.keys(uc).length === 0
-      ? [{op: 'remove', path: '/user_config'}]
-      : [{op: 'add', path: '/user_config', value: uc}];
-
+    const uc = C.copyWithoutDefs(state[C.USER_CFG]);
+    const admin = uc[C.ADMIN] || 'down'; // the port admin needs this as well
+    const laneSplit = uc[C.LANE_SPLIT] || '';
     return (dispatch, getStoreFn) => {
       dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
-
       const mStore = getStoreFn()[NAME];
       const id = mStore.edit.id;
       const URL_INF = `${URL_INFS}/${id}`;
-      const URL_INF_SEL_CFG = `${URL_INF}?${SEL_CFG}`;
       const URL_PORT = `${URL_PORTS}/${id}`;
-      const URL_PORT_SEL_CFG = `${URL_PORT}?${SEL_CFG}`;
+      // if split don't use admin, autoNeg, duplex and flowCtrl from state,
+      // Use mStore data for above four fields.
 
+      const send = Object.keys(uc).length === 0
+          ? [{op: 'remove', path: '/user_config'}]
+          : [{op: 'add', path: '/user_config', value: uc}];
       Async.waterfall([
-        // Step: interface patch add or remove based on defaults
+        // Step: if no port post, else patch
         cb1 => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
-          Agent.patch(URL_INF_SEL_CFG)
-            .send(send)
-            .set('If-Match', mStore.edit.interface.etag)
-            .end(cb1);
+          if (laneSplit === '') {
+            createorPatchPort(admin, mStore, cb1);
+          } else if (laneSplit === 'split') {
+            deleteParentPort(mStore, cb1);
+          }
         },
-        // Step: if no port post, else patch
+        // Step: interface patch add or remove based on defaults
         (r1, cb2) => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
-          if (mStore.edit.port.etag) {
-            Agent.patch(URL_PORT_SEL_CFG)
-              .send([{op: 'add', path: '/admin', value: admin}])
-              .set('If-Match', mStore.edit.port.etag)
-              .end(cb2);
-          } else {
-            Agent.post(URL_PORTS)
-              .send({
-                configuration: {
-                  admin: 'up',
-                  name: id,
-                  tag: 1,
-                  'vlan_mode': 'access',
-                  interfaces: [URL_INF],
-                },
-                'referenced_by': [{uri: URL_VRF}],
-              })
-              .set('If-None-Match', '*')
-              .end(cb2);
-          }
+          infPatch(send, mStore, cb2);
         },
         // Step: refresh the page and details
         (r2, cb3) => {
           dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
-          Async.parallel([
-            cb => Agent.get(URL_INFS_D1).end(cb),
-            cb => Agent.get(URL_INF).end(cb),
-            cb => Agent.get(URL_PORT).end(cb),
-          ], cb3);
+          // if split don't fetch the ports/X
+          if (laneSplit === 'split') {
+            fetchInf(URL_INF, cb3);
+          } else {
+            fetchInfAndPort(URL_INF, URL_PORT, cb3);
+          }
+        }
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        const parser = (r) => {
+          return {
+            ...pageParser(r[0]),
+            ...detailParser([r[1], r[2]]),
+            edit: { ...INITIAL_STORE.edit },
+          };
+        };
+        return dispatch(AD.action('SUCCESS', { result, parser }));
+      });
+    };
+  },
+
+  unsplit() {
+    return (dispatch, getStoreFn) => {
+      const mStore = getStoreFn()[NAME];
+      const id = mStore.edit.id;
+      const URL_INF = `${URL_INFS}/${id}`;
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 3 }));
+      Async.waterfall([
+        cb1 => {
+          //delete all the ports of children
+          //TODO: Just make sure all children exist before deleting
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          deletePortsForInfs(mStore.interface.splitChildren, cb1);
+        },
+        (r1, cb2) => {
+          // Remove lane_split from parent interface
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          const send = [{op: 'remove', path: '/user_config'}];
+          infPatch(send, mStore, cb2);
+        },
+
+        (r2, cb3) => {
+          //get ports, interfaces
+          dispatch(AD.action('REQUEST_STEP', { currStep: 3 }));
+          fetchInf(URL_INF, cb3);
         }
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }

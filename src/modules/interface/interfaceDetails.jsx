@@ -70,6 +70,11 @@ class InterfaceDetails extends Component {
     const inf = this.props.interface.interface;
     const port = this.props.interface.port;
     const tcs = Formatter.toCommaString;
+    const parent = inf.splitParent;
+    let splitChildren = '';
+    if (inf.splitChildren) {
+      splitChildren = inf.splitChildren.sort().join(', ');
+    }
 
     const sysDesc = inf.lldp.sysDesc;
     const lldpOpsLink = sysDesc && sysDesc.indexOf(LLDP_SYS_DESC_SEARCH) >= 0 ?
@@ -103,6 +108,8 @@ class InterfaceDetails extends Component {
                 {pr('flowControl', t(inf.cfgFlowCtrl))}
                 {pr('ipV4', port.ipV4)}
                 {pr('ipV6', port.ipV6)}
+                {pr('splitParent', parent)}
+                {pr('splitChildren', splitChildren)}
               </tbody>
             </table>
           </Tab>
