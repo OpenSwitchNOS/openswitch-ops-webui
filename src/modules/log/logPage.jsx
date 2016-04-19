@@ -94,8 +94,8 @@ class LogPage extends Component {
 
   _onMsgCell = (cellData, cellProps) => {
     return (
-      <CustomCell title={t(cellData)} {...cellProps}>
-        {t(cellData)}
+      <CustomCell title={cellData} {...cellProps}>
+        {cellData}
       </CustomCell>
     );
   };
