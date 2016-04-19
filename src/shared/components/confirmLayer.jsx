@@ -48,7 +48,12 @@ export default class ConfirmLayer extends Component {
 
   render() {
     return (
-      <Layer onClose={this.props.onClose} closer flush align="top">
+      <Layer
+          onClose={this.props.onClose}
+          closer
+          flush
+          className="confirm"
+          align="top">
         <Box pad="large">
           <Header>
             <Title>

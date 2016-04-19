@@ -37,10 +37,10 @@ class LagEdit extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    constants: PropTypes.object.isRequired,
     lag: PropTypes.object.isRequired,
     lagId: PropTypes.string.isRequired,
     onClose: PropTypes.func.isRequired,
+    settings: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -121,7 +121,7 @@ class LagEdit extends Component {
                   subSet={this.state.lagInfs}
                   subSetCols={this.cols}
                   onChange={this._onChangeLag}
-                  maxSubSetSize={this.props.constants.LAG_MAX_INTERFACES}
+                  maxSubSetSize={this.props.settings.LAG_MAX_INTERFACES}
               />
             </Tab>
             <Tab title={t('attributes')}>
@@ -222,7 +222,7 @@ class LagEdit extends Component {
 }
 
 const select = (store) => ({
-  constants: store.constants,
+  settings: store.settings,
   lag: store.lag
 });
 
