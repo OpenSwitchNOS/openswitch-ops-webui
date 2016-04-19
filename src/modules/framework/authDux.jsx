@@ -57,7 +57,6 @@ const ACTIONS = {
   changePassword(changePw) {
     const OLDPW = changePw.oldPw;
     const NEWPW = changePw.newPw;
-    console.log('changePassword called()...oldPw = ${OLDPW} newPW = ${NEWPW}');
     return dispatch => {
       dispatch(AD.action('REQUEST'));
       Agent.put('/account').send({configuration: {password: OLDPW, 'new_password': NEWPW}}).end((error) => {

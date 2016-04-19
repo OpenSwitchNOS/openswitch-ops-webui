@@ -18,6 +18,7 @@ import { t } from 'i18n/lookup.js';
 import AsyncDux, { cooledDown } from 'asyncDux.js';
 import Agent from 'agent.js';
 import EcmpPage from './ecmpPage.jsx';
+import * as C from './ecmpConst.js';
 
 const NAME = 'ecmp';
 
@@ -40,12 +41,12 @@ const parser = (result) => {
   }
 
   return {
-    enabled: norm('enabled'),
-    hashDstIp: norm('hash_dstip_enabled'),
-    hashDstPort: norm('hash_dstport_enabled'),
-    hashSrcIp: norm('hash_srcip_enabled'),
-    hashSrcPort: norm('hash_srcport_enabled'),
-    resilientHash: norm('resilient_hash_enabled'),
+    enabled: norm(C.ECMP_ENABLED),
+    hashDstIp: norm(C.DST_IP_ENABLED),
+    hashDstPort: norm(C.DST_PORT_ENABLED),
+    hashSrcIp: norm(C.SRC_IP_ENABLED),
+    hashSrcPort: norm(C.SRC_PORT_ENABLED),
+    resilientHash: norm(C.RESILIENT_HAS_ENABLED),
   };
 };
 
@@ -63,6 +64,34 @@ const ACTIONS = {
           return dispatch(AD.action('SUCCESS', { result, parser }));
         });
       }
+    };
+  },
+
+  editEcmp(ecmpDataObj) {
+    const ecmpEnabled = (ecmpDataObj.enabled === 'enabled').toString();
+    const resilientHash = (ecmpDataObj.resilientHash === 'enabled').toString();
+    const hashDstPort = (ecmpDataObj.hashDstPort === 'enabled').toString();
+    const hashDstIp = (ecmpDataObj.hashDstIp === 'enabled').toString();
+    const hashSrcIp = (ecmpDataObj.hashSrcIp === 'enabled').toString();
+    const hashSrcPort = (ecmpDataObj.hashSrcPort === 'enabled').toString();
+
+    return dispatch => {
+      dispatch(AD.action('REQUEST'));
+      Agent.patch(URL_SYS).send([{
+        'op': 'add',
+        'path': '/ecmp_config',
+        'value': {
+          [C.ECMP_ENABLED]: ecmpEnabled,
+          [C.RESILIENT_HAS_ENABLED]: resilientHash,
+          [C.DST_IP_ENABLED]: hashDstIp,
+          [C.DST_PORT_ENABLED]: hashDstPort,
+          [C.SRC_IP_ENABLED]: hashSrcIp,
+          [C.SRC_PORT_ENABLED]: hashSrcPort}}]).end((error) => {
+            if (error) { return dispatch(AD.action('FAILURE', { error })); }
+            return dispatch(AD.action('SUCCESS', {
+              parser: () => { return { 'SUCCESS': true }; }
+            }));
+          });
     };
   },
 

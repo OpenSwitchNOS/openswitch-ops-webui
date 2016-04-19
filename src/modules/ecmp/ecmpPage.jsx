@@ -14,13 +14,14 @@
     under the License.
 */
 
-
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'i18n/lookup.js';
 import Box from 'grommet/components/Box';
 import { mkStatusLayer } from 'asyncStatusLayer.jsx';
-
+import EditIcon from 'grommet/components/icons/base/Configuration';
+import Anchor from 'grommet/components/Anchor';
+import EcmpEdit from './ecmpEdit.jsx';
 
 class EcmpPage extends Component {
 
@@ -45,7 +46,6 @@ class EcmpPage extends Component {
     p.actions.toolbar.setFetchTB(p.ecmp.asyncStatus, this._onRefresh);
   }
 
-
   componentWillReceiveProps(nextProps) {
     const p = nextProps;
     p.actions.toolbar.setFetchTB(p.ecmp.asyncStatus, this._onRefresh);
@@ -55,6 +55,20 @@ class EcmpPage extends Component {
     this.props.actions.toolbar.clear();
   }
 
+  _onCloseEcmpEdit = () => {
+    this.setState({editEcmpShow: false});
+  };
+
+  _onEdit = () => {
+    this.setState({editEcmpShow: true});
+  };
+
+  _onSubmitEcmpEdit= (ecmpDataObj) => {
+    this.props.actions.ecmp.editEcmp(ecmpDataObj);
+    this._onCloseEcmpEdit();
+    this._onRefresh();
+  };
+
   render() {
     const data = this.props.ecmp;
 
@@ -62,9 +76,18 @@ class EcmpPage extends Component {
           this.props.ecmp.asyncStatus,
           this.props.actions.ecmp.clearError);
 
+    const ecmpEdit = this.state.editEcmpShow ?
+      <EcmpEdit
+          onClose={this._onCloseEcmpEdit}
+          onSubmit={this._onSubmitEcmpEdit}
+      /> : null;
+
     return (
       <Box className="flex1">
         {statusLayer}
+        <Anchor onClick={this._onEdit}>
+          <EditIcon />
+        </Anchor>
         <Box pad={this.pad} className="flex1 pageBox min200x400">
           <span><b>{t('ecmp')}: </b>{t(data.enabled)}</span>
           <br/>
@@ -96,6 +119,7 @@ class EcmpPage extends Component {
               </tr>
             </tbody>
           </table>
+          {ecmpEdit}
         </Box>
       </Box>
     );
