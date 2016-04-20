@@ -64,22 +64,22 @@ export default class BoxGraphic extends Component {
       const inf = this.props.interfaces[k];
       if (inf.canSplit) {
         canSplit.push(k);
-        if (inf.cfgLaneSplit === 'split') {
-          isSplit.push(k);
-          inf.adminState = 'up';
-          inf.splitChildren.forEach(i => {
-            const childInf = this.props.interfaces[i];
-            if (childInf.adminState === 'down') {
-              splitAdminDownIds.push(i);
-            } else if (childInf.linkState === 'up') {
-              splitLinkUpIds.push(i);
-            }
-          });
-        } else if (inf.adminState === 'down') {
-          adminDownIds.push(k);
-        } else if (inf.linkState === 'up') {
-          linkUpIds.push(k);
-        }
+      }
+      if (inf.cfgLaneSplit === 'split') {
+        isSplit.push(k);
+        inf.adminState = 'up';
+        inf.splitChildren.forEach(i => {
+          const childInf = this.props.interfaces[i];
+          if (childInf.adminState === 'down') {
+            splitAdminDownIds.push(i);
+          } else if (childInf.linkState === 'up') {
+            splitLinkUpIds.push(i);
+          }
+        });
+      } else if (inf.adminState === 'down') {
+        adminDownIds.push(k);
+      } else if (inf.linkState === 'up') {
+        linkUpIds.push(k);
       }
     });
 
