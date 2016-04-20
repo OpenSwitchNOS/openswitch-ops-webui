@@ -6,19 +6,22 @@ High level design of OPS-WEBUI
 The GUI design is based on the following technologies:
 * [ReactJS](https://github.com/facebook/react)
  * Controller-view framework
-* [RefluxJS](https://github.com/reflux/refluxjs)
+* [Redux](https://github.com/reactjs/redux)
+ * State container for JavaScript applications
  * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation with a unidirectional data flow pattern
 * [React-Router](https://github.com/rackt/react-router)
  * URL routing (i.e View) framework
  * Browser history support
+* [Superagent](https://visionmedia.github.io/superagent/)
+ * ajax API library
 
 ```ditaa
-+---------+     +--------+     +-----------------+
-| Actions +---->+ Stores +---->+ View Components |
-+----+----+     +--------+     +-------+---------+
-     ^                                 |
-     |                                 |
-     +---------------------------------+
++---------+     +-------+     +-----------------+
+| Actions +---->+ Store +---->+ View Components |
++----+----+     +-------+     +-------+---------+
+     ^                                |
+     |                                |
+     +--------------------------------+
 ```
 
 This approach is taken one step further to isolate all back-end service interaction within actions.
@@ -30,14 +33,14 @@ This approach is taken one step further to isolate all back-end service interact
              ^                 |       |
              |                 v       v
              |               +-+-------+-------+    Calls
-             |               | A Reflux Action +------------+
+             |               |     Action      +------------+
              |               +-+----------+----+            |
              |                 |          ^                 |
 Publishes to |    Publishes to |          |                 |
              |                 |          |                 v
              |                 |          |          +------+------------+
         +----+-------------+   |          |          | A Backend Service |
-        | A RefluxJS Store +<--+          +----------+ (REST)            |
+        |      Store       +<--+          +----------+ (REST)            |
         +------------------+               Callback  +-------------------+
 ```
 
@@ -45,21 +48,32 @@ The major Web UI components.
 
 ```ditaa
                             +---------------------------------+
-                   +------->+ src/index.html                  |
-                   |        | (index.jsx content loaded here) |
+                   +------->+ index.html                      |
+                   |        | index.jsx content loaded here |
                    |        +---------------------------------+
 +------------------+---+
 |                      |    +---------------------------------+
-|  webpack.config.js   +--->+ src/js/index.jsx                |
-|  entry: [            |    +-----------------+---------------+
-|    src/index.html,   |                      |
-|    src/js/index.jsx  |                      v
+|  webpack.config.js   +--->+ index.jsx                       |
+|  entry: [            |    | environment variable:           |
+|    index.html        |    |   OPS_WEBUI_BUILD_CONFIG        |
+|    index.jsx         |    |     determines build.config.js  |
 |  ]                   |    +-----------------+---------------+
-|                      |    | src/js/main/router.js           |
-+----------------------+    | (react-router routes)           |
-                            | "app" -> App.jsx                |
-                            | "dashboard" -> Dashboard.jsx    |                   
-                            | ...etc...                       |
+|                      |                      |
++----------------------+                      v
+                            +-----------------+---------------+
+                            | src/app/main.jsx                |
+                            | Main Component                  |
+                            |   parses build config for       |
+                            |      settings, "Dux" files, ... |
+                            |   creates react-router          |
+                            |      components                 |
+                            +-----+---------------------------+
+                                  |
+                                  v
+                            +-----+---------------------------+
+                            | src/app/mainApp.jsx             |
+                            | App Component                   |
+                            |   main application container    |
                             +-----+---------------------------+
                                   |
                                   v
@@ -68,66 +82,192 @@ The major Web UI components.
 | App                                                    |
 |                                                        |
 | +----------------------------------------------------+ |
-| |                                                    | |
-| | Mast                                               | |
-| |                                                    | |
-| +----------------------------------------------------+ |
-|                                                        |
-| +---------+  +---------------------------------------+ |
-| |         |  |                                       | |
-| | NavPane |  | RouteHandler                          | |
-| |         |  |                                       | |
-| |         |  |   +-------------------------------+   | |
-| |         |  |   |                               |   | |
-| |         |  |   |  View                         |   | |
-| |         |  |   |                               |   | |
-| |         |  |   +-----------+-------------------+   | |
-| |         |  |                                       | |
-| +---------+  +---------------------------------------+ |
+| |         |                                          | |
+| |         |    Mast                                  | |
+| |         |                                          | |
+| |         +------------------------------------------+ |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| | NavPane |      Page (App Component's children)     | |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| |         |                                          | |
+| +---------+------------------------------------------+ |
 |                                                        |
 +--------------------------------------------------------+
 ```
 
-The main entry points for the web compilation are configured in the `webpack.config.js` file.  The `index.html` contains a root element **div** with an ID. The `router.js` file contains a list of all the available routes (or considered views in our case). Each view is denoted by its own ID (app -> App component). Based on the current browser `window.location` (or URL), the appropriate view is loaded in the RouteHandler.  The NavPane Link items are automatically activated based on the current URL.
+Entry Points
+------------
+
+The main entry points for the web compilation are configured in the `webpack.config.js` file.  The `index.html` contains a root element **div** with an ID of "main".  The navigation links and routes come from the `*dux.jsx` files specified in the `build.config.js` (described below).  Once the build configuration is loaded, the **Main** component is rendered in the DOM at the **div** root element.  The **Main** component uses the react-router framework to create the route tree based on the modules specified in the build configuration.  The top-level component **App** contains the main UI framework layout.  The **Page** area is where the child routes of the **App** component are rendered.
+
+Build Configuration
+-------------------
+
+When the UI is compiled, it loads build configuration file.  The file is in the form:
+```javascript
+// import module "Dux"
+import OverviewDux from 'overview/overviewDux.jsx';
+import InterfaceDux from 'interface/interfaceDux.jsx';
+
+// create an array of the loaded "Dux" modules for export below
+const modules = [
+  OverviewDux,
+  InterfaceDux,
+];
+
+// import any guide modules
+import ConfigInterfaceGuide from 'guides/configInterfaceGuide.jsx';
+
+// create an array of the loaded "Guide" modules for export below
+const guides = [
+  ConfigInterfaceGuide,
+];
+
+// import the localization module
+import * as i18nLocale from 'i18n/en-US.js';
+
+// import the box graphic modules
+import As5712 from 'boxGraphics/as5712.jsx';
+import As6712 from 'boxGraphics/as6712.jsx';
+
+// create the settings object based on the loaded modules
+const settings = {
+
+  // Global constants for this build
+  AUTO_ACTIONS_INTERVAL: 10000,
+  VLAN_ID_RANGE: '1-4094',
+  LAG_ID_RANGE: '1-2000',
+  LAG_MAX_INTERFACES: 8,
+
+  // localization object loaded above
+  i18nLocale,
+
+  // box graphic components supported in this build
+  boxGraphics: [ As5712, As6712 ],
+
+  // REST redirection (default is '')
+  agent: {
+    prefix: '',
+  },
+
+  // Any external links (accessible in the navigation bar)
+  extLinks: [
+    {
+      key: 'osApi',
+      href: '/api/index.html'
+    },
+    {
+      key: 'osNet',
+      href: 'http://openswitch.net'
+    },
+  ],
+
+};
+
+export default { modules, guides, settings };
+```
+
+The default build configuration file is named `build.config.js`.  Set the environment variable **OPS_WEBUI_BUILD_CONFIG** to specify a different filename.
+
+
+Dux Components
+--------------
+The Web UI modules are located in `src/modules`. Each module is contained in its own directory. Each module must contain a valid **Dux** file in the form:
+```javascript
+export default {
+  // String name of this module (required)
+  NAME,
+
+  // Array of navigation object (optional)
+  NAVS,
+
+  // Object containing the action functions (optional)
+  ACTIONS,
+
+  // Redux "reducer" function (optional)
+  REDUCER: AD.reducer(),
+};
+```
+
+The **NAV** array has the form:
+```javascript
+const NAVS = [
+  {
+  	// Specifics the react-router Route's path and component
+    route: { path: '/ecmp', component: EcmpPage },
+    // Specifies the navigation path and order index
+    link: { path: '/ecmp', order: 350 }
+  },
+];
+```
+The navigation link order determine what order (from top low to bottom high) the navigation items will appear.
+
+The **ACTIONS** object has the form:
+```javascript
+const ACTIONS = {
+  // Action that uses the Redux Thunk middleware that returns a function.
+  fetch() {
+    returns (dispatch, getStoreFn) => {...}
+  }
+
+  // Action that returns an object (is automatically bound to the dispatcher)
+  clearError() {
+    return return { type: 'MY_ACTION' };
+  },
+}
+```
+
+The **modules** specified in the build config must be an array of valid **Dux** components.  During initialization, the loaded **Dux** components are parsed to determine what routes and navigation items are avialble.  In this way, different builds can include or exclude different functionality.
+
 
 Development environment
 -----------------------
 
 The **ops-webui** directory structure (described below) includes:
 
+* `.babelrc` - javascript/JSX [Babel](https://babeljs.io/) compiler configuration
 * `.eslintrc` - javascript/JSX [ESLint](http://eslint.org/) rule definitions
 * `aliases.sh` - can be sourced by bash, aliases of "npm run ..." commands
 * `package.json` - nodeJS/npm dependences and npm command definitions
 * `webpack.config.js` - [Webpack Module Bundler](https://webpack.github.io/) configuration
+* `index.html` - copied to ./build
+* `build.config.js` - default build configuration
+* `karma.*` - unit test framework files
 * `build/` - all built artifacts go here
- * `index.html` - contains the main application _div_
- * `bundle.js` - all compiled javascript and style
- * _images, icons, & fonts_
+  * `index.html` - contains the main application _div_
+  * `bundle.js` - all compiled javascript and style
+  * _images, icons, & fonts_
 * `node_modules/` - all 3rd party npm modules are install here
- * `react/`
- * `grommet/`
- * _...etc..._
-* `src/` - all source
- * `font/` - all font files
- * `img/` - all image & icon files
- * `js/` - all javascript/JSX files
-  * `actions/` - all **action** modules
-  * `components/` - react building block component modules (not views)
-  * `i18n/` - internationalization text (i.e. en-US.js)
-  * `main/` - framework modules/components (i.e. mast, navpane, ...)
-   * `stores/` - all **store** modules
-   * `utils/` - general javascript utility modules
-   * `views/` - react view components (associated with a navigation route)
- * `scss` - all [Sassy CSS](http://sass-lang.com/guide) style files
-  * `components/` - styles associated with building block components
-  * `views/` - styles associated with views
-  * `app.scss` - main framework styles (i.e. mast, navpane, ...)
-  * `index.scss` - main style entry point (sets globals and loads all style files)
- * `index.html` - bare bones single page that contains single content _div_
- * `tools/` - development tools (build and test)
-  * `loader/` - custom webpack loaders needed for building
+  * `react/`
+  * `grommet/`
+  * _...etc..._
+* `src/` - all javascript/JSX source
+  * `shared/` - shared business logic, components and resources
+    * `assets/` - fonts and icons
+    * `boxGraphics/` - box graphic component and device drawings
+    * `components/` - ReactJS shared components
+    * `i18n/` - localization component and locale text (i.e. en-US.js)
+    * `test/` - business logic tests
+    * _business logic modules_
+  * `app/` - main application source
+    * _global scss styles, main framework, layout, navigation_
+  * `modules/` - plug-in module directories
+    * `exampleModule/` - example module directory
+      * `exampleConst.jsx` - constant definitions (i.e. client-server shared keys)
+      * `exampleDux.jsx` - Dux file for this module (imported in the build config)
+      * `examplePage.jsx` - page component (Dux will have a route component for this)
+      * `exampleDetails.jsx` - detail component (optional)
+      * `exampleEdit.jsx` - edit component (optional)
+* `tools/` - development tools (build and test)
+  * `scripts/` - script tools (tar/untar node modules)
   * `reference/` - backup directory for legacy code (not used)
-  * `test/` - test configuration and helper files
 
 The development stack is based on the following technologies:
 * [NodeJS / npm](https://nodejs.org/en)
@@ -157,20 +297,19 @@ The Web UI module provides a graphical user interface designed to run on desktop
 * General system information (i.e. model number, version, ...).
 * Current hardware status & statistics (i.e. fan temperature, power faults, ...).
 * Network status & statistics (i.e. interface utilization, VLAN status, ...).
+* Basic "Quick Start" configuration
 
 Design choices
 --------------
-A major motivation for the following design decisions is time-to-market.  The GUI development was proposed relatively late in the project life cycle.
-
 [Grommet](http://grommet.io/docs/), which is an open source UX framework for enterprise applications lead by HP, was selected early in the process.  This framework is based on [ReactJS](https://github.com/facebook/react).
 
 The **ops-webui** development environment uses a subset of the Grommet _modular development environment_ stack.  To this end, Grommet can be viewed as just another NodeJS module. This reduces the coupling but still allows full access to the entire set of Grommet components and assets. The only build tools needed are NodeJS and Webpack ([Gulp](http://gulpjs.com/) and [Bower](http://bower.io/) are not needed).
 
-Grommet doesn't necessarily specify which [Flux](https://facebook.github.io/react/docs/flux-overview.html) implementation to use. However, as Grommet is leveraging [RefluxJS](https://github.com/reflux/refluxjs) the  same package was selected for use here.
+Grommet doesn't necessarily specify which [Flux](https://facebook.github.io/react/docs/flux-overview.html) implementation to use. However, Grommet's UI prototype _Ferret_ is leveraging [Redux](http://redux.js.org/) so the same package was selected for use here.
 
 Based on several meetings and discussions with OpenSwitch architects, the current _auto generated_ REST API to obtain the data to be displayed by the GUI was chosen. Because this requires the GUI to perform a large number of REST requests, a shim layer was created to allow the browser to make these requests in parallel.  However, most browsers only allow a small number of socket requests (~5) to be open at the same time.
 
-The _auto generated_ REST server [Tornado](http://www.tornadoweb.org/en/stable/) is kept separate from the GUI Server [Lighttpd](http://www.lighttpd.net/), allowing the GUI to still use the default HTTP/HTTPS port numbers (80/443).
+The [Tornado](http://www.tornadoweb.org/en/stable/) HTTP service provides the static application files and _auto generated_ REST.
 
 Relationships to external OpenSwitch entities
 ---------------------------------------------
@@ -179,22 +318,22 @@ Relationships to external OpenSwitch entities
 +------------------------------------------------------------+
 |     Client Browser (feature/webui)                         |
 +------------------------+-------------------+---------------+
-                         |                   |
-  HTTPS GET/POST/...     |                   |
-  (token authentication) |                   |
-                         |                   |
+                         |
+  HTTPS GET/POST/...     |
+  (token authentication) |
+                         |
 +------------------------------------------------------------+
-|  OpenSwitch Platform   |                   |               |
-|                        v                   v               |
-|  +---------------------+--+   +------------+------------+  |
-|  | Tornado Web Server     |   | Lighttpd (static files) |  |
-|  | (Port: 18091)          |   | (Port: 80)              |  |
-|  +-----------+------------+   +------------+------------+  |
+|  OpenSwitch Platform   |                                   |
+|                        v                                   |
+|  +---------------------+--+                                |
+|  | Tornado Web Server     |                                |
+|  | (HTTPS)                +----------------+               |
+|  +-----------+------------+                |               |
 |              |                             |               |
 |              |                             |               |
 |              v                             |               |
 |  +-----------+------------+                |               |
-|  |REST (auto generated)   |                v               |
+|  | REST (auto generated)  |                v               |
 |  +-----------+------------+    +-----------+------------+  |
 |              |                 | built artifacts        |  |
 |              |                 |     index.html         |  |
@@ -225,35 +364,40 @@ REST API URLs
 * `/rest/v1/system/subsystems/base/power_supplies`
  * power supply status
 
-Internal structure: Views
+Internal structure: Pages
 -------------------------
 As previously described, the main components are:
 * App - application component
  * Mast - mast component
  * NavPane - navigation pane component
- * Views - various view components
+ * Pages - various page components (contained in the modules directories)
 
-Leveraging the [React-Router](https://github.com/rackt/react-router) framework each **View** is associated with a _route_.
-
-    <Route name="dashboard" handler={DashboardView}/>
+Leveraging the [React-Router](https://github.com/rackt/react-router) framework each **Page** is associated with a _route_.
+```javascript
+<Route name="/dashboard" component={DashboardPage}/>
+```
+_As described above, this is defined by the modules **NAVS** route object in its **Dux** file._
 
 When a particular route is active (window location URL is set to the route), its associated link is given the _active_ class.
+```javascript
+<Link onClick={clickFn} to="/dashboard">"Dashboard"</Link>
+```
+_As described above, this is defined by the modules **NAVS** link object in its **Dux** file._
 
-    <Link onClick={clickFn} to="dashboard">"Dashboard"</Link>
-
-The router added to the DOM at the specified ID:
-
-    Router.run(routes, function(Handler) {
-        React.render(<Handler />, document.getElementById('appContent'));
-    });
-
+The **Main** component is rendered by `index.jsx`:
+```javascript
+ReactDOM.render(
+  <Main/>,
+  document.getElementById('main')
+);
+```
 Since the **App** component is also a route (parent to all routes), it is rendered along with the child route based on the URL.
-
-    <Route name="app" path="/" handler={App}>
-        <Route name="dashboard" handler={DashboardView}/>
-    </Route>
-
-Therefore a window location URL of "#/dashboard" selects the **DashboardView** component to be loaded/rendered.
+```javascript
+<Route name="/app" path="/" handler={App}>
+  <Route name="/dashboard" handler={DashboardPage}/>
+</Route>
+```
+Therefore a window location URL of "#/dashboard" selects the **DashboardPage** component to be loaded/rendered.
 
 ```ditaa
 +---------------------+
@@ -263,7 +407,7 @@ Therefore a window location URL of "#/dashboard" selects the **DashboardView** c
 | |                 | |
 | | +-------------+ | |
 | | |             | | |
-| | |  View       | | |
+| | |  Page       | | |
 | | |             | | |
 | | +------+------+ | |
 | |        ^        | |
@@ -276,58 +420,95 @@ Therefore a window location URL of "#/dashboard" selects the **DashboardView** c
        +----------------+------+---------+------------+
        |                |                |            |
 +------+------+   +-----+------+   +-----+------+   +-+-+
-|DashboardView|   |MgmtIntfView|   |PortMgmtView|   |...|
+|DashboardPage|   |MgmtIntfPage|   |PortMgmtPage|   |...|
 +-------------+   +------------+   +------------+   +---+
 ```
 
-A **View** component's _render_ method is invoked and contented added to the DOM appropriately within the **RouteHandler**.
+A **Page** component's _render_ method is invoked and content is added to the DOM appropriately within the **RouteHandler**.
 
-```ditaa
-
-    module.exports = React.createClass({
-
-        displayName: 'DashboardView',
-
-        render: function() {
-            return (
-                <div id="dashboardView">
-                (where the content JSX/HTML goes)
-                </div>
-            );
-        }
+```javascript
+class DashboardPage extends Component {
+  render() {
+    return <div>...</div>;
+  }
+}
 ```
 
-From this point on, the view component behaves as any _normal_ [ReactJS](https://github.com/facebook/react) framework component. In addition, each **View** is _connected_ to its own **Store**. Based on the **Store**-**View** linkage, the **View**'s state gets updated by the **Store** which will, in turn, result in a re-render of the View.
+From this point on, the view component behaves as any _normal_ [ReactJS](https://github.com/facebook/react) framework component. In addition, each **Page** has access to the one and only **Store**.  The component can specify which parts of the **Store** it would like to connect it properties
 
-Internal structure: Stores
+```javascript
+function select(store) {
+  return {
+    dashboard: store.dashboard,
+  };
+}
+
+export default connect(select)(DashboardPage);
+```
+In the above example code, _store.dashboard_ will be available in the component as _this.props.dashboard_.  In this way, the component will get re-rendered when the _store.dashboard_ data changes.
+
+Internal structure: Store
 --------------------------
-A **Store** provides each view with backing data.  For example, the **DashboardView** is backed by a **DashboardStore** that contains the following data:
-
-    state: {
-        sysInfo: {},
-        sysStats: {
-            fans: [],
-            powerSupplies: []
-        },
-        interfaceStats: {}
-    }
-
-When the **DashboardStore** triggers an update, the listening view **DashboardView** gets its state modified and re-render.
+The **Store** provides data for the entire application.  For example, the **DashboardPage** is backed by the _store.dashboard_ data object:
+```javascript
+store: {
+    dashboard: {},
+    interfaces: {},
+    ...
+}
+```
+Any component can _connect_ to any object in the **Store** using **Redux** _connect_.  The **Store** is _only_ ever updated by a module's _reducer_ function:
+```javascript
+function REDUCER(moduleStore = INITIAL_STORE, action) {
+  switch (action.type) {...}
+```
+The following provided reducer can be used for asynchronous support. This reducer includes REQUEST, FAILURE and SUCCESS actions
+```javascript
+const AD = new AsyncDux(NAME, INITIAL_STORE);
+AD.reducer(),
+```
+See `asyncDux.js` for more information.
 
 Internal structure: Actions
 ---------------------------
-An **Action** can be invoked globally from **View** components (or a View's child components). Each action can be synchronous or asynchronous.  Synchronous actions are the result of user actions, timers firing, etc.  Asynchronous actions are the result of loading data from the switch (REST API calls).
-
-**All** interactions with the back-end server are performed by asynchronous actions.
-
-**All** JSON returned by the back-end server (REST API) is not allowed outside the action module.
-
-For example, **InterfaceActions** defines three actions:
-* load
-* loadFailed
-* loadCompleted
-
-A component sets up a connection to the **InterfaceStore** and then calls the asynchronous action **InterfaceActions.load()**.  Within the **InterfaceActions** implemenation the **load** action is intercepted and a request is made to the back-end REST API.  When the REST call asynchronously completes, the **loadFailed** or **loadCompleted** action is invoked (see [SuperAgent](https://visionmedia.github.io/superagent/) for more information on ajax requests). Any stores listening to the **loadCompleted** action are notified and are now able to handle the new data.  Each **Action** has the option of using the generic **loadFailed** handler to pop-up an error dialog to the GUI.
+An **Action** can be invoked globally from any **Page** (routed) components. All actions (from all loaded modules) are injected into the properties of a component during initialization. Invoking an action takes the form:
+```javascript
+this.props.actions.dashboard.fetch()
+```
+Based on the **Redux** framework, this action might take the form:
+```javascript
+const ACTIONS = {
+  fetch() {
+    // return a function here, not a "simple" action object
+    return (dispatch) => {
+      // dispatch the request action (using asyncDux helper here)
+      dispatch(AD.action('REQUEST', { title: t('loading') }));
+      // Use Superagent to make the AJAX request
+      Agent.get(url).end((error, result) => {
+        if (error) {
+          // dispatch the error action (using asyncDux helper here)
+          return dispatch(AD.action('FAILURE', { error }));
+        }
+        // dispatch the success action proving the result and parser (using asyncDux helper here)
+        return dispatch(AD.action('SUCCESS', { result, parser }));
+      });
+    };
+  }
+}
+```
+In the 'SUCCESS' case above the provided _parser_ argument is a function that is used to parse the JSON response data and return an object that will be injected into the **Store** at the module's location.  For example:
+```javascript
+const parser = (result) => {
+  const data = result.body;
+  return { entries: {1: 'new1', 2: 'new2', ... } };
+};
+```
+If the module was named "dashboard", new data would be set in the **Store** under the "dashboard" key:
+```javascript
+store: {
+    dashboard: { entries: {1: 'new1', 2: 'new2', ... } },
+}
+```
 
 For more information, see the documentation for the  [RefluxJS](https://github.com/reflux/refluxjs) framework.
 
@@ -335,7 +516,7 @@ References
 ----------
 Source dependencies:
 * [ReactJS](https://github.com/facebook/react)
-* [RefluxJS](https://github.com/reflux/refluxjs)
+* [Redux](http://redux.js.org/)
 * [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html)
 * [React-Router](https://github.com/rackt/react-router)
 * [Grommet](http://grommet.io/docs/)
@@ -352,7 +533,6 @@ Development dependencies:
 
 OpenSwitch HTTP servers:
 * [Tornado](http://www.tornadoweb.org/en/stable/)
-* [Lighttpd](http://www.lighttpd.net/)
 
 OpenSwitch modules:
 * [restd](tbd)
