@@ -15,6 +15,7 @@
 */
 
 import { t } from 'i18n/lookup.js';
+import Async from 'async';
 import AsyncDux, { cooledDown } from 'asyncDux.js';
 import Agent from 'agent.js';
 import EcmpPage from './ecmpPage.jsx';
@@ -76,22 +77,31 @@ const ACTIONS = {
     const hashSrcPort = (ecmpDataObj.hashSrcPort === 'enabled').toString();
 
     return dispatch => {
-      dispatch(AD.action('REQUEST'));
-      Agent.patch(URL_SYS).send([{
-        'op': 'add',
-        'path': '/ecmp_config',
-        'value': {
-          [C.ECMP_ENABLED]: ecmpEnabled,
-          [C.RESILIENT_HAS_ENABLED]: resilientHash,
-          [C.DST_IP_ENABLED]: hashDstIp,
-          [C.DST_PORT_ENABLED]: hashDstPort,
-          [C.SRC_IP_ENABLED]: hashSrcIp,
-          [C.SRC_PORT_ENABLED]: hashSrcPort}}]).end((error) => {
-            if (error) { return dispatch(AD.action('FAILURE', { error })); }
-            return dispatch(AD.action('SUCCESS', {
-              parser: () => { return { 'SUCCESS': true }; }
-            }));
-          });
+      dispatch(AD.action('REQUEST', { title: t('deploying'), numSteps: 2 }));
+      Async.series([
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 1 }));
+          Agent.patch(URL_SYS).send([{
+            'op': 'add',
+            'path': '/ecmp_config',
+            'value': {
+              [C.ECMP_ENABLED]: ecmpEnabled,
+              [C.RESILIENT_HAS_ENABLED]: resilientHash,
+              [C.DST_IP_ENABLED]: hashDstIp,
+              [C.DST_PORT_ENABLED]: hashDstPort,
+              [C.SRC_IP_ENABLED]: hashSrcIp,
+              [C.SRC_PORT_ENABLED]: hashSrcPort
+            }
+          }]).end(cb);
+        },
+        cb => {
+          dispatch(AD.action('REQUEST_STEP', { currStep: 2 }));
+          Agent.get(URL_SYS).end(cb);
+        },
+      ], (error, result) => {
+        if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        return dispatch(AD.action('SUCCESS', { result: result[1], parser }));
+      });
     };
   },
 

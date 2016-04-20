@@ -66,7 +66,6 @@ class EcmpPage extends Component {
   _onSubmitEcmpEdit= (ecmpDataObj) => {
     this.props.actions.ecmp.editEcmp(ecmpDataObj);
     this._onCloseEcmpEdit();
-    this._onRefresh();
   };
 
   render() {
