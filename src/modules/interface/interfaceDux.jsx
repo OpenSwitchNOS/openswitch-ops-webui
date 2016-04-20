@@ -102,7 +102,7 @@ function parseInterface(inf) {
   const cfgDuplex = (uc && uc[C.DUPLEX]) || C.DUPLEX_DEF;
   const cfgAutoNeg = (uc && uc[C.AUTO_NEG]) || C.AUTO_NEG_DEF;
   const cfgFlowCtrl = (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF;
-  const cfgLaneSplit = (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT;
+  const cfgLaneSplit = (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEFAULT;
 
   const adminState = status.admin_state;
   const linkState = status.link_state;
