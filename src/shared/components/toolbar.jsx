@@ -36,7 +36,10 @@ export default class Toolbar extends Component {
     const style = {height: HEIGHT, width: this.props.width};
     return (
       <div className="toolbar" style={style}>
-        <Box {...this.props} direction="row" justify="between">
+        <Box {...this.props}
+            direction="row"
+            responsive={false}
+            justify="between">
           {this.props.children}
         </Box>
       </div>

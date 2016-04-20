@@ -59,7 +59,7 @@ const COMPONENT = (
           <td>Link State is <b>Up</b></td>
         </tr>
         <tr>
-          <td>
+          <td style={{width: '64px'}}>
             <div
                 style={SPLIT_SUPPORTED}>
             </div>
