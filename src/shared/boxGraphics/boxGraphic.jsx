@@ -56,12 +56,30 @@ export default class BoxGraphic extends Component {
 
     const adminDownIds = [];
     const linkUpIds = [];
+    const canSplit = [];
+    const isSplit = [];
+    const splitAdminDownIds = [];
+    const splitLinkUpIds = [];
     Object.getOwnPropertyNames(this.props.interfaces).forEach(k => {
       const inf = this.props.interfaces[k];
-      if (inf.adminState === 'down') {
-        adminDownIds.push(k);
-      } else if (inf.linkState === 'up') {
-        linkUpIds.push(k);
+      if (inf.canSplit) {
+        canSplit.push(k);
+        if (inf.cfgLaneSplit === 'split') {
+          isSplit.push(k);
+          inf.adminState = 'up';
+          inf.splitChildren.forEach(i => {
+            const childInf = this.props.interfaces[i];
+            if (childInf.adminState === 'down') {
+              splitAdminDownIds.push(i);
+            } else if (childInf.linkState === 'up') {
+              splitLinkUpIds.push(i);
+            }
+          });
+        } else if (inf.adminState === 'down') {
+          adminDownIds.push(k);
+        } else if (inf.linkState === 'up') {
+          linkUpIds.push(k);
+        }
       }
     });
 
@@ -75,25 +93,24 @@ export default class BoxGraphic extends Component {
       linkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
-    // TODO: Replace with correct mapping from the data.
     const canSplitCls = classNames(
       'canSplit',
-      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+      canSplit.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const isSplitCls = classNames(
       'isSplit',
-      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+      isSplit.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const splitLinkCls = classNames(
       'splitLinkUp',
-      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+      splitLinkUpIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const splitAdminCls = classNames(
       'splitAdminDown',
-      [].map(i => this.props.spec.toSvgInterfaceName(i)),
+      splitAdminDownIds.map(i => this.props.spec.toSvgInterfaceName(i)),
     );
 
     const select = this.props.select && [ this.props.select ] || [];

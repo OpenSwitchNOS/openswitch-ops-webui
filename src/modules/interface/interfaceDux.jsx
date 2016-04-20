@@ -102,7 +102,7 @@ function parseInterface(inf) {
   const cfgDuplex = (uc && uc[C.DUPLEX]) || C.DUPLEX_DEF;
   const cfgAutoNeg = (uc && uc[C.AUTO_NEG]) || C.AUTO_NEG_DEF;
   const cfgFlowCtrl = (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF;
-  const cfgLaneSplit = (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT;
+  const cfgLaneSplit = (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEF;
 
   const adminState = status.admin_state;
   const linkState = status.link_state;
@@ -225,7 +225,7 @@ const editParser = (result) => {
     [C.DUPLEX]: (uc && uc[C.DUPLEX]) || C.DUPLEX_DEF,
     [C.AUTO_NEG]: (uc && uc[C.AUTO_NEG]) || C.AUTO_NEG_DEF,
     [C.FLOW_CTRL]: (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF,
-    [C.LANE_SPLIT]: (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEFAULT,
+    [C.LANE_SPLIT]: (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEF,
   };
   const id = cfg.name;
   const etag = result[0].headers.etag;
