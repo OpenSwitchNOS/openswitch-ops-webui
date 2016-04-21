@@ -164,7 +164,7 @@ class NavSideBar extends Component {
       /> : null;
     return (
 
-      <Sidebar colorIndex="neutral-3" fixed separator="right">
+      <Sidebar colorIndex="neutral-3" separator="right">
       {chpwInfoLayer}
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>

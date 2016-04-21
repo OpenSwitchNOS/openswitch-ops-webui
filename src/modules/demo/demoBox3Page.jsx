@@ -42,7 +42,7 @@ class DemoBoxPage extends Component {
   render() {
     return (
       <Box direction="row" className="flex1">
-        <Box>
+        <Box className="flex1">
           <Box pad={this.pad} className="flex0 pageBox min200x400">
             <b>Box</b>Col1 Row1 (min 200x400)
             <Button onClick={this._onClick} label="Toggle"/>

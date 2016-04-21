@@ -41,9 +41,19 @@ h1, h2, h3, .headline, .title {
 }
 
 @mixin flex($g, $s, $b) {
+  // Need to special case for each browser - they are implemented differently :(
   flex: $g $s $b;
   -webkit-flex: $g $s $b;
   -moz-flex: $g $s $b;
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /* IE10+ CSS styles go here */
+  @if ($b != auto) {
+    flex: $g;
+  }
+}
+
+
   min-width: 0; //https://code.google.com/p/chromium/issues/detail?id=546034#c6
   min-height: 0;
 }
