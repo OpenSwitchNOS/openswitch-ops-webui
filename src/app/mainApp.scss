@@ -46,13 +46,19 @@ h1, h2, h3, .headline, .title {
   -webkit-flex: $g $s $b;
   -moz-flex: $g $s $b;
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  /* IE10+ CSS styles go here */
-  @if ($b != auto) {
-    flex: $g;
+  @supports (overflow:-webkit-marquee) and (justify-content:inherit) {
+    // Safari 9.0+
+    @if ($b == 0) {
+      -webkit-flex: $g $s 300px; // Bug in Safari 9+
+    }
   }
-}
 
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    /* IE10+ CSS styles go here */
+    @if ($b != auto) {
+      flex: $g;
+    }
+  }
 
   min-width: 0; //https://code.google.com/p/chromium/issues/detail?id=546034#c6
   min-height: 0;

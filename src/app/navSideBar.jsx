@@ -122,7 +122,11 @@ class NavSideBar extends Component {
   _mkExtLinks = () => {
     if (!this.props.settings.extLinks) { return []; }
     return this.props.settings.extLinks.map( lnk => {
-      return <Anchor key={lnk.key} href={lnk.href}>{t(lnk.key)}</Anchor>;
+      return (
+        <Anchor target="_blank" key={lnk.key} href={lnk.href}>
+          {t(lnk.key)}
+        </Anchor>
+      );
     });
   };
 
@@ -187,8 +191,9 @@ class NavSideBar extends Component {
           </Box>
           <br/>
           <Menu primary>
-          {this.items}
+            {this.items}
           </Menu>
+          <br/>
         </Box>
         <Footer pad={{vertical: 'small'}} direction="column" align="start">
           <Box align="center" direction="row" pad={{horizontal: 'small'}}>
