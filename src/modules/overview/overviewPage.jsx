@@ -366,13 +366,14 @@ class OverviewPage extends Component {
 
     const utl = this._mkUtilization();
 
-    let logHdr = null;
-    const logData = this.props.collector.log;
-    if (logData.tsMin) {
-      const ts1 = Time.toTimestamp(logData.tsMin);
-      const ts2 = Time.toTimestamp(this.props.collector.ts);
-      logHdr = `${ts1} - ${ts2}`;
-    }
+    // FIXME: not correct and doesn't display correctly on Safari.
+    // let logHdr = null;
+    // const logData = this.props.collector.log;
+    // if (logData.tsMin) {
+    //   const ts1 = Time.toTimestamp(logData.tsMin);
+    //   const ts2 = Time.toTimestamp(this.props.collector.ts);
+    //   logHdr = `${ts1} - ${ts2}`;
+    // }
 
     const async = this.props.collector.asyncStatus;
     const statusLayer = !async.lastError ? null :
@@ -422,10 +423,7 @@ class OverviewPage extends Component {
           </Box>
         </Box>
         <Box pad={this.pad} className="flex1 pageBox min150x400">
-          <span>
-            <b>{t('log')}&nbsp;&nbsp;</b>
-            <small>{logHdr}</small>
-          </span>
+          <b className="safari">{t('log')}</b>
           <hr/>
           <div className="logTable">
             {this._mkLog()}

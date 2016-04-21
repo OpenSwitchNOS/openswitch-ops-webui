@@ -40,6 +40,14 @@ h1, h2, h3, .headline, .title {
   height: 100%;
 }
 
+// FIXME: problem on overview page Log header text height
+@supports (overflow:-webkit-marquee) and (justify-content:inherit) {
+  // Safari 9.0+
+  b.safari {
+    margin-bottom: 12px;
+  }
+}
+
 @mixin flex($g, $s, $b) {
   // Need to special case for each browser - they are implemented differently :(
   flex: $g $s $b;
