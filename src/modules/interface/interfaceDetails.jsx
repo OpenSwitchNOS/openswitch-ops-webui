@@ -94,7 +94,7 @@ class InterfaceDetails extends Component {
         </Box>
         <Tabs>
           <Tab title={t('general')}>
-            <table style={{tableLayout: 'fixed'}} className="propTable">
+            <table style={{tableLayout: 'fixed', width: 380}} className="propTable">
               <tbody>
                 {pr('configured', t(inf.cfgAdmin), 180, 200)}
                 {pr('adminState', t(inf.adminStateConnector))}
@@ -114,7 +114,7 @@ class InterfaceDetails extends Component {
             </table>
           </Tab>
           <Tab title={t('statistics')}>
-            <table style={{tableLayout: 'fixed'}} className="propTable">
+            <table style={{tableLayout: 'fixed', width: 380}} className="propTable">
               <tbody>
                 {pr('rxPackets', tcs(inf.rxPackets), 180, 200)}
                 {pr('rxBytes', tcs(inf.rxBytes))}
@@ -130,7 +130,7 @@ class InterfaceDetails extends Component {
           <Tab title={t('lldp')}>
             <small>{t('neighborInfo')}{lldpOpsLink}</small>
             <hr/>
-            <table style={{tableLayout: 'fixed'}} className="propTable">
+            <table style={{tableLayout: 'fixed', width: 380}} className="propTable">
               <tbody>
                 {pr('chassisName', inf.lldp.chassisName, 180, 200)}
                 {pr('chassisId', inf.lldp.chassisId)}
@@ -144,7 +144,7 @@ class InterfaceDetails extends Component {
             <br/>
             <small>{t('statistics')}</small>
             <hr/>
-            <table style={{tableLayout: 'fixed'}} className="propTable">
+            <table style={{tableLayout: 'fixed', width: 380}} className="propTable">
               <tbody>
                 {pr('framesRx', tcs(inf.lldp.framesRx), 180, 200)}
                 {pr('framesRxDiscarded', tcs(inf.lldp.framesRxDiscarded))}
@@ -154,7 +154,7 @@ class InterfaceDetails extends Component {
             </table>
           </Tab>
           <Tab title={t('lag')}>
-            <table style={{tableLayout: 'fixed'}} className="propTable">
+            <table style={{tableLayout: 'fixed', width: 380}} className="propTable">
               <tbody>
                 {pr('lagActorKey', inf.lag.actorKey)}
                 {pr('lagActorSystemId', inf.lag.actorSystemId)}

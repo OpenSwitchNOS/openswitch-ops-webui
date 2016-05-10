@@ -21,6 +21,7 @@ import Async from 'async';
 import * as C from './interfaceConst.js';
 import InterfacePage from './interfacePage.jsx';
 import InterfaceDetails from './interfaceDetails.jsx';
+import Formatter from 'formatter.js';
 
 
 const NAME = 'interface';
@@ -108,6 +109,7 @@ function parseInterface(inf) {
   const linkState = status.link_state;
 
   const speed = linkState !== 'up' ? null : status.link_speed || 0;
+  const speedFormatted = Formatter.bpsToString(status.link_speed) || '';
 
   const duplex = linkState !== 'up' ? null : status.duplex;
 
@@ -116,6 +118,8 @@ function parseInterface(inf) {
 
   const hw = status.hw_intf_info;
   const mac = (hw && hw.mac_addr) ? hw.mac_addr.toUpperCase() : '';
+
+  const mtu = status.mtu || '';
 
   const adminStateConnector = adminState !== 'up' &&
     cfgAdmin === 'up' && connector === 'absent' ? 'downAbsent' : adminState;
@@ -145,7 +149,9 @@ function parseInterface(inf) {
     adminState, // needed by the boxGraphic
     adminStateConnector,
     mac,
+    mtu,
     speed,
+    speedFormatted,
     duplex,
     linkState,
     lacpStatus,
