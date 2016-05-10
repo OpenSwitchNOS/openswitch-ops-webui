@@ -172,7 +172,7 @@ export const MESSAGES = {
   neighborInfo: 'Neighbor Information',
   new: 'New',
   newPw: 'New Password',
-  noMemberPort: 'no member port',
+  'no_member_port': 'No Member Port',
   none: 'None',
   notice: 'Notice',
   notConfigured: 'Not Configured',
