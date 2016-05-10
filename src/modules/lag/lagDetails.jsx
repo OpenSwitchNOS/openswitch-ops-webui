@@ -51,6 +51,7 @@ class LagDetails extends Component {
     const id = this.props.params.id;
     const lag = this.props.lag.lags[id];
     const tcs = Formatter.toCommaString;
+    const bpsToString = Formatter.bpsToString;
     const infs = Object.keys(lag.interfaces).sort(naturalSort).join(', ');
 
 
@@ -72,7 +73,7 @@ class LagDetails extends Component {
             {pr('fallback', t(lag[C.FALLBACK]))}
             {pr('hash', t(lag[C.HASH]))}
             {pr('interfaces', infs, 160, 180)}
-            {pr('speed', lag.speed)}
+            {pr('speed', bpsToString(lag.stats.speed))}
             {pr('bondStatus', t(lag.bondStatus))}
             {pr('lagActorKey', lag.status.actorKey)}
             {pr('lagActorSystemId', lag.status.actorSystemId)}

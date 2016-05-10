@@ -50,12 +50,16 @@ class InterfaceEdit extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const edit = nextProps.interface.edit;
-    this.setState({ [C.USER_CFG]: { ...edit.interface[C.USER_CFG] }});
+    const async = this.props.interface.asyncStatus;
+    const nextAsync = nextProps.interface.asyncStatus;
+    if (nextAsync.lastSuccessMillis > async.lastSuccessMillis) {
+      const edit = nextProps.interface.edit;
+      this.setState({ [C.USER_CFG]: { ...edit.interface[C.USER_CFG] }});
+    }
   }
 
   _isDirty = () => {
-    const initUserCfg = this.props.interface.edit.interface[C.USER_CFG];
+    const initUserCfg = {...this.props.interface.edit.interface[C.USER_CFG]};
     return !_.isEqual(this.state[C.USER_CFG], initUserCfg);
   };
 
@@ -73,11 +77,13 @@ class InterfaceEdit extends Component {
     this.props.actions.interface.edit(this.state);
     this.props.onClose();
   };
+
  _onClose = () => {
    this.props.onClose();
  };
+
   _onChange = (setting) => {
-    const initUserCfg = this.props.interface.edit.interface[C.USER_CFG];
+    const initUserCfg = {...this.props.interface.edit.interface[C.USER_CFG]};
     let newUserCfg = { ...this.state[C.USER_CFG], ...setting };
     if (setting[C.LANE_SPLIT] === 'split') {
       newUserCfg = {...initUserCfg};

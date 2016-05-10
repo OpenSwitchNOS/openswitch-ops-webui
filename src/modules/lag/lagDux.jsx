@@ -123,6 +123,7 @@ function parsePortsInfs(result) {
   result[1].body.forEach(elm => {
     const cfg = elm.configuration;
     const stats = elm.statistics.statistics;
+    const status = elm.status;
     const id = cfg.name;
     const oc = cfg.other_config;
     const lacpAggrKey = oc && oc[C.LACP_AGGR_KEY];
