@@ -96,14 +96,15 @@ function createAutoActions(BuildConfig, s) {
 
 function createReducersAndStore(BuildConfig, initStore) {
   const reducers = createReducers(BuildConfig);
+  let createStoreFn = null;
   if (BuildConfig.settings.reduxLogger) {
-    const createStoreFn = applyMiddleware(
-      thunkMiddleware,
-      createLogger()
-    )(createStore);
-    return createStoreFn(reducers, initStore);
+    createStoreFn =
+      applyMiddleware(thunkMiddleware, createLogger())(createStore);
+  } else {
+    createStoreFn =
+      applyMiddleware(thunkMiddleware)(createStore);
   }
-  return createStore(reducers, initStore);
+  return createStoreFn(reducers, initStore);
 }
 
 // Entry point called by index.jsx. The BuildConfig is passed as a parameter
