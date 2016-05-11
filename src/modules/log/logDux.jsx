@@ -43,10 +43,10 @@ const parser = (result) => {
   if (!Array.isArray(result.body)) {
     return { entries };
   }
-  let id = 1;
+  let id = result.body.length;
   result.body.forEach(item => {
     const entry = {};
-    entry.id = id++;
+    entry.id = id--;
     entry.ts = Time.toTimestamp(Math.round(item.__REALTIME_TIMESTAMP / 1000));
 
     const pri = Number(item.PRIORITY);
