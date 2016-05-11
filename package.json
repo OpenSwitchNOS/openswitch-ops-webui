@@ -22,7 +22,7 @@
   "dependencies": {
     "async": "1.5.2",
     "classnames": "2.2.3",
-    "element-resize-event": "2.0.3",
+    "element-resize-event": "2.0.4",
     "fixed-data-table": "0.6.0",
     "grommet": "0.5.3",
     "history": "1.17.0",
