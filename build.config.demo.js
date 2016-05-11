@@ -51,6 +51,7 @@ import As5712 from 'boxGraphics/as5712.jsx';
 import As6712 from 'boxGraphics/as6712.jsx';
 
 const settings = {
+  disableLogin: false,
   reduxLogger: true,
 
   AUTO_ACTIONS_INTERVAL: 10000,
@@ -63,13 +64,13 @@ const settings = {
   boxGraphics: [ As5712, As6712 ],
 
   agent: {
-    prefix: 'https://15.108.30.246',
+    prefix: 'https://15.108.30.248',
   },
 
   extLinks: [
     {
       key: 'osApi',
-      href: `http://15.108.30.246/api/index.html`
+      href: `http://15.108.30.248/api/index.html`
     },
     {
       key: 'osNet',

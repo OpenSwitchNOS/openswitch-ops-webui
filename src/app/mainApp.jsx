@@ -206,7 +206,7 @@ class MainApp extends Component {
     return (
       <App centered={false}>
         {infoLayer}
-        {this.props.auth.isLoggedIn
+        {this.props.auth.isLoggedIn || this.props.settings.disableLogin
           ? <Split
               flex="right"
               onResponsive={this._onNavSplitResponsive}
