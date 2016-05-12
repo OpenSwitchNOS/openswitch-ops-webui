@@ -48,6 +48,17 @@ h1, h2, h3, .headline, .title {
   }
 }
 
+// FIXME: IE doesn't scale the SVG correctly
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .boxGraphic {
+    overflow: auto;
+    svg {
+      width: 980px !important;
+      height: 120px !important;
+    }
+  }
+}
+
 @mixin flex($g, $s, $b) {
   // Need to special case for each browser - they are implemented differently :(
   flex: $g $s $b;

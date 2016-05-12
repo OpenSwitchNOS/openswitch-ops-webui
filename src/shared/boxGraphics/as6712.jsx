@@ -18,22 +18,25 @@ import './as6712.scss';
 
 import React from 'react';
 
-const SVG_INTERFACE_NAME_PREFIX = 'bxGfx_';
+const SVG_INF_NAME_PREFIX = 'bxGfx_';
 
-const supportsPlatform = desc => desc && 0 < desc.indexOf('_as6712_');
+const supportsPlatform = desc => desc && (
+  0 < desc.indexOf('_as6712_') ||
+  0 < desc.indexOf('_as6940_')
+);
 
 const toSvgInterfaceName = (id) => {
-  return `${SVG_INTERFACE_NAME_PREFIX}${id}`;
+  return `${SVG_INF_NAME_PREFIX}${id}`;
 };
 
 const toExternalInterfaceId = (name) => {
-  return name.substring(SVG_INTERFACE_NAME_PREFIX.length);
+  return name.substring(SVG_INF_NAME_PREFIX.length);
 };
 
 const onClick = (e) => {
   const svgInfName = e.target.id;
   const tagName = e.target.tagName;
-  if (tagName === 'rect' && svgInfName.startsWith(SVG_INTERFACE_NAME_PREFIX)) {
+  if (tagName === 'rect' && 0 === svgInfName.indexOf(SVG_INF_NAME_PREFIX)) {
     return toExternalInterfaceId(svgInfName);
   }
   return null;
