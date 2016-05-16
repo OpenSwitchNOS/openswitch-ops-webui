@@ -31,16 +31,20 @@ const ACTIONS = {
 
   login(data) {
     const { username, password } = data;
-    const send = `username=${username}&password=${password}`;
 
     return dispatch => {
       dispatch(AD.action('REQUEST'));
-      Agent.post('/login').send(send).end((error) => {
-        if (error) { return dispatch(AD.action('FAILURE', { error })); }
-        return dispatch(AD.action('SUCCESS', {
-          parser: () => { return { username, isLoggedIn: true }; }
-        }));
-      });
+      Agent
+        .post('/login')
+        .type('form')
+        .send({ username })
+        .send({ password })
+        .end((error) => {
+          if (error) { return dispatch(AD.action('FAILURE', { error })); }
+          return dispatch(AD.action('SUCCESS', {
+            parser: () => { return { username, isLoggedIn: true }; }
+          }));
+        });
     };
   },
 
