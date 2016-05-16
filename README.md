@@ -1,49 +1,61 @@
-*** FIXME ***
-
 OPS-WebUI
 =========
 
-What is ops-webui
-----------------
-ops-webui is a module in the [OpenSwitch](http://www.openswitch.net) project that is responsible for displaying information about the switch via a Web User Interface.  This project leverages [NodeJS / npm](https://nodejs.org/en), [RefluxJS](https://github.com/reflux/refluxjs), [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html), [React-Router](https://github.com/rackt/react-router), and [Grommet](http://grommet.io/docs/).
+What is ops-webui?
+------------------
 
+ops-webui is a module in the [OpenSwitch](http://www.openswitch.net) project that is responsible for displaying information about the switch via a Web User Interface.
+
+This project leverages:
+* [NodeJS / npm](https://nodejs.org/en)
+* [ReactJS](https://github.com/facebook/react)
+  * Controller-view framework
+* [Redux](https://github.com/reactjs/redux)
+  * State container for JavaScript applications
+* [React-Router](https://github.com/rackt/react-router)
+  * URL routing (i.e View) framework
+  * Browser history support
+* [Superagent](https://visionmedia.github.io/superagent/)
+  * ajax API library
 
 Repository Structure
 --------------------
+* `.babelrc` - javascript/JSX [Babel](https://babeljs.io/) compiler configuration
 * `.eslintrc` - javascript/JSX [ESLint](http://eslint.org/) rule definitions
 * `aliases.sh` - can be sourced by bash, aliases of "npm run ..." commands
 * `package.json` - nodeJS/npm dependences and npm command definitions
 * `webpack.config.js` - [Webpack Module Bundler](https://webpack.github.io/) configuration
-* build/ - all built artifacts go here
- * `index.html` - contains the main application _div_
- * `bundle.js` - all compiled javascript and style
- * _images, icons, & fonts_
-- errors/ - static error pages
-* node\_modules/ - all 3rd party npm modules are install here
- * react/
- * grommet/
- * _...etc..._
-* src/ - all source
- * font/ - all font files
- * img/ - all image & icon files
- * js/ - all javascript/JSX files
-    * actions/ - all **action** modules
-    * components/ - react building block component modules (not views)
-    * i18n/ - internationalization text (i.e. en-US.js)
-    * main/ - framework modules/components (i.e. mast, navpane, ...)
-    * stores/ - all **store** modules
-    * utils/ - general javascript utility modules
-    * views/ - react view components (associated with a navigation route)
- * scss - all [Sassy CSS](http://sass-lang.com/guide) style files
-    * components/ - styles associated with building block components
-    * views/ - styles associated with views
-    * `app.scss` - main framework styles (i.e. mast, navpane, ...)
-    * `index.scss` - main style entry point (sets globals and loads all style files)
- * `index.html` - bare bones single page that contains single content _div_
-* tools/ - development tools (build and test)
-  * loader/ - custom webpack loaders needed for building
-  * reference/ - backup directory for legacy code (not used)
-  * test/ - test configuration and helper files
+* `index.html` - copied to ./build
+* `build.config.js` - default build configuration
+* `karma.*` - unit test framework files
+* `build/` - all built artifacts go here
+  * `index.html` - contains the main application _div_
+  * `bundle.js` - all compiled javascript and style
+  * _images, icons, & fonts_
+* `node_modules/` - all 3rd party npm modules are install here
+  * `react/`
+  * `grommet/`
+  * _...etc..._
+* `src/` - all javascript/JSX source
+  * `shared/` - shared business logic, components and resources
+    * `assets/` - fonts and icons
+    * `boxGraphics/` - box graphic component and device drawings
+    * `components/` - ReactJS shared components
+    * `i18n/` - localization component and locale text (i.e. en-US.js)
+    * `test/` - business logic tests
+    * _business logic modules_
+  * `app/` - main application source
+    * _global scss styles, main framework, layout, navigation_
+  * `modules/` - plug-in module directories
+    * `exampleModule/` - example module directory
+      * `exampleConst.jsx` - constant definitions (i.e. client-server shared keys)
+      * `exampleDux.jsx` - Dux file for this module (imported in the build config)
+      * `examplePage.jsx` - page component (Dux will have a route component for this)
+      * `exampleDetails.jsx` - detail component (optional)
+      * `exampleEdit.jsx` - edit component (optional)
+* `tools/` - development tools (build and test)
+  * `scripts/` - script tools (tar/untar node modules)
+  * `reference/` - backup directory for legacy code (not used)
 
 License Information
 --------------------
