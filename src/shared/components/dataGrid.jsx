@@ -250,9 +250,13 @@ export default class DataGrid extends Component {
     }
 
     const sel = newProps.select;
-    const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
-    const scrollToRow = dataMap.getIndexForKey(activeDataKeys[0]);
-    this.setState({ activeDataKeys, scrollToRow });
+    if (!_.isEqual(sel, this.props.select)) {
+      const activeDataKeys = !sel ? [] : Array.isArray(sel) ? sel : [sel];
+      const scrollToRow = dataMap.getIndexForKey(activeDataKeys[0]);
+      this.setState({ activeDataKeys, scrollToRow });
+    } else {
+      this.setState({ scrollToRow: null });
+    }
   }
 
   _normalizeSelect = (activeDataKeys) => {
