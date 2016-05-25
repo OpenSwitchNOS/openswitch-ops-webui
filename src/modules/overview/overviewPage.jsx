@@ -271,8 +271,9 @@ class OverviewPage extends Component {
     }
     const entries = this.props.collector.log.entries;
     const rows = [];
+    const numEntries = entries.length;
     Object.getOwnPropertyNames(entries).forEach(k => {
-      rows.push(tr(entries[k]));
+      rows.push(tr(entries[numEntries-k]));
     });
     return (
       <table>

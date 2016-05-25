@@ -74,13 +74,14 @@ const parser = (result) => {
   const interfaceTopMetrics = metrics.top;
 
   const entries = {};
-  let logId = 1;
+  let logId = 0;
   let tsMin = 0;
   let tsMax = 0;
   if (Array.isArray(result[3].body)) {
+    logId = result[3].body.length;
     result[3].body.forEach(item => {
       const entry = {};
-      entry.id = logId++;
+      entry.id = logId--;
       entry.ts = Math.round(item.__REALTIME_TIMESTAMP / 1000);
       if (!tsMin || tsMin > entry.ts) { tsMin = entry.ts; }
       if (!tsMax || tsMax < entry.ts) { tsMax = entry.ts; }
