@@ -49,13 +49,17 @@ const ACTIONS = {
   },
 
   logout() {
+    document.cookie = 'user=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/;';
     return dispatch => {
       dispatch(AD.action('REQUEST'));
-      return dispatch(AD.action('SUCCESS', {
-        parser: () => { return { username: null, isLoggedIn: false }; }
-      }));
+      Agent
+        .post('/logout')
+        .end(() => {
+          return dispatch(AD.action('SUCCESS', {
+            parser: () => { return { username: null, isLoggedIn: false }; }
+          }));
+        });
     };
-
   },
 
   changePassword(changePw) {
