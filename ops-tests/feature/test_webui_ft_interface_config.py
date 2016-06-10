@@ -159,10 +159,8 @@ def patch_port_int_admin(step):
     assert status_code == http.client.OK, "Failed to query added Port"
     json_data = get_json(response_data)
 
-    assert (
-        json_data["configuration"] == port_data["configuration"],
+    assert json_data["configuration"] == port_data["configuration"], \
         "Configuration data is not equal that posted data"
-    )
     step("### Configuration data validated ###\n")
 
     step("\n########## Test to Validate Patch Port Int ##########\n")
@@ -174,10 +172,8 @@ def patch_port_int_admin(step):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching a Port "
+    assert status_code == http.client.NO_CONTENT, "Error patching a Port " \
         "Status code: %s Response data: %s " % (status_code, response_data)
-    )
     step("### Port Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -189,10 +185,8 @@ def patch_port_int_admin(step):
     assert status_code == http.client.OK, "Failed to query patched Port"
     json_data = get_json(response_data)
 
-    assert (
-        json_data["configuration"] == port_data["configuration"],
+    assert json_data["configuration"] == port_data["configuration"], \
         "Configuration data is not equal that posted data"
-    )
     step("### Configuration data validated ###\n")
 
     status_code, response_data = execute_request(
@@ -200,11 +194,9 @@ def patch_port_int_admin(step):
         SWITCH_IP, False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching an "
-        "Interface. Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching an " \
+        "Interface. Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Interface Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -216,10 +208,8 @@ def patch_port_int_admin(step):
     assert status_code == http.client.OK, "Failed to query patched Port"
     json_data = get_json(response_data)
 
-    assert (
-        json_data["configuration"] == int_data["configuration"],
+    assert json_data["configuration"] == int_data["configuration"], \
         "Configuration data is not equal that posted data"
-    )
     step("### Configuration data validated ###\n")
 
     step("\n########## End Test Create And Patch Port Int ##########\n")
@@ -243,11 +233,9 @@ def patch_other(step):
         SWITCH_IP, False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching an "
-        "Interface. Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching an " \
+        "Interface. Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Interface Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -259,10 +247,8 @@ def patch_other(step):
     assert status_code == http.client.OK, "Failed to query patched Port"
     json_data = get_json(response_data)
 
-    assert (
-        json_data["configuration"] == int_data["configuration"],
+    assert json_data["configuration"] == int_data["configuration"], \
         "Configuration data is not equal that posted data"
-    )
     step("### Configuration data validated ###\n")
 
     # Remove data
@@ -273,11 +259,9 @@ def patch_other(step):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching an "
-        "Interface. Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching an " \
+        "Interface. Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Interface Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -289,10 +273,8 @@ def patch_other(step):
     assert status_code == http.client.OK, "Failed to query patched Port"
     json_data = get_json(response_data)
 
-    assert (
-        json_data["configuration"] == int_data["configuration"],
+    assert json_data["configuration"] == int_data["configuration"], \
         "Configuration data is not equal that posted data"
-    )
     step("### Configuration data validated ###\n")
 
     step("\n########## End Test Create And Patch Port Int ##########\n")
