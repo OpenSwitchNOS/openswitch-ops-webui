@@ -110,10 +110,8 @@ def test_initial_config(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config "
     json_data = get_json(response_data)
-    assert (
-        "ecmp" not in list(json_data["configuration"]),
+    assert "ecmp" not in list(json_data["configuration"]), \
         "Default ECMP configuration data is non blank"
-    )
     step("### ECMP default configuration data validated ###\n")
 
 
@@ -131,11 +129,9 @@ def test_ecmp_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching a ecmp "
+    assert status_code == http.client.NO_CONTENT, "Error patching a ecmp " \
         "enable Status code: %s Response data: %s " % (status_code,
                                                        response_data)
-    )
     step("### Enable ECMP Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -146,10 +142,8 @@ def test_ecmp_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]["enabled"] == TRUE,
+    assert json_data["configuration"]["ecmp_config"]["enabled"] == TRUE, \
         "ECMP enable failed"
-    )
     step("### ECMP enable validated ###\n")
 
 
@@ -167,11 +161,9 @@ def test_ecmp_disable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching a ecmp disable Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, \
+        "Error patching a ecmp disable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Disable ECMP Patched. Status code is 204 NO CONTENT  ###\n")
 
     # Verify data
@@ -182,10 +174,8 @@ def test_ecmp_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]["enabled"] == FALSE,
+    assert json_data["configuration"]["ecmp_config"]["enabled"] == FALSE, \
         "ECMP disable failed"
-    )
     step("### ECMP disable validated ###\n")
 
 
@@ -204,11 +194,9 @@ def test_ecmp_dstip_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching ecmp dest ip enable Status code: "
+    assert status_code == http.client.NO_CONTENT, \
+        "Error patching ecmp dest ip enable Status code: " \
         "%s Response data: %s " % (status_code, response_data)
-    )
     step("### Enable Dest IP ECMP Patched. "
          "Status code is 204 NO CONTENT  ###\n")
 
@@ -220,10 +208,8 @@ def test_ecmp_dstip_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_dstip_enabled"] == TRUE, "ECMP dest IP enable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_dstip_enabled"] \
+        == TRUE, "ECMP dest IP enable failed"
     step("### ECMP dest IP enable validated ###\n")
 
 
@@ -242,11 +228,9 @@ def test_ecmp_dstip_disable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching ecmp dest ip disable Status code:"
+    assert status_code == http.client.NO_CONTENT, \
+        "Error patching ecmp dest ip disable Status code:" \
         "%s Response data: %s " % (status_code, response_data)
-    )
     step("### Disable Dest IP ECMP Patched. "
          "Status code is 204 NO CONTENT  ###\n")
 
@@ -258,11 +242,8 @@ def test_ecmp_dstip_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_dstip_enabled"] == FALSE,
-        "ECMP dest IP disable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_dstip_enabled"] \
+        == FALSE, "ECMP dest IP disable failed"
     step("### ECMP dest IP disable validated ###\n")
 
 
@@ -281,11 +262,9 @@ def test_ecmp_srcip_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching ecmp source ip enable Status code: "
+    assert status_code == http.client.NO_CONTENT, \
+        "Error patching ecmp source ip enable Status code: " \
         "%s Response data: %s " % (status_code, response_data)
-    )
     step("### Enable Source IP ECMP Patched. Status code is "
          "204 NO CONTENT  ###\n")
 
@@ -297,11 +276,8 @@ def test_ecmp_srcip_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_srcip_enabled"] == TRUE,
-        "ECMP source IP enable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_srcip_enabled"] \
+        == TRUE, "ECMP source IP enable failed"
     step("### ECMP source IP enable validated ###\n")
 
 
@@ -320,11 +296,9 @@ def test_ecmp_srcip_disable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching ecmp source ip disable Status code: %s Response "
+    assert status_code == http.client.NO_CONTENT, \
+        "Error patching ecmp source ip disable Status code: %s Response " \
         "data: %s " % (status_code, response_data)
-    )
     step("### Disable Source IP ECMP Patched. Status code is 204 "
          "NO CONTENT  ###\n")
 
@@ -336,11 +310,8 @@ def test_ecmp_srcip_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_srcip_enabled"] == FALSE,
-        "ECMP source IP disable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_srcip_enabled"] \
+        == FALSE, "ECMP source IP disable failed"
     step("### ECMP source IP disable validated ###\n")
 
 
@@ -359,11 +330,9 @@ def test_ecmp_dstport_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching ecmp dest "
-        "port enable Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching ecmp dest " \
+        "port enable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Enable Dest port ECMP Patched. Status code is 204 "
          "NO CONTENT  ###\n")
 
@@ -375,11 +344,8 @@ def test_ecmp_dstport_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_dstport_enabled"] == TRUE,
-        "ECMP dest port enable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_dstport_enabled"] \
+        == TRUE, "ECMP dest port enable failed"
     step("### ECMP dest port enable validated ###\n")
 
 
@@ -397,11 +363,9 @@ def test_ecmp_dstport_disable(netop_login, topology, step, sanity_check):
         PATH, "PATCH", json.dumps(ECMP_PATCH), SWITCH_IP,
         False, xtra_header=cookie_header
     )
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching ecmp dest "
-        "ecmp dest port enable Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching ecmp " \
+        "dest ecmp dest port enable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Disable Dest port ECMP Patched. Status code is 204 "
          "NO CONTENT  ###\n")
 
@@ -413,11 +377,8 @@ def test_ecmp_dstport_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_dstport_enabled"] == FALSE,
-        "ECMP dest port disable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_dstport_enabled"] \
+        == FALSE, "ECMP dest port disable failed"
     step("### ECMP dest port disable validated ###\n")
 
 
@@ -436,11 +397,9 @@ def test_ecmp_srcport_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching ecmp src "
-        "ecmp source port enable Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching ecmp src " \
+        "ecmp source port enable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("Enable Source Port ECMP Patched. Status code is 204 "
          "NO CONTENT\n")
 
@@ -452,11 +411,8 @@ def test_ecmp_srcport_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_srcport_enabled"] == TRUE,
-        "ECMP source port enable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_srcport_enabled"] \
+        == TRUE, "ECMP source port enable failed"
     step("### ECMP source port enable validated ###\n")
 
 
@@ -475,11 +431,9 @@ def test_ecmp_srcport_disable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching ecmp src "
-        "ecmp source port disable Status code: %s Response data: %s "
+    assert status_code == http.client.NO_CONTENT, "Error patching ecmp src " \
+        "ecmp source port disable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("Disable Source Port ECMP Patched. Status code is 204 "
          "NO CONTENT\n")
 
@@ -491,11 +445,8 @@ def test_ecmp_srcport_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["hash_srcport_enabled"] == FALSE,
-        "ECMP source port disable failed"
-    )
+    assert json_data["configuration"]["ecmp_config"]["hash_srcport_enabled"] \
+        == FALSE, "ECMP source port disable failed"
     step("### ECMP source port disable validated ###\n")
 
 
@@ -514,11 +465,10 @@ def test_ecmp_reshash_enable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT, "Error patching ecmp "
-        "resilient hash enable Status code: %s Response data: %s "
+    assert \
+        status_code == http.client.NO_CONTENT, "Error patching ecmp " \
+        "resilient hash enable Status code: %s Response data: %s " \
         % (status_code, response_data)
-    )
     step("### Enable Resilient Hash ECMP Patched. Status code is 204 "
          "NO CONTENT  ###\n")
 
@@ -529,11 +479,9 @@ def test_ecmp_reshash_enable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["resilient_hash_enabled"] == TRUE,
-        "ECMP resilient hash enable failed"
-    )
+    assert \
+        json_data["configuration"]["ecmp_config"]["resilient_hash_enabled"] \
+        == TRUE, "ECMP resilient hash enable failed"
     step("### ECMP resilient hash enable validated ###\n")
 
 
@@ -550,11 +498,10 @@ def test_ecmp_reshash_disable(netop_login, topology, step, sanity_check):
         False, xtra_header=cookie_header
     )
 
-    assert (
-        status_code == http.client.NO_CONTENT,
-        "Error patching ecmp resilient hash disable Status code:"
+    assert \
+        status_code == http.client.NO_CONTENT, \
+        "Error patching ecmp resilient hash disable Status code:" \
         "%s Response data: %s " % (status_code, response_data)
-    )
     step("### Disable Resilient Hash ECMP Patched. Status code is 204 "
          "NO CONTENT  ###\n")
 
@@ -565,9 +512,7 @@ def test_ecmp_reshash_disable(netop_login, topology, step, sanity_check):
 
     assert status_code == http.client.OK, "Failed to query ecmp config"
     json_data = get_json(response_data)
-    assert (
-        json_data["configuration"]["ecmp_config"]
-        ["resilient_hash_enabled"] == FALSE,
-        "ECMP resilient hash disable failed"
-    )
+    assert \
+        json_data["configuration"]["ecmp_config"]["resilient_hash_enabled"] \
+        == FALSE, "ECMP resilient hash disable failed"
     step("### ECMP resilient hash disable validated ###\n")
