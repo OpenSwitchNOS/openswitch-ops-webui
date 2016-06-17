@@ -22,7 +22,9 @@ const SVG_INF_NAME_PREFIX = 'bxGfx_';
 
 const supportsPlatform = desc => desc && (
   0 < desc.indexOf('_as6712_') ||
-  0 < desc.indexOf('_as6940_')
+  0 < desc.indexOf('_as6940_') ||
+  0 < desc.indexOf('_as6960_') ||
+  0 < desc.indexOf('_as7712_')
 );
 
 const toSvgInterfaceName = (id) => {
