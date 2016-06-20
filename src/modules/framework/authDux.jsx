@@ -31,16 +31,18 @@ const ACTIONS = {
 
   login(data) {
     const { username, password } = data;
-
     return dispatch => {
       dispatch(AD.action('REQUEST'));
+      if (username === 'root') {
+        return dispatch(AD.action('FAILURE', { error: 'rootNotAllowed'}));
+      }
       Agent
         .post('/login')
         .type('form')
         .send({ username })
         .send({ password })
         .end((error) => {
-          if (error) { return dispatch(AD.action('FAILURE', { error })); }
+          if (error) {return dispatch(AD.action('FAILURE', { error })); }
           return dispatch(AD.action('SUCCESS', {
             parser: () => { return { username, isLoggedIn: true }; }
           }));
