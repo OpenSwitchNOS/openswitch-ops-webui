@@ -194,7 +194,8 @@ class MainApp extends Component {
           value="warning"
           title={t('loginFailed')}
           onClose={() => this.props.actions.auth.clearError()}>
-        {t('reenterUserPwd')}
+        {auth.lastError === 'rootNotAllowed' ? t('rootNotAllowed') :
+          t('reenterUserPwd')}
       </StatusLayer>;
 
     // Split will only show the priority column on small screens, we make this

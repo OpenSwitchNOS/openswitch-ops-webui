@@ -51,7 +51,7 @@ import As5712 from 'boxGraphics/as5712.jsx';
 import As6712 from 'boxGraphics/as6712.jsx';
 
 const settings = {
-  disableLogin: true,
+  disableLogin: false,
   reduxLogger: true,
 
   AUTO_ACTIONS_INTERVAL: 10000,

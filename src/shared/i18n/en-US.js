@@ -202,6 +202,7 @@ export const MESSAGES = {
   reenterUserPwd: 'Please re-enter your username and password.',
   resilientHash: 'Resilience Hashing',
   retryChPw: 'Please retry by entering current passowrd and new password correctly',
+  rootNotAllowed: 'Login user root not allowed.',
   rpm: 'RPMs',
   rx: 'Rx',
   rxPackets: 'Rx Packets',
