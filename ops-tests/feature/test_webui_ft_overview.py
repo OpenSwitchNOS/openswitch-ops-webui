@@ -141,6 +141,7 @@ def overview_data(step):
     step("\n########## System Data Validated ##########\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_webui_ft_overview(topology, step, netop_login, sanity_check):
     overview_data(step)
