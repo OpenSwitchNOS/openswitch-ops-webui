@@ -280,6 +280,7 @@ def patch_other(step):
     step("\n########## End Test Create And Patch Port Int ##########\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_webui_ft_interface_config(topology, step, netop_login, sanity_check):
     patch_port_int_admin(step)

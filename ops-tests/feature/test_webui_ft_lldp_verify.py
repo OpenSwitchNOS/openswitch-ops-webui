@@ -311,6 +311,7 @@ def lldp_config(step, ops1, ops2, hs1):
     rest_lldp_interface(step, SWITCH_IP_1, COOKIE_HEADER_1)
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_webui_ft_lldp(topology, step, netop_login, sanity_check):
     hs1 = topology.get("hs1")
