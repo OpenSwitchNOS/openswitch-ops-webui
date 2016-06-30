@@ -101,6 +101,7 @@ def sanity_check():
     rest_sanity_check(SWITCH_IP)
 
 
+@mark.gate
 def test_initial_config(netop_login, topology, step, sanity_check):
     # Verify data
     status_code, response_data = execute_request(
@@ -115,6 +116,7 @@ def test_initial_config(netop_login, topology, step, sanity_check):
     step("### ECMP default configuration data validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_enable(netop_login, topology, step, sanity_check):
 
@@ -147,6 +149,7 @@ def test_ecmp_enable(netop_login, topology, step, sanity_check):
     step("### ECMP enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_disable(netop_login, topology, step, sanity_check):
 
@@ -179,6 +182,7 @@ def test_ecmp_disable(netop_login, topology, step, sanity_check):
     step("### ECMP disable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_dstip_enable(netop_login, topology, step, sanity_check):
 
@@ -213,6 +217,7 @@ def test_ecmp_dstip_enable(netop_login, topology, step, sanity_check):
     step("### ECMP dest IP enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_dstip_disable(netop_login, topology, step, sanity_check):
 
@@ -247,6 +252,7 @@ def test_ecmp_dstip_disable(netop_login, topology, step, sanity_check):
     step("### ECMP dest IP disable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_srcip_enable(netop_login, topology, step, sanity_check):
 
@@ -281,6 +287,7 @@ def test_ecmp_srcip_enable(netop_login, topology, step, sanity_check):
     step("### ECMP source IP enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_srcip_disable(netop_login, topology, step, sanity_check):
 
@@ -315,6 +322,7 @@ def test_ecmp_srcip_disable(netop_login, topology, step, sanity_check):
     step("### ECMP source IP disable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_dstport_enable(netop_login, topology, step, sanity_check):
 
@@ -349,6 +357,7 @@ def test_ecmp_dstport_enable(netop_login, topology, step, sanity_check):
     step("### ECMP dest port enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_dstport_disable(netop_login, topology, step, sanity_check):
 
@@ -382,6 +391,7 @@ def test_ecmp_dstport_disable(netop_login, topology, step, sanity_check):
     step("### ECMP dest port disable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_srcport_enable(netop_login, topology, step, sanity_check):
 
@@ -416,6 +426,7 @@ def test_ecmp_srcport_enable(netop_login, topology, step, sanity_check):
     step("### ECMP source port enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_srcport_disable(netop_login, topology, step, sanity_check):
 
@@ -450,6 +461,7 @@ def test_ecmp_srcport_disable(netop_login, topology, step, sanity_check):
     step("### ECMP source port disable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_reshash_enable(netop_login, topology, step, sanity_check):
 
@@ -485,6 +497,7 @@ def test_ecmp_reshash_enable(netop_login, topology, step, sanity_check):
     step("### ECMP resilient hash enable validated ###\n")
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_ecmp_reshash_disable(netop_login, topology, step, sanity_check):
     # disable ecmp resilient hash
