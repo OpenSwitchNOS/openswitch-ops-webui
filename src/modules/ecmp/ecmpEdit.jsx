@@ -89,14 +89,6 @@ class EcmpEdit extends Component {
           <Title>Edit ECMP</Title>
         </Header>
         <hr/>
-
-        <CheckBox id="enabled"
-            label={t('enabled')}
-            toggle
-            reverse
-            checked={ecmpDataObj.enabled === 'enabled'}
-            onChange={this._onChange} />
-        <br/>
         <br/>
         <CheckBox id="resilientHash"
             label={t('resilientHash')}
