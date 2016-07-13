@@ -50,11 +50,7 @@ TOPOLOGY = """
 
 # Ports
 [force_name=oobm] ops1:sp1
-[force_name=oobm] ops1:sp2
-[force_name=oobm] ops1:sp3
 [force_name=oobm] ops2:sp1
-[force_name=oobm] ops2:sp2
-[force_name=oobm] ops2:sp3
 
 # Links
 ops1:sp1 -- hs1:1
