@@ -50,11 +50,7 @@ TOPOLOGY = """
 
 # Ports
 [force_name=oobm] ops1:sp1
-[force_name=oobm] ops1:sp2
-[force_name=oobm] ops1:sp3
 [force_name=oobm] ops2:sp1
-[force_name=oobm] ops2:sp2
-[force_name=oobm] ops2:sp3
 
 # Links
 ops1:sp1 -- hs1:1
@@ -62,7 +58,6 @@ ops1:sp2 -- ops2:sp2
 ops1:sp3 -- ops2:sp3
 ops2:sp1 -- hs2:1
 """
-
 
 SWITCH_IP_1 = None
 SWITCH_IP_2 = None
