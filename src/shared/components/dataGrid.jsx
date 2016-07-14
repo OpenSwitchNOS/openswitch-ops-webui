@@ -19,7 +19,7 @@ import './dataGrid.scss';
 import React, { PropTypes, Component } from 'react';
 import { t } from 'i18n/lookup.js';
 import _ from 'lodash';
-import { Table, Column, Cell } from 'fixed-data-table';
+import { Table, Column, Cell } from 'fixed-data-table-2';
 import Search from 'grommet/components/Search';
 import DownIcon from 'grommet/components/icons/base/LinkDown';
 import UpIcon from 'grommet/components/icons/base/LinkUp';
@@ -478,6 +478,7 @@ export default class DataGrid extends Component {
             onRowClick={this._onRowClick}
             rowClassNameGetter={this._rowClassName}
             scrollToRow={this.state.scrollToRow}
+            touchScrollEnabled
         >
           {columns}
         </Table>
