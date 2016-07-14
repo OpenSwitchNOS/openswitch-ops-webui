@@ -130,16 +130,16 @@ function parseInterface(inf) {
 
   let splitParent = '';
   let splitChildren = [];
-  if (cfg.split_children) {
-    splitChildren = formatUrl(cfg.split_children);
+  if (status.split_children) {
+    splitChildren = formatUrl(status.split_children);
   }
-  if (cfg.split_parent) {
-    splitParent = formatUrl(cfg.split_parent);
+  if (status.split_parent) {
+    splitParent = formatUrl(status.split_parent);
     connector = '';
   }
 
   return {
-    id: cfg.name,
+    id: status.name,
     cfgAdmin,
     cfgDuplex,
     cfgAutoNeg,
@@ -166,8 +166,7 @@ const pageParser = (result) => {
   const allInterfaces = {};
   const interfaces = {};
   result.body.forEach((elm) => {
-    const cfg = elm.configuration;
-    if (cfg.type === 'system') {
+    if (elm.status.type === 'system') {
       const inf = parseInterface(elm);
       allInterfaces[inf.id] = inf;
     }
@@ -233,7 +232,7 @@ const editParser = (result) => {
     [C.FLOW_CTRL]: (uc && uc[C.FLOW_CTRL]) || C.FLOW_CTRL_DEF,
     [C.LANE_SPLIT]: (uc && uc[C.LANE_SPLIT]) || C.LANE_SPLIT_DEF,
   };
-  const id = cfg.name;
+  const id = result.infId;
   const etag = result[0].headers.etag;
   const inf = { [C.USER_CFG]: userCfg, etag };
   // parse the port (if available)
@@ -403,6 +402,7 @@ const ACTIONS = {
         }
       ], (error, result) => {
         if (error) { return dispatch(AD.action('FAILURE', { error })); }
+        result.infId = infId;
         return dispatch(AD.action('SUCCESS', { result, parser: editParser }));
       });
     };

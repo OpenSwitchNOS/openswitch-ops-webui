@@ -43,11 +43,10 @@ const parser = (result) => {
   const now = Date.now();
   const interfaces = {};
   result[2].body.forEach((elm) => {
-    const cfg = elm.configuration;
     const status = elm.status;
     const stats = elm.statistics.statistics;
-    if (cfg.type === 'system') {
-      const id = cfg.name;
+    if (status.type === 'system') {
+      const id = status.name;
       const linkState = status.link_state;
 
       if (linkState === 'up') {
