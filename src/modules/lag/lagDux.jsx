@@ -88,8 +88,8 @@ function parsePortsInfs(result) {
     if (LAG_REGEX.test(name)) {
       const status = elm.status;
 
-      const ls = status.lacp_status;
-      const bondStatus = ls && ls.bond_status;
+      const ls = status.bond_status;
+      const bondStatus = ls && ls.up;
 
       const id = name.substring(LAG_PREFIX.length);
       const vlanMode = cfg.vlan_mode;
@@ -124,7 +124,7 @@ function parsePortsInfs(result) {
     const cfg = elm.configuration;
     const stats = elm.statistics.statistics;
     const status = elm.status;
-    const id = cfg.name;
+    const id = status.name;
     const oc = cfg.other_config;
     const lacpAggrKey = oc && oc[C.LACP_AGGR_KEY];
     if (lacpAggrKey) {
@@ -148,7 +148,7 @@ function parsePortsInfs(result) {
         };
         lag.interfaces[id] = data;
       }
-    } else if (cfg.type === 'system') {
+    } else if (status.type === 'system') {
       availInterfaces[id] = { id };
     }
   });
@@ -167,7 +167,8 @@ function parsePortsInfs(result) {
   return { lags, availInterfaces };
 }
 
-const SEL_CFG = 'selector=configuration';
+const SEL_INF_STAT = 'selector=status';
+const SEL_PORT_CFG = 'selector=configuration';
 const URL_PORTS = '/rest/v1/system/ports';
 const URL_PORTS_D1 = `${URL_PORTS}?depth=1`;
 const URL_INFS = '/rest/v1/system/interfaces';
@@ -178,7 +179,7 @@ const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
 function fetchInfsSelCfg(infs, resultCb) {
   const reqs = [];
   Object.keys(infs).forEach(infId => {
-    const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+    const url = `${URL_INFS}/${infId}?${SEL_INF_STAT}`;
     reqs.push(cb => Agent.get(url).end(cb));
   });
   Async.series(reqs, resultCb);
@@ -190,8 +191,8 @@ function addInfsToLag(infs, lagId, resultCb) {
     (resArray, cb2) => {
       const reqs = [];
       resArray.forEach(res => {
-        const infId = res.body.configuration.name;
-        const url = `${URL_INFS}/${infId}?${SEL_CFG}`;
+        const infId = res.body.status.name;
+        const url = `${URL_INFS}/${infId}?${SEL_INF_STAT}`;
         const etag = res.headers.etag;
         const send = [
           {op: 'add', path: '/user_config', value: { admin: 'up'}},
@@ -214,8 +215,8 @@ function removeInfsFromLag(infs, resultCb) {
     (resArray, cb2) => {
       const reqs = [];
       resArray.forEach(res => {
-        const id = res.body.configuration.name;
-        const url = `${URL_INFS}/${id}?${SEL_CFG}`;
+        const id = res.body.status.name;
+        const url = `${URL_INFS}/${id}?${SEL_INF_STAT}`;
         const etag = res.headers.etag;
         const send = [{op: 'remove', path: `/${[C.OTHER_CFG]}`}];
         reqs.push(cb => {
@@ -269,7 +270,7 @@ function createLag(state, resultCb) {
 }
 
 function patchLag(state, resultCb) {
-  const lagUrl = `${URL_PORTS}/${LAG_PREFIX}${state.lagId}?${SEL_CFG}`;
+  const lagUrl = `${URL_PORTS}/${LAG_PREFIX}${state.lagId}?${SEL_PORT_CFG}`;
   Async.waterfall([
     cb1 => Agent.get(lagUrl).end(cb1),
     (lagRes, cb2) => {
