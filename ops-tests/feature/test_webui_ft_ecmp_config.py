@@ -100,7 +100,7 @@ def sanity_check():
     sleep(2)
     rest_sanity_check(SWITCH_IP)
 
-
+@mark.platform_incompatible(['ostl'])
 def test_initial_config(netop_login, topology, step, sanity_check):
     # Verify data
     status_code, response_data = execute_request(
