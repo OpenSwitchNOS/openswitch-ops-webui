@@ -102,6 +102,7 @@ def sanity_check():
 
 
 @mark.gate
+@mark.platform_incompatible(['ostl'])
 def test_initial_config(netop_login, topology, step, sanity_check):
     # Verify data
     status_code, response_data = execute_request(
