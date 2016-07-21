@@ -445,6 +445,7 @@ def create_l2_dynamic_lag(step):
     validate_dynamic_lag_created(step, SWITCH_IP_2, COOKIE_HEADER_2, LAG_NAME)
 
 
+@mark.gate
 @mark.platform_incompatible(['ostl'])
 def test_webui_ft_l2_dynamic_lag(topology, step, netop_login, sanity_check):
     create_l2_dynamic_lag(step)
