@@ -21,7 +21,7 @@ $linkUpColor: #0F0;
 $linkUpHoverColor: #0A0;
 $hoverColor: lighten(black, 20%);
 $canSplitColor: lighten(black, 30%);
-$activeColor: $brand-color;
+$activeColor: $brand-color-2;
 
 
 @mixin bxGfx($svgId, $cssIds) {
