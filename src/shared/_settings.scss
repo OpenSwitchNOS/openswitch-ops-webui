@@ -19,7 +19,10 @@
 
 // Grommet settings
 
+// $brand-color: #004876;
 $brand-color: #FF6F3E;
+$brand-color-2: #FF6F3E;
+// $brand-neutral-colors: (#432965, #724230, #404040, #CDCCCC);
 $brand-neutral-colors: (#432965, #724230, #3D7791, #CDCCCC);
 $brand-accent-colors: (#D0703E, #B2AA61, #6492A6);
 $brand-link-color: inherit;
@@ -41,7 +44,7 @@ $brand-grey-colors: (#333333, #3B3B3B, #434343, #666666);
 $button-secondary-color: nth($brand-neutral-colors, 2);
 
 $button-primary-text-color: #FFF;
-$button-primary-background-color: $brand-color;
+$button-primary-background-color: #004876;
 $border-radius: 8px;
 
 // Brand specific settings
@@ -49,14 +52,14 @@ $border-radius: 8px;
 $pageBgColor: #E5E5E5;
 
 $headerBgColor: #EEE;
-$headerHoverColor: $brand-color;
+$headerHoverColor: $brand-color-2;
 
 $rowHoverBgColor: #EEE;
 $rowHoverColor: #000;
 
 $rowOddBgColor: darken(#FFF, 1%);
 
-$rowActiveBgColor: lighten($brand-color, 23%);
+$rowActiveBgColor: lighten($brand-color-2, 23%);
 $rowActiveColor: #333;
 $rowActiveHoverBgColor: darken($rowActiveBgColor, 5%);
 

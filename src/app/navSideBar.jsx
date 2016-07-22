@@ -34,7 +34,6 @@ import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
 import HelpIcon from 'grommet/components/icons/base/Help';
 import WorldIcon from 'grommet/components/icons/base/Language';
 
-import BrandLogo from 'brandLogo.jsx';
 import PasswordChange from './passwordChange.jsx';
 import StatusLayer from 'statusLayer.jsx';
 
@@ -172,8 +171,8 @@ class NavSideBar extends Component {
       {chpwInfoLayer}
         <Header tag="h4" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
-            <BrandLogo />
-            {t('openSwitch')}
+            {this.props.settings.navLogo}
+            {this.props.settings.logoText}
           </Title>
           <Menu responsive={false}>
             <Anchor onClick={this._onClose}>

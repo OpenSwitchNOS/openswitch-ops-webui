@@ -47,6 +47,8 @@ const guides = [
 
 import * as i18nLocale from 'i18n/en-US.js';
 
+import { navLogo, loginLogo } from 'brandLogoOps.jsx';
+
 import As5712 from 'boxGraphics/as5712.jsx';
 import As6712 from 'boxGraphics/as6712.jsx';
 
@@ -59,6 +61,10 @@ const settings = {
   LAG_MAX_INTERFACES: 8,
 
   i18nLocale,
+
+  navLogo,
+  loginLogo,
+  logoText: 'OpenSwitch',
 
   boxGraphics: [ As5712, As6712 ],
 
