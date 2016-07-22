@@ -183,7 +183,6 @@ export const MESSAGES = {
   oldPw: 'Old Password',
   on: 'On',
   onieVersion: 'ONIE Version',
-  openSwitch: 'OpenSwitch',
   osApi: 'OpenSwitch API',
   osNet: 'OpenSwitch.Net',
   partNumber: 'Part #',

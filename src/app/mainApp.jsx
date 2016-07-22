@@ -223,6 +223,8 @@ class MainApp extends Component {
               </Box>
             </Split>
           : <LoginLayer
+              logo={this.props.settings.loginLogo}
+              logoText={this.props.settings.logoText}
               onSubmit={auth.inProgress ? null : this._onLoginSubmit}/>
         }
       </App>

@@ -381,3 +381,7 @@ u {
 .search--inline input.search__input {
   width: 160px;
 }
+
+nav.menu--primary > a:not(.button).active {
+  border-color: $brand-color-2;
+}

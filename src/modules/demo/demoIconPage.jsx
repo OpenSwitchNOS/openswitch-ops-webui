@@ -18,7 +18,7 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
 import Box from 'grommet/components/Box';
-import BrandLogo from 'brandLogo.jsx';
+import { navLogo, loginLogo } from 'brandLogoOps.jsx';
 import Section from 'grommet/components/Section';
 import SpanStatus from 'spanStatus.jsx';
 import TimeAgo from 'react-timeago';
@@ -40,9 +40,8 @@ class DemoIconPage extends Component {
     return (
       <Box>
         <Section pad={this.pad} className="pageBox" colorIndex="neutral-4">
-          <BrandLogo size="small" lightColor="grey" />
-          <BrandLogo size="medium" lightColor="grey" />
-          <BrandLogo size="large" lightColor="grey" />
+          {navLogo}
+          {loginLogo}
         </Section>
         <Section pad={this.pad} className="pageBox" >
           <SpanStatus value="ok">

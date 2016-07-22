@@ -19,7 +19,7 @@ import classNames from 'classnames';
 
 const CLASS_ROOT = 'logo-icon';
 
-export default class BrandLogo extends Component {
+class BrandLogo extends Component {
 
   static propTypes = {
     className: PropTypes.string,
@@ -49,3 +49,7 @@ export default class BrandLogo extends Component {
   }
 
 }
+
+export const navLogo = <BrandLogo />;
+
+export const loginLogo = <BrandLogo size="large" lightColor="grey"/>;

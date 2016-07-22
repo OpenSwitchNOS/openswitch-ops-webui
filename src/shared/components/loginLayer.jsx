@@ -20,14 +20,12 @@ import React, { PropTypes, Component } from 'react';
 import LoginForm from 'grommet/components/LoginForm';
 import Layer from 'grommet/components/Layer';
 
-import { t } from 'i18n/lookup.js';
-
-import BrandLogo from 'brandLogo.jsx';
-
 
 export default class LoginLayer extends Component {
 
   static propTypes = {
+    logo: PropTypes.element,
+    logoText: PropTypes.string,
     onSubmit: PropTypes.func,
   };
 
@@ -40,9 +38,9 @@ export default class LoginLayer extends Component {
     return (
       <Layer id="loginLayer" flush align="top">
         <LoginForm
-            logo={<BrandLogo size="large" lightColor="grey"/>}
+            logo={this.props.logo}
             usernameType="text"
-            title={t('openSwitch')}
+            title={this.props.logoText}
             onSubmit={this.props.onSubmit}
         />
       </Layer>

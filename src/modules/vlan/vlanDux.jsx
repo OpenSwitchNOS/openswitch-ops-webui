@@ -53,15 +53,17 @@ const parser = (result) => {
   result[1].body.forEach(elm => {
     const cfg = elm.configuration;
     const status = elm.status;
-    const id = cfg.id;
-    vlans[id] = {
-      id,
-      name: cfg.name,
-      admin: cfg.admin,
-      operState: status.oper_state,
-      operStateReason: status.oper_state_reason,
-      interfaces: {},
-    };
+    if (!status.internal_usage) {
+      const id = cfg.id;
+      vlans[id] = {
+        id,
+        name: cfg.name,
+        admin: cfg.admin,
+        operState: status.oper_state,
+        operStateReason: status.oper_state_reason,
+        interfaces: {},
+      };
+    }
   });
 
   const ports = {};

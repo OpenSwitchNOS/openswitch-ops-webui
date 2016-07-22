@@ -18,7 +18,7 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
 import Box from 'grommet/components/Box';
-import BrandLogo from 'brandLogo.jsx';
+import { navLogo } from 'brandLogoOps.jsx';
 
 class DemoColorPage extends Component {
 
@@ -35,7 +35,7 @@ class DemoColorPage extends Component {
   _mkBox(color) {
     return (
       <Box direction="row" align="center" colorIndex={color}>
-        <BrandLogo/>colorIndex="{color}"
+        {navLogo}colorIndex="{color}"
       </Box>
     );
   }
