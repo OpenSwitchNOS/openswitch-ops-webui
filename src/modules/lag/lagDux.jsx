@@ -93,8 +93,17 @@ function parsePortsInfs(result) {
 
       const id = name.substring(LAG_PREFIX.length);
       const vlanMode = cfg.vlan_mode;
-      const vlanIds = cfg.trunks || [];
-      if (cfg.tag && vlanIds.indexOf(cfg.tag) < 0) { vlanIds.push(cfg.tag); }
+      const vlanIds = [];
+
+      if (cfg.vlan_trunks) {
+        cfg.vlan_trunks.forEach(vurl => {
+          vlanIds.push(vurl.split('/').pop());
+        });
+      }
+
+      if (cfg.vlan_tag) {
+        vlanIds.push(cfg.vlan_tag[0].split('/').pop());
+      }
 
       const lag = {
         name,
@@ -174,6 +183,7 @@ const URL_PORTS_D1 = `${URL_PORTS}?depth=1`;
 const URL_INFS = '/rest/v1/system/interfaces';
 const URL_INFS_D1 = `${URL_INFS}?depth=1`;
 const URL_BRIDGE = '/rest/v1/system/bridges/bridge_normal';
+const DEF_VLAN = '/rest/v1/system/bridges/bridge_normal/vlans/DEFAULT_VLAN_1';
 
 
 function fetchInfsSelCfg(infs, resultCb) {
@@ -258,7 +268,7 @@ function createLag(state, resultCb) {
   const send = {
     configuration: {
       name: `lag${state.lagId}`,
-      tag: 1,
+      'vlan_tag': [DEF_VLAN],
       lacp: state[C.AGGR_MODE],
       'vlan_mode': 'access',
       interfaces: infsUrls,

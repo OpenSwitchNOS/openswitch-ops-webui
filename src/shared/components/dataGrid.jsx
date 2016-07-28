@@ -174,7 +174,8 @@ export default class DataGrid extends Component {
   _filterRowData = (rowData, filterText) => {
     const trimmedRowData = this._trimRowDataToCols(rowData);
     const keys = Object.keys(trimmedRowData);
-    for (const key of keys) {
+    for (let i=0; i<keys.length; i++) {
+      const key = keys[i];
       const val = trimmedRowData[key];
       const type = typeof val;
       if (type === 'string' && val.toLowerCase().indexOf(filterText) !== -1) {
