@@ -59,7 +59,6 @@ ops1:sp3 -- ops2:sp3
 ops2:sp1 -- hs2:1
 """
 
-
 SWITCH_IP_1 = None
 SWITCH_IP_2 = None
 COOKIE_HEADER_1 = None

@@ -42,9 +42,9 @@ const parser = (result) => {
 
   const interfaces = {};
   result[0].body.forEach(elm => {
-    const cfg = elm.configuration;
-    if (cfg.type === 'system') {
-      const id = cfg.name;
+    const status = elm.status;
+    if (status.type === 'system') {
+      const id = status.name;
       interfaces[id] = { id };
     }
   });
@@ -55,7 +55,7 @@ const parser = (result) => {
     const status = elm.status;
     if (!status.internal_usage) {
       const id = cfg.id;
-      vlans[id] = {
+      vlans[cfg.name] = { // for the URI below we need the VLAN name
         id,
         name: cfg.name,
         admin: cfg.admin,
@@ -73,16 +73,20 @@ const parser = (result) => {
       const id = cfg.name;
       const data = {
         id,
-        tag: cfg.tag,
-        trunks: cfg.trunks,
+        tag: cfg.vlan_tag,
+        trunks: cfg.vlan_trunks,
         vlanMode: cfg.vlan_mode,
         interface: interfaces[id],
       };
       if (data.tag) {
-        vlans[data.tag].interfaces[id] = data;
+        const vlanName = data.tag[0].split('/').pop();
+        vlans[vlanName].interfaces[id] = data;
       }
       if (data.trunks) {
-        data.trunks.forEach(vid => vlans[vid].interfaces[id] = data);
+        data.trunks.forEach(vurl => {
+          const vlanName = vurl.split('/').pop();
+          vlans[vlanName].interfaces[id] = data;
+        });
       }
     }
   });

@@ -19,6 +19,52 @@ import ReactDOM from 'react-dom';
 import Main, { mainInit } from './src/app/main.jsx';
 import BuildConfig from 'buildConfig';
 
+/**
+ * FIX for IE - polyfill Object.keys
+ */
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
+if (!Object.keys) {
+  Object.keys = (function() {
+    const hasOwnProperty = Object.prototype.hasOwnProperty;
+    const hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString');
+    const dontEnums = [
+      'toString',
+      'toLocaleString',
+      'valueOf',
+      'hasOwnProperty',
+      'isPrototypeOf',
+      'propertyIsEnumerable',
+      'constructor'
+    ];
+    const dontEnumsLength = dontEnums.length;
+
+    return function(obj) {
+      if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+        throw new TypeError('Object.keys called on non-object');
+      }
+
+      const result = [];
+      let prop;
+      let i;
+
+      for (prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) {
+          result.push(prop);
+        }
+      }
+
+      if (hasDontEnumBug) {
+        for (i = 0; i < dontEnumsLength; i++) {
+          if (hasOwnProperty.call(obj, dontEnums[i])) {
+            result.push(dontEnums[i]);
+          }
+        }
+      }
+      return result;
+    };
+  }());
+}
+
 mainInit(BuildConfig);
 
 ReactDOM.render(
